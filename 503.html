@@ -6,22 +6,34 @@
 <title>503 — Технічні роботи | My Computer Academy</title>
 <link rel="icon" type="image/x-icon" href="/favicon.ico"/>
 <meta name="robots" content="noindex"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,-apple-system,Arial,sans-serif;background:#f0eeff;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;color:#1a1a2e}
-.card{background:#fff;border-radius:24px;padding:48px 40px;max-width:480px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(108,71,255,.12)}
-.logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:32px;text-decoration:none;color:inherit}
-.logo img{width:40px;height:40px;border-radius:50%}
-.logo span{font-weight:800;font-size:16px}
-.code{font-size:80px;font-weight:900;color:#6C47FF;line-height:1;margin-bottom:8px}
-.emoji{font-size:40px;margin-bottom:16px}
-h1{font-size:22px;font-weight:800;margin-bottom:10px}
-p{color:#666;font-size:15px;line-height:1.6;margin-bottom:24px}
-.badge{display:inline-flex;align-items:center;gap:8px;background:#fff8e1;color:#b45309;padding:10px 20px;border-radius:50px;font-size:14px;font-weight:600;margin-bottom:24px}
+body{font-family:'Inter',-apple-system,Arial,sans-serif;background:linear-gradient(135deg,#0D0C1A 0%,#1a1400 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;color:#fff}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(245,158,11,.1) 0%,transparent 55%),radial-gradient(ellipse at 80% 30%,rgba(108,71,255,.1) 0%,transparent 50%);pointer-events:none}
+.card{background:rgba(255,255,255,.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:32px;padding:64px 48px;max-width:560px;width:100%;text-align:center;position:relative;z-index:1}
+.logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:48px;text-decoration:none;color:#fff}
+.logo img{width:44px;height:44px;border-radius:50%}
+.logo span{font-weight:800;font-size:17px;opacity:.9}
+.code{font-size:clamp(96px,20vw,160px);font-weight:900;line-height:1;background:linear-gradient(135deg,#f59e0b,#fcd34d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.emoji{font-size:48px;margin:16px 0 0;display:block}
+h1{font-size:clamp(20px,4vw,28px);font-weight:800;margin:16px 0 12px}
+p{color:rgba(255,255,255,.6);font-size:16px;line-height:1.7;margin-bottom:24px}
+.status-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fcd34d;padding:10px 22px;border-radius:50px;font-size:14px;font-weight:600;margin-bottom:32px}
 .dot{width:8px;height:8px;background:#f59e0b;border-radius:50%;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.contacts{padding:16px;background:#f9f7ff;border-radius:12px;font-size:14px;color:#555}
-.contacts a{color:#6C47FF;font-weight:600;text-decoration:none}
+.actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-later{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#6C47FF;color:#fff;border-radius:14px;font-weight:700;font-size:16px;text-decoration:none;transition:all .2s;box-shadow:0 4px 20px rgba(108,71,255,.5)}
+.btn-later:hover{background:#5533EE;transform:translateY(-2px)}
+.contact{margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);font-size:14px;color:rgba(255,255,255,.4)}
+.contact a{color:rgba(178,151,255,.85);font-weight:600;text-decoration:none}
+.contact a:hover{color:#a78bfa}
+@media(max-width:500px){
+  .card{padding:44px 24px;border-radius:24px}
+  .actions{flex-direction:column}
+  .btn-later{justify-content:center}
+}
 </style>
 </head>
 <body>
@@ -31,13 +43,16 @@ p{color:#666;font-size:15px;line-height:1.6;margin-bottom:24px}
     <span>My Computer Academy</span>
   </a>
   <div class="code">503</div>
-  <div class="emoji">🛠️</div>
+  <span class="emoji">🛠️</span>
   <h1>Технічні роботи</h1>
-  <div class="badge"><span class="dot"></span>Сайт оновлюється</div>
-  <p>Ми проводимо технічне обслуговування та незабаром повернемося. Дякуємо за терпіння!</p>
-  <div class="contacts">
-    Зв'яжіться з нами поки: <a href="tel:+380954624672">+38 (095) 462-46-72</a><br/>
-    або у <a href="https://api.whatsapp.com/send?phone=380954624672" target="_blank">WhatsApp</a>
+  <p>Ми оновлюємо сайт та незабаром повернемося. Дякуємо за терпіння!</p>
+  <div class="status-badge"><span class="dot"></span>Сайт оновлюється</div>
+  <div class="actions">
+    <a href="javascript:location.reload()" class="btn-later">🔄 Спробувати знову</a>
+  </div>
+  <div class="contact">
+    Зв'яжіться з нами поки: <a href="tel:+380954624672">+38 (095) 462-46-72</a>
+    &nbsp;або у <a href="https://api.whatsapp.com/send?phone=380954624672" target="_blank" rel="noopener">WhatsApp</a>
   </div>
 </div>
 </body>

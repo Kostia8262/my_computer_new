@@ -283,6 +283,14 @@ SPA_ROUTES.forEach(r => app.get(r, (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'index.html'));
 }));
 
+// ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────
+app.get('/503', (req, res) => {
+  res.status(503).sendFile(path.join(__dirname, '..', '503.html'));
+});
+app.get('/test-500', (req, res, next) => {
+  next(new Error('Test 500 error'));
+});
+
 // 404 — everything else that wasn't caught by static files or API
 app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
