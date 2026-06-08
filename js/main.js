@@ -218,9 +218,15 @@ function validateForm(formEl) {
 
   const phoneEl = formEl.querySelector('[name="phone"]');
   if (phoneEl) {
+    const codeEl = formEl.querySelector('[name="phone_code"]');
+    const code   = codeEl ? codeEl.value : '+380';
     const digits = phoneEl.value.replace(/\D/g, '');
-    if (!digits) { setFieldError(phoneEl, t('phone_req'));   ok = false; }
-    else if (digits.length < 7) { setFieldError(phoneEl, t('phone_short')); ok = false; }
+    const minLen = code === '+380' ? 9 : 6;
+    const maxLen = code === '+380' ? 10 : 13;
+    if (!digits) { setFieldError(phoneEl, t('phone_req')); ok = false; }
+    else if (digits.length < minLen || digits.length > maxLen) {
+      setFieldError(phoneEl, t('phone_short')); ok = false;
+    }
   }
 
   const ageEl = formEl.querySelector('[name="age"]');

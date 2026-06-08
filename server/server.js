@@ -21,18 +21,18 @@ const cors         = require('cors');
 const helmet       = require('helmet');
 const rateLimit    = require('express-rate-limit');
 const path         = require('path');
-const db           = require('./database');
+const db             = require('./database');
+const adminsDb       = require('./admins');
 const { sendLeadNotification } = require('./mailer');
 
-const app          = express();
-const PORT         = process.env.PORT || 3000;
-const ADMIN_TOKEN  = process.env.ADMIN_TOKEN;
+const app            = express();
+const PORT           = process.env.PORT || 3000;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+// Support both SUPERADMIN_TOKEN (new) and ADMIN_TOKEN (legacy)
+const SUPERADMIN_TOKEN = process.env.SUPERADMIN_TOKEN || process.env.ADMIN_TOKEN;
 
-// ── SECURITY: warn if token is missing ──────────────────────────────────────
-if (!ADMIN_TOKEN || ADMIN_TOKEN === 'changeme-secret-token') {
-  console.warn('⚠️  WARNING: ADMIN_TOKEN is not set or uses default value!');
-  console.warn('   Set a strong token in .env before deploying to production.');
+if (!SUPERADMIN_TOKEN) {
+  console.warn('⚠️  WARNING: SUPERADMIN_TOKEN / ADMIN_TOKEN is not set in .env!');
 }
 
 // ── SECURITY HEADERS (helmet) ────────────────────────────────────────────────
@@ -110,11 +110,30 @@ function validateLead(data) {
   return errors;
 }
 
+// Returns 'superadmin' | 'admin' | null
+function getRole(token) {
+  if (!token) return null;
+  if (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) return 'superadmin';
+  if (adminsDb.findByToken(token)) return 'admin';
+  return null;
+}
+
 function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'] || req.query.token;
-  if (!ADMIN_TOKEN || token !== ADMIN_TOKEN) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  const role  = getRole(token);
+  if (!role) return res.status(401).json({ error: 'Unauthorized' });
+  req.role  = role;
+  req.token = token;
+  next();
+}
+
+function requireSuperAdmin(req, res, next) {
+  const token = req.headers['x-admin-token'] || req.query.token;
+  if (!SUPERADMIN_TOKEN || token !== SUPERADMIN_TOKEN) {
+    return res.status(403).json({ error: 'Forbidden: superadmin only' });
   }
+  req.role  = 'superadmin';
+  req.token = token;
   next();
 }
 
@@ -123,6 +142,38 @@ function requireAdmin(req, res, next) {
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
+});
+
+// GET /api/me — returns current user role
+app.get('/api/me', adminLimiter, requireAdmin, (req, res) => {
+  const info = req.role === 'superadmin'
+    ? { role: 'superadmin', name: 'Супер-адмін' }
+    : (() => { const a = adminsDb.findByToken(req.token); return { role: 'admin', name: a?.name || 'Адмін' }; })();
+  res.json({ success: true, ...info });
+});
+
+// ── ADMIN MANAGEMENT (superadmin only) ───────────────────────────────────────
+app.get('/api/admins', adminLimiter, requireSuperAdmin, (req, res) => {
+  res.json({ success: true, admins: adminsDb.getAll() });
+});
+
+app.post('/api/admins', adminLimiter, requireSuperAdmin, (req, res) => {
+  const name = sanitize(req.body.name || '');
+  if (!name || name.length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я адміністратора' });
+  const admin = adminsDb.create(name);
+  res.status(201).json({ success: true, admin });
+});
+
+app.patch('/api/admins/:id/revoke', adminLimiter, requireSuperAdmin, (req, res) => {
+  const admin = adminsDb.revoke(parseInt(req.params.id));
+  if (!admin) return res.status(404).json({ error: 'Not found' });
+  res.json({ success: true, admin });
+});
+
+app.delete('/api/admins/:id', adminLimiter, requireSuperAdmin, (req, res) => {
+  const ok = adminsDb.delete(parseInt(req.params.id));
+  if (!ok) return res.status(404).json({ error: 'Not found' });
+  res.json({ success: true });
 });
 
 // POST /api/leads — submit lead (rate-limited)
@@ -204,8 +255,8 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
   }
 });
 
-// DELETE /api/leads/:id
-app.delete('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
+// DELETE /api/leads/:id — superadmin only
+app.delete('/api/leads/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   const id = parseInt(req.params.id);
   try {
     const r = db.deleteLead(id);
