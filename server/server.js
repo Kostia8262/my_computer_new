@@ -214,8 +214,13 @@ app.delete('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
   }
 });
 
-// Admin panel
+// Admin panel — no cache so updates apply immediately
 app.get('/admin', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, '..', 'admin.html'));
+});
+app.get('/admin.html', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
   res.sendFile(path.join(__dirname, '..', 'admin.html'));
 });
 
