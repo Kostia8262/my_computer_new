@@ -6,7 +6,7 @@
 <title>Admin — My Computer Academy</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,Arial,sans-serif;background:#f0eeff;color:#1a1a2e;min-height:100vh}
+body{font-family:Inter,Arial,sans-serif;background:#f0eeff;color:#1a1a2e;min-height:100vh;overflow-x:hidden}
 a{color:#6C47FF;text-decoration:none}
 
 /* LOGIN */
@@ -23,7 +23,7 @@ a{color:#6C47FF;text-decoration:none}
 .logo-icon{width:36px;height:36px;background:#6C47FF;border-radius:8px;display:flex;align-items:center;justify-content:center}
 
 /* LAYOUT */
-.app{display:none;flex-direction:column;min-height:100vh}
+.app{display:none;flex-direction:column;min-height:100vh;overflow:hidden}
 .topbar{background:#fff;border-bottom:1px solid #e8e4ff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
 .topbar-right{display:flex;align-items:center;gap:12px}
@@ -33,7 +33,7 @@ a{color:#6C47FF;text-decoration:none}
 .btn-danger{background:#fff0f0;color:#e53e3e;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
 .btn-sm{padding:5px 10px;font-size:12px}
 
-.main{padding:24px;max-width:1200px;margin:0 auto;width:100%}
+.main{padding:24px;overflow-y:auto;flex:1;min-width:0;height:calc(100vh - 56px)}
 
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
@@ -95,7 +95,172 @@ tr:hover td{background:#faf9ff}
   .main{padding:14px}
   .topbar{padding:0 14px}
   th,td{padding:9px 10px}
+  .cms-grid2{grid-template-columns:1fr}
+  .cms-features-row{grid-template-columns:1fr}
 }
+
+/* ALERTS PANEL */
+.alerts-panel{background:#fff;border:1.5px solid #fecaca;border-radius:12px;margin-bottom:20px;overflow:hidden}
+.alerts-panel.ok{border-color:#e8f5e9}
+.alerts-panel__header{display:flex;align-items:center;gap:10px;padding:12px 18px;cursor:pointer;user-select:none}
+.alerts-panel__title{font-weight:700;font-size:14px;flex:1}
+.alerts-panel__badge{background:#dc2626;color:#fff;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700}
+.alerts-panel__badge.ok{background:#15803d}
+.alerts-panel__body{padding:0 18px 14px;display:none}
+.alerts-panel__body.open{display:block}
+.alert-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #f8f7ff;align-items:flex-start}
+.alert-item:last-child{border-bottom:none}
+.alert-item__sev{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.sev-high{background:#dc2626}.sev-medium{background:#f59e0b}.sev-low{background:#6C47FF}
+.alert-item__info{flex:1}
+.alert-item__msg{font-size:13px;font-weight:600;margin-bottom:3px}
+.alert-item__hint{font-size:12px;color:#888}
+.alert-item__btn{font-size:11px;padding:4px 10px;white-space:nowrap}
+
+/* CLIENTS TAB */
+.client-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.cs-new{background:#e8f4ff;color:#2563eb}
+.cs-trial{background:#f0e8ff;color:#7c3aed}
+.cs-active{background:#e8f5e9;color:#15803d}
+.cs-paused{background:#fef9e7;color:#b45309}
+.cs-completed{background:#f0fdf4;color:#166534}
+.cs-churned{background:#fff0f0;color:#dc2626}
+
+/* CLIENT MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.modal-box{background:#fff;border-radius:16px;padding:28px;max-width:640px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+@media(max-width:520px){.modal-grid{grid-template-columns:1fr}.modal-box{padding:20px}}
+.modal-box h3{font-size:18px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-group{display:flex;flex-direction:column;gap:4px}
+.modal-group.full{grid-column:1/-1}
+.modal-label{font-size:12px;font-weight:600;color:#888}
+.modal-input{padding:8px 12px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:13px;outline:none;font-family:inherit}
+.modal-input:focus{border-color:#6C47FF}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+@media(max-width:600px){.modal-grid{grid-template-columns:1fr}}
+
+/* SIDEBAR LAYOUT */
+.app-body{display:flex;flex:1;min-height:0;overflow:hidden}
+.sidebar{width:218px;background:#fff;border-right:1px solid #e8e4ff;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-nav{padding:14px 10px;flex:1}
+.sidebar-section{font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.8px;padding:16px 10px 6px}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-size:13.5px;font-weight:600;color:#555;cursor:pointer;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.sidebar-item:hover{background:#f0eeff;color:#6C47FF}
+.sidebar-item.active{background:#6C47FF;color:#fff}
+.sidebar-icon{font-size:15px;width:20px;flex-shrink:0;text-align:center}
+.main{flex:1;padding:24px;overflow-y:auto;min-width:0}
+@media(max-width:900px){
+  .sidebar{width:58px}
+  .sidebar-item span:not(.sidebar-icon){display:none}
+  .sidebar-section{display:none}
+  .sidebar-item{justify-content:center;padding:10px}
+  .main{padding:14px}
+}
+
+/* CLIENT SUB-TABS */
+.client-subtabs{display:flex;gap:4px;margin-bottom:20px;background:#f0eeff;padding:4px;border-radius:10px}
+.csub-btn{flex:1;padding:8px 10px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#6C47FF;transition:all .15s;text-align:center}
+.csub-btn.active{background:#fff;color:#6C47FF;box-shadow:0 1px 6px rgba(108,71,255,.15)}
+.csub-btn:hover:not(.active){background:rgba(255,255,255,.55)}
+
+/* ATTENDANCE CALENDAR */
+.att-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.att-month-nav{display:flex;align-items:center;gap:8px}
+.att-month-label{font-size:15px;font-weight:800;min-width:160px;text-align:center}
+.att-wrap{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #e8e4ff}
+.att-table{border-collapse:collapse;font-size:12px}
+.att-table th{padding:8px 4px;text-align:center;font-size:11px;font-weight:700;color:#888;border-bottom:1px solid #f0eeff;white-space:nowrap;background:#faf9ff}
+.att-table th.aname{text-align:left;padding-left:14px;min-width:150px;background:#faf9ff}
+.att-table th.acourse{min-width:80px;background:#faf9ff}
+.att-table td{padding:3px;text-align:center;vertical-align:middle;border-bottom:1px solid #f8f7ff}
+.att-table td.aname{padding:8px 14px;text-align:left;font-weight:600;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.att-table td.acourse{padding:4px 8px;font-size:11px;color:#888;white-space:nowrap}
+.att-table tr:last-child td{border-bottom:none}
+.att-cell{width:24px;height:24px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;transition:transform .1s;user-select:none;border:1px solid transparent;margin:1px}
+.att-cell:hover{transform:scale(1.25);z-index:1;position:relative}
+.att-none{background:#f0f0f0;color:#bbb}
+.att-present{background:#86efac;color:#15803d;border-color:#4ade80}
+.att-absent{background:#fca5a5;color:#dc2626;border-color:#f87171}
+.att-makeup{background:#fde68a;color:#92400e;border-color:#fbbf24}
+.att-cancelled{background:#d1d5db;color:#6b7280;border-color:#9ca3af}
+.att-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;align-items:center;color:#666}
+.att-legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
+.att-legend-item{display:flex;align-items:center;gap:5px}
+.att-scheduled{background:#ede9fe;color:#7c3aed;border-color:#c4b5fd}
+.att-drop{position:fixed;z-index:9999;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);border:1px solid #e8e4ff;padding:5px;min-width:155px}
+.att-drop-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:none;cursor:pointer;border-radius:6px;font-size:12px;font-weight:600;text-align:left;color:#333}
+.att-drop-btn:hover{background:#f0eeff}
+.att-drop-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+/* Schedule pickers in client modal */
+.sched-row{display:flex;gap:8px;margin-bottom:6px}
+.sched-row select{flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff}
+.sched-row select:focus{outline:none;border-color:#6C47FF}
+/* Schedule quick-edit popup */
+.sched-popup{position:fixed;z-index:9999;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(108,71,255,.18);border:1px solid #e8e4ff;padding:16px;min-width:260px}
+.sched-popup h5{font-size:13px;font-weight:700;margin-bottom:10px;color:#333}
+.sched-popup-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
+.sched-popup-row label{font-size:11px;color:#888;min-width:40px}
+.sched-popup-row select{flex:1;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px}
+.sched-popup-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;border-top:1px solid #f0eeff;padding-top:10px}
+
+/* PAYMENTS SUB-TAB */
+.pay-table{width:100%;border-collapse:collapse;font-size:13px}
+.pay-table th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #f0eeff;white-space:nowrap;background:#faf9ff}
+.pay-table td{padding:10px 12px;border-bottom:1px solid #f8f7ff;vertical-align:middle}
+.pay-table tr:last-child td{border-bottom:none}
+.pay-table tr:hover td{background:#faf9ff}
+.debt-red{color:#dc2626;font-weight:700}
+.debt-ok{color:#15803d;font-weight:600}
+
+/* MONTHLY PAYMENTS */
+.pay-month-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between;background:#fff;border-radius:10px;padding:12px 16px;border:1px solid #e8e4ff}
+.pay-month-nav{display:flex;align-items:center;gap:6px}
+.pay-month-label{font-size:15px;font-weight:800;min-width:155px;text-align:center}
+.pay-alert{background:#fff0f0;border:1.5px solid #fecaca;border-radius:10px;padding:12px 16px;margin-bottom:14px}
+.pay-alert-title{font-size:13px;font-weight:700;color:#dc2626;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.pay-alert-names{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.pay-alert-badge{background:#fecaca;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600;color:#991b1b;white-space:nowrap}
+.mp-status-sel{padding:3px 7px;border-radius:6px;font-size:12px;font-weight:700;border:1.5px solid transparent;cursor:pointer;outline:none;min-width:120px}
+.mp-status-pending{background:#fff0f0;color:#dc2626;border-color:#fecaca}
+.mp-status-paid{background:#e8f5e9;color:#15803d;border-color:#a7f3d0}
+.mp-status-partial{background:#fef9e7;color:#b45309;border-color:#fde68a}
+.mp-status-waived{background:#e8f4ff;color:#2563eb;border-color:#bfdbfe}
+.mp-status-completed{background:#f5f5f5;color:#888;border-color:#e0e0e0}
+.mp-inline{padding:4px 7px;border:1.5px solid #e0d9ff;border-radius:6px;font-size:12px;outline:none;background:#fff;width:100%;min-width:60px}
+.mp-inline:focus{border-color:#6C47FF}
+.mp-no-month{text-align:center;padding:40px 20px;color:#888}
+.mp-no-month h3{font-size:16px;margin-bottom:8px;color:#444}
+.mp-month-del{color:#dc2626;background:none;border:none;cursor:pointer;font-size:12px;padding:3px 6px;opacity:0.6}
+.mp-month-del:hover{opacity:1}
+
+/* PAY HISTORY MODAL */
+.pay-hist-list{max-height:320px;overflow-y:auto;margin-top:12px}
+.pay-hist-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0eeff}
+.pay-hist-item:last-child{border-bottom:none}
+.pay-hist-amount{font-weight:700;font-size:15px;color:#6C47FF;min-width:80px}
+.pay-hist-date{font-size:12px;color:#888;min-width:85px}
+.pay-hist-method{font-size:11px;background:#f0eeff;color:#6C47FF;padding:2px 7px;border-radius:10px;font-weight:600}
+.pay-hist-note{font-size:12px;color:#666;flex:1}
+
+/* CONTENT CMS */
+.cms-section{margin-bottom:32px}
+.cms-section-title{font-size:16px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cms-save-btn{margin-left:auto}
+.cms-card{background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:20px;margin-bottom:14px}
+.cms-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-weight:700;font-size:14px;color:#6C47FF;flex-wrap:wrap;gap:8px}
+.cms-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cms-label{display:block;font-size:12px;font-weight:600;color:#888;margin-bottom:4px}
+.cms-input{width:100%;padding:8px 12px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:13px;outline:none;font-family:inherit}
+.cms-input:focus{border-color:#6C47FF}
+.cms-textarea{width:100%;padding:8px 12px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:13px;outline:none;resize:vertical;font-family:inherit;min-height:72px}
+.cms-textarea:focus{border-color:#6C47FF}
+.cms-subtabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.cms-subtab{padding:7px 16px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1.5px solid #e0d9ff;background:#f0eeff;color:#6C47FF;transition:all .15s}
+.cms-subtab.active,.cms-subtab:hover{background:#6C47FF;color:#fff;border-color:#6C47FF}
+.cms-features-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.lang-flag{font-size:10px;opacity:.7;margin-right:2px}
+.cms-toggle{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -126,14 +291,39 @@ tr:hover td{background:#faf9ff}
       <span id="roleBadge" style="font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;margin-left:8px"></span>
     </div>
     <div class="topbar-right">
-      <button class="btn btn-ghost btn-sm superadmin-only" id="adminsTabBtn" onclick="showTab('admins')" style="display:none">👥 Адміни</button>
-      <button class="btn btn-ghost btn-sm" onclick="showTab('leads')">📋 Заявки</button>
       <a href="/" target="_blank" class="btn btn-ghost btn-sm">← Сайт</a>
-      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📥 CSV</button>
-      <button class="btn btn-ghost btn-sm" onclick="loadLeads()">🔄 Оновити</button>
+      <button class="btn btn-ghost btn-sm" id="csvExportBtn" onclick="exportCSV()" style="display:none" title="Завантажити CSV">📥 CSV</button>
+      <button class="btn btn-ghost btn-sm" id="csvImportBtn" onclick="triggerImport()" style="display:none" title="Імпортувати CSV">📤 Імпорт</button>
+      <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importCSV(this)"/>
+      <button class="btn btn-ghost btn-sm" id="reloadBtn" onclick="reloadCurrentTab()" title="Оновити">🔄</button>
       <button class="btn btn-ghost btn-sm" onclick="doLogout()">Вийти</button>
     </div>
   </div>
+
+  <div class="app-body">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebarEl">
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Навігація</div>
+      <button class="sidebar-item active" id="sideNav-leads" onclick="showTab('leads')">
+        <span class="sidebar-icon">📋</span><span>Заявки</span>
+      </button>
+      <button class="sidebar-item" id="sideNav-clients" onclick="showTab('clients')">
+        <span class="sidebar-icon">🗂</span><span>База клієнтів</span>
+      </button>
+      <button class="sidebar-item" id="sideNav-courses" onclick="showTab('courses')">
+        <span class="sidebar-icon">🎓</span><span>Курси</span>
+      </button>
+      <button class="sidebar-item" id="sideNav-content" onclick="showTab('content')">
+        <span class="sidebar-icon">✏️</span><span>Контент</span>
+      </button>
+      <div class="sidebar-section">Налаштування</div>
+      <button class="sidebar-item superadmin-only" id="sideNav-admins" onclick="showTab('admins')" style="display:none">
+        <span class="sidebar-icon">👥</span><span>Адміни</span>
+      </button>
+    </nav>
+  </div>
+  <!-- /SIDEBAR -->
 
   <div class="main">
     <!-- ADMINS TAB (superadmin only) -->
@@ -179,6 +369,302 @@ tr:hover td{background:#faf9ff}
           </tr></thead>
           <tbody id="adminsBody"></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- ALERTS PANEL (always visible) -->
+    <div class="alerts-panel" id="alertsPanel">
+      <div class="alerts-panel__header" onclick="toggleAlerts()">
+        <span style="font-size:16px">⚠️</span>
+        <span class="alerts-panel__title" id="alertsTitle">Завантаження підказок...</span>
+        <span class="alerts-panel__badge" id="alertsBadge">...</span>
+        <span id="alertsChevron" style="font-size:12px;color:#888">▼</span>
+      </div>
+      <div class="alerts-panel__body" id="alertsBody"></div>
+    </div>
+
+    <!-- CLIENT MODAL -->
+    <div class="modal-overlay" id="clientModal" style="display:none" onclick="if(event.target===this)closeClientModal()">
+      <div class="modal-box">
+        <h3><span id="clientModalTitle">Новий клієнт</span><button class="btn btn-ghost btn-sm" onclick="closeClientModal()">✕</button></h3>
+        <div class="modal-grid">
+          <div class="modal-group"><label class="modal-label">Ім'я *</label><input class="modal-input" id="cf_name" placeholder="Артем"/></div>
+          <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="cf_age" type="number" placeholder="10" min="4" max="80"/></div>
+          <div class="modal-group"><label class="modal-label">Курс</label>
+            <select class="modal-input course-dynamic-select" id="cf_course">
+              <option value="">— Оберіть —</option>
+              <option value="scratch">🧩 Scratch</option><option value="python">🐍 Python</option>
+              <option value="roblox">🎮 Roblox</option><option value="web">🌐 Веб-розробка</option>
+              <option value="other">Інше</option>
+            </select>
+          </div>
+          <div class="modal-group"><label class="modal-label">Телефон *</label><input class="modal-input" id="cf_phone" placeholder="+380954624672"/></div>
+          <div class="modal-group"><label class="modal-label">Email</label><input class="modal-input" id="cf_email" type="email" placeholder="email@gmail.com"/></div>
+          <div class="modal-group"><label class="modal-label">Статус</label>
+            <select class="modal-input" id="cf_status">
+              <option value="new">🔵 Новий</option><option value="trial">🟣 Пробний урок</option>
+              <option value="active">🟢 Активний</option><option value="paused">🟡 Пауза</option>
+              <option value="completed">✅ Завершив курс</option><option value="churned">🔴 Відмовився</option>
+            </select>
+          </div>
+          <div class="modal-group"><label class="modal-label">Джерело</label>
+            <select class="modal-input" id="cf_source">
+              <option value="website">🌐 Сайт</option><option value="referral">👥 Рекомендація</option>
+              <option value="social">📱 Соцмережі</option><option value="phone">📞 Телефон</option>
+              <option value="walk-in">🚶 Прийшов сам</option><option value="other">Інше</option>
+            </select>
+          </div>
+          <div class="modal-group"><label class="modal-label">Місячний внесок (грн)</label><input class="modal-input" id="cf_monthlyFee" type="number" placeholder="3800"/></div>
+          <div class="modal-group"><label class="modal-label">Разом сплачено (грн)</label><input class="modal-input" id="cf_totalPaid" type="number" placeholder="0"/></div>
+          <div class="modal-group"><label class="modal-label">Дата запису</label><input class="modal-input" id="cf_enrolledDate" type="date"/></div>
+          <div class="modal-group"><label class="modal-label">Дата пробного уроку</label><input class="modal-input" id="cf_trialDate" type="date"/></div>
+          <div class="modal-group"><label class="modal-label">Останній контакт</label><input class="modal-input" id="cf_lastContact" type="date"/></div>
+          <div class="modal-group"><label class="modal-label">Наступний дзвінок 📅</label><input class="modal-input" id="cf_nextContact" type="date"/></div>
+          <div class="modal-group"><label class="modal-label">Менеджер</label><input class="modal-input" id="cf_manager" placeholder="Ім'я менеджера"/></div>
+          <div class="modal-group"><label class="modal-label">Викладач</label><input class="modal-input" id="cf_teacher" placeholder="Андрій, Ростислав…"/></div>
+          <div class="modal-group"><label class="modal-label">Формат</label>
+            <select class="modal-input" id="cf_lessonType" onchange="onLessonTypeChange(this.value)">
+              <option value="group">👥 Група (1×/тиж)</option>
+              <option value="group2">👥 Група (2×/тиж)</option>
+              <option value="individual">👤 Індивідуально</option>
+              <option value="adult">🧑 Дорослий</option>
+            </select>
+          </div>
+          <div class="modal-group full" id="scheduleSection">
+            <label class="modal-label">Розклад занять</label>
+            <div id="scheduleStructured">
+              <div class="sched-row">
+                <select id="cf_day1"><option value="">— день 1 —</option><option value="1">Понеділок</option><option value="2">Вівторок</option><option value="3">Середа</option><option value="4">Четвер</option><option value="5">П'ятниця</option><option value="6">Субота</option><option value="7">Неділя</option></select>
+                <select id="cf_time1"><option value="">— час —</option><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option><option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option><option>20:00</option></select>
+              </div>
+              <div class="sched-row" id="schedSlot2" style="display:none">
+                <select id="cf_day2"><option value="">— день 2 —</option><option value="1">Понеділок</option><option value="2">Вівторок</option><option value="3">Середа</option><option value="4">Четвер</option><option value="5">П'ятниця</option><option value="6">Субота</option><option value="7">Неділя</option></select>
+                <select id="cf_time2"><option value="">— час —</option><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option><option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option><option>20:00</option></select>
+              </div>
+            </div>
+            <div id="scheduleTextWrap" style="display:none">
+              <input class="modal-input" id="cf_scheduleNote" placeholder="вручну — напр.: пн 15:00"/>
+            </div>
+          </div>
+          <div class="modal-group"><label class="modal-label">Місто</label><input class="modal-input" id="cf_city" placeholder="Дніпро"/></div>
+          <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="cf_notes" rows="3" placeholder="Вільний текст..."></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeClientModal()">Скасувати</button>
+          <button class="btn btn-primary" onclick="saveClient()">💾 Зберегти</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COURSES TAB -->
+    <div id="coursesTab" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 style="font-size:18px;font-weight:800">🎓 Управління курсами</h2>
+        <button class="btn btn-primary btn-sm" onclick="openCourseModal(null)">+ Новий курс</button>
+      </div>
+      <div id="coursesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
+    </div>
+
+    <!-- COURSE MODAL -->
+    <div class="modal-overlay" id="courseModal" style="display:none" onclick="if(event.target===this)closeCourseModal()">
+      <div class="modal-box" style="max-width:540px">
+        <h3><span id="courseModalTitle">Новий курс</span><button class="btn btn-ghost btn-sm" onclick="closeCourseModal()">✕</button></h3>
+        <div class="modal-grid">
+          <div class="modal-group"><label class="modal-label">ID курсу *</label><input class="modal-input" id="crs_id" placeholder="scratch"/></div>
+          <div class="modal-group"><label class="modal-label">Emoji</label><input class="modal-input" id="crs_emoji" placeholder="🧩" style="font-size:20px"/></div>
+          <div class="modal-group full"><label class="modal-label">Назва курсу *</label><input class="modal-input" id="crs_name" placeholder="Scratch: візуальне програмування"/></div>
+          <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="crs_age" placeholder="6–10 років"/></div>
+          <div class="modal-group"><label class="modal-label">Тривалість</label><input class="modal-input" id="crs_duration" placeholder="3 місяці"/></div>
+          <div class="modal-group"><label class="modal-label">К-сть занять</label><input class="modal-input" type="number" id="crs_lessonsCount" placeholder="24"/></div>
+          <div class="modal-group"><label class="modal-label">Розмір групи</label><input class="modal-input" type="number" id="crs_groupSize" placeholder="6"/></div>
+          <div class="modal-group"><label class="modal-label">Ціна (₴/міс)</label><input class="modal-input" type="number" id="crs_price" placeholder="3600"/></div>
+          <div class="modal-group"><label class="modal-label">Колір (hex)</label><input class="modal-input" type="color" id="crs_color" value="#6C47FF"/></div>
+          <div class="modal-group full"><label class="modal-label">Опис</label><textarea class="modal-input" id="crs_description" rows="3" placeholder="Короткий опис для лендингу..."></textarea></div>
+          <div class="modal-group"><label class="modal-label">Статус</label>
+            <select class="modal-input" id="crs_active">
+              <option value="true">✅ Активний</option>
+              <option value="false">⏸ Прихований</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeCourseModal()">Скасувати</button>
+          <button class="btn btn-primary" onclick="saveCourse()">💾 Зберегти</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS TAB -->
+    <div id="clientsTab" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <h2 style="font-size:18px;font-weight:800">🗂 База клієнтів</h2>
+      </div>
+      <div class="stats" id="clientStatsRow" style="margin-bottom:16px"></div>
+
+      <!-- SUB-TABS -->
+      <div class="client-subtabs">
+        <button class="csub-btn active" id="csub-base" onclick="showClientsSubTab('base')">📋 База заявок</button>
+        <button class="csub-btn" id="csub-payments" onclick="showClientsSubTab('payments')">💰 Оплати</button>
+        <button class="csub-btn" id="csub-attendance" onclick="showClientsSubTab('attendance')">📅 Відвідування</button>
+      </div>
+
+      <!-- ── SUB-TAB: BASE (full clients list) ── -->
+      <div id="csubBase">
+        <div class="toolbar">
+          <input class="search" id="clientSearch" placeholder="🔍 Пошук по імені, телефону, курсу..." oninput="renderClients()"/>
+          <select class="filter-select" id="clientStatusFilter" onchange="renderClients()">
+            <option value="">Всі статуси</option>
+            <option value="new">🔵 Новий</option><option value="trial">🟣 Пробний</option>
+            <option value="active">🟢 Активний</option><option value="paused">🟡 Пауза</option>
+            <option value="completed">✅ Завершив</option><option value="churned">🔴 Відмовився</option>
+          </select>
+          <select class="filter-select" id="clientCourseFilter" onchange="renderClients()">
+            <option value="">Всі курси</option>
+            <option value="scratch">Scratch</option><option value="python">Python</option>
+            <option value="roblox">Roblox</option><option value="web">Веб</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="openClientModal(null)">+ Додати клієнта</button>
+        </div>
+        <div class="table-wrap" style="overflow-x:auto">
+          <table id="clientsTable" style="min-width:960px">
+            <thead><tr>
+              <th>#</th><th>Ім'я</th><th>Вік</th><th>Курс</th><th>Телефон</th>
+              <th>Статус</th><th>Розклад</th><th>Викладач</th><th>Внесок</th><th>Сплачено</th>
+              <th>Наст. дзвінок</th><th>Нотатки</th><th></th>
+            </tr></thead>
+            <tbody id="clientsBody"></tbody>
+          </table>
+          <div class="pager" id="clientsPager"></div>
+        </div>
+      </div>
+
+      <!-- ── SUB-TAB: PAYMENTS ── -->
+      <div id="csubPayments" style="display:none">
+        <!-- Month navigation bar -->
+        <div class="pay-month-bar">
+          <div class="pay-month-nav">
+            <button class="btn btn-ghost btn-sm" onclick="changePayMonth(-1)">‹</button>
+            <span class="pay-month-label" id="payMonthLabel">—</span>
+            <button class="btn btn-ghost btn-sm" onclick="changePayMonth(1)">›</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <select class="filter-select" id="payMonthDropdown" onchange="jumpToPayMonth(this.value)" style="min-width:160px">
+              <option value="">— Обрати місяць —</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="createNewPayMonth()">+ Новий місяць</button>
+          </div>
+        </div>
+
+        <!-- Unpaid alert -->
+        <div class="pay-alert" id="payAlert" style="display:none">
+          <div class="pay-alert-title">
+            ⚠️ <span id="payAlertText">Є несплачені учні</span>
+          </div>
+          <div class="pay-alert-names" id="payAlertNames"></div>
+        </div>
+
+        <!-- Filters + "no month" placeholder -->
+        <div id="payTableArea">
+          <div class="mp-no-month" id="payNoMonth">
+            <h3>Місяць не створено</h3>
+            <p style="font-size:13px;color:#aaa;margin-bottom:12px">Натисніть «+ Новий місяць» щоб створити список оплат</p>
+            <button class="btn btn-primary" onclick="createNewPayMonth()">+ Новий місяць</button>
+          </div>
+          <div id="payMonthContent" style="display:none">
+            <div class="toolbar" style="margin-bottom:12px">
+              <input class="search" id="paySearch" placeholder="🔍 Пошук по імені..." oninput="renderMonthPayments()"/>
+              <select class="filter-select" id="payStatusFilter" onchange="renderMonthPayments()">
+                <option value="">Всі статуси</option>
+                <option value="pending">🔴 Не оплатили</option>
+                <option value="paid">✅ Оплатили</option>
+                <option value="partial">🟡 Частково</option>
+                <option value="waived">🔵 Звільнені</option>
+                <option value="completed">⬜ Завершили</option>
+              </select>
+            </div>
+            <div class="table-wrap" style="overflow-x:auto">
+              <table class="pay-table" style="min-width:860px">
+                <thead><tr>
+                  <th>Учень</th><th>Курс</th><th>Формат</th><th>Розклад</th>
+                  <th>Очікується ₴</th><th>Сплачено ₴</th><th>Статус</th>
+                  <th>Дата оплати</th><th>Спосіб</th><th>Нотатка</th><th style="width:32px"></th>
+                </tr></thead>
+                <tbody id="monthPayBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SUB-TAB: ATTENDANCE ── -->
+      <div id="csubAttendance" style="display:none">
+        <div class="att-header">
+          <div class="att-month-nav">
+            <button class="btn btn-ghost btn-sm" onclick="changeAttMonth(-1)">‹</button>
+            <span class="att-month-label" id="attMonthLabel">Червень 2026</span>
+            <button class="btn btn-ghost btn-sm" onclick="changeAttMonth(1)">›</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="loadAttendance()">🔄 Оновити</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportAttendanceCSV()">📥 CSV</button>
+        </div>
+        <div class="att-legend">
+          <span class="att-legend-item"><span class="att-legend-dot" style="background:#86efac;border:1px solid #4ade80"></span>Присутній</span>
+          <span class="att-legend-item"><span class="att-legend-dot" style="background:#fca5a5;border:1px solid #f87171"></span>Відсутній</span>
+          <span class="att-legend-item"><span class="att-legend-dot" style="background:#fde68a;border:1px solid #fbbf24"></span>Відробка</span>
+          <span class="att-legend-item"><span class="att-legend-dot" style="background:#d1d5db;border:1px solid #9ca3af"></span>Скасовано</span>
+          <span class="att-legend-item"><span class="att-legend-dot" style="background:#f0f0f0"></span>Не відмічено</span>
+          <span class="att-legend-item"><span class="att-legend-dot" style="background:#ede9fe;border:1px solid #c4b5fd"></span>За розкладом</span>
+          <span style="font-size:11px;color:#aaa;margin-left:auto">Натисніть на клітинку, щоб змінити статус</span>
+        </div>
+        <div class="att-wrap">
+          <div id="attCalendar" style="min-height:200px;padding:12px"><div class="empty" style="padding:40px">Завантаження...</div></div>
+        </div>
+      </div>
+
+    </div><!-- /clientsTab -->
+
+    <!-- CONTENT TAB -->
+    <div id="contentTab" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 style="font-size:18px;font-weight:800">✏️ Управління контентом</h2>
+      </div>
+      <div class="cms-subtabs">
+        <button class="cms-subtab active" id="cmsTabPricing" onclick="showCmsSection('pricing')">💰 Варіанти навчання</button>
+        <button class="cms-subtab" id="cmsTabFaq" onclick="showCmsSection('faq')">❓ Питання та відповіді</button>
+        <button class="cms-subtab" id="cmsTabCourses" onclick="showCmsSection('courses')">📚 Курси</button>
+      </div>
+
+      <!-- PRICING SECTION -->
+      <div id="cmsPricing" class="cms-section">
+        <div class="cms-section-title">
+          💰 Варіанти навчання (3 картки)
+          <button class="btn btn-primary btn-sm cms-save-btn" onclick="savePricing()">💾 Зберегти</button>
+        </div>
+        <div id="pricingEditor"><div class="empty" style="padding:30px">Завантаження...</div></div>
+      </div>
+
+      <!-- FAQ SECTION -->
+      <div id="cmsFaq" class="cms-section" style="display:none">
+        <div class="cms-section-title">
+          ❓ Питання та відповіді
+          <div style="display:flex;gap:8px;margin-left:auto">
+            <button class="btn btn-ghost btn-sm" onclick="addFaqItem()">+ Додати питання</button>
+            <button class="btn btn-primary btn-sm" onclick="saveFaq()">💾 Зберегти</button>
+          </div>
+        </div>
+        <div id="faqEditor"><div class="empty" style="padding:30px">Завантаження...</div></div>
+      </div>
+
+      <!-- COURSES SECTION -->
+      <div id="cmsCourses" class="cms-section" style="display:none">
+        <div class="cms-section-title">
+          📚 Курси
+          <div style="display:flex;gap:8px;margin-left:auto">
+            <button class="btn btn-ghost btn-sm" onclick="addCourse()">+ Додати курс</button>
+            <button class="btn btn-primary btn-sm" onclick="saveCourses()">💾 Зберегти</button>
+          </div>
+        </div>
+        <div id="coursesEditor"><div class="empty" style="padding:30px">Завантаження...</div></div>
       </div>
     </div>
 
@@ -230,8 +716,9 @@ tr:hover td{background:#faf9ff}
       <div class="pager" id="pager"></div>
     </div>
     </div><!-- /leadsTab -->
-  </div>
-</div>
+  </div><!-- /main -->
+  </div><!-- /app-body -->
+</div><!-- /app -->
 
 <div class="toast" id="toast"></div>
 
@@ -334,6 +821,8 @@ async function showApp() {
   await loadMe();
   await loadLeads();
   showTab('leads');
+  loadAlerts();
+  setInterval(loadAlerts, 5 * 60 * 1000); // refresh alerts every 5 min
 }
 
 async function loadMe() {
@@ -352,15 +841,51 @@ async function loadMe() {
     const title = document.getElementById('panelTitle');
     if (title) title.textContent = data.name || 'Admin Panel';
 
-    const adminsBtn = document.getElementById('adminsTabBtn');
-    if (adminsBtn) adminsBtn.style.display = currentRole === 'superadmin' ? 'inline-flex' : 'none';
+    // Show admins nav item only for superadmin
+    document.querySelectorAll('.superadmin-only').forEach(el => {
+      el.style.display = currentRole === 'superadmin' ? '' : 'none';
+    });
   } catch (e) { console.error('loadMe', e); }
 }
 
+let _currentTab = 'leads';
+
 function showTab(tab) {
-  document.getElementById('leadsTab').style.display  = tab === 'leads'  ? '' : 'none';
-  document.getElementById('adminsTab').style.display = tab === 'admins' ? '' : 'none';
-  if (tab === 'admins') renderAdmins();
+  _currentTab = tab;
+  ['leads','admins','content','clients','courses'].forEach(t => {
+    const el = document.getElementById(t + 'Tab');
+    if (el) el.style.display = t === tab ? '' : 'none';
+  });
+  // Sidebar active state
+  ['leads','admins','content','clients','courses'].forEach(t => {
+    const btn = document.getElementById('sideNav-' + t);
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  // CSV buttons: export = superadmin only; import = superadmin + administrator + manager
+  const csvExportBtn = document.getElementById('csvExportBtn');
+  const csvImportBtn = document.getElementById('csvImportBtn');
+  const showCsv = ['leads','clients'].includes(tab);
+  const canExport = currentRole === 'superadmin';
+  const canImport = ['superadmin','administrator','manager'].includes(currentRole);
+  if (csvExportBtn) csvExportBtn.style.display = (showCsv && canExport) ? '' : 'none';
+  if (csvImportBtn) csvImportBtn.style.display = (showCsv && canImport) ? '' : 'none';
+  if (tab === 'admins')  renderAdmins();
+  if (tab === 'content' && !_cmsData) loadContentData();
+  if (tab === 'clients' && !_allClients) loadClients();
+  if (tab === 'courses') loadCoursesTab();
+}
+
+function reloadCurrentTab() {
+  if (_currentTab === 'leads')   loadLeads();
+  if (_currentTab === 'clients') {
+    _allClients = null;
+    loadClients().then(() => {
+      if (_clientsSubTab === 'payments')   loadMonthPayments();
+      if (_clientsSubTab === 'attendance') loadAttendance();
+    });
+  }
+  if (_currentTab === 'admins')  renderAdmins();
+  loadAlerts();
 }
 
 async function loadLeads() {
@@ -497,23 +1022,6 @@ async function deleteLead(id) {
   } catch { showToast('Помилка', 'error'); }
 }
 
-// ── CSV EXPORT ────────────────────────────────────────────────────────────────
-function exportCSV() {
-  const rows = [
-    ['#','Ім\'я дитини','Вік','Курс','Телефон','Email','Статус','Нотатки','Дата'],
-    ...filtered.map(l => [
-      l.id, l.child_name, l.age||'', l.course||'', l.phone, l.email||'',
-      STATUS_LABELS[l.status]||l.status, l.notes||'', l.created_at||''
-    ])
-  ];
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
-  const a    = document.createElement('a');
-  a.href     = URL.createObjectURL(blob);
-  a.download = `leads-${new Date().toISOString().slice(0,10)}.csv`;
-  a.click();
-  showToast('CSV завантажено ✓', 'success');
-}
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function esc(s) {
@@ -622,8 +1130,1271 @@ function copyToken(t) {
     .catch(() => showToast('Не вдалося скопіювати', 'error'));
 }
 
+// ── ALERTS ───────────────────────────────────────────────────────────────────
+let _alertsOpen = true;
+
+async function loadAlerts() {
+  try {
+    const res = await fetch('/api/alerts', { headers: { 'x-admin-token': token } });
+    if (!res.ok) return;
+    const data = await res.json();
+    renderAlerts(data);
+  } catch {}
+}
+
+function renderAlerts(data) {
+  const panel  = document.getElementById('alertsPanel');
+  const title  = document.getElementById('alertsTitle');
+  const badge  = document.getElementById('alertsBadge');
+  const body   = document.getElementById('alertsBody');
+  const total  = data.total || 0;
+  const alerts = data.alerts || [];
+
+  if (total === 0) {
+    panel.className = 'alerts-panel ok';
+    title.textContent = 'Все під контролем — нових завдань немає';
+    badge.textContent = '✓';
+    badge.className = 'alerts-panel__badge ok';
+    body.innerHTML = '';
+    return;
+  }
+
+  panel.className = 'alerts-panel';
+  title.textContent = `${total} завдань потребують уваги`;
+  badge.textContent = total;
+  badge.className = 'alerts-panel__badge';
+
+  body.innerHTML = alerts.map(a => `
+    <div class="alert-item">
+      <div class="alert-item__sev sev-${a.severity}"></div>
+      <div class="alert-item__info">
+        <div class="alert-item__msg">${esc(a.message)}</div>
+        <div class="alert-item__hint">${esc(a.hint)}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm alert-item__btn" onclick="showTab('${a.tab}')">Переглянути →</button>
+    </div>`).join('');
+
+  if (_alertsOpen) {
+    body.classList.add('open');
+    document.getElementById('alertsChevron').textContent = '▲';
+  }
+}
+
+function toggleAlerts() {
+  const body = document.getElementById('alertsBody');
+  _alertsOpen = !_alertsOpen;
+  body.classList.toggle('open', _alertsOpen);
+  document.getElementById('alertsChevron').textContent = _alertsOpen ? '▲' : '▼';
+}
+
+// ── CLIENTS ───────────────────────────────────────────────────────────────────
+let _allClients  = null;
+let _clientPage  = 1;
+const CLIENT_PAGE_SIZE = 20;
+let _editingClientId = null;
+
+const CLIENT_STATUS_LABELS = {
+  new: '🔵 Новий', trial: '🟣 Пробний', active: '🟢 Активний',
+  paused: '🟡 Пауза', completed: '✅ Завершив', churned: '🔴 Відмовився',
+};
+const SOURCE_LABELS = {
+  website: '🌐 Сайт', referral: '👥 Рекомендація', social: '📱 Соцмережі',
+  phone: '📞 Телефон', 'walk-in': '🚶 Прийшов', other: 'Інше',
+};
+
+async function loadClients() {
+  try {
+    const res = await fetch('/api/clients', { headers: { 'x-admin-token': token } });
+    if (res.status === 401) { doLogout(); return; }
+    const data = await res.json();
+    _allClients = data.clients || [];
+    _clientPage = 1;
+    renderClientStats(data.stats || {});
+    renderClients();
+  } catch { showToast('Помилка завантаження бази клієнтів', 'error'); }
+}
+
+function renderClientStats(stats) {
+  const el = document.getElementById('clientStatsRow');
+  if (!el) return;
+  el.innerHTML = [
+    ['Всього', stats.total || 0, '#6C47FF'],
+    ['Нові', stats.new || 0, '#2563eb'],
+    ['Пробний', stats.trial || 0, '#7c3aed'],
+    ['Активні', stats.active || 0, '#15803d'],
+    ['Пауза', stats.paused || 0, '#b45309'],
+    ['Завершили', stats.completed || 0, '#166534'],
+  ].map(([label, num, color]) => `
+    <div class="stat"><div class="stat-num" style="color:${color}">${num}</div><div class="stat-label">${label}</div></div>
+  `).join('');
+}
+
+function renderClients() {
+  if (!_allClients) return;
+  const q      = document.getElementById('clientSearch')?.value.toLowerCase() || '';
+  const status = document.getElementById('clientStatusFilter')?.value || '';
+  const course = document.getElementById('clientCourseFilter')?.value || '';
+
+  const filtered = _allClients.filter(c => {
+    if (status && c.status !== status) return false;
+    if (course && c.course !== course) return false;
+    if (q) {
+      const hay = [c.name, c.phone, c.email, c.course, c.manager, c.notes].join(' ').toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / CLIENT_PAGE_SIZE));
+  if (_clientPage > totalPages) _clientPage = totalPages;
+  const page = filtered.slice((_clientPage - 1) * CLIENT_PAGE_SIZE, _clientPage * CLIENT_PAGE_SIZE);
+
+  const tbody = document.getElementById('clientsBody');
+  if (!page.length) {
+    tbody.innerHTML = `<tr><td colspan="13"><div class="empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg><div>Клієнтів не знайдено</div></div></td></tr>`;
+  } else {
+    tbody.innerHTML = page.map(c => {
+      const statusCls = 'cs-' + (c.status || 'new');
+      const nextDate = c.nextContact ? (new Date(c.nextContact) < new Date() ? `<span style="color:#dc2626;font-weight:700">${esc(c.nextContact)}</span>` : `<span style="color:#15803d">${esc(c.nextContact)}</span>`) : '—';
+      return `<tr>
+        <td style="color:#aaa;font-size:12px">#${c.id}</td>
+        <td style="font-weight:600">${esc(c.name)}</td>
+        <td>${c.age || '—'}</td>
+        <td>${c.course ? `<span class="chip">${COURSE_LABELS[c.course] || c.course}</span>` : '—'}</td>
+        <td><a href="tel:${esc(c.phone)}" class="phone-link">${esc(c.phone)}</a></td>
+        <td><span class="client-status ${statusCls}">${CLIENT_STATUS_LABELS[c.status] || c.status}</span></td>
+        <td style="font-size:12px;white-space:nowrap;max-width:140px">
+          <span style="display:inline-flex;align-items:center;gap:4px;max-width:120px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle">${esc(c.schedule || '')}</span>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;vertical-align:middle" onclick="openSchedPopup(event,${c.id})" title="Редагувати розклад">🕐</button>
+        </td>
+        <td style="font-size:12px;color:#888">${esc(c.teacher || '—')}</td>
+        <td style="font-size:13px">${c.monthlyFee ? c.monthlyFee + ' ₴' : '—'}</td>
+        <td style="font-size:13px">${c.totalPaid ? c.totalPaid + ' ₴' : '—'}</td>
+        <td style="font-size:12px">${nextDate}</td>
+        <td><input class="notes-input" value="${esc(c.notes||'')}" placeholder="Нотатки..."
+          onblur="saveClientNotes(${c.id}, this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td style="white-space:nowrap;display:flex;gap:4px">
+          <button class="btn btn-ghost btn-sm" onclick="openClientModal(${c.id})">✏️</button>
+          ${currentRole === 'superadmin' ? `<button class="btn btn-danger btn-sm" onclick="deleteClient(${c.id})">✕</button>` : ''}
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('clientsPager').innerHTML = `
+    <span>${filtered.length} клієнтів · стор. ${_clientPage} з ${totalPages}</span>
+    <div class="pager-btns">
+      <button class="btn btn-ghost btn-sm" onclick="_clientPage=${_clientPage-1};renderClients()" ${_clientPage<=1?'disabled':''}>‹</button>
+      <button class="btn btn-ghost btn-sm" onclick="_clientPage=${_clientPage+1};renderClients()" ${_clientPage>=totalPages?'disabled':''}>›</button>
+    </div>`;
+}
+
+function openClientModal(id) {
+  _editingClientId = id;
+  const modal = document.getElementById('clientModal');
+  document.getElementById('clientModalTitle').textContent = id ? 'Редагувати клієнта' : 'Новий клієнт';
+  const fields = ['name','age','course','phone','email','status','source','monthlyFee','totalPaid','enrolledDate','trialDate','lastContact','nextContact','manager','teacher','lessonType','city','notes'];
+  fields.forEach(f => { const el = document.getElementById('cf_' + f); if (el) el.value = ''; });
+  // Reset schedule pickers
+  ['cf_day1','cf_time1','cf_day2','cf_time2'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const noteEl = document.getElementById('cf_scheduleNote');
+  if (noteEl) noteEl.value = '';
+  onLessonTypeChange('group');
+
+  if (id) {
+    const c = _allClients?.find(x => x.id === id);
+    if (c) {
+      fields.forEach(f => {
+        const el = document.getElementById('cf_' + f);
+        if (el && c[f] != null) el.value = c[f];
+      });
+      // Populate schedule pickers
+      const lt = c.lessonType || 'group';
+      onLessonTypeChange(lt);
+      const isFree = lt === 'individual' || lt === 'adult';
+      if (isFree) {
+        if (noteEl) noteEl.value = c.schedule || '';
+      } else if (c.scheduleDays?.length) {
+        const d0 = c.scheduleDays[0];
+        const d1 = c.scheduleDays[1];
+        if (d0) { const el1 = document.getElementById('cf_day1'); const et1 = document.getElementById('cf_time1'); if (el1) el1.value = d0.day||''; if (et1) et1.value = d0.time||''; }
+        if (d1) { const el2 = document.getElementById('cf_day2'); const et2 = document.getElementById('cf_time2'); if (el2) el2.value = d1.day||''; if (et2) et2.value = d1.time||''; }
+      } else if (c.schedule) {
+        // Legacy: show old text in note field as fallback
+        if (noteEl) { noteEl.value = c.schedule; }
+      }
+    }
+  }
+  modal.style.display = 'flex';
+}
+
+function closeClientModal() {
+  document.getElementById('clientModal').style.display = 'none';
+}
+
+async function saveClient() {
+  const name  = document.getElementById('cf_name')?.value.trim();
+  const phone = document.getElementById('cf_phone')?.value.trim();
+  if (!name || name.length < 2) { showToast('Вкажіть ім\'я', 'error'); return; }
+  if (!phone) { showToast('Вкажіть телефон', 'error'); return; }
+
+  const data = {};
+  ['name','age','course','phone','email','status','source','monthlyFee','totalPaid',
+   'enrolledDate','trialDate','lastContact','nextContact','manager','teacher','lessonType','city','notes'].forEach(f => {
+    const el = document.getElementById('cf_' + f);
+    if (el) data[f] = el.value;
+  });
+
+  // Build scheduleDays from structured pickers or free-text
+  const lt = data.lessonType || 'group';
+  const isFree = lt === 'individual' || lt === 'adult';
+  if (isFree) {
+    data.scheduleDays = [];
+    data.schedule = document.getElementById('cf_scheduleNote')?.value.trim() || '';
+  } else {
+    const scheduleDays = [];
+    const day1  = document.getElementById('cf_day1')?.value;
+    const time1 = document.getElementById('cf_time1')?.value;
+    const day2  = document.getElementById('cf_day2')?.value;
+    const time2 = document.getElementById('cf_time2')?.value;
+    if (day1) scheduleDays.push({ day: parseInt(day1), time: time1 || '' });
+    if (lt === 'group2' && day2) scheduleDays.push({ day: parseInt(day2), time: time2 || '' });
+    data.scheduleDays = scheduleDays;
+    data.schedule = buildScheduleText(scheduleDays, '');
+  }
+
+  try {
+    const url    = _editingClientId ? `/api/clients/${_editingClientId}` : '/api/clients';
+    const method = _editingClientId ? 'PATCH' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) { showToast(json.error || 'Помилка', 'error'); return; }
+    closeClientModal();
+    await loadClients();
+    loadAlerts();
+    showToast(_editingClientId ? 'Клієнта оновлено ✓' : 'Клієнта додано ✓', 'success');
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+async function saveClientNotes(id, notes) {
+  try {
+    await fetch(`/api/clients/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ notes }),
+    });
+    const c = _allClients?.find(x => x.id === id);
+    if (c) c.notes = notes;
+    showToast('Нотатки збережено ✓', 'success');
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function deleteClient(id) {
+  if (!confirm('Видалити клієнта #' + id + '?')) return;
+  try {
+    const res = await fetch(`/api/clients/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    if (!res.ok) { showToast('Помилка видалення', 'error'); return; }
+    _allClients = _allClients.filter(c => c.id !== id);
+    renderClients();
+    loadAlerts();
+    showToast('Клієнта видалено', 'success');
+  } catch { showToast('Помилка', 'error'); }
+}
+
+// ── CLIENT SUB-TABS ───────────────────────────────────────────────────────────
+let _clientsSubTab = 'base';
+
+function showClientsSubTab(tab) {
+  _clientsSubTab = tab;
+  ['base','payments','attendance'].forEach(t => {
+    const el = document.getElementById('csub' + t.charAt(0).toUpperCase() + t.slice(1));
+    const btn = document.getElementById('csub-' + t);
+    if (el)  el.style.display = t === tab ? '' : 'none';
+    if (btn) btn.classList.toggle('active', t === tab);
+  });
+  const addBtn = document.getElementById('addClientBtn');
+  if (addBtn) addBtn.style.display = 'none';
+  if (tab === 'payments')    { loadMonthPayments(); }
+  if (tab === 'attendance')  { loadAttendance(); }
+}
+
+// ── MONTHLY PAYMENTS SUB-TAB ─────────────────────────────────────────────────
+const LESSON_TYPE_LABELS = { individual: '👤 Інд.', adult: '🧑 Дор.', group: '👥 Груп.1×', group2: '👥 Груп.2×' };
+const DAYS_SHORT = ['','Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+
+function onLessonTypeChange(val) {
+  const isFree = val === 'individual' || val === 'adult';
+  document.getElementById('scheduleStructured').style.display = isFree ? 'none' : '';
+  document.getElementById('scheduleTextWrap').style.display   = isFree ? '' : 'none';
+  document.getElementById('schedSlot2').style.display = val === 'group2' ? '' : 'none';
+}
+
+function buildScheduleText(days, note) {
+  if (note) return note;
+  if (!days?.length) return '';
+  return days.map(s => `${DAYS_SHORT[s.day]||s.day} ${s.time}`).join(', ');
+}
+const PAY_METHOD_LABELS = {
+  cash: '💵 Готівка', card: '💳 Картка', wayforpay: '🌐 WayForPay',
+  googlepay: '📱 G Pay', applepay: '🍎 Apple Pay', transfer: '🏦 Переказ', other: 'Інше',
+};
+const MP_STATUS_LABELS = {
+  pending:'🔴 Не оплатили', paid:'✅ Оплатили', partial:'🟡 Частково',
+  waived:'🔵 Звільнені', completed:'⬜ Завершили',
+};
+const MP_STATUS_CLASS = {
+  pending:'mp-status-pending', paid:'mp-status-paid', partial:'mp-status-partial',
+  waived:'mp-status-waived', completed:'mp-status-completed',
+};
+
+let _mpYear      = new Date().getFullYear();
+let _mpMonth     = new Date().getMonth() + 1;
+let _mpAllMonths = []; // ['2026-06','2026-05',...]
+let _mpData      = []; // current month records
+
+function _mpYM() { return `${_mpYear}-${String(_mpMonth).padStart(2,'0')}`; }
+
+async function loadMonthPayments() {
+  try {
+    // Load list of existing months
+    const res1 = await fetch('/api/monthly-payments', { headers: { 'x-admin-token': token } });
+    const d1   = await res1.json();
+    _mpAllMonths = d1.months || [];
+    _updatePayMonthDropdown();
+
+    // Load current month
+    await _loadMpMonth();
+  } catch { showToast('Помилка завантаження оплат', 'error'); }
+}
+
+async function _loadMpMonth() {
+  const ym = _mpYM();
+  document.getElementById('payMonthLabel').textContent = _mpFormatLabel(_mpYear, _mpMonth);
+  try {
+    const res = await fetch(`/api/monthly-payments/${ym}`, { headers: { 'x-admin-token': token } });
+    const d   = await res.json();
+    _mpData = d.records || [];
+    const hasMonth = _mpAllMonths.includes(ym);
+    document.getElementById('payNoMonth').style.display       = hasMonth ? 'none' : '';
+    document.getElementById('payMonthContent').style.display  = hasMonth ? ''     : 'none';
+    if (hasMonth) {
+      renderMonthPayments();
+      renderPayAlert();
+    }
+  } catch { showToast('Помилка', 'error'); }
+}
+
+function _mpFormatLabel(y, m) {
+  return MONTHS_UA[m-1] + ' ' + y;
+}
+
+function _updatePayMonthDropdown() {
+  const sel = document.getElementById('payMonthDropdown');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Обрати місяць —</option>' +
+    _mpAllMonths.map(ym => {
+      const [y, m] = ym.split('-');
+      return `<option value="${ym}" ${ym === _mpYM() ? 'selected' : ''}>${MONTHS_UA[parseInt(m)-1]} ${y}</option>`;
+    }).join('');
+}
+
+function changePayMonth(delta) {
+  _mpMonth += delta;
+  if (_mpMonth < 1) { _mpMonth = 12; _mpYear--; }
+  if (_mpMonth > 12) { _mpMonth = 1; _mpYear++; }
+  _loadMpMonth();
+  _updatePayMonthDropdown();
+}
+
+function jumpToPayMonth(ym) {
+  if (!ym) return;
+  [_mpYear, _mpMonth] = ym.split('-').map(Number);
+  _loadMpMonth();
+}
+
+async function createNewPayMonth() {
+  const ym = _mpYM();
+  if (!confirm(`Створити місяць ${_mpFormatLabel(_mpYear, _mpMonth)}?`)) return;
+
+  // Build records from last month or active clients
+  let records = [];
+  if (_mpAllMonths.length > 0) {
+    // Copy from the most recent existing month, reset payment info
+    const prevYm = _mpAllMonths[0]; // already sorted desc
+    const res = await fetch(`/api/monthly-payments/${prevYm}`, { headers: { 'x-admin-token': token } });
+    const d = await res.json();
+    records = (d.records || [])
+      .filter(r => r.status !== 'completed') // drop completed students
+      .map(r => ({ ...r, paidAmount: 0, status: 'pending', paidDate: null, method: null, note: '' }));
+  } else {
+    // First month: build from active clients
+    if (!_allClients) return;
+    records = _allClients
+      .filter(c => ['active','trial'].includes(c.status))
+      .map(c => ({
+        clientId: c.id, clientName: c.name,
+        expectedAmount: c.monthlyFee || 0, paidAmount: 0,
+        status: 'pending', paidDate: null, method: null, note: '',
+      }));
+  }
+
+  try {
+    const res = await fetch(`/api/monthly-payments/${ym}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ records }),
+    });
+    const d = await res.json();
+    if (!res.ok) { showToast(d.error || 'Помилка', 'error'); return; }
+    if (d.alreadyExists) { showToast('Місяць вже існує', 'error'); }
+    else { showToast(`${_mpFormatLabel(_mpYear, _mpMonth)} створено ✓`, 'success'); }
+    _mpAllMonths = [...new Set([ym, ..._mpAllMonths])].sort().reverse();
+    _updatePayMonthDropdown();
+    _mpData = d.records || records;
+    document.getElementById('payNoMonth').style.display       = 'none';
+    document.getElementById('payMonthContent').style.display  = '';
+    renderMonthPayments();
+    renderPayAlert();
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+function renderMonthPayments() {
+  const q      = (document.getElementById('paySearch')?.value || '').toLowerCase();
+  const status = document.getElementById('payStatusFilter')?.value || '';
+  const filtered = _mpData.filter(r => {
+    if (status && r.status !== status) return false;
+    if (q) { const hay = (r.clientName || '').toLowerCase(); if (!hay.includes(q)) return false; }
+    return true;
+  });
+
+  // Enrich with client info
+  const rows = filtered.map(r => {
+    const client = _allClients?.find(c => c.id === r.clientId);
+    return { ...r, client };
+  });
+
+  const tbody = document.getElementById('monthPayBody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty">Записів не знайдено</div></td></tr>`;
+    return;
+  }
+
+  const methodOpts = Object.entries(PAY_METHOD_LABELS)
+    .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+  const statusOpts = Object.entries(MP_STATUS_LABELS)
+    .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
+
+  tbody.innerHTML = rows.map(r => {
+    const c = r.client;
+    const statusCls = MP_STATUS_CLASS[r.status] || '';
+    return `<tr>
+      <td style="font-weight:600;white-space:nowrap">${esc(r.clientName || (c?.name) || '#'+r.clientId)}</td>
+      <td style="font-size:12px">${c?.course ? `<span class="chip">${COURSE_LABELS[c.course]||c.course}</span>` : '—'}</td>
+      <td style="font-size:12px">${LESSON_TYPE_LABELS[c?.lessonType] || '—'}</td>
+      <td style="font-size:11px;color:#888;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis">${esc(c?.schedule || '—')}</td>
+      <td><input class="mp-inline" style="width:72px" type="number" value="${r.expectedAmount||''}" placeholder="0"
+        onblur="updateMpRecord(${r.clientId},'expectedAmount',this.value)"/></td>
+      <td><input class="mp-inline" style="width:72px" type="number" value="${r.paidAmount||''}" placeholder="0"
+        onblur="updateMpRecord(${r.clientId},'paidAmount',this.value)"/></td>
+      <td>
+        <select class="mp-status-sel ${statusCls}" onchange="updateMpRecord(${r.clientId},'status',this.value);this.className='mp-status-sel mp-status-'+this.value">
+          ${statusOpts.replace(`value="${r.status}"`, `value="${r.status}" selected`)}
+        </select>
+      </td>
+      <td><input class="mp-inline" style="width:105px" type="date" value="${r.paidDate||''}"
+        onblur="updateMpRecord(${r.clientId},'paidDate',this.value)"/></td>
+      <td>
+        <select class="mp-inline" style="width:105px" onchange="updateMpRecord(${r.clientId},'method',this.value)">
+          <option value="">—</option>
+          ${methodOpts.replace(`value="${r.method}"`, `value="${r.method}" selected`)}
+        </select>
+      </td>
+      <td><input class="mp-inline" style="width:110px" value="${esc(r.note||'')}" placeholder="Коментар…"
+        onblur="updateMpRecord(${r.clientId},'note',this.value)"/></td>
+      <td>
+        <button class="mp-month-del" onclick="removeMpRecord(${r.clientId})" title="Видалити зі списку">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function updateMpRecord(clientId, field, value) {
+  const rec = _mpData.find(r => r.clientId === clientId);
+  if (!rec) return;
+  rec[field] = field === 'expectedAmount' || field === 'paidAmount' ? parseFloat(value) || 0 : value;
+  // Auto-set paidDate when marking as paid/partial
+  if (field === 'status' && ['paid','partial'].includes(value) && !rec.paidDate) {
+    rec.paidDate = new Date().toISOString().slice(0,10);
+  }
+  renderPayAlert();
+  try {
+    await fetch(`/api/monthly-payments/${_mpYM()}/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ [field]: rec[field], paidDate: rec.paidDate }),
+    });
+  } catch { showToast('Помилка збереження', 'error'); }
+}
+
+async function removeMpRecord(clientId) {
+  if (!confirm('Видалити учня з цього місяця?')) return;
+  try {
+    const res = await fetch(`/api/monthly-payments/${_mpYM()}/${clientId}`, {
+      method: 'DELETE', headers: { 'x-admin-token': token },
+    });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    _mpData = _mpData.filter(r => r.clientId !== clientId);
+    renderMonthPayments();
+    renderPayAlert();
+    showToast('Видалено ✓', 'success');
+  } catch { showToast('Помилка', 'error'); }
+}
+
+function renderPayAlert() {
+  const alertEl = document.getElementById('payAlert');
+  const textEl  = document.getElementById('payAlertText');
+  const namesEl = document.getElementById('payAlertNames');
+  if (!alertEl) return;
+
+  const unpaid = _mpData.filter(r => ['pending','partial'].includes(r.status));
+  const totalDebt = unpaid.reduce((s, r) => s + Math.max(0, (r.expectedAmount||0) - (r.paidAmount||0)), 0);
+
+  if (!unpaid.length) { alertEl.style.display = 'none'; return; }
+  alertEl.style.display = '';
+  textEl.innerHTML = `Не зібрано оплату від <strong>${unpaid.length} учн${unpaid.length === 1 ? 'я' : 'ів'}</strong> · загалом <strong>${totalDebt} ₴</strong>`;
+  namesEl.innerHTML = unpaid.map(r => {
+    const debt = Math.max(0, (r.expectedAmount||0) - (r.paidAmount||0));
+    return `<span class="pay-alert-badge">${esc(r.clientName||'#'+r.clientId)} · ${debt} ₴</span>`;
+  }).join('');
+}
+
+// ── ATTENDANCE SUB-TAB ────────────────────────────────────────────────────────
+let _attYear  = new Date().getFullYear();
+let _attMonth = new Date().getMonth() + 1;
+let _attData  = {};
+const ATT_CYCLE = ['', 'present', 'absent', 'makeup', 'cancelled'];
+const ATT_LABELS = { '': '', present: '✓', absent: '✗', makeup: 'В', cancelled: '—' };
+const MONTHS_UA = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
+
+async function loadAttendance() {
+  const label = document.getElementById('attMonthLabel');
+  if (label) label.textContent = `${MONTHS_UA[_attMonth-1]} ${_attYear}`;
+  const cal = document.getElementById('attCalendar');
+  if (cal) cal.innerHTML = '<div class="empty" style="padding:40px">Завантаження...</div>';
+  try {
+    const res = await fetch(`/api/attendance?year=${_attYear}&month=${_attMonth}`, { headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    _attData = data.data || {};
+    renderAttCalendar();
+  } catch { showToast('Помилка завантаження відвідувань', 'error'); }
+}
+
+function changeAttMonth(delta) {
+  _attMonth += delta;
+  if (_attMonth < 1) { _attMonth = 12; _attYear--; }
+  if (_attMonth > 12) { _attMonth = 1;  _attYear++; }
+  loadAttendance();
+}
+
+function renderAttCalendar() {
+  const cal = document.getElementById('attCalendar');
+  if (!cal || !_allClients) return;
+
+  const clients = _allClients.filter(c => !['churned','completed'].includes(c.status));
+  if (!clients.length) { cal.innerHTML = '<div class="empty" style="padding:40px">Активних клієнтів немає</div>'; return; }
+
+  // Build scheduled DOW set per client (1=Mon…7=Sun, ISO-style)
+  const clientSched = {};
+  clients.forEach(c => {
+    if (c.scheduleDays?.length) {
+      clientSched[c.id] = new Set(c.scheduleDays.map(s => parseInt(s.day)));
+    }
+  });
+
+  const daysInMonth = new Date(_attYear, _attMonth, 0).getDate();
+  const today = new Date().toISOString().slice(0,10);
+
+  let html = `<table class="att-table"><thead><tr>
+    <th class="aname">Учень</th><th class="acourse">Курс</th>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = `${_attYear}-${String(_attMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow = new Date(date).getDay();
+    const isWeekend = dow === 0 || dow === 6;
+    const isToday   = date === today;
+    const style = isToday ? 'background:#fff0e8;color:#e53e3e' : (isWeekend ? 'color:#bbb' : '');
+    html += `<th style="${style}" title="${date}">${d}</th>`;
+  }
+  html += '</tr></thead><tbody>';
+
+  clients.forEach(c => {
+    const cData = _attData[String(c.id)] || {};
+    const schedSet = clientSched[c.id];
+    html += `<tr><td class="aname" title="${esc(c.phone)}">${esc(c.name)}</td>
+      <td class="acourse">${c.course ? `<span class="chip" style="font-size:10px">${COURSE_LABELS[c.course]||c.course}</span>` : '—'}</td>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = `${_attYear}-${String(_attMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const status = cData[date] || '';
+      const dow = new Date(date).getDay();
+      const isoDow = dow === 0 ? 7 : dow; // JS 0=Sun → ISO 7=Sun
+      const isScheduled = schedSet?.has(isoDow);
+      const cls = status ? `att-${status}` : (isScheduled ? 'att-scheduled' : 'att-none');
+      const lbl = ATT_LABELS[status] || (isScheduled && !status ? '·' : '');
+      html += `<td><span class="att-cell ${cls}" onclick="openAttDropdown(event,${c.id},'${date}')" title="${date}">${lbl}</span></td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  cal.innerHTML = html;
+}
+
+// ── SCHEDULE QUICK-EDIT POPUP ────────────────────────────────────────────────
+let _schedPopupClientId = null;
+
+function openSchedPopup(event, clientId) {
+  event.stopPropagation();
+  _schedPopupClientId = clientId;
+  const client = _allClients?.find(c => c.id === clientId);
+  const days = client?.scheduleDays || [];
+  const d0 = days[0], d1 = days[1];
+  document.getElementById('sp_day1').value  = d0?.day  || '';
+  document.getElementById('sp_time1').value = d0?.time || '';
+  document.getElementById('sp_day2').value  = d1?.day  || '';
+  document.getElementById('sp_time2').value = d1?.time || '';
+  const pop = document.getElementById('schedPopup');
+  pop.style.display = 'block';
+  const r = event.target.getBoundingClientRect();
+  let left = r.left, top = r.bottom + 4;
+  if (left + 270 > window.innerWidth) left = window.innerWidth - 275;
+  if (top + 220 > window.innerHeight) top = r.top - 225;
+  pop.style.left = left + 'px';
+  pop.style.top  = top  + 'px';
+}
+
+function closeSchedPopup() {
+  document.getElementById('schedPopup').style.display = 'none';
+}
+
+async function saveSchedPopup() {
+  const clientId = _schedPopupClientId;
+  if (!clientId) return;
+  const day1 = document.getElementById('sp_day1').value;
+  const time1 = document.getElementById('sp_time1').value;
+  const day2 = document.getElementById('sp_day2').value;
+  const time2 = document.getElementById('sp_time2').value;
+  const scheduleDays = [];
+  if (day1) scheduleDays.push({ day: parseInt(day1), time: time1 });
+  if (day2) scheduleDays.push({ day: parseInt(day2), time: time2 });
+  const schedule = buildScheduleText(scheduleDays, '');
+  closeSchedPopup();
+  try {
+    const res = await fetch(`/api/clients/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ scheduleDays, schedule }),
+    });
+    if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
+    const client = _allClients?.find(c => c.id === clientId);
+    if (client) { client.scheduleDays = scheduleDays; client.schedule = schedule; }
+    renderClients();
+    showToast('Розклад збережено ✓', 'success');
+  } catch { showToast('Помилка', 'error'); }
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('#schedPopup') && !e.target.closest('[onclick*="openSchedPopup"]'))
+    closeSchedPopup();
+});
+
+// ── ATTENDANCE DROPDOWN ───────────────────────────────────────────────────────
+let _attDropClientId = null;
+let _attDropDate     = null;
+
+function openAttDropdown(event, clientId, date) {
+  event.stopPropagation();
+  _attDropClientId = clientId;
+  _attDropDate     = date;
+  const drop = document.getElementById('attDropdown');
+  drop.style.display = 'block';
+  const r = event.target.getBoundingClientRect();
+  let left = r.left, top = r.bottom + 4;
+  if (left + 160 > window.innerWidth) left = window.innerWidth - 165;
+  if (top + 200 > window.innerHeight) top = r.top - 210;
+  drop.style.left = left + 'px';
+  drop.style.top  = top  + 'px';
+}
+
+async function setAttStatus(status) {
+  document.getElementById('attDropdown').style.display = 'none';
+  if (_attDropClientId === null) return;
+  const clientId = _attDropClientId;
+  const date     = _attDropDate;
+  if (!_attData[String(clientId)]) _attData[String(clientId)] = {};
+  if (status === '') { delete _attData[String(clientId)][date]; }
+  else               { _attData[String(clientId)][date] = status; }
+  renderAttCalendar();
+  try {
+    await fetch('/api/attendance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ clientId, date, status }),
+    });
+  } catch { showToast('Помилка збереження', 'error'); }
+}
+
+document.addEventListener('click', () => {
+  const drop = document.getElementById('attDropdown');
+  if (drop) drop.style.display = 'none';
+});
+
+function exportAttendanceCSV() {
+  if (!_allClients) return;
+  const clients = _allClients.filter(c => !['churned','completed'].includes(c.status));
+  const daysInMonth = new Date(_attYear, _attMonth, 0).getDate();
+  const days = [];
+  for (let d = 1; d <= daysInMonth; d++) {
+    days.push(`${_attYear}-${String(_attMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+  }
+  const headers = ['Ім\'я', 'Курс', 'Викладач', ...days.map(d => d.slice(8))];
+  const rows = [headers];
+  clients.forEach(c => {
+    const cData = _attData[String(c.id)] || {};
+    rows.push([c.name, COURSE_LABELS[c.course]||c.course||'', c.teacher||'', ...days.map(d => cData[d] || '')]);
+  });
+  downloadCSV(rows, `attendance-${_attYear}-${String(_attMonth).padStart(2,'0')}.csv`);
+  showToast('CSV відвідувань завантажено ✓', 'success');
+}
+
+// ── CSV EXPORT ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  if (_currentTab === 'clients') { exportClientsCSV(); return; }
+  // Leads export (existing)
+  const rows = [
+    ['id','name','age','course','phone','email','status','source','enrolled_date','trial_date',
+     'last_contact','next_contact','monthly_fee','total_paid','manager','notes','created_at'],
+    ...filtered.map(l => [
+      l.id, l.child_name, l.age||'', l.course||'', l.phone, l.email||'',
+      l.status||'', '', '', '', '', '', '', '', '', l.notes||'', l.created_at||''
+    ])
+  ];
+  downloadCSV(rows, `leads-${todayStr()}.csv`);
+  showToast('CSV завантажено ✓', 'success');
+}
+
+function exportClientsCSV() {
+  const q      = document.getElementById('clientSearch')?.value.toLowerCase() || '';
+  const status = document.getElementById('clientStatusFilter')?.value || '';
+  const course = document.getElementById('clientCourseFilter')?.value || '';
+  const data   = (_allClients || []).filter(c => {
+    if (status && c.status !== status) return false;
+    if (course && c.course !== course) return false;
+    if (q) { const hay = [c.name,c.phone,c.email,c.course,c.manager,c.teacher,c.notes].join(' ').toLowerCase(); if (!hay.includes(q)) return false; }
+    return true;
+  });
+  const rows = [
+    ['id','name','age','course','phone','email','status','source','lesson_type','schedule','teacher','city',
+     'enrolled_date','trial_date','last_contact','next_contact','monthly_fee','total_paid','manager','notes','created_at'],
+    ...data.map(c => [
+      c.id, c.name, c.age||'', c.course||'', c.phone, c.email||'', c.status||'', c.source||'',
+      c.lessonType||'', c.schedule||'', c.teacher||'', c.city||'',
+      c.enrolledDate||'', c.trialDate||'', c.lastContact||'', c.nextContact||'',
+      c.monthlyFee||'', c.totalPaid||'', c.manager||'', c.notes||'', c.createdAt||''
+    ])
+  ];
+  downloadCSV(rows, `clients-${todayStr()}.csv`);
+  showToast('CSV клієнтів завантажено ✓', 'success');
+}
+
+function downloadCSV(rows, filename) {
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+}
+
+function todayStr() { return new Date().toISOString().slice(0,10); }
+
+// ── CSV IMPORT ─────────────────────────────────────────────────────────────────
+function triggerImport() {
+  document.getElementById('csvFileInput').click();
+}
+
+function importCSV(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const rows = parseCSVText(e.target.result);
+      if (!rows.length) { showToast('CSV порожній або невірний формат', 'error'); return; }
+      const endpoint = _currentTab === 'clients' ? '/api/clients/import' : '/api/leads/import';
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify(rows),
+      });
+      const data = await res.json();
+      if (!res.ok) { showToast(data.error || 'Помилка імпорту', 'error'); return; }
+      showToast(`Імпортовано ${data.imported} записів ✓`, 'success');
+      if (_currentTab === 'clients') { _allClients = null; await loadClients(); }
+      else { await loadLeads(); }
+    } catch (e) { showToast('Помилка читання файлу', 'error'); }
+    input.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
+}
+
+function parseCSVText(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const headers = parseCSVRow(lines[0]);
+  return lines.slice(1).map(line => {
+    const vals = parseCSVRow(line);
+    const obj = {};
+    headers.forEach((h, i) => { obj[h.toLowerCase().replace(/\s+/g,'_')] = vals[i] || ''; });
+    // map common field name variants
+    if (obj.child_name && !obj.name) obj.name = obj.child_name;
+    if (obj.ім_я && !obj.name)       obj.name = obj['ім_я'];
+    if (obj.телефон && !obj.phone)   obj.phone = obj.телефон;
+    return obj;
+  }).filter(r => r.name || r.child_name);
+}
+
+function parseCSVRow(line) {
+  const result = []; let cur = ''; let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') { if (inQ && line[i+1] === '"') { cur += '"'; i++; } else inQ = !inQ; }
+    else if (ch === ',' && !inQ) { result.push(cur.trim()); cur = ''; }
+    else cur += ch;
+  }
+  result.push(cur.trim());
+  return result;
+}
+
+// ── CONTENT CMS ──────────────────────────────────────────────────────────────
+let _cmsData = null;
+
+function showCmsSection(section) {
+  ['Pricing','Faq','Courses'].forEach(s => {
+    document.getElementById('cms' + s).style.display = s.toLowerCase() === section ? '' : 'none';
+    document.getElementById('cmsTab' + s).classList.toggle('active', s.toLowerCase() === section);
+  });
+}
+
+async function loadContentData() {
+  try {
+    const res = await fetch('/api/content', { headers: { 'x-admin-token': token } });
+    _cmsData = await res.json();
+    renderPricingEditor(_cmsData.pricing || []);
+    renderFaqEditor(_cmsData.faq || []);
+    renderCoursesEditor(_cmsData.courses || []);
+  } catch { showToast('Помилка завантаження контенту', 'error'); }
+}
+
+// ── PRICING EDITOR ─────────────────────────────────────────────────────────────
+function renderPricingEditor(cards) {
+  document.getElementById('pricingEditor').innerHTML = cards.map((c, i) => `
+    <div class="cms-card">
+      <div class="cms-card-header">
+        <span>Картка ${i+1}${c.featured ? ' ⭐' : ''}</span>
+        <label class="cms-toggle">
+          <input type="checkbox" id="pFeatured_${i}" ${c.featured ? 'checked' : ''}> Рекомендована
+        </label>
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Лейбл UA</label>
+          <input class="cms-input" id="pBadgeUa_${i}" value="${esc(c.badge?.ua||'')}"/></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Лейбл RU</label>
+          <input class="cms-input" id="pBadgeRu_${i}" value="${esc(c.badge?.ru||'')}"/></div>
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Назва UA</label>
+          <input class="cms-input" id="pTitleUa_${i}" value="${esc(c.title?.ua||'')}"/></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Назва RU</label>
+          <input class="cms-input" id="pTitleRu_${i}" value="${esc(c.title?.ru||'')}"/></div>
+      </div>
+      <div style="margin-bottom:10px">
+        <label class="cms-label">Переваги (UA / RU):</label>
+        ${(c.features||[]).map((f,fi) => `
+          <div class="cms-features-row">
+            <input class="cms-input" id="pFeatUa_${i}_${fi}" value="${esc(f.ua||'')}" placeholder="🇺🇦 UA"/>
+            <input class="cms-input" id="pFeatRu_${i}_${fi}" value="${esc(f.ru||'')}" placeholder="🇷🇺 RU"/>
+          </div>`).join('')}
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label">Ціна</label>
+          <input class="cms-input" id="pPrice_${i}" value="${esc(c.price||'')}"/></div>
+        <div><label class="cms-label">Стара ціна (необов'язково)</label>
+          <input class="cms-input" id="pOldPrice_${i}" value="${esc(c.oldPrice||'')}" placeholder="—"/></div>
+      </div>
+      <div class="cms-grid2">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Одиниця ціни UA</label>
+          <input class="cms-input" id="pUnitUa_${i}" value="${esc(c.priceUnit?.ua||'')}"/></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Одиниця ціни RU</label>
+          <input class="cms-input" id="pUnitRu_${i}" value="${esc(c.priceUnit?.ru||'')}"/></div>
+      </div>
+    </div>`).join('');
+}
+
+async function savePricing() {
+  const cards = (_cmsData.pricing || []).map((c, i) => ({
+    ...c,
+    featured: document.getElementById(`pFeatured_${i}`)?.checked || false,
+    badge:    { ua: document.getElementById(`pBadgeUa_${i}`)?.value||'', ru: document.getElementById(`pBadgeRu_${i}`)?.value||'' },
+    title:    { ua: document.getElementById(`pTitleUa_${i}`)?.value||'', ru: document.getElementById(`pTitleRu_${i}`)?.value||'' },
+    features: (c.features||[]).map((_,fi) => ({
+      ua: document.getElementById(`pFeatUa_${i}_${fi}`)?.value||'',
+      ru: document.getElementById(`pFeatRu_${i}_${fi}`)?.value||'',
+    })),
+    price:     document.getElementById(`pPrice_${i}`)?.value||'',
+    oldPrice:  document.getElementById(`pOldPrice_${i}`)?.value || null,
+    priceUnit: { ua: document.getElementById(`pUnitUa_${i}`)?.value||'', ru: document.getElementById(`pUnitRu_${i}`)?.value||'' },
+  }));
+  try {
+    const res = await fetch('/api/content/pricing', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(cards),
+    });
+    if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
+    _cmsData.pricing = cards;
+    showToast('Варіанти навчання збережено ✓', 'success');
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+// ── FAQ EDITOR ─────────────────────────────────────────────────────────────────
+function collectFaqFromForm() {
+  return (_cmsData.faq || []).map((item, i) => ({
+    ...item,
+    question: { ua: document.getElementById(`fqQUa_${i}`)?.value||'', ru: document.getElementById(`fqQRu_${i}`)?.value||'' },
+    answer:   { ua: document.getElementById(`fqAUa_${i}`)?.value||'', ru: document.getElementById(`fqARu_${i}`)?.value||'' },
+  }));
+}
+
+function renderFaqEditor(items) {
+  const el = document.getElementById('faqEditor');
+  if (!items.length) { el.innerHTML = '<div class="empty" style="padding:30px">Питань немає. Натисніть «+ Додати питання».</div>'; return; }
+  el.innerHTML = items.map((item, i) => `
+    <div class="cms-card">
+      <div class="cms-card-header">
+        <span>Питання ${i+1}</span>
+        <button class="btn btn-danger btn-sm" onclick="deleteFaqItem(${i})">✕ Видалити</button>
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Питання UA</label>
+          <input class="cms-input" id="fqQUa_${i}" value="${esc(item.question?.ua||'')}"/></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Питання RU</label>
+          <input class="cms-input" id="fqQRu_${i}" value="${esc(item.question?.ru||'')}"/></div>
+      </div>
+      <div class="cms-grid2">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Відповідь UA</label>
+          <textarea class="cms-textarea" id="fqAUa_${i}">${esc(item.answer?.ua||'')}</textarea></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Відповідь RU</label>
+          <textarea class="cms-textarea" id="fqARu_${i}">${esc(item.answer?.ru||'')}</textarea></div>
+      </div>
+    </div>`).join('');
+}
+
+function addFaqItem() {
+  _cmsData.faq = collectFaqFromForm();
+  const maxId = _cmsData.faq.reduce((m,it) => Math.max(m, it.id||0), 0);
+  _cmsData.faq.push({ id: maxId+1, question:{ua:'',ru:''}, answer:{ua:'',ru:''} });
+  renderFaqEditor(_cmsData.faq);
+  showToast('Додано нове питання', 'success');
+}
+
+function deleteFaqItem(idx) {
+  if (!confirm(`Видалити питання ${idx+1}?`)) return;
+  _cmsData.faq = collectFaqFromForm();
+  _cmsData.faq.splice(idx, 1);
+  renderFaqEditor(_cmsData.faq);
+}
+
+async function saveFaq() {
+  const items = collectFaqFromForm();
+  try {
+    const res = await fetch('/api/content/faq', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(items),
+    });
+    if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
+    _cmsData.faq = items;
+    showToast('FAQ збережено ✓', 'success');
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+// ── COURSES EDITOR ─────────────────────────────────────────────────────────────
+function collectCoursesFromForm() {
+  return (_cmsData.courses || []).map((c, i) => ({
+    ...c,
+    emoji:     document.getElementById(`cEmoji_${i}`)?.value||'',
+    slug:      document.getElementById(`cSlug_${i}`)?.value||'',
+    popular:   document.getElementById(`cPopular_${i}`)?.checked||false,
+    age:       { ua: document.getElementById(`cAgeUa_${i}`)?.value||'', ru: document.getElementById(`cAgeRu_${i}`)?.value||'' },
+    title:     { ua: document.getElementById(`cTitleUa_${i}`)?.value||'', ru: document.getElementById(`cTitleRu_${i}`)?.value||'' },
+    desc:      { ua: document.getElementById(`cDescUa_${i}`)?.value||'', ru: document.getElementById(`cDescRu_${i}`)?.value||'' },
+    features:  (c.features||[]).map((_,fi) => ({
+      ua: document.getElementById(`cFeatUa_${i}_${fi}`)?.value||'',
+      ru: document.getElementById(`cFeatRu_${i}_${fi}`)?.value||'',
+    })),
+    duration:  { ua: document.getElementById(`cDurUa_${i}`)?.value||'', ru: document.getElementById(`cDurRu_${i}`)?.value||'' },
+    groupSize: { ua: document.getElementById(`cGroupUa_${i}`)?.value||'', ru: document.getElementById(`cGroupRu_${i}`)?.value||'' },
+  }));
+}
+
+function renderCoursesEditor(courses) {
+  const el = document.getElementById('coursesEditor');
+  if (!courses.length) { el.innerHTML = '<div class="empty" style="padding:30px">Курсів немає. Натисніть «+ Додати курс».</div>'; return; }
+  el.innerHTML = courses.map((c, i) => `
+    <div class="cms-card">
+      <div class="cms-card-header">
+        <span>${esc(c.emoji||'📚')} Курс ${i+1}</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label class="cms-toggle">
+            <input type="checkbox" id="cPopular_${i}" ${c.popular?'checked':''}> Популярний
+          </label>
+          <button class="btn btn-danger btn-sm" onclick="deleteCourse(${i})">✕</button>
+        </div>
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label">Emoji</label>
+          <input class="cms-input" id="cEmoji_${i}" value="${esc(c.emoji||'')}" style="font-size:18px"/></div>
+        <div><label class="cms-label">Slug (URL: /courses/slug)</label>
+          <input class="cms-input" id="cSlug_${i}" value="${esc(c.slug||'')}"/></div>
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Назва UA</label>
+          <input class="cms-input" id="cTitleUa_${i}" value="${esc(c.title?.ua||'')}"/></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Назва RU</label>
+          <input class="cms-input" id="cTitleRu_${i}" value="${esc(c.title?.ru||'')}"/></div>
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Вік UA</label>
+          <input class="cms-input" id="cAgeUa_${i}" value="${esc(c.age?.ua||'')}"/></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Вік RU</label>
+          <input class="cms-input" id="cAgeRu_${i}" value="${esc(c.age?.ru||'')}"/></div>
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Опис UA</label>
+          <textarea class="cms-textarea" id="cDescUa_${i}">${esc(c.desc?.ua||'')}</textarea></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Опис RU</label>
+          <textarea class="cms-textarea" id="cDescRu_${i}">${esc(c.desc?.ru||'')}</textarea></div>
+      </div>
+      <div style="margin-bottom:10px">
+        <label class="cms-label">Особливості (UA / RU):</label>
+        ${(c.features||[]).map((f,fi) => `
+          <div class="cms-features-row">
+            <input class="cms-input" id="cFeatUa_${i}_${fi}" value="${esc(f.ua||'')}" placeholder="🇺🇦 UA"/>
+            <input class="cms-input" id="cFeatRu_${i}_${fi}" value="${esc(f.ru||'')}" placeholder="🇷🇺 RU"/>
+          </div>`).join('')}
+      </div>
+      <div class="cms-grid2" style="margin-bottom:10px">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Тривалість UA</label>
+          <input class="cms-input" id="cDurUa_${i}" value="${esc(c.duration?.ua||'')}"/></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Тривалість RU</label>
+          <input class="cms-input" id="cDurRu_${i}" value="${esc(c.duration?.ru||'')}"/></div>
+      </div>
+      <div class="cms-grid2">
+        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Розмір групи UA</label>
+          <input class="cms-input" id="cGroupUa_${i}" value="${esc(c.groupSize?.ua||'')}"/></div>
+        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Розмір групи RU</label>
+          <input class="cms-input" id="cGroupRu_${i}" value="${esc(c.groupSize?.ru||'')}"/></div>
+      </div>
+    </div>`).join('');
+}
+
+function addCourse() {
+  _cmsData.courses = collectCoursesFromForm();
+  const maxId = _cmsData.courses.reduce((m,c) => Math.max(m, c.id||0), 0);
+  _cmsData.courses.push({
+    id: maxId+1, emoji:'📚', slug:'new-course',
+    headerClass:'course-card__header--scratch', popular:false,
+    age:{ua:'',ru:''}, title:{ua:'',ru:''}, desc:{ua:'',ru:''},
+    features:[{ua:'',ru:''},{ua:'',ru:''},{ua:'',ru:''}],
+    duration:{ua:'',ru:''}, groupSize:{ua:'',ru:''},
+  });
+  renderCoursesEditor(_cmsData.courses);
+  showToast('Додано новий курс', 'success');
+}
+
+function deleteCourse(idx) {
+  if (!confirm(`Видалити курс ${idx+1}?`)) return;
+  _cmsData.courses = collectCoursesFromForm();
+  _cmsData.courses.splice(idx, 1);
+  renderCoursesEditor(_cmsData.courses);
+}
+
+async function saveCourses() {
+  const courses = collectCoursesFromForm();
+  try {
+    const res = await fetch('/api/content/courses', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(courses),
+    });
+    if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
+    _cmsData.courses = courses;
+    showToast('Курси збережено ✓', 'success');
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+// ── COURSES TAB ──────────────────────────────────────────────────────────────
+let _allCourses    = null;
+let _editingCourse = null;
+
+async function loadCoursesTab() {
+  try {
+    const res = await fetch('/api/courses?all=1', { headers: { 'x-admin-token': token } });
+    const d = await res.json();
+    _allCourses = d.courses || [];
+    renderCoursesGrid();
+    // Also refresh course dropdowns in client form
+    _populateCourseDropdowns();
+  } catch { showToast('Помилка завантаження курсів', 'error'); }
+}
+
+function renderCoursesGrid() {
+  const grid = document.getElementById('coursesGrid');
+  if (!grid) return;
+  if (!_allCourses.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px">Курсів поки немає</div>';
+    return;
+  }
+  grid.innerHTML = _allCourses.map(c => `
+    <div style="background:#fff;border:1px solid #e8e4ff;border-radius:14px;padding:20px;position:relative">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;background:${c.color}22;border:1px solid ${c.color}44">${c.emoji}</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:800;color:#1a1a2e">${esc(c.name)}</div>
+          <div style="font-size:12px;color:#888">${esc(c.age || '—')}</div>
+        </div>
+        <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:${c.active!==false?'#dcfce7':'#f3f4f6'};color:${c.active!==false?'#15803d':'#999'}">${c.active!==false?'Активний':'Прихований'}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;font-size:12px">
+        <div style="background:#faf9ff;border-radius:8px;padding:8px 10px"><div style="color:#888;margin-bottom:2px">Ціна</div><div style="font-weight:700;color:#6C47FF">${c.price} ₴/міс</div></div>
+        <div style="background:#faf9ff;border-radius:8px;padding:8px 10px"><div style="color:#888;margin-bottom:2px">Тривалість</div><div style="font-weight:600">${esc(c.duration||'—')}</div></div>
+        <div style="background:#faf9ff;border-radius:8px;padding:8px 10px"><div style="color:#888;margin-bottom:2px">Група</div><div style="font-weight:600">до ${c.groupSize||'?'} осіб</div></div>
+      </div>
+      <p style="font-size:13px;color:#555;line-height:1.5;margin-bottom:14px">${esc(c.description||'')}</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="openCourseModal('${c.id}')">✏️ Редагувати</button>
+        ${currentRole==='superadmin'?`<button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')">✕ Видалити</button>`:''}
+        <a href="/course.html?c=${c.id}" target="_blank" class="btn btn-ghost btn-sm" style="margin-left:auto">🔗 Переглянути</a>
+      </div>
+    </div>`).join('');
+}
+
+function openCourseModal(id) {
+  _editingCourse = id;
+  const fields = ['id','name','emoji','age','duration','lessonsCount','groupSize','price','description'];
+  fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el) el.value = ''; });
+  document.getElementById('crs_color').value = '#6C47FF';
+  document.getElementById('crs_active').value = 'true';
+  document.getElementById('courseModalTitle').textContent = id ? 'Редагувати курс' : 'Новий курс';
+  document.getElementById('crs_id').disabled = !!id;
+  if (id) {
+    const c = _allCourses?.find(x => x.id === id);
+    if (c) {
+      fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el && c[f] != null) el.value = c[f]; });
+      document.getElementById('crs_color').value  = c.color  || '#6C47FF';
+      document.getElementById('crs_active').value = String(c.active !== false);
+    }
+  }
+  document.getElementById('courseModal').style.display = 'flex';
+}
+
+function closeCourseModal() { document.getElementById('courseModal').style.display = 'none'; }
+
+async function saveCourse() {
+  const idVal = document.getElementById('crs_id')?.value.trim();
+  const name  = document.getElementById('crs_name')?.value.trim();
+  if (!name) { showToast('Вкажіть назву', 'error'); return; }
+  if (!_editingCourse && !idVal) { showToast('Вкажіть ID', 'error'); return; }
+  const data = {
+    id:           idVal,
+    name,
+    emoji:        document.getElementById('crs_emoji')?.value.trim()        || '📚',
+    age:          document.getElementById('crs_age')?.value.trim()          || '',
+    duration:     document.getElementById('crs_duration')?.value.trim()     || '',
+    lessonsCount: document.getElementById('crs_lessonsCount')?.value        || 0,
+    groupSize:    document.getElementById('crs_groupSize')?.value           || 0,
+    price:        document.getElementById('crs_price')?.value               || 0,
+    description:  document.getElementById('crs_description')?.value.trim() || '',
+    color:        document.getElementById('crs_color')?.value               || '#6C47FF',
+    active:       document.getElementById('crs_active')?.value === 'true',
+  };
+  try {
+    const url    = _editingCourse ? `/api/courses/${_editingCourse}` : '/api/courses';
+    const method = _editingCourse ? 'PATCH' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) { showToast(json.error || 'Помилка', 'error'); return; }
+    closeCourseModal();
+    showToast(_editingCourse ? 'Курс оновлено ✓' : 'Курс створено ✓', 'success');
+    await loadCoursesTab();
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+async function deleteCourse(id) {
+  if (!confirm(`Видалити курс "${id}"?`)) return;
+  try {
+    const res = await fetch(`/api/courses/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    showToast('Курс видалено ✓', 'success');
+    await loadCoursesTab();
+  } catch { showToast('Помилка', 'error'); }
+}
+
+function _populateCourseDropdowns() {
+  if (!_allCourses) return;
+  // Update all course <select> elements in the admin (client form + filters)
+  const opts = '<option value="">— Курс —</option>' +
+    _allCourses.filter(c => c.active !== false).map(c =>
+      `<option value="${c.id}">${c.emoji} ${esc(c.name)}</option>`
+    ).join('');
+  document.querySelectorAll('.course-dynamic-select').forEach(sel => {
+    const cur = sel.value;
+    sel.innerHTML = opts;
+    if (cur) sel.value = cur;
+  });
+}
+
 // ── AUTO LOGIN if token saved ─────────────────────────────────────────────────
 if (token) showApp();
 </script>
+
+<!-- Schedule quick-edit popup (singleton) -->
+<div id="schedPopup" class="sched-popup" style="display:none">
+  <h5>Розклад занять</h5>
+  <div class="sched-popup-row"><label>День 1</label>
+    <select id="sp_day1"><option value="">— —</option><option value="1">Пн</option><option value="2">Вт</option><option value="3">Ср</option><option value="4">Чт</option><option value="5">Пт</option><option value="6">Сб</option><option value="7">Нд</option></select>
+    <select id="sp_time1"><option value="">— —</option><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option><option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option><option>20:00</option></select>
+  </div>
+  <div class="sched-popup-row"><label>День 2</label>
+    <select id="sp_day2"><option value="">— —</option><option value="1">Пн</option><option value="2">Вт</option><option value="3">Ср</option><option value="4">Чт</option><option value="5">Пт</option><option value="6">Сб</option><option value="7">Нд</option></select>
+    <select id="sp_time2"><option value="">— —</option><option>09:00</option><option>09:30</option><option>10:00</option><option>10:30</option><option>11:00</option><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option>14:30</option><option>15:00</option><option>15:30</option><option>16:00</option><option>16:30</option><option>17:00</option><option>17:30</option><option>18:00</option><option>18:30</option><option>19:00</option><option>19:30</option><option>20:00</option></select>
+  </div>
+  <div class="sched-popup-footer">
+    <button class="btn btn-ghost btn-sm" onclick="closeSchedPopup()">Скасувати</button>
+    <button class="btn btn-primary btn-sm" onclick="saveSchedPopup()">Зберегти</button>
+  </div>
+</div>
+
+<!-- Attendance status dropdown (singleton) -->
+<div id="attDropdown" class="att-drop" style="display:none">
+  <button class="att-drop-btn" onclick="setAttStatus('')"><span class="att-drop-dot" style="background:#f0f0f0;border:1px solid #ddd"></span> Порожньо</button>
+  <button class="att-drop-btn" onclick="setAttStatus('present')"><span class="att-drop-dot" style="background:#86efac;border:1px solid #4ade80"></span> Присутній</button>
+  <button class="att-drop-btn" onclick="setAttStatus('absent')"><span class="att-drop-dot" style="background:#fca5a5;border:1px solid #f87171"></span> Відсутній</button>
+  <button class="att-drop-btn" onclick="setAttStatus('makeup')"><span class="att-drop-dot" style="background:#fde68a;border:1px solid #fbbf24"></span> Відпрацювання</button>
+  <button class="att-drop-btn" onclick="setAttStatus('cancelled')"><span class="att-drop-dot" style="background:#d1d5db;border:1px solid #9ca3af"></span> Скасовано</button>
+</div>
 </body>
 </html>

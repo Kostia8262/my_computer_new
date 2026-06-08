@@ -65,6 +65,31 @@ a{color:inherit;text-decoration:none}
 .nav__menu{display:flex;list-style:none;gap:2px;margin-left:auto}
 .nav__link{font-size:14px;font-weight:500;color:var(--color-text-2);padding:6px 12px;border-radius:var(--r-full);transition:all var(--t)}
 .nav__link:hover{color:var(--color-primary);background:var(--color-primary-light)}
+
+/* Courses dropdown */
+.nav__has-dropdown{position:relative}
+.nav__link--drop::after{content:'▾';margin-left:3px;font-size:10px;opacity:.7}
+.nav__dropdown{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%) translateY(-6px);
+  background:#fff;border:1px solid var(--color-border);border-radius:var(--r-lg);
+  box-shadow:0 8px 30px rgba(108,71,255,.12),0 2px 8px rgba(0,0,0,.05);
+  padding:6px;min-width:230px;z-index:200;
+  opacity:0;pointer-events:none;transition:opacity .18s,transform .18s}
+.nav__has-dropdown:hover .nav__dropdown,.nav__has-dropdown.open .nav__dropdown{
+  opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+.nav__dropdown a{display:flex;align-items:center;gap:10px;padding:9px 12px;
+  border-radius:var(--r-md);font-size:13px;font-weight:500;color:var(--color-text-2);
+  transition:all var(--t);white-space:nowrap}
+.nav__dropdown a:hover{background:var(--color-primary-light);color:var(--color-primary)}
+.nav__dropdown-emoji{font-size:17px;flex-shrink:0}
+
+/* "Детальніше" ghost button on dark course cards */
+.course-card__footer .btn--ghost-sm{
+  font-size:13px;font-weight:600;color:rgba(255,255,255,.75);
+  border:1.5px solid rgba(255,255,255,.22);border-radius:var(--r-full);
+  padding:6px 14px;transition:all var(--t);white-space:nowrap;background:transparent;
+  display:inline-block}
+.course-card__footer .btn--ghost-sm:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.4)}
+
 .nav__actions{display:flex;align-items:center;gap:10px}
 .nav__phone{font-size:14px;font-weight:500;color:var(--color-text-2);transition:color var(--t)}
 .nav__phone:hover{color:var(--color-primary)}
@@ -309,7 +334,7 @@ a{color:inherit;text-decoration:none}
 /* ===================================================
    FIX 7: CONTACT — grid-area layout, mobile separation
    =================================================== */
-.contact{padding:88px 0;background:var(--color-bg-soft)}
+.contact{padding:32px 0 88px;background:var(--color-bg-soft)}
 .contact__grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -321,11 +346,7 @@ a{color:inherit;text-decoration:none}
 .contact__form-wrap{grid-area:form}
 .contact__details{grid-area:details}
 
-.contact__title{font-size:clamp(26px,4vw,38px);font-weight:800;line-height:1.2;margin:14px 0}
-.contact__subtitle{font-size:15px;color:var(--color-text-2);line-height:1.7;margin-bottom:24px}
-.contact__features{display:flex;flex-direction:column;gap:10px}
-.contact__feature{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500}
-.feature-check{width:22px;height:22px;background:var(--color-success);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.contact__title{font-size:clamp(26px,4vw,38px);font-weight:800;line-height:1.2;margin:8px 0 14px}
 
 /* Contact details */
 .contact__info-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--color-text-muted);margin-top:20px;margin-bottom:10px}
@@ -380,6 +401,11 @@ a{color:inherit;text-decoration:none}
 .footer__col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
 .footer__col a{font-size:13px;color:rgba(255,255,255,.45);transition:color var(--t)}
 .footer__col a:hover{color:var(--color-primary-mid)}
+.footer__payments{display:flex;align-items:center;gap:14px;padding:14px 0;border-top:1px solid rgba(255,255,255,.08);margin-top:4px;flex-wrap:wrap}
+.footer__payments-label{font-size:12px;font-weight:600;color:rgba(255,255,255,.4);white-space:nowrap;text-transform:uppercase;letter-spacing:.5px}
+.footer__payment-icons{display:flex;gap:7px;flex-wrap:wrap}
+.pay-badge{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:rgba(255,255,255,.6);white-space:nowrap;transition:border-color .2s}
+.pay-badge:hover{border-color:rgba(108,71,255,.5);color:rgba(108,71,255,.9)}
 .footer__bottom{padding-top:20px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:rgba(255,255,255,.3)}
 .footer__bottom-left{display:flex;flex-direction:column;gap:6px}
 .footer__bottom p{color:rgba(255,255,255,.3)}
@@ -528,6 +554,15 @@ a{color:inherit;text-decoration:none}
     border-radius:var(--r-full);
     box-shadow:0 4px 14px rgba(108,71,255,.4);
   }
+  /* Dropdown inline in mobile menu */
+  .nav__dropdown{
+    position:static;transform:none!important;opacity:1;pointer-events:auto;
+    box-shadow:none;border:none;background:transparent;
+    padding:0 0 4px 8px;display:none
+  }
+  .nav__has-dropdown.open .nav__dropdown{display:block}
+  .nav__dropdown a{font-size:14px;padding:7px 14px;color:var(--color-text-2)}
+  .nav__link--drop::after{content:' ▾'}
 
   /* Hero */
   .hero__inner{grid-template-columns:1fr}

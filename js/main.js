@@ -61,11 +61,27 @@ burger.addEventListener('click', () => {
 });
 
 document.querySelectorAll('.nav__link').forEach(link => {
-  link.addEventListener('click', () => {
+  link.addEventListener('click', (e) => {
+    // Toggle courses dropdown on mobile / click; anchor links close menu
+    if (link.classList.contains('nav__link--drop')) {
+      const li = link.closest('.nav__has-dropdown');
+      if (window.innerWidth <= 768) {
+        e.preventDefault();
+        li.classList.toggle('open');
+        return;
+      }
+    }
     navMenu.classList.remove('open');
     burger.setAttribute('aria-expanded', 'false');
     burger.querySelectorAll('span').forEach(b => { b.style.transform = ''; b.style.opacity = ''; });
   });
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.nav__has-dropdown')) {
+    document.querySelectorAll('.nav__has-dropdown').forEach(el => el.classList.remove('open'));
+  }
 });
 
 /* ===================================================
@@ -221,7 +237,7 @@ function validateForm(formEl) {
     const codeEl = formEl.querySelector('[name="phone_code"]');
     const code   = codeEl ? codeEl.value : '+380';
     const digits = phoneEl.value.replace(/\D/g, '');
-    const minLen = code === '+380' ? 10 : 6;
+    const minLen = code === '+380' ? 9 : 6;
     const maxLen = code === '+380' ? 10 : 13;
     if (!digits) { setFieldError(phoneEl, t('phone_req')); ok = false; }
     else if (digits.length < minLen || digits.length > maxLen) {
@@ -264,11 +280,13 @@ function applyUkrMask(input) {
   if (v.startsWith('380')) v = v.slice(3);
   else if (v.startsWith('38')) v = v.slice(2);
   else if (v.startsWith('8'))  v = v.slice(1);
+  else if (v.startsWith('0'))  v = v.slice(1); // strip local trunk 0 (380 already has it)
+  v = v.slice(0, 9);
   let f = '';
-  if (v.length > 0) f = '(' + v.substring(0, 3);
-  if (v.length >= 3) f += ') ' + v.substring(3, 6);
-  if (v.length >= 6) f += '-' + v.substring(6, 8);
-  if (v.length >= 8) f += '-' + v.substring(8, 10);
+  if (v.length > 0) f = '(' + v.substring(0, 2);
+  if (v.length >= 2) f += ') ' + v.substring(2, 5);
+  if (v.length >= 5) f += '-' + v.substring(5, 7);
+  if (v.length >= 7) f += '-' + v.substring(7, 9);
   input.value = f;
 }
 
@@ -279,7 +297,7 @@ document.querySelectorAll('.phone-wrap').forEach(wrap => {
 
   function updatePlaceholder() {
     if (codeEl.value === '+380') {
-      phoneEl.placeholder = '(0__) ___-__-__';
+      phoneEl.placeholder = '(95) ___-__-__';
     } else {
       phoneEl.placeholder = 'XXX XXX XXXX';
     }
@@ -382,6 +400,100 @@ if (modalForm) {
     submitLeadForm(modalForm, modalSubmit);
   });
 }
+
+/* ===================================================
+   DYNAMIC CONTENT — loads from /api/content
+   =================================================== */
+let _siteContent = null;
+
+async function loadSiteContent() {
+  try {
+    const res = await fetch('/api/content');
+    if (!res.ok) return;
+    _siteContent = await res.json();
+    renderPricing(_siteContent.pricing || []);
+    renderCourses(_siteContent.courses || []);
+    renderFaq(_siteContent.faq || []);
+  } catch(e) { /* keep static fallback */ }
+}
+
+function t2(obj) {
+  if (!obj) return '';
+  return currentLang === 'ru' ? (obj.ru || obj.ua || '') : (obj.ua || '');
+}
+
+function renderPricing(cards) {
+  const el = document.getElementById('pricingGrid');
+  if (!el || !cards.length) return;
+  el.innerHTML = cards.map(c => `
+    <div class="pricing-card${c.featured ? ' pricing-card--featured' : ''}">
+      <div class="pricing-card__badge">${t2(c.badge)}</div>
+      <h3 class="pricing-card__title">${t2(c.title)}</h3>
+      <ul class="pricing-card__features">
+        ${(c.features||[]).map(f => `<li>${t2(f)}</li>`).join('')}
+      </ul>
+      <div class="pricing-card__price">
+        <div class="pricing-card__price-label">${t2({ua:'від',ru:'от'})}</div>
+        <div class="pricing-card__price-val">${c.price} <span>${t2(c.priceUnit)}</span>${c.oldPrice ? ` <del class="pricing-card__price-old">${c.oldPrice}</del>` : ''}</div>
+      </div>
+      <a href="#contact" class="pricing-card__btn open-modal">${t2({ua:'Записатись на пробне',ru:'Записаться на пробное'})}</a>
+    </div>
+  `).join('');
+  // Re-attach open-modal handlers
+  el.querySelectorAll('.open-modal').forEach(btn => btn.addEventListener('click', e => { e.preventDefault(); openModal(''); }));
+}
+
+function renderCourses(courses) {
+  const el = document.getElementById('coursesGrid');
+  if (!el || !courses.length) return;
+  el.innerHTML = courses.map(c => `
+    <div class="course-card${c.popular ? ' course-card--popular' : ''}">
+      <div class="course-card__header ${c.headerClass}">
+        <div class="course-card__emoji">${c.emoji}</div>
+        <div class="course-card__age-badge">${t2(c.age)}</div>
+      </div>
+      <div class="course-card__body">
+        <h3 class="course-card__title">${t2(c.title)}</h3>
+        <p class="course-card__desc">${t2(c.desc)}</p>
+        <ul class="course-card__features">${(c.features||[]).map(f=>`<li>${t2(f)}</li>`).join('')}</ul>
+        <div class="course-card__footer">
+          <div class="course-card__info">
+            <span>${t2(c.duration)}</span>
+            <span>${t2(c.groupSize)}</span>
+          </div>
+          <a href="#" class="btn btn--primary btn--sm open-modal">${t2({ua:'Записатись',ru:'Записаться'})}</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  el.querySelectorAll('.open-modal').forEach(btn => btn.addEventListener('click', e => { e.preventDefault(); const card=btn.closest('.course-card'); const title=card?.querySelector('.course-card__title')?.textContent||''; let course=''; if(/scratch/i.test(title))course='scratch'; else if(/python/i.test(title))course='python'; else if(/roblox/i.test(title))course='roblox'; else if(/web|веб/i.test(title))course='web'; openModal(course); }));
+}
+
+function renderFaq(items) {
+  const el = document.getElementById('faqList');
+  if (!el || !items.length) return;
+  el.innerHTML = items.map(item => `
+    <div class="faq-item">
+      <button class="faq-item__question">
+        <span>${t2(item.question)}</span>
+        <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="faq-item__answer"><p>${t2(item.answer)}</p></div>
+    </div>
+  `).join('');
+  // Re-attach FAQ accordion
+  el.querySelectorAll('.faq-item__question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('active');
+      el.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+      if (!isOpen) item.classList.add('active');
+    });
+  });
+}
+
+// Load content on page start (after lang is applied)
+loadSiteContent();
 
 /* ===================================================
    FAQ ACCORDION

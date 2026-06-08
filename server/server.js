@@ -21,9 +21,21 @@ const cors         = require('cors');
 const helmet       = require('helmet');
 const rateLimit    = require('express-rate-limit');
 const path         = require('path');
+const fs           = require('fs');
 const db             = require('./database');
 const adminsDb       = require('./admins');
+const clientsDb      = require('./clients');
+const paymentsDb     = require('./payments');
+const attendanceDb   = require('./attendance');
+const monthlyPayDb   = require('./monthly-payments');
+const coursesDb      = require('./courses');
 const { sendLeadNotification } = require('./mailer');
+
+const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
+function loadContent() {
+  try { return JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8')); } catch { return {}; }
+}
+function saveContent(data) { fs.writeFileSync(CONTENT_FILE, JSON.stringify(data, null, 2), 'utf8'); }
 
 const app            = express();
 const PORT           = process.env.PORT || 3000;
@@ -57,7 +69,7 @@ app.use(helmet({
 // ── CORS ─────────────────────────────────────────────────────────────────────
 app.use(cors({
   origin: ALLOWED_ORIGIN === '*' ? '*' : ALLOWED_ORIGIN.split(',').map(s => s.trim()),
-  methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-admin-token'],
 }));
 
@@ -288,6 +300,322 @@ const SPA_ROUTES = ['/', '/index.html'];
 SPA_ROUTES.forEach(r => app.get(r, (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'index.html'));
 }));
+
+// ── CLIENTS CRM API ──────────────────────────────────────────────────────────
+function sanitizeClient(body) {
+  const s = v => sanitize(v);
+  return {
+    name:         s(body.name),
+    age:          body.age ? parseInt(body.age) || null : null,
+    course:       s(body.course) || null,
+    phone:        s(body.phone),
+    email:        s(body.email) || null,
+    status:       s(body.status),
+    source:       s(body.source),
+    enrolledDate: s(body.enrolledDate) || null,
+    trialDate:    s(body.trialDate) || null,
+    lastContact:  s(body.lastContact) || null,
+    nextContact:  s(body.nextContact) || null,
+    monthlyFee:   body.monthlyFee != null ? parseFloat(body.monthlyFee) || null : null,
+    totalPaid:    body.totalPaid != null ? parseFloat(body.totalPaid) || null : null,
+    notes:        s(body.notes),
+    manager:      s(body.manager),
+    teacher:      s(body.teacher),
+    schedule:     s(body.schedule),
+    scheduleDays: Array.isArray(body.scheduleDays) ? body.scheduleDays : [],
+    lessonType:   s(body.lessonType) || null,
+    city:         s(body.city),
+  };
+}
+
+app.get('/api/clients', adminLimiter, requireAdmin, (req, res) => {
+  res.json({ success: true, clients: clientsDb.getAll(), stats: clientsDb.getStats() });
+});
+
+app.post('/api/clients', adminLimiter, requireAdmin, (req, res) => {
+  const data = sanitizeClient(req.body);
+  if (!data.name || data.name.length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я' });
+  const client = clientsDb.create(data);
+  res.status(201).json({ success: true, client });
+});
+
+app.patch('/api/clients/:id', adminLimiter, requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  const data = sanitizeClient(req.body);
+  const client = clientsDb.update(id, data);
+  if (!client) return res.status(404).json({ error: 'Not found' });
+  res.json({ success: true, client });
+});
+
+app.delete('/api/clients/:id', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  const ok = clientsDb.delete(id);
+  if (!ok) return res.status(404).json({ error: 'Not found' });
+  res.json({ success: true });
+});
+
+// ── ALERTS API ────────────────────────────────────────────────────────────────
+function parseUkDate(s) {
+  if (!s) return null;
+  const [datePart, timePart] = String(s).split(', ');
+  if (!datePart) return null;
+  const [day, month, year] = datePart.split('.');
+  if (!year) return null;
+  return new Date(`${year}-${month}-${day}T${timePart || '00:00:00'}`);
+}
+
+app.get('/api/alerts', adminLimiter, requireAdmin, (req, res) => {
+  const leads   = db.getAllLeads();
+  const clients = clientsDb.getAll();
+  const now     = Date.now();
+  const H2      = 2  * 60 * 60 * 1000;
+  const D3      = 3  * 24 * 60 * 60 * 1000;
+  const D7      = 7  * 24 * 60 * 60 * 1000;
+  const D30     = 30 * 24 * 60 * 60 * 1000;
+  const alerts  = [];
+
+  // 1. New leads not contacted > 2h
+  const uncontacted = leads.filter(l => {
+    if (l.status !== 'new') return false;
+    const d = parseUkDate(l.created_at);
+    return d && (now - d.getTime()) > H2;
+  });
+  if (uncontacted.length) alerts.push({
+    type: 'leads_uncontacted', severity: 'high', count: uncontacted.length,
+    message: `${uncontacted.length} нових заявок не прозвонені більше 2 годин`,
+    hint: 'Зателефонуйте негайно — шанс конверсії падає з кожною годиною',
+    ids: uncontacted.map(l => l.id), tab: 'leads',
+  });
+
+  // 2. Leads in contacted/trial_scheduled > 3 days without update
+  const stale = leads.filter(l => {
+    if (!['contacted', 'trial_scheduled'].includes(l.status)) return false;
+    const d = parseUkDate(l.updated_at);
+    return d && (now - d.getTime()) > D3;
+  });
+  if (stale.length) alerts.push({
+    type: 'leads_stale', severity: 'medium', count: stale.length,
+    message: `${stale.length} заявок без оновлення більше 3 днів`,
+    hint: 'Перенабрати — можливо, клієнт передумав або забув',
+    ids: stale.map(l => l.id), tab: 'leads',
+  });
+
+  // 3. Trial scheduled > 7 days not moved to enrolled
+  const trialPending = leads.filter(l => {
+    if (l.status !== 'trial_scheduled') return false;
+    const d = parseUkDate(l.updated_at);
+    return d && (now - d.getTime()) > D7;
+  });
+  if (trialPending.length) alerts.push({
+    type: 'leads_trial_pending', severity: 'medium', count: trialPending.length,
+    message: `${trialPending.length} пробних уроків не завершено записом`,
+    hint: 'З\'ясуйте результат пробного уроку та запропонуйте запис',
+    ids: trialPending.map(l => l.id), tab: 'leads',
+  });
+
+  // 4. Clients with overdue nextContact
+  const overdueClients = clients.filter(c => {
+    if (!c.nextContact || !['active','trial','paused'].includes(c.status)) return false;
+    return new Date(c.nextContact) < new Date();
+  });
+  if (overdueClients.length) alerts.push({
+    type: 'clients_overdue', severity: 'medium', count: overdueClients.length,
+    message: `${overdueClients.length} клієнтів — прострочений дзвінок`,
+    hint: 'Дата наступного контакту вже минула — зателефонуйте сьогодні',
+    ids: overdueClients.map(c => c.id), tab: 'clients',
+  });
+
+  // 5. Paused clients > 30 days
+  const longPaused = clients.filter(c => {
+    if (c.status !== 'paused') return false;
+    const d = new Date(c.updatedAt);
+    return !isNaN(d) && (now - d.getTime()) > D30;
+  });
+  if (longPaused.length) alerts.push({
+    type: 'clients_paused', severity: 'low', count: longPaused.length,
+    message: `${longPaused.length} клієнтів на паузі більше 30 днів`,
+    hint: 'Нагадайте про себе — після відпустки або канікул добре "утеплити" контакт',
+    ids: longPaused.map(c => c.id), tab: 'clients',
+  });
+
+  const total = alerts.reduce((s, a) => s + a.count, 0);
+  res.json({ success: true, alerts, total });
+});
+
+// ── CSV IMPORT API ────────────────────────────────────────────────────────────
+app.post('/api/leads/import', adminLimiter, requireAdmin, (req, res) => {
+  const rows = req.body;
+  if (!Array.isArray(rows)) return res.status(400).json({ error: 'Expected array' });
+  let imported = 0;
+  const errors = [];
+  rows.forEach((row, i) => {
+    try {
+      const name = sanitize(row.name || row.child_name || '');
+      const phone = sanitize(row.phone || '');
+      if (name.length >= 2 && phone) {
+        db.insertLead({
+          child_name: name,
+          age:    row.age ? parseInt(row.age) || null : null,
+          course: sanitize(row.course) || null,
+          phone,
+          email:  sanitize(row.email) || null,
+        });
+        imported++;
+      }
+    } catch (e) { errors.push(`Row ${i}: ${e.message}`); }
+  });
+  res.json({ success: true, imported, errors });
+});
+
+app.post('/api/clients/import', adminLimiter, requireAdmin, (req, res) => {
+  const rows = req.body;
+  if (!Array.isArray(rows)) return res.status(400).json({ error: 'Expected array' });
+  let imported = 0;
+  const errors = [];
+  rows.forEach((row, i) => {
+    try {
+      const name = sanitize(row.name || row.child_name || '');
+      const phone = sanitize(row.phone || '');
+      if (name.length >= 2 && phone) {
+        clientsDb.create(sanitizeClient({ ...row, name, phone }));
+        imported++;
+      }
+    } catch (e) { errors.push(`Row ${i}: ${e.message}`); }
+  });
+  res.json({ success: true, imported, errors });
+});
+
+// ── PAYMENTS API ─────────────────────────────────────────────────────────────
+app.get('/api/payments', adminLimiter, requireAdmin, (req, res) => {
+  const clientId = req.query.clientId ? parseInt(req.query.clientId) : null;
+  res.json({ success: true, payments: paymentsDb.getAll(clientId) });
+});
+
+app.post('/api/payments', adminLimiter, requireAdmin, (req, res) => {
+  const { clientId, amount, date, method, note } = req.body;
+  if (!clientId) return res.status(400).json({ error: 'clientId обов\'язковий' });
+  if (!amount || parseFloat(amount) <= 0) return res.status(400).json({ error: 'Сума має бути більше 0' });
+  const payment = paymentsDb.create({
+    clientId, amount, date: date || new Date().toISOString().slice(0, 10),
+    method: sanitize(method || 'other'),
+    note: sanitize(note || ''),
+  });
+  // Recalculate totalPaid for client from payment history
+  const total = paymentsDb.getTotalForClient(parseInt(clientId));
+  clientsDb.update(parseInt(clientId), { totalPaid: total });
+  res.status(201).json({ success: true, payment });
+});
+
+app.delete('/api/payments/:id', adminLimiter, requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  const payment = paymentsDb.getById(id);
+  if (!payment) return res.status(404).json({ error: 'Not found' });
+  paymentsDb.delete(id);
+  const total = paymentsDb.getTotalForClient(payment.clientId);
+  clientsDb.update(payment.clientId, { totalPaid: total });
+  res.json({ success: true });
+});
+
+// ── MONTHLY PAYMENTS API ─────────────────────────────────────────────────────
+app.get('/api/monthly-payments', adminLimiter, requireAdmin, (req, res) => {
+  res.json({ success: true, months: monthlyPayDb.getAllMonths() });
+});
+
+app.get('/api/monthly-payments/:ym', adminLimiter, requireAdmin, (req, res) => {
+  const { ym } = req.params;
+  if (!/^\d{4}-\d{2}$/.test(ym)) return res.status(400).json({ error: 'Format: YYYY-MM' });
+  const records = monthlyPayDb.getMonth(ym);
+  res.json({ success: true, ym, records: records || [] });
+});
+
+app.post('/api/monthly-payments/:ym', adminLimiter, requireAdmin, (req, res) => {
+  const { ym } = req.params;
+  if (!/^\d{4}-\d{2}$/.test(ym)) return res.status(400).json({ error: 'Format: YYYY-MM' });
+  if (!Array.isArray(req.body.records)) return res.status(400).json({ error: 'records[] required' });
+  const result = monthlyPayDb.createMonth(ym, req.body.records);
+  res.status(result.alreadyExists ? 200 : 201).json({ success: true, ...result });
+});
+
+app.patch('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, (req, res) => {
+  const { ym, clientId } = req.params;
+  const record = monthlyPayDb.updateRecord(ym, clientId, req.body);
+  if (!record) return res.status(404).json({ error: 'Not found' });
+  res.json({ success: true, record });
+});
+
+app.delete('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, (req, res) => {
+  const { ym, clientId } = req.params;
+  const ok = monthlyPayDb.removeRecord(ym, parseInt(clientId));
+  if (!ok) return res.status(404).json({ error: 'Not found' });
+  res.json({ success: true });
+});
+
+// ── ATTENDANCE API ────────────────────────────────────────────────────────────
+app.get('/api/attendance', adminLimiter, requireAdmin, (req, res) => {
+  const year  = parseInt(req.query.year)  || new Date().getFullYear();
+  const month = parseInt(req.query.month) || (new Date().getMonth() + 1);
+  res.json({ success: true, year, month, data: attendanceDb.getMonth(year, month) });
+});
+
+app.post('/api/attendance', adminLimiter, requireAdmin, (req, res) => {
+  const { clientId, date, status } = req.body;
+  if (!clientId || !date) return res.status(400).json({ error: 'clientId та date обов\'язкові' });
+  const ok = attendanceDb.setRecord(clientId, date, status || '');
+  if (ok === false) return res.status(400).json({ error: 'Невірний статус' });
+  res.json({ success: true });
+});
+
+// ── CONTENT CMS API ──────────────────────────────────────────────────────────
+// Public: read all content
+app.get('/api/content', (req, res) => {
+  res.json(loadContent());
+});
+
+// Admin: update a section (pricing | faq | courses)
+app.put('/api/content/:section', adminLimiter, requireAdmin, (req, res) => {
+  const { section } = req.params;
+  const allowed = ['pricing', 'faq', 'courses'];
+  if (!allowed.includes(section)) return res.status(400).json({ error: 'Unknown section' });
+  const data = loadContent();
+  data[section] = req.body;
+  saveContent(data);
+  res.json({ success: true, section, count: req.body.length });
+});
+
+// ── COURSES API ───────────────────────────────────────────────────────────────
+// Public endpoint — landing page fetches it without auth
+app.get('/api/courses', (req, res) => {
+  const all = req.query.all === '1';
+  res.json({ success: true, courses: all ? coursesDb.getAll() : coursesDb.getActive() });
+});
+
+app.post('/api/courses', adminLimiter, requireAdmin, (req, res) => {
+  const course = coursesDb.create(req.body);
+  if (!course) return res.status(409).json({ error: 'ID вже існує' });
+  res.status(201).json({ success: true, course });
+});
+
+app.patch('/api/courses/:id', adminLimiter, requireAdmin, (req, res) => {
+  const course = coursesDb.update(req.params.id, req.body);
+  if (!course) return res.status(404).json({ error: 'Курс не знайдено' });
+  res.json({ success: true, course });
+});
+
+app.delete('/api/courses/:id', adminLimiter, requireAdmin, (req, res) => {
+  const ok = coursesDb.delete(req.params.id);
+  if (!ok) return res.status(404).json({ error: 'Курс не знайдено' });
+  res.json({ success: true });
+});
+
+// ── COURSE PAGES ──────────────────────────────────────────────────────────────
+const COURSE_SLUGS = ['scratch', 'python', 'roblox', 'web'];
+app.get('/courses/:slug', (req, res) => {
+  const { slug } = req.params;
+  if (!COURSE_SLUGS.includes(slug)) {
+    return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  }
+  res.sendFile(path.join(__dirname, '..', 'courses', `${slug}.html`));
+});
 
 // ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────
 app.get('/503', (req, res) => {
