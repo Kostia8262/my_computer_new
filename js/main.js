@@ -412,10 +412,50 @@ async function loadSiteContent() {
     if (!res.ok) return;
     _siteContent = await res.json();
     renderPricing(_siteContent.pricing || []);
-    renderCourses(_siteContent.courses || []);
     renderFaq(_siteContent.faq || []);
     applyModuleVisibility(_siteContent.modules || {});
   } catch(e) { /* keep static fallback */ }
+}
+
+async function loadCourses() {
+  try {
+    const res = await fetch('/api/courses');
+    if (!res.ok) return;
+    const { courses } = await res.json();
+    const active = (courses || []).filter(c => c.active !== false);
+    if (!active.length) return;
+    const el = document.getElementById('coursesGrid');
+    if (!el) return;
+    const COLOR_CLASS = { scratch: 'course-card__header--scratch', python: 'course-card__header--python', roblox: 'course-card__header--roblox', web: 'course-card__header--web' };
+    el.innerHTML = active.map(c => {
+      const hClass = COLOR_CLASS[c.id] || '';
+      const hStyle = hClass ? '' : `style="background:${esc(c.color || '#6C47FF')}"`;
+      return `<div class="course-card" style="cursor:pointer" onclick="location.href='/courses/${esc(c.id)}'">
+        <div class="course-card__header ${hClass}" ${hStyle}>
+          <div class="course-card__emoji">${c.emoji || ''}</div>
+          <div class="course-card__age-badge">${esc(c.age)}</div>
+        </div>
+        <div class="course-card__body">
+          <h3 class="course-card__title">${esc(c.name)}</h3>
+          <p class="course-card__desc">${esc(c.description)}</p>
+          <div class="course-card__footer">
+            <div class="course-card__info">
+              <span>⏱ ${esc(c.duration)}</span>
+              <span>👥 Група до ${c.groupSize} осіб</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <a href="/courses/${esc(c.id)}" class="btn--ghost-sm" onclick="event.stopPropagation()">${currentLang === 'ru' ? 'Подробнее' : 'Детальніше'}</a>
+              <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" onclick="event.stopPropagation()">${currentLang === 'ru' ? 'Записаться' : 'Записатись'}</a>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.open-modal').forEach(btn => btn.addEventListener('click', e => {
+      e.preventDefault();
+      openModal(btn.dataset.course || '');
+    }));
+  } catch (e) { /* keep static fallback */ }
 }
 
 function applyModuleVisibility(modules) {
@@ -514,6 +554,7 @@ function renderFaq(items) {
 
 // Load content on page start (after lang is applied)
 loadSiteContent();
+loadCourses();
 
 /* ===================================================
    ARTICLES — loads from /api/articles

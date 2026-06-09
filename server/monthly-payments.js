@@ -64,6 +64,14 @@ module.exports = {
     return true;
   },
 
+  addRecord(ym, record) {
+    const all = load();
+    if (!all[ym]) return false;
+    all[ym].push(record);
+    save(all);
+    return true;
+  },
+
   deleteMonth(ym) {
     const all = load();
     if (!all[ym]) return false;

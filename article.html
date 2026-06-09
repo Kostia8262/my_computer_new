@@ -15,7 +15,7 @@
     .article-hero__badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:13px;font-weight:700;padding:6px 16px;border-radius:100px;margin-bottom:20px}
     .article-hero__title{font-size:clamp(26px,5vw,44px);font-weight:900;line-height:1.15;margin-bottom:20px;max-width:780px}
     .article-hero__meta{display:flex;align-items:center;gap:16px;font-size:14px;color:rgba(255,255,255,.75)}
-    .article-breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.65);margin-bottom:24px}
+    .article-breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.65);margin-bottom:24px;flex-wrap:wrap}
     .article-breadcrumb a{color:rgba(255,255,255,.85);font-weight:500}
     .article-breadcrumb a:hover{color:#fff;text-decoration:underline}
     .article-breadcrumb-sep{opacity:.4}
@@ -53,45 +53,97 @@
 </head>
 <body>
 
+<!-- ========== HEADER ========== -->
 <header class="header" id="header">
-  <div class="container header__inner">
-    <a href="/" class="logo">
-      <div class="logo__icon"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M8 11L13 16L8 21" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21H24" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div>
-      <span class="logo__text">My Computer Academy</span>
+  <nav class="nav container">
+    <a href="/" class="nav__logo">
+      <img src="/android-chrome-192x192.png" alt="" class="nav__logo-img" width="38" height="38" fetchpriority="high"/>
+      <span>My Computer <strong>Academy</strong></span>
     </a>
-    <nav class="nav" id="navMenu">
-      <ul class="nav__list">
-        <li><a href="/#courses" class="nav__link">Курси</a></li>
-        <li><a href="/#faq" class="nav__link">FAQ</a></li>
-        <li><a href="/#contact" class="nav__link">Контакти</a></li>
-      </ul>
-      <div class="nav__actions">
-        <a href="/#contact" class="btn btn--primary btn--sm">Записатись</a>
-      </div>
-    </nav>
+    <ul class="nav__menu" id="navMenu">
+      <li><a href="/#courses" class="nav__link">Курси</a></li>
+      <li><a href="/#how-it-works" class="nav__link">Як це працює</a></li>
+      <li><a href="/#reviews" class="nav__link">Відгуки</a></li>
+      <li><a href="/#faq" class="nav__link">FAQ</a></li>
+    </ul>
+    <div class="nav__actions">
+      <a href="tel:+380954624672" class="nav__phone">+38 (095) 462-46-72</a>
+      <a href="/#contact" class="btn btn--primary btn--sm nav__cta">Записатись</a>
+    </div>
     <button class="nav__burger" id="navBurger" aria-label="Меню" aria-expanded="false">
       <span></span><span></span><span></span>
     </button>
-  </div>
+  </nav>
 </header>
 
 <div id="pageContent">
   <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>
 </div>
 
+<!-- ========== FAQ ========== -->
+<section class="faq" id="articleFaq" style="display:none">
+  <div class="container">
+    <div class="faq__inner">
+      <div class="section-header section-header--left">
+        <div class="section-badge">Часті питання</div>
+        <h2 class="section-title">Відповіді на ваші запитання</h2>
+      </div>
+      <div class="faq__list" id="articleFaqList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
 <footer class="footer">
   <div class="container">
     <div class="footer__inner">
       <div class="footer__brand">
-        <a href="/" class="logo logo--footer">
-          <div class="logo__icon"><svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M8 11L13 16L8 21" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21H24" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div>
-          <span class="logo__text">My Computer Academy</span>
+        <a href="/" class="nav__logo footer__logo">
+          <img src="/android-chrome-192x192.png" alt="" class="nav__logo-img" width="38" height="38" loading="lazy"/>
+          <span>My Computer <strong>Academy</strong></span>
         </a>
-        <p class="footer__tagline">Школа програмування для дітей від 6 до 18 років</p>
+        <p class="footer__desc">Онлайн школа програмування для дітей від 6 до 16 років. Дніпро, Україна.</p>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/my_computer_academy_/" target="_blank" rel="noopener" class="social-link" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://www.facebook.com/MyComputerAcademy.Dnipro" target="_blank" rel="noopener" class="social-link" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://t.me/Artist8262" target="_blank" class="social-link" aria-label="Telegram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div class="footer__links">
+        <div class="footer__col">
+          <h4>Курси</h4>
+          <ul>
+            <li><a href="/courses/scratch">Scratch (6–10 років)</a></li>
+            <li><a href="/courses/python">Python (10–14 років)</a></li>
+            <li><a href="/courses/roblox">Roblox (9–14 років)</a></li>
+            <li><a href="/courses/web">Веб-розробка</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Академія</h4>
+          <ul>
+            <li><a href="/#about">Про нас</a></li>
+            <li><a href="/#how-it-works">Як це працює</a></li>
+            <li><a href="/#reviews">Відгуки</a></li>
+            <li><a href="/#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Контакти</h4>
+          <ul>
+            <li><a href="tel:+380954624672">+38 (095) 462-46-72</a></li>
+            <li><a href="tel:+380682522876">+38 (068) 252-28-76</a></li>
+            <li><a href="mailto:my.computer.academy25@gmail.com">my.computer.academy25@gmail.com</a></li>
+          </ul>
+        </div>
       </div>
     </div>
     <div class="footer__bottom">
       <span>© 2025 My Computer Academy. Всі права захищено.</span>
+      <div class="footer__legal">
+        <a href="/docs/privacy-policy.html">Політика конфіденційності</a>
+        <a href="/docs/public-offer.html">Публічна оферта</a>
+      </div>
     </div>
   </div>
 </footer>
@@ -99,30 +151,31 @@
 <script>
 'use strict';
 
-// Simple header scroll
+// ── Header scroll ─────────────────────────────────────────────────────────────
 const header = document.getElementById('header');
 window.addEventListener('scroll', () => {
   header.classList.toggle('scrolled', window.scrollY > 20);
 }, { passive: true });
 
-// Burger
-const burger = document.getElementById('navBurger');
+// ── Burger menu ───────────────────────────────────────────────────────────────
+const burger  = document.getElementById('navBurger');
 const navMenu = document.getElementById('navMenu');
 burger.addEventListener('click', () => {
   const isOpen = navMenu.classList.toggle('open');
   burger.setAttribute('aria-expanded', String(isOpen));
 });
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 function formatDate(d) {
   if (!d) return '';
   try { return new Date(d).toLocaleDateString('uk-UA', {day:'numeric',month:'long',year:'numeric'}); }
   catch { return d; }
 }
 
+// ── Article loader ────────────────────────────────────────────────────────────
 async function init() {
   const pathMatch = window.location.pathname.match(/\/articles\/([^/?#]+)/);
   const slug = pathMatch ? pathMatch[1] : null;
@@ -193,7 +246,40 @@ function showNotFound() {
   `;
 }
 
+// ── FAQ loader ────────────────────────────────────────────────────────────────
+async function loadFaq() {
+  try {
+    const res = await fetch('/api/content');
+    if (!res.ok) return;
+    const data = await res.json();
+    const items = (data.faq || []).slice(0, 6);
+    if (!items.length) return;
+    const el = document.getElementById('articleFaqList');
+    if (!el) return;
+    el.innerHTML = items.map(item => `
+      <div class="faq-item">
+        <button class="faq-item__question">
+          <span>${esc(item.question?.ua || item.question || '')}</span>
+          <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="faq-item__answer"><p>${esc(item.answer?.ua || item.answer || '')}</p></div>
+      </div>
+    `).join('');
+    document.getElementById('articleFaq').style.display = '';
+    // Accordion
+    el.querySelectorAll('.faq-item__question').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const faqItem = btn.closest('.faq-item');
+        const isOpen = faqItem.classList.contains('active');
+        el.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+        if (!isOpen) faqItem.classList.add('active');
+      });
+    });
+  } catch { /* silent */ }
+}
+
 init();
+loadFaq();
 </script>
 </body>
 </html>

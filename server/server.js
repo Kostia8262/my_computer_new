@@ -269,6 +269,49 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
     if (status) {
       if (!valid.includes(status)) return res.status(400).json({ error: `Статус: ${valid.join(', ')}` });
       db.updateStatus(id, status);
+
+      // Auto-create client when lead is enrolled
+      if (status === 'enrolled') {
+        try {
+          const lead = db.getLeadById(id);
+          if (lead) {
+            const phone = lead.phone || '';
+            const existing = phone ? clientsDb.getAll().find(c => c.phone === phone) : null;
+            if (!existing) {
+              const today = new Date().toISOString().slice(0, 10);
+              const newClient = clientsDb.create({
+                name:         lead.child_name,
+                age:          lead.age,
+                course:       lead.course || null,
+                phone:        lead.phone,
+                email:        lead.email || null,
+                status:       'active',
+                source:       'website',
+                enrolledDate: today,
+                notes:        lead.notes || '',
+              });
+              // Add to current month's payments if the month sheet exists
+              const ym = new Date().toISOString().slice(0, 7);
+              const monthData = monthlyPayDb.getMonth(ym);
+              if (monthData) {
+                monthlyPayDb.addRecord(ym, {
+                  clientId:       newClient.id,
+                  clientName:     newClient.name,
+                  expectedAmount: 0,
+                  paidAmount:     0,
+                  status:         'pending',
+                  paidDate:       null,
+                  method:         null,
+                  note:           'Автоматично з заявки #' + lead.id,
+                });
+              }
+              console.log(`[AUTO-CLIENT] Created client #${newClient.id} from lead #${lead.id}`);
+            }
+          }
+        } catch (autoErr) {
+          console.error('[AUTO-CLIENT]', autoErr.message);
+        }
+      }
     }
     if (notes !== undefined) db.updateNotes(id, sanitize(notes));
     res.json({ success: true, lead: db.getLeadById(id) });
