@@ -261,6 +261,30 @@ tr:hover td{background:#faf9ff}
 .cms-features-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .lang-flag{font-size:10px;opacity:.7;margin-right:2px}
 .cms-toggle{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;white-space:nowrap}
+
+/* GLOBAL SEARCH */
+.gs-wrap{position:relative;display:flex;align-items:center}
+.gs-input{padding:6px 12px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:13px;outline:none;width:190px;background:#f8f7ff;transition:width .2s,border-color .2s}
+.gs-input:focus{border-color:#6C47FF;background:#fff;width:250px}
+.gs-dropdown{position:absolute;top:calc(100% + 4px);left:0;min-width:320px;background:#fff;border-radius:10px;border:1px solid #e8e4ff;box-shadow:0 8px 30px rgba(0,0,0,.18);z-index:5000;max-height:380px;overflow-y:auto}
+.gs-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 3px;color:#aaa;background:#fafafa}
+.gs-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid #f8f7ff}
+.gs-item:last-child{border-bottom:none}
+.gs-item:hover{background:#f0eeff}
+.gs-item-name{font-weight:600;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-item-sub{font-size:11px;color:#888;flex-shrink:0}
+.gs-empty{padding:16px 14px;text-align:center;color:#aaa;font-size:13px}
+/* BULK ACTIONS BAR */
+.bulk-bar{display:none;align-items:center;gap:8px;padding:10px 14px;background:#ede9fe;border-radius:10px;margin-bottom:10px;flex-wrap:wrap;border:1.5px solid #c4b5fd}
+.bulk-bar.show{display:flex}
+.bulk-count{font-weight:700;color:#6C47FF;font-size:13px}
+/* SCHEDULE VIEW */
+.sched-wrap{overflow-x:auto}
+.sched-tbl{border-collapse:collapse;min-width:600px;width:100%}
+.sched-tbl th{padding:10px 6px;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;text-align:center;background:#faf9ff;border:1px solid #f0eeff}
+.sched-tbl td{border:1px solid #f0eeff;padding:3px;vertical-align:top;min-width:80px}
+.sched-time{font-size:11px;color:#aaa;font-weight:700;text-align:right;padding:8px;white-space:nowrap;background:#faf9ff;width:52px}
+.sched-card{border-radius:6px;padding:3px 7px;margin:2px 0;font-size:11px;font-weight:600;line-height:1.4;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -296,6 +320,14 @@ tr:hover td{background:#faf9ff}
       <button class="btn btn-ghost btn-sm" id="csvImportBtn" onclick="triggerImport()" style="display:none" title="Імпортувати CSV">📤 Імпорт</button>
       <input type="file" id="csvFileInput" accept=".csv" style="display:none" onchange="importCSV(this)"/>
       <button class="btn btn-ghost btn-sm" id="reloadBtn" onclick="reloadCurrentTab()" title="Оновити">🔄</button>
+      <div class="gs-wrap" id="gsWrap">
+        <input class="gs-input" id="gsInput" placeholder="🔍 Пошук..." autocomplete="off"
+          oninput="globalSearch(this.value)"
+          onfocus="if(this.value.length>=2)globalSearch(this.value)"
+          onblur="setTimeout(closeGsDropdown,200)"
+          onkeydown="if(event.key==='Escape'){closeGsDropdown();this.value=''}"/>
+        <div id="gsDropdown" class="gs-dropdown" style="display:none"></div>
+      </div>
       <button class="btn btn-ghost btn-sm" onclick="doLogout()">Вийти</button>
     </div>
   </div>
@@ -716,6 +748,7 @@ tr:hover td{background:#faf9ff}
         <button class="csub-btn active" id="csub-base" onclick="showClientsSubTab('base')">📋 База заявок</button>
         <button class="csub-btn" id="csub-payments" onclick="showClientsSubTab('payments')">💰 Оплати</button>
         <button class="csub-btn" id="csub-attendance" onclick="showClientsSubTab('attendance')">📅 Відвідування</button>
+        <button class="csub-btn" id="csub-schedule" onclick="showClientsSubTab('schedule')">🗓 Розклад</button>
       </div>
 
       <!-- ── SUB-TAB: BASE (full clients list) ── -->
@@ -734,6 +767,7 @@ tr:hover td{background:#faf9ff}
             <option value="roblox">Roblox</option><option value="web">Веб</option>
           </select>
           <button class="btn btn-primary btn-sm" onclick="openClientModal(null)">+ Додати клієнта</button>
+          <button class="btn btn-ghost btn-sm" id="archiveToggleBtn" onclick="toggleArchive()" title="Архів відрахованих учнів">📦 Архів</button>
         </div>
         <div class="table-wrap" style="overflow-x:auto">
           <table id="clientsTable" style="min-width:960px">
@@ -792,9 +826,20 @@ tr:hover td{background:#faf9ff}
                 <option value="completed">⬜ Завершили</option>
               </select>
             </div>
+            <!-- Bulk actions bar (appears when rows selected) -->
+            <div class="bulk-bar" id="payBulkBar">
+              <span class="bulk-count" id="payBulkCount">0 вибрано</span>
+              <button class="btn btn-primary btn-sm" onclick="bulkPayAction('paid')">✅ Оплачено</button>
+              <button class="btn btn-ghost btn-sm" onclick="bulkPayAction('pending')">🔴 Несплачено</button>
+              <button class="btn btn-ghost btn-sm" onclick="bulkPayAction('waived')">🔵 Звільнити</button>
+              <button class="btn btn-ghost btn-sm" onclick="bulkPayAction('amount')">💰 Встановити суму</button>
+              <button id="bulkDelBtn" class="btn btn-danger btn-sm" style="display:none" onclick="bulkPayAction('delete')">✕ Видалити</button>
+              <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearPaySelection()">✕ Скасувати</button>
+            </div>
             <div class="table-wrap" style="overflow-x:auto">
-              <table class="pay-table" style="min-width:860px">
+              <table class="pay-table" style="min-width:900px">
                 <thead><tr>
+                  <th style="width:36px;text-align:center"><input type="checkbox" id="paySelectAll" onclick="toggleAllPayChecks()" title="Вибрати всіх"/></th>
                   <th>Учень</th><th>Курс</th><th>Формат</th><th>Розклад</th>
                   <th>Очікується ₴</th><th>Сплачено ₴</th><th>Статус</th>
                   <th>Дата оплати</th><th>Спосіб</th><th>Нотатка</th><th style="width:32px"></th>
@@ -831,7 +876,75 @@ tr:hover td{background:#faf9ff}
         </div>
       </div>
 
+      <!-- ── SUB-TAB: SCHEDULE ── -->
+      <div id="csubSchedule" style="display:none">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
+          <h3 style="font-size:15px;font-weight:800;margin:0">🗓 Тижневий розклад</h3>
+          <select class="filter-select" id="schedTeacherFilter" onchange="renderSchedule()">
+            <option value="">Всі викладачі</option>
+          </select>
+        </div>
+        <div style="background:#fff;border-radius:12px;border:1px solid #e8e4ff;padding:16px">
+          <div class="sched-wrap" id="schedGrid">
+            <div class="empty" style="padding:40px">Завантаження...</div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /clientsTab -->
+
+    <!-- TEACHER PROFILE MODAL (superadmin only) -->
+    <div class="modal-overlay" id="teacherProfileModal" style="display:none" onclick="if(event.target===this)closeTeacherProfile()">
+      <div class="modal-box" style="max-width:640px;max-height:90vh;overflow-y:auto">
+        <h3><span id="teacherProfileTitle">Особова справа</span><button class="btn btn-ghost btn-sm" onclick="closeTeacherProfile()">✕</button></h3>
+        <div class="modal-grid">
+          <div class="modal-group"><label class="modal-label">Ім'я</label><input class="modal-input" id="tp_name" placeholder="Ім'я"/></div>
+          <div class="modal-group"><label class="modal-label">Телефон</label><input class="modal-input" id="tp_phone" placeholder="+380..."/></div>
+          <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="tp_notes" rows="2" placeholder="Спеціалізація, примітки..."></textarea></div>
+        </div>
+        <!-- Teacher-only fields -->
+        <div id="tp_teacherSection">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin:14px 0 8px">📚 Оплата праці</div>
+          <div class="modal-grid">
+            <div class="modal-group"><label class="modal-label">Тип оплати</label>
+              <select class="modal-input" id="tp_paymentType" onchange="onPaymentTypeChange(this.value)">
+                <option value="hourly">⏱ Погодинна</option>
+                <option value="monthly">📅 Місячна ставка</option>
+              </select>
+            </div>
+            <div class="modal-group" id="tp_hourlyWrap"><label class="modal-label">Ставка (₴/год)</label><input class="modal-input" type="number" id="tp_hourlyRate" placeholder="150" min="0"/></div>
+            <div class="modal-group" id="tp_lessonDurationWrap"><label class="modal-label">Тривалість уроку (хв)</label><input class="modal-input" type="number" id="tp_lessonDuration" placeholder="60" min="1"/></div>
+            <div class="modal-group" id="tp_monthlyWrap" style="display:none"><label class="modal-label">Місячна ставка (₴)</label><input class="modal-input" type="number" id="tp_monthlyRate" placeholder="12000" min="0"/></div>
+          </div>
+          <!-- Salary calculation section -->
+          <div style="margin-top:12px;padding:14px;background:#f9f7ff;border-radius:10px;border:1px solid #e0d9ff">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">💰 Розрахунок зарплати</div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <select class="filter-select" id="tp_salaryMonth" style="min-width:160px" onchange="loadTeacherSalary()">
+                <option value="">— Оберіть місяць —</option>
+              </select>
+              <div id="tp_salaryResult" style="font-size:14px;color:#6C47FF;font-weight:700"></div>
+            </div>
+            <div id="tp_salaryBreakdown" style="margin-top:10px"></div>
+          </div>
+        </div>
+        <!-- Documents section -->
+        <div style="margin-top:16px;padding:14px;background:#f7f9ff;border-radius:10px;border:1px solid #dde8ff">
+          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+            📎 Документи
+            <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
+              + Завантажити
+              <input type="file" style="display:none" id="tp_docInput" onchange="uploadStaffDoc()" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"/>
+            </label>
+          </div>
+          <div id="tp_docsList" style="font-size:13px;color:#aaa">Немає документів</div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeTeacherProfile()">Скасувати</button>
+          <button class="btn btn-primary" onclick="saveTeacherProfile()">💾 Зберегти</button>
+        </div>
+      </div>
+    </div>
 
     <!-- CONTENT TAB -->
     <div id="contentTab" style="display:none">
@@ -915,6 +1028,8 @@ tr:hover td{background:#faf9ff}
             <th>Курс</th>
             <th>Телефон</th>
             <th>Email</th>
+            <th>Викладач</th>
+            <th>Розклад</th>
             <th>Статус</th>
             <th>Нотатки</th>
             <th>Дата</th>
@@ -1115,6 +1230,7 @@ function reloadCurrentTab() {
     loadClients().then(() => {
       if (_clientsSubTab === 'payments')   loadMonthPayments();
       if (_clientsSubTab === 'attendance') loadAttendance();
+      if (_clientsSubTab === 'schedule')   loadSchedule();
     });
   }
   if (_currentTab === 'admins')   renderAdmins();
@@ -1172,7 +1288,7 @@ function renderTable() {
 
   const tbody = document.getElementById('leadsBody');
   if (!page.length) {
-    tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6M9 16h6M7 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1h-3M9 4a2 2 0 002 2h2a2 2 0 002-2M9 4a2 2 0 012-2h2a2 2 0 012 2"/></svg><div>Заявок не знайдено</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6M9 16h6M7 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1h-3M9 4a2 2 0 002 2h2a2 2 0 002-2M9 4a2 2 0 012-2h2a2 2 0 012 2"/></svg><div>Заявок не знайдено</div></div></td></tr>`;
   } else {
     tbody.innerHTML = page.map(l => `
       <tr id="row-${l.id}">
@@ -1189,6 +1305,8 @@ function renderTable() {
         </td>
         <td><input class="notes-input" value="${esc(l.phone)}" onblur="saveLeadFields(${l.id},{phone:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td><input class="notes-input" value="${esc(l.email||'')}" placeholder="email" onblur="saveLeadFields(${l.id},{email:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="notes-input" value="${esc(l.teacher||'')}" placeholder="Викладач…" onblur="saveLeadFields(${l.id},{teacher:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="notes-input" style="min-width:100px" value="${esc(l.schedule||'')}" placeholder="Пн 15:00…" onblur="saveLeadFields(${l.id},{schedule:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td>
           <select class="status-sel" onchange="changeStatus(${l.id}, this.value)">
             ${Object.entries(STATUS_LABELS).map(([v,lbl]) =>
@@ -1335,20 +1453,26 @@ async function renderAdmins() {
       const roleLbl = ROLE_LABELS[a.role] || a.role || '—';
       const roleBg  = ROLE_COLORS[a.role]      || '#f0eeff';
       const roleClr = ROLE_TEXT_COLORS[a.role] || '#6C47FF';
+      const nameCell = currentRole === 'superadmin'
+        ? `<button style="background:none;border:none;cursor:pointer;font-weight:600;color:#6C47FF;font-size:14px;text-decoration:underline;padding:0" onclick="openStaffProfile(${a.id})" title="Особова справа">${esc(a.name)}</button>`
+        : `<span style="font-weight:600">${esc(a.name)}</span>`;
+      const tokenDisplay = a.active
+        ? `<code style="font-size:11px;background:#f0eeff;padding:2px 8px;border-radius:4px;word-break:break-all;user-select:all">${esc(a.token)}</code>
+           <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="copyToken('${esc(a.token)}')">📋</button>`
+        : `<span style="color:#aaa;font-size:12px">—</span>`;
       return `<tr>
-        <td style="font-weight:600">${esc(a.name)}</td>
+        <td>${nameCell}</td>
         <td><span style="display:inline-block;background:${roleBg};color:${roleClr};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${roleLbl}</span></td>
-        <td>
-          <code style="font-size:11px;background:#f0eeff;padding:2px 8px;border-radius:4px;word-break:break-all;user-select:all">${esc(a.token)}</code>
-          <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="copyToken('${esc(a.token)}')">📋</button>
-        </td>
+        <td>${tokenDisplay}</td>
         <td>${a.active
           ? '<span class="badge badge-enrolled">Активний</span>'
           : '<span class="badge badge-rejected">Відкликано</span>'}</td>
         <td style="color:#aaa;font-size:12px;white-space:nowrap">${esc(a.createdAt)}</td>
-        <td style="white-space:nowrap;display:flex;gap:6px">
-          ${a.active ? `<button class="btn btn-ghost btn-sm" onclick="revokeAdmin(${a.id})">🔒 Відкликати</button>` : ''}
-          <button class="btn btn-danger btn-sm" onclick="deleteAdminUser(${a.id})">✕ Видалити</button>
+        <td>
+          <div style="display:flex;gap:6px;white-space:nowrap;flex-wrap:wrap">
+            ${a.active ? `<button class="btn btn-ghost btn-sm" onclick="revokeAdmin(${a.id})">🔒 Відкликати</button>` : `<button class="btn btn-primary btn-sm" onclick="regenerateAdminToken(${a.id})">🔄 Відновити токен</button>`}
+            <button class="btn btn-danger btn-sm" onclick="deleteAdminUser(${a.id})">✕ Видалити</button>
+          </div>
         </td>
       </tr>`;
     }).join('');
@@ -1491,7 +1615,10 @@ function renderClients() {
   const status = document.getElementById('clientStatusFilter')?.value || '';
   const course = document.getElementById('clientCourseFilter')?.value || '';
 
+  const ARCHIVED_STATUSES = ['churned', 'completed'];
   const filtered = _allClients.filter(c => {
+    const isArchived = ARCHIVED_STATUSES.includes(c.status);
+    if (_showArchive ? !isArchived : isArchived) return false;
     if (status && c.status !== status) return false;
     if (course && c.course !== course) return false;
     if (q) {
@@ -1511,27 +1638,33 @@ function renderClients() {
   } else {
     tbody.innerHTML = page.map(c => {
       const statusCls = 'cs-' + (c.status || 'new');
+      const statusOpts = Object.entries(CLIENT_STATUS_LABELS).map(([v,lbl]) =>
+        `<option value="${v}" ${c.status===v?'selected':''}>${lbl}</option>`).join('');
+      const courseOpts = [['','— курс —'],['scratch','Scratch'],['python','Python'],['roblox','Roblox'],['web','Веб'],['other','Інше']].map(([v,lbl]) =>
+        `<option value="${v}" ${c.course===v?'selected':''}>${lbl}</option>`).join('');
       const nextDate = c.nextContact ? (new Date(c.nextContact) < new Date() ? `<span style="color:#dc2626;font-weight:700">${esc(c.nextContact)}</span>` : `<span style="color:#15803d">${esc(c.nextContact)}</span>`) : '—';
       return `<tr>
         <td style="color:#aaa;font-size:12px">#${c.id}</td>
-        <td style="font-weight:600">${esc(c.name)}</td>
-        <td>${c.age || '—'}</td>
-        <td>${c.course ? `<span class="chip">${COURSE_LABELS[c.course] || c.course}</span>` : '—'}</td>
-        <td><a href="tel:${esc(c.phone)}" class="phone-link">${esc(c.phone)}</a></td>
-        <td><span class="client-status ${statusCls}">${CLIENT_STATUS_LABELS[c.status] || c.status}</span></td>
+        <td><input class="notes-input" style="font-weight:600;min-width:90px" value="${esc(c.name)}" onblur="saveClientField(${c.id},'name',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="notes-input" style="width:40px;text-align:center" type="number" value="${esc(String(c.age||''))}" placeholder="вік" onblur="saveClientField(${c.id},'age',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><select class="status-sel" style="min-width:80px" onchange="saveClientField(${c.id},'course',this.value)">${courseOpts}</select></td>
+        <td><input class="notes-input" value="${esc(c.phone)}" onblur="saveClientField(${c.id},'phone',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><select class="status-sel ${statusCls}" onchange="saveClientField(${c.id},'status',this.value);this.className='status-sel cs-'+this.value">${statusOpts}</select></td>
         <td style="font-size:12px;white-space:nowrap;max-width:140px">
           <span style="display:inline-flex;align-items:center;gap:4px;max-width:120px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle">${esc(c.schedule || '')}</span>
           <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;vertical-align:middle" onclick="openSchedPopup(event,${c.id})" title="Редагувати розклад">🕐</button>
         </td>
-        <td style="font-size:12px;color:#888">${esc(c.teacher || '—')}</td>
-        <td style="font-size:13px">${c.monthlyFee ? c.monthlyFee + ' ₴' : '—'}</td>
-        <td style="font-size:13px">${c.totalPaid ? c.totalPaid + ' ₴' : '—'}</td>
-        <td style="font-size:12px">${nextDate}</td>
+        <td><input class="notes-input" style="min-width:90px" value="${esc(c.teacher||'')}" placeholder="Викладач…" onblur="saveClientField(${c.id},'teacher',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="notes-input" style="width:72px" type="number" value="${esc(String(c.monthlyFee||''))}" placeholder="0" onblur="saveClientField(${c.id},'monthlyFee',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="notes-input" style="width:72px" type="number" value="${esc(String(c.totalPaid||''))}" placeholder="0" onblur="saveClientField(${c.id},'totalPaid',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="notes-input" style="width:100px" type="date" value="${esc(c.nextContact||'')}" onblur="saveClientField(${c.id},'nextContact',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td><input class="notes-input" value="${esc(c.notes||'')}" placeholder="Нотатки..."
-          onblur="saveClientNotes(${c.id}, this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-        <td style="white-space:nowrap;display:flex;gap:4px">
-          <button class="btn btn-ghost btn-sm" onclick="openClientModal(${c.id})">✏️</button>
-          ${currentRole === 'superadmin' ? `<button class="btn btn-danger btn-sm" onclick="deleteClient(${c.id})">✕</button>` : ''}
+          onblur="saveClientField(${c.id},'notes',this.value)" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td>
+          <div style="display:flex;gap:4px;white-space:nowrap">
+            <button class="btn btn-ghost btn-sm" onclick="openClientModal(${c.id})" title="Детальне редагування">✏️</button>
+            ${currentRole === 'superadmin' ? `<button class="btn btn-danger btn-sm" onclick="deleteClient(${c.id})">✕</button>` : ''}
+          </div>
         </td>
       </tr>`;
     }).join('');
@@ -1645,7 +1778,22 @@ async function saveClientNotes(id, notes) {
     });
     const c = _allClients?.find(x => x.id === id);
     if (c) c.notes = notes;
-    showToast('Нотатки збережено ✓', 'success');
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function saveClientField(id, field, value) {
+  const patch = { [field]: value };
+  try {
+    const res = await fetch(`/api/clients/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(patch),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Помилка', 'error'); return; }
+    const c = _allClients?.find(x => x.id === id);
+    if (c && data.client) Object.assign(c, data.client);
+    showToast('Збережено ✓', 'success');
   } catch { showToast('Помилка', 'error'); }
 }
 
@@ -1666,7 +1814,7 @@ let _clientsSubTab = 'base';
 
 function showClientsSubTab(tab) {
   _clientsSubTab = tab;
-  ['base','payments','attendance'].forEach(t => {
+  ['base','payments','attendance','schedule'].forEach(t => {
     const el = document.getElementById('csub' + t.charAt(0).toUpperCase() + t.slice(1));
     const btn = document.getElementById('csub-' + t);
     if (el)  el.style.display = t === tab ? '' : 'none';
@@ -1676,6 +1824,7 @@ function showClientsSubTab(tab) {
   if (addBtn) addBtn.style.display = 'none';
   if (tab === 'payments')    { loadMonthPayments(); }
   if (tab === 'attendance')  { loadAttendance(); }
+  if (tab === 'schedule')    { loadSchedule(); }
 }
 
 // ── MONTHLY PAYMENTS SUB-TAB ─────────────────────────────────────────────────
@@ -1835,7 +1984,7 @@ function renderMonthPayments() {
 
   const tbody = document.getElementById('monthPayBody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="11"><div class="empty">Записів не знайдено</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty">Записів не знайдено</div></td></tr>`;
     return;
   }
 
@@ -1844,10 +1993,16 @@ function renderMonthPayments() {
   const statusOpts = Object.entries(MP_STATUS_LABELS)
     .map(([v,l]) => `<option value="${v}">${l}</option>`).join('');
 
+  // Show/hide bulk delete button for superadmin only
+  const bulkDelBtn = document.getElementById('bulkDelBtn');
+  if (bulkDelBtn) bulkDelBtn.style.display = currentRole === 'superadmin' ? '' : 'none';
+
   tbody.innerHTML = rows.map(r => {
     const c = r.client;
     const statusCls = MP_STATUS_CLASS[r.status] || '';
+    const isChecked = _selectedPayments.has(r.clientId);
     return `<tr>
+      <td style="padding:4px 6px;text-align:center"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePayCheck(${r.clientId})"/></td>
       <td style="font-weight:600;white-space:nowrap">${esc(r.clientName || (c?.name) || '#'+r.clientId)}</td>
       <td style="font-size:12px">${c?.course ? `<span class="chip">${COURSE_LABELS[c.course]||c.course}</span>` : '—'}</td>
       <td style="font-size:12px">${LESSON_TYPE_LABELS[c?.lessonType] || '—'}</td>
@@ -1876,6 +2031,7 @@ function renderMonthPayments() {
       </td>
     </tr>`;
   }).join('');
+  _updateBulkBar();
 }
 
 async function updateMpRecord(clientId, field, value) {
@@ -1896,18 +2052,16 @@ async function updateMpRecord(clientId, field, value) {
   } catch { showToast('Помилка збереження', 'error'); }
 }
 
-async function removeMpRecord(clientId) {
-  if (!confirm('Видалити учня з цього місяця?')) return;
+async function removeMpRecord(clientId, silent) {
+  if (!silent && !confirm('Видалити учня з цього місяця?')) return;
   try {
     const res = await fetch(`/api/monthly-payments/${_mpYM()}/${clientId}`, {
       method: 'DELETE', headers: { 'x-admin-token': token },
     });
-    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    if (!res.ok) { if (!silent) showToast('Помилка', 'error'); return; }
     _mpData = _mpData.filter(r => r.clientId !== clientId);
-    renderMonthPayments();
-    renderPayAlert();
-    showToast('Видалено ✓', 'success');
-  } catch { showToast('Помилка', 'error'); }
+    if (!silent) { renderMonthPayments(); renderPayAlert(); showToast('Видалено ✓', 'success'); }
+  } catch { if (!silent) showToast('Помилка', 'error'); }
 }
 
 function renderPayAlert() {
@@ -3415,6 +3569,498 @@ async function loadDashboardTab() {
     console.error('Dashboard error:', e);
     if (financialsEl) financialsEl.innerHTML = '<div style="color:#e53e3e;padding:20px;font-size:13px">⚠️ Помилка завантаження дашборду. Перевірте консоль.</div>';
   }
+}
+
+// ── ARCHIVE TOGGLE ───────────────────────────────────────────────────────────
+let _showArchive = false;
+
+function toggleArchive() {
+  _showArchive = !_showArchive;
+  const btn = document.getElementById('archiveToggleBtn');
+  if (btn) {
+    btn.textContent = _showArchive ? '📋 Активні' : '📦 Архів';
+    btn.style.background = _showArchive ? '#dc2626' : '';
+    btn.style.color      = _showArchive ? '#fff' : '';
+    btn.style.borderColor = _showArchive ? '#dc2626' : '';
+  }
+  _clientPage = 1;
+  renderClients();
+}
+
+// ── BULK PAYMENT ACTIONS ──────────────────────────────────────────────────────
+let _selectedPayments = new Set();
+
+function togglePayCheck(clientId) {
+  if (_selectedPayments.has(clientId)) _selectedPayments.delete(clientId);
+  else _selectedPayments.add(clientId);
+  _updateBulkBar();
+}
+
+function toggleAllPayChecks() {
+  const masterCb = document.getElementById('paySelectAll');
+  const checkAll = masterCb ? masterCb.checked : false;
+  _selectedPayments.clear();
+  if (checkAll) {
+    _mpData.forEach(r => _selectedPayments.add(r.clientId));
+  }
+  renderMonthPayments();
+}
+
+function _updateBulkBar() {
+  const bar   = document.getElementById('payBulkBar');
+  const count = document.getElementById('payBulkCount');
+  const n = _selectedPayments.size;
+  if (bar)   bar.classList.toggle('show', n > 0);
+  if (count) count.textContent = `${n} вибрано`;
+  // Sync master checkbox
+  const masterCb = document.getElementById('paySelectAll');
+  if (masterCb) {
+    masterCb.checked       = n > 0 && n === _mpData.length;
+    masterCb.indeterminate = n > 0 && n < _mpData.length;
+  }
+}
+
+function clearPaySelection() {
+  _selectedPayments.clear();
+  renderMonthPayments();
+}
+
+async function bulkPayAction(action) {
+  if (!_selectedPayments.size) return;
+  const ids = [..._selectedPayments];
+
+  if (action === 'delete') {
+    if (!confirm(`Видалити ${ids.length} записів з цього місяця?`)) return;
+    for (const cId of ids) await removeMpRecord(cId, true);
+    _selectedPayments.clear();
+    renderMonthPayments();
+    showToast(`${ids.length} записів видалено ✓`, 'success');
+    return;
+  }
+
+  if (action === 'amount') {
+    const amtStr = prompt('Введіть суму оплати (₴) для всіх вибраних:');
+    const amt = parseFloat(amtStr);
+    if (!amtStr || isNaN(amt)) return;
+    for (const cId of ids) await _bulkPatch(cId, { expectedAmount: amt });
+    _selectedPayments.clear();
+    renderMonthPayments();
+    showToast(`Суму встановлено для ${ids.length} учнів ✓`, 'success');
+    return;
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const patches = {
+    paid:    { status: 'paid',    paidDate: today },
+    pending: { status: 'pending', paidDate: ''    },
+    waived:  { status: 'waived'                   },
+  };
+  const patch = patches[action];
+  if (!patch) return;
+
+  for (const cId of ids) await _bulkPatch(cId, patch);
+  _selectedPayments.clear();
+  renderMonthPayments();
+  showToast(`Оновлено ${ids.length} записів ✓`, 'success');
+}
+
+async function _bulkPatch(clientId, patch) {
+  const rec = _mpData.find(r => r.clientId === clientId);
+  if (!rec) return;
+  Object.assign(rec, patch);
+  renderPayAlert();
+  try {
+    await fetch(`/api/monthly-payments/${_mpYM()}/${clientId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(patch),
+    });
+  } catch {}
+}
+
+// ── SCHEDULE VIEW ─────────────────────────────────────────────────────────────
+const SCHED_DAYS_FULL = ['','Понеділок','Вівторок','Середа','Четвер','П\'ятниця','Субота','Неділя'];
+const SCHED_DAYS_SHORT = ['','Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+
+function loadSchedule() {
+  if (!_allClients) { loadClients().then(renderSchedule); return; }
+  renderSchedule();
+}
+
+function renderSchedule() {
+  const gridEl = document.getElementById('schedGrid');
+  if (!gridEl) return;
+
+  const filterTeacher = document.getElementById('schedTeacherFilter')?.value || '';
+  const clients = (_allClients || []).filter(c =>
+    c.scheduleDays && c.scheduleDays.length > 0 &&
+    (filterTeacher === '' || c.teacher === filterTeacher)
+  );
+
+  // Populate teacher filter dropdown
+  const sel = document.getElementById('schedTeacherFilter');
+  if (sel && sel.options.length < 2) {
+    const teachers = [...new Set((_allClients || []).map(c => c.teacher).filter(Boolean))].sort();
+    teachers.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = t;
+      sel.appendChild(opt);
+    });
+  }
+
+  if (!clients.length) {
+    gridEl.innerHTML = '<div class="empty" style="padding:40px">Немає учнів з розкладом' + (filterTeacher ? ` для ${filterTeacher}` : '') + '</div>';
+    return;
+  }
+
+  // Collect all unique time slots
+  const slotSet = new Set();
+  clients.forEach(c => c.scheduleDays.forEach(s => slotSet.add(s.time)));
+  const slots = [...slotSet].sort();
+
+  // Build grid[time][day] = array of client cards
+  const grid = {};
+  slots.forEach(t => { grid[t] = {1:[],2:[],3:[],4:[],5:[],6:[],7:[]}; });
+  clients.forEach(c => {
+    const color = _teacherColor(c.teacher || '');
+    c.scheduleDays.forEach(s => {
+      const d = parseInt(s.day);
+      if (d >= 1 && d <= 7 && grid[s.time]) {
+        grid[s.time][d].push({ name: c.name, course: c.course, color, teacher: c.teacher || '' });
+      }
+    });
+  });
+
+  let html = '<table class="sched-tbl"><thead><tr><th class="sched-time">Час</th>';
+  for (let d = 1; d <= 7; d++) html += `<th>${SCHED_DAYS_FULL[d]}</th>`;
+  html += '</tr></thead><tbody>';
+
+  slots.forEach(time => {
+    html += `<tr><td class="sched-time">${time}</td>`;
+    for (let d = 1; d <= 7; d++) {
+      const cards = grid[time][d];
+      if (!cards.length) {
+        html += `<td></td>`;
+      } else {
+        html += `<td>${cards.map(card => {
+          const bgLight = card.color + '22';
+          const courseLabel = COURSE_LABELS[card.course] || card.course || '';
+          return `<span class="sched-card" style="background:${bgLight};color:${card.color};border:1px solid ${card.color}44" title="${esc(card.teacher)}: ${esc(card.name)} (${courseLabel})">${esc(card.name)}${courseLabel?' · '+courseLabel:''}</span>`;
+        }).join('')}</td>`;
+      }
+    }
+    html += '</tr>';
+  });
+
+  html += '</tbody></table>';
+  gridEl.innerHTML = html;
+}
+
+function _teacherColor(name) {
+  const palette = ['#6C47FF','#2563eb','#15803d','#b45309','#dc2626','#7c3aed','#0891b2'];
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+  return palette[h % palette.length];
+}
+
+// ── GLOBAL SEARCH ─────────────────────────────────────────────────────────────
+function globalSearch(q) {
+  q = (q || '').trim().toLowerCase();
+  const dropdown = document.getElementById('gsDropdown');
+  if (!dropdown) return;
+  if (q.length < 2) { dropdown.style.display = 'none'; return; }
+
+  const leadMatches   = (allLeads    || []).filter(l => [l.child_name, l.phone, l.email, l.course, l.notes].join(' ').toLowerCase().includes(q)).slice(0, 6);
+  const clientMatches = (_allClients || []).filter(c => [c.name, c.phone, c.email, c.course, c.notes, c.teacher].join(' ').toLowerCase().includes(q)).slice(0, 6);
+
+  if (!leadMatches.length && !clientMatches.length) {
+    dropdown.innerHTML = '<div class="gs-empty">Нічого не знайдено</div>';
+    dropdown.style.display = '';
+    return;
+  }
+
+  let html = '';
+  if (leadMatches.length) {
+    html += `<div class="gs-section">📋 Заявки</div>`;
+    html += leadMatches.map(l => `<div class="gs-item" onclick="gsGotoLead(${l.id})">
+      <span class="gs-item-name">${esc(l.child_name)}</span>
+      <span class="gs-item-sub">${esc(l.phone)}</span>
+    </div>`).join('');
+  }
+  if (clientMatches.length) {
+    html += `<div class="gs-section">🗂 Клієнти</div>`;
+    html += clientMatches.map(c => `<div class="gs-item" onclick="gsGotoClient(${c.id})">
+      <span class="gs-item-name">${esc(c.name)}</span>
+      <span class="gs-item-sub">${esc(c.phone)} · ${CLIENT_STATUS_LABELS[c.status]||c.status}</span>
+    </div>`).join('');
+  }
+
+  dropdown.innerHTML = html;
+  dropdown.style.display = '';
+}
+
+function closeGsDropdown() {
+  const d = document.getElementById('gsDropdown');
+  if (d) d.style.display = 'none';
+}
+
+function gsGotoLead(id) {
+  closeGsDropdown();
+  const inp = document.getElementById('gsInput');
+  if (inp) inp.value = '';
+  showTab('leads');
+  setTimeout(() => {
+    const row = document.getElementById('row-' + id);
+    if (row) {
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      row.style.transition = 'background .3s';
+      row.style.background = '#ede9fe';
+      setTimeout(() => row.style.background = '', 1600);
+    }
+  }, 120);
+}
+
+function gsGotoClient(id) {
+  closeGsDropdown();
+  const inp = document.getElementById('gsInput');
+  if (inp) inp.value = '';
+  showTab('clients');
+  setTimeout(() => {
+    const client = (_allClients || []).find(c => c.id === id);
+    if (client) openClientModal(client.id);
+  }, 150);
+}
+
+// ── STAFF PERSONAL FILES (superadmin only) ───────────────────────────────────
+let _currentTeacherId = null;
+let _currentStaffRole = null;
+
+function onPaymentTypeChange(val) {
+  document.getElementById('tp_hourlyWrap').style.display        = val === 'monthly' ? 'none' : '';
+  document.getElementById('tp_lessonDurationWrap').style.display = val === 'monthly' ? 'none' : '';
+  document.getElementById('tp_monthlyWrap').style.display       = val === 'monthly' ? '' : 'none';
+}
+
+async function openStaffProfile(adminId) {
+  if (currentRole !== 'superadmin') return;
+  _currentTeacherId = adminId;
+  try {
+    const res = await fetch('/api/admins', { headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    const admin = (data.admins || []).find(a => a.id === adminId);
+    if (!admin) { showToast('Не знайдено', 'error'); return; }
+    _currentStaffRole = admin.role;
+
+    document.getElementById('teacherProfileTitle').textContent = `👤 ${admin.name}`;
+    document.getElementById('tp_name').value  = admin.name  || '';
+    document.getElementById('tp_phone').value = admin.phone || '';
+    document.getElementById('tp_notes').value = admin.notes || '';
+
+    // Show/hide teacher-specific section
+    const isTeacher = admin.role === 'teacher';
+    document.getElementById('tp_teacherSection').style.display = isTeacher ? '' : 'none';
+
+    if (isTeacher) {
+      const pt = admin.paymentType || 'hourly';
+      document.getElementById('tp_paymentType').value    = pt;
+      document.getElementById('tp_hourlyRate').value     = admin.hourlyRate    != null ? admin.hourlyRate    : '';
+      document.getElementById('tp_lessonDuration').value = admin.lessonDuration != null ? admin.lessonDuration : 60;
+      document.getElementById('tp_monthlyRate').value    = admin.monthlyRate   != null ? admin.monthlyRate   : '';
+      onPaymentTypeChange(pt);
+
+      // Populate salary month dropdown
+      const salaryMonthSel = document.getElementById('tp_salaryMonth');
+      salaryMonthSel.innerHTML = '<option value="">— Оберіть місяць —</option>';
+      const now = new Date();
+      for (let i = 0; i < 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const ym = d.toISOString().slice(0, 7);
+        const mm = d.getMonth() + 1;
+        const opt = document.createElement('option');
+        opt.value = ym;
+        opt.textContent = `${MONTH_NAMES[mm]} ${d.getFullYear()}`;
+        salaryMonthSel.appendChild(opt);
+      }
+      document.getElementById('tp_salaryResult').textContent = '';
+      document.getElementById('tp_salaryBreakdown').innerHTML = '';
+    }
+
+    // Load docs
+    await loadStaffDocs(adminId);
+
+    document.getElementById('teacherProfileModal').style.display = 'flex';
+  } catch { showToast('Помилка завантаження', 'error'); }
+}
+
+const openTeacherProfile = openStaffProfile;
+
+function closeTeacherProfile() {
+  document.getElementById('teacherProfileModal').style.display = 'none';
+  _currentTeacherId = null;
+  _currentStaffRole = null;
+}
+
+async function saveTeacherProfile() {
+  if (!_currentTeacherId) return;
+  const patch = {
+    name:  document.getElementById('tp_name').value.trim(),
+    phone: document.getElementById('tp_phone').value.trim(),
+    notes: document.getElementById('tp_notes').value.trim(),
+  };
+  if (!patch.name || patch.name.length < 2) { showToast('Вкажіть ім\'я', 'error'); return; }
+  if (_currentStaffRole === 'teacher') {
+    const pt = document.getElementById('tp_paymentType').value;
+    patch.paymentType    = pt;
+    patch.lessonDuration = parseInt(document.getElementById('tp_lessonDuration').value) || 60;
+    if (pt === 'monthly') {
+      patch.monthlyRate = parseFloat(document.getElementById('tp_monthlyRate').value) || 0;
+    } else {
+      patch.hourlyRate  = parseFloat(document.getElementById('tp_hourlyRate').value)  || 0;
+    }
+  }
+  try {
+    const res = await fetch(`/api/admins/${_currentTeacherId}/profile`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(patch),
+    });
+    if (!res.ok) { const d = await res.json(); showToast(d.error || 'Помилка', 'error'); return; }
+    showToast('Збережено ✓', 'success');
+    closeTeacherProfile();
+    renderAdmins();
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+async function regenerateAdminToken(id) {
+  if (!confirm('Згенерувати новий токен для цього співробітника? Старий токен перестане працювати.')) return;
+  try {
+    const res = await fetch(`/api/admins/${id}/regenerate-token`, {
+      method: 'POST',
+      headers: { 'x-admin-token': token },
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Помилка', 'error'); return; }
+    showToast('Новий токен згенеровано ✓', 'success');
+    renderAdmins();
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+// ── STAFF DOCS ────────────────────────────────────────────────────────────────
+async function loadStaffDocs(adminId) {
+  const listEl = document.getElementById('tp_docsList');
+  if (!listEl) return;
+  try {
+    const res = await fetch(`/api/admins/${adminId}/docs`, { headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    const docs = data.docs || [];
+    if (!docs.length) {
+      listEl.innerHTML = '<span style="color:#aaa">Немає документів</span>';
+      return;
+    }
+    listEl.innerHTML = docs.map(d => {
+      const kb = Math.round(d.size / 1024);
+      const safeName = d.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee">
+        <span style="color:#444;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📄 ${esc(d.name)} <span style="color:#aaa;font-size:11px">(${kb} KB)</span></span>
+        <div style="display:flex;gap:4px;flex-shrink:0;margin-left:8px">
+          <button class="btn btn-ghost btn-sm" onclick="downloadStaffDoc(${adminId},'${safeName}')" title="Завантажити">⬇</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteStaffDoc(${adminId},'${safeName}')" title="Видалити">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch { listEl.innerHTML = '<span style="color:#e53e3e">Помилка завантаження</span>'; }
+}
+
+async function uploadStaffDoc() {
+  const input = document.getElementById('tp_docInput');
+  const file = input?.files?.[0];
+  if (!file || !_currentTeacherId) return;
+  const maxSize = 8 * 1024 * 1024;
+  if (file.size > maxSize) { showToast('Файл занадто великий (макс 8 МБ)', 'error'); input.value = ''; return; }
+  showToast('Завантаження...', 'success');
+  try {
+    const b64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    const res = await fetch(`/api/admins/${_currentTeacherId}/docs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ name: file.name, data: b64 }),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Помилка завантаження', 'error'); return; }
+    showToast('Документ завантажено ✓', 'success');
+    await loadStaffDocs(_currentTeacherId);
+  } catch { showToast('Помилка', 'error'); }
+  finally { input.value = ''; }
+}
+
+async function deleteStaffDoc(adminId, filename) {
+  if (!confirm(`Видалити "${filename}"?`)) return;
+  try {
+    const res = await fetch(`/api/admins/${adminId}/docs/${encodeURIComponent(filename)}`, {
+      method: 'DELETE',
+      headers: { 'x-admin-token': token },
+    });
+    if (!res.ok) { showToast('Помилка видалення', 'error'); return; }
+    showToast('Документ видалено ✓', 'success');
+    await loadStaffDocs(adminId);
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function downloadStaffDoc(adminId, filename) {
+  try {
+    const res = await fetch(`/api/admins/${adminId}/docs/${encodeURIComponent(filename)}`, {
+      headers: { 'x-admin-token': token },
+    });
+    if (!res.ok) { showToast('Помилка завантаження', 'error'); return; }
+    const blob = await res.blob();
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function loadTeacherSalary() {
+  const ym = document.getElementById('tp_salaryMonth')?.value;
+  if (!ym || !_currentTeacherId) return;
+  const resultEl    = document.getElementById('tp_salaryResult');
+  const breakdownEl = document.getElementById('tp_salaryBreakdown');
+  resultEl.textContent = '⏳ Розраховуємо...';
+  try {
+    const res = await fetch(`/api/admins/${_currentTeacherId}/salary?ym=${ym}`, {
+      headers: { 'x-admin-token': token },
+    });
+    const d = await res.json();
+    if (!res.ok) { resultEl.textContent = '⚠️ Помилка'; return; }
+    const pt = document.getElementById('tp_paymentType')?.value || 'hourly';
+    if (pt === 'monthly') {
+      const mRate = parseFloat(document.getElementById('tp_monthlyRate')?.value) || d.admin?.monthlyRate || 0;
+      resultEl.textContent = `💰 ${mRate.toLocaleString('uk-UA')} ₴ (місячна ставка)`;
+    } else {
+      resultEl.textContent = `💰 ${d.totalSalary.toLocaleString('uk-UA')} ₴ (${d.totalLessons} ур. × ${d.lessonDuration} хв × ${d.hourlyRate} ₴/год)`;
+    }
+    if (d.breakdown && d.breakdown.length) {
+      breakdownEl.innerHTML = `<div style="margin-top:8px;font-size:12px">
+        ${d.breakdown.filter(b => b.lessons > 0).map(b =>
+          `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f0eeff">
+            <span>${esc(b.clientName)}</span>
+            <span style="color:#6C47FF;font-weight:600">${b.lessons} ур.</span>
+          </div>`
+        ).join('') || '<div style="color:#aaa">Уроків не відмічено</div>'}
+      </div>`;
+    } else {
+      breakdownEl.innerHTML = '<div style="color:#aaa;font-size:12px;margin-top:6px">Учнів у цього викладача не знайдено</div>';
+    }
+  } catch { resultEl.textContent = '⚠️ Помилка'; }
 }
 
 // ── AUTO LOGIN if token saved ─────────────────────────────────────────────────

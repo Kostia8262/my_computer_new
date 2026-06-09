@@ -26,11 +26,42 @@ module.exports = {
   getById(id)     { return load().find(a => a.id === id) || null; },
   findByToken(t)  { return load().find(a => a.token === t && a.active) || null; },
 
-  create(name, role) {
+  create(name, role, extra = {}) {
     const r = ALLOWED_ROLES.includes(role) ? role : 'administrator';
     const list  = load();
     const admin = { id: nextId(list), name: String(name).trim(), role: r, token: genToken(), active: true, createdAt: now() };
+    if (extra.hourlyRate     !== undefined) admin.hourlyRate     = parseFloat(extra.hourlyRate)    || 0;
+    if (extra.lessonDuration !== undefined) admin.lessonDuration = parseInt(extra.lessonDuration)  || 60;
+    if (extra.notes !== undefined) admin.notes = String(extra.notes).slice(0, 500);
+    if (extra.phone !== undefined) admin.phone = String(extra.phone).slice(0, 30);
     list.push(admin);
+    save(list);
+    return admin;
+  },
+
+  update(id, patch) {
+    const list = load();
+    const idx  = list.findIndex(a => a.id === id);
+    if (idx === -1) return null;
+    ['name', 'hourlyRate', 'lessonDuration', 'notes', 'phone', 'paymentType', 'monthlyRate'].forEach(k => {
+      if (!(k in patch)) return;
+      if (k === 'hourlyRate' || k === 'monthlyRate') list[idx][k] = parseFloat(patch[k]) || 0;
+      else if (k === 'lessonDuration') list[idx][k] = parseInt(patch[k]) || 60;
+      else if (k === 'paymentType')    list[idx][k] = String(patch[k]).slice(0, 20);
+      else                             list[idx][k] = String(patch[k]).slice(0, 500);
+    });
+    list[idx].updatedAt = now();
+    save(list);
+    return list[idx];
+  },
+
+  regenerateToken(id) {
+    const list  = load();
+    const admin = list.find(a => a.id === id);
+    if (!admin) return null;
+    admin.token    = genToken();
+    admin.active   = true;
+    admin.updatedAt = now();
     save(list);
     return admin;
   },

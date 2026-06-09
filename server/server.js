@@ -34,6 +34,29 @@ const reviewsDb      = require('./reviews');
 const { sendLeadNotification } = require('./mailer');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
+
+// ── STARTUP SEED (test teachers + demo clients) ───────────────────────────────
+(function seedTestData() {
+  try {
+    if (!adminsDb.getAll().some(a => a.role === 'teacher')) {
+      adminsDb.create('Богдан Коваль',   'teacher', { hourlyRate: 150, lessonDuration: 60, phone: '+380501234567', notes: 'Веб-розробка, Python' });
+      adminsDb.create('Аліна Петренко',  'teacher', { hourlyRate: 130, lessonDuration: 60, phone: '+380671234568', notes: 'Scratch, Roblox' });
+      console.log('✅  Seeded 2 test teachers');
+    }
+    if (!clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
+      [
+        { name: 'Марко Тищенко',    age: 10, course: 'scratch', phone: '+380501001001', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'1',time:'15:00'},{day:'4',time:'15:00'}], schedule: 'Пн 15:00, Чт 15:00' },
+        { name: 'Діана Коваль',     age: 12, course: 'python',  phone: '+380502002002', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'group',      scheduleDays: [{day:'2',time:'16:00'},{day:'5',time:'16:00'}], schedule: 'Вт 16:00, Пт 16:00' },
+        { name: 'Артем Мороз',      age: 14, course: 'web',     phone: '+380503003003', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'individual', scheduleDays: [{day:'3',time:'17:00'}],                       schedule: 'Ср 17:00' },
+        { name: 'Соня Петрик',      age: 11, course: 'roblox',  phone: '+380504004004', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'3',time:'14:30'}],                       schedule: 'Ср 14:30' },
+        { name: 'Данило Романів',   age:  9, course: 'scratch', phone: '+380505005005', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'6',time:'10:00'}],                       schedule: 'Сб 10:00' },
+        { name: 'Вікторія Лисенко', age: 13, course: 'python',  phone: '+380506006006', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'group',      scheduleDays: [{day:'2',time:'18:00'}],                       schedule: 'Вт 18:00' },
+      ].forEach(c => clientsDb.create(c));
+      console.log('✅  Seeded 6 test clients with schedule data');
+    }
+  } catch(e) { console.warn('Seed warning:', e.message); }
+})();
+
 function loadContent() {
   try { return JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8')); } catch { return {}; }
 }
@@ -76,8 +99,8 @@ app.use(cors({
 }));
 
 // ── BODY PARSING ─────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '16kb' }));
-app.use(express.urlencoded({ extended: false, limit: '16kb' }));
+app.use(express.json({ limit: '12mb' }));
+app.use(express.urlencoded({ extended: false, limit: '12mb' }));
 
 // ── RATE LIMITING ─────────────────────────────────────────────────────────────
 // Public: 10 form submissions per 15 minutes per IP
@@ -225,6 +248,115 @@ app.delete('/api/admins/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   res.json({ success: true });
 });
 
+// Teacher profile update (superadmin only)
+app.patch('/api/admins/:id/profile', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid ID' });
+  const patch = {};
+  const { name, hourlyRate, lessonDuration, notes, phone, paymentType, monthlyRate } = req.body;
+  if (name           !== undefined) patch.name           = sanitize(name);
+  if (hourlyRate     !== undefined) patch.hourlyRate     = parseFloat(hourlyRate)    || 0;
+  if (lessonDuration !== undefined) patch.lessonDuration = parseInt(lessonDuration)  || 60;
+  if (notes          !== undefined) patch.notes          = sanitize(notes);
+  if (phone          !== undefined) patch.phone          = sanitize(phone);
+  if (paymentType    !== undefined) patch.paymentType    = sanitize(paymentType);
+  if (monthlyRate    !== undefined) patch.monthlyRate    = parseFloat(monthlyRate)   || 0;
+  const admin = adminsDb.update(id, patch);
+  if (!admin) return res.status(404).json({ error: 'Не знайдено' });
+  res.json({ success: true, admin });
+});
+
+// Regenerate token for revoked admin (superadmin only)
+app.post('/api/admins/:id/regenerate-token', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid ID' });
+  const admin = adminsDb.regenerateToken(id);
+  if (!admin) return res.status(404).json({ error: 'Не знайдено' });
+  res.json({ success: true, admin });
+});
+
+// Staff document upload (base64 JSON) — superadmin only
+const STAFF_DOCS_DIR = path.join(__dirname, '..', 'data', 'staff-docs');
+
+app.post('/api/admins/:id/docs', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid ID' });
+  const { name: fileName, data: b64 } = req.body;
+  if (!fileName || !b64) return res.status(400).json({ error: 'Потрібні name і data' });
+  const safeName = sanitize(fileName).replace(/[^a-zA-Z0-9_\-\.а-яА-ЯіІїЇєЄ]/gu, '_').slice(0, 120);
+  if (!safeName) return res.status(400).json({ error: 'Недійсна назва файлу' });
+  try {
+    const dir = path.join(STAFF_DOCS_DIR, String(id));
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const buf = Buffer.from(b64, 'base64');
+    if (buf.length > 8 * 1024 * 1024) return res.status(400).json({ error: 'Файл завеликий (макс 8 МБ)' });
+    fs.writeFileSync(path.join(dir, safeName), buf);
+    res.json({ success: true, name: safeName });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/admins/:id/docs', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid ID' });
+  const dir = path.join(STAFF_DOCS_DIR, String(id));
+  if (!fs.existsSync(dir)) return res.json({ success: true, docs: [] });
+  const docs = fs.readdirSync(dir).filter(f => !f.startsWith('.')).map(f => {
+    const stat = fs.statSync(path.join(dir, f));
+    return { name: f, size: stat.size, mtime: stat.mtime };
+  });
+  res.json({ success: true, docs });
+});
+
+app.delete('/api/admins/:id/docs/:filename', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  const filename = req.params.filename;
+  if (!id || !filename) return res.status(400).json({ error: 'Invalid params' });
+  const filePath = path.join(STAFF_DOCS_DIR, String(id), filename);
+  if (!filePath.startsWith(STAFF_DOCS_DIR)) return res.status(400).json({ error: 'Invalid path' });
+  try {
+    if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Not found' });
+    fs.unlinkSync(filePath);
+    res.json({ success: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/admins/:id/docs/:filename', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  const filename = req.params.filename;
+  if (!id || !filename) return res.status(400).json({ error: 'Invalid params' });
+  const filePath = path.join(STAFF_DOCS_DIR, String(id), filename);
+  if (!filePath.startsWith(STAFF_DOCS_DIR)) return res.status(400).json({ error: 'Invalid path' });
+  if (!fs.existsSync(filePath)) return res.status(404).json({ error: 'Not found' });
+  res.download(filePath, filename);
+});
+
+// Teacher salary calculation (superadmin only)
+app.get('/api/admins/:id/salary', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  const admin = adminsDb.getById(id);
+  if (!admin) return res.status(404).json({ error: 'Не знайдено' });
+  const ym = req.query.ym || new Date().toISOString().slice(0, 7);
+  const [year, month] = ym.split('-').map(Number);
+  const allClients     = clientsDb.getAll();
+  const teacherClients = allClients.filter(c => c.teacher === admin.name);
+  const attData        = attendanceDb.getMonth(year, month);
+  const breakdown = [];
+  let totalLessons = 0;
+  teacherClients.forEach(c => {
+    const clientAtt = attData[String(c.id)] || {};
+    const lessons = Object.values(clientAtt).filter(v => ['present', 'absent', 'makeup'].includes(v)).length;
+    totalLessons += lessons;
+    breakdown.push({ clientId: c.id, clientName: c.name, lessons });
+  });
+  const hourlyRate     = admin.hourlyRate     || 0;
+  const lessonDuration = admin.lessonDuration || 60;
+  const totalHours     = (totalLessons * lessonDuration) / 60;
+  const totalSalary    = Math.round(totalHours * hourlyRate);
+  res.json({ success: true, admin, ym, totalLessons, totalHours, totalSalary, hourlyRate, lessonDuration, breakdown });
+});
+
 // POST /api/leads — submit lead (rate-limited)
 app.post('/api/leads', leadsLimiter, (req, res) => {
   const { child_name, age, course, phone } = req.body;
@@ -290,7 +422,7 @@ app.get('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
 // PATCH /api/leads/:id
 app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
   const id = parseInt(req.params.id);
-  const { status, notes, child_name, phone, age, course, email } = req.body;
+  const { status, notes, child_name, phone, age, course, email, teacher, schedule } = req.body;
   const valid = ['new', 'contacted', 'trial_scheduled', 'enrolled', 'rejected'];
   try {
     // Update editable fields
@@ -300,6 +432,8 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
     if (age        !== undefined) fieldPatch.age        = age ? parseInt(age) || null : null;
     if (course     !== undefined) fieldPatch.course     = sanitize(course) || null;
     if (email      !== undefined) fieldPatch.email      = sanitize(email) || null;
+    if (teacher    !== undefined) fieldPatch.teacher    = sanitize(teacher) || null;
+    if (schedule   !== undefined) fieldPatch.schedule   = sanitize(schedule) || null;
     if (Object.keys(fieldPatch).length) db.updateFields(id, fieldPatch);
 
     if (status) {

@@ -80,7 +80,7 @@ module.exports = {
     const leads = load();
     const lead = leads.find(l => l.id === id);
     if (!lead) return null;
-    const allowed = ['child_name', 'phone', 'age', 'course', 'email'];
+    const allowed = ['child_name', 'phone', 'age', 'course', 'email', 'teacher', 'schedule'];
     allowed.forEach(k => { if (k in fields && fields[k] !== undefined) lead[k] = fields[k]; });
     lead.updated_at = now();
     save(leads);
