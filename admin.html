@@ -882,11 +882,19 @@ tr:hover td{background:#faf9ff}
 
       <!-- ── SUB-TAB: SCHEDULE ── -->
       <div id="csubSchedule" style="display:none">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">
-          <h3 style="font-size:15px;font-weight:800;margin:0">🗓 Тижневий розклад</h3>
-          <select class="filter-select" id="schedTeacherFilter" onchange="renderSchedule()">
-            <option value="">Всі викладачі</option>
-          </select>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 style="font-size:15px;font-weight:800;margin:0">🗓 Тижневий розклад</h3>
+            <select class="filter-select" id="schedTeacherFilter" onchange="renderSchedule()">
+              <option value="">Всі викладачі</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="changeSchedWeek(-1)" title="Попередній тиждень">‹</button>
+            <span id="schedWeekLabel" style="font-size:13px;font-weight:600;min-width:160px;text-align:center;white-space:nowrap">—</span>
+            <button class="btn btn-ghost btn-sm" onclick="changeSchedWeek(1)" title="Наступний тиждень">›</button>
+            <button class="btn btn-ghost btn-sm" onclick="goToCurrentSchedWeek()" title="Поточний тиждень" style="font-size:11px">Сьогодні</button>
+          </div>
         </div>
         <div style="background:#fff;border-radius:12px;border:1px solid #e8e4ff;padding:16px">
           <div class="sched-wrap" id="schedGrid">
@@ -1054,8 +1062,9 @@ tr:hover td{background:#faf9ff}
 <script>
 'use strict';
 
-const STORAGE_KEY     = 'mca_admin_token';
-const STORAGE_TAB_KEY = 'mca_admin_tab';
+const STORAGE_KEY        = 'mca_admin_token';
+const STORAGE_TAB_KEY    = 'mca_admin_tab';
+const STORAGE_SUBTAB_KEY = 'mca_admin_subtab';
 const PAGE_SIZE       = 20;
 
 let allLeads      = [];
@@ -1170,8 +1179,15 @@ async function showApp() {
   if (currentRole !== 'teacher') {
     await loadLeads();
     // Restore last-used tab (or default to leads)
-    const savedTab = localStorage.getItem(STORAGE_TAB_KEY) || 'leads';
+    const savedTab    = localStorage.getItem(STORAGE_TAB_KEY)    || 'leads';
+    const savedSubTab = localStorage.getItem(STORAGE_SUBTAB_KEY) || 'base';
     showTab(savedTab);
+    // Restore clients sub-tab if applicable
+    if (savedTab === 'clients' && savedSubTab !== 'base') {
+      // Wait for loadClients() to finish before switching sub-tab
+      const restoreSubTab = () => showClientsSubTab(savedSubTab);
+      setTimeout(restoreSubTab, 400);
+    }
   }
   loadAlerts();
   setInterval(loadAlerts, 5 * 60 * 1000); // refresh alerts every 5 min
@@ -1851,6 +1867,7 @@ let _clientsSubTab = 'base';
 
 function showClientsSubTab(tab) {
   _clientsSubTab = tab;
+  localStorage.setItem(STORAGE_SUBTAB_KEY, tab);
   ['base','payments','attendance','schedule'].forEach(t => {
     const el = document.getElementById('csub' + t.charAt(0).toUpperCase() + t.slice(1));
     const btn = document.getElementById('csub-' + t);
@@ -1905,7 +1922,7 @@ async function loadMonthPayments() {
     // Load list of existing months
     const res1 = await fetch('/api/monthly-payments', { headers: { 'x-admin-token': token } });
     const d1   = await res1.json();
-    _mpAllMonths = d1.months || [];
+    _mpAllMonths = (d1.months || []).sort().reverse(); // newest first
     _updatePayMonthDropdown();
 
     // Load current month
@@ -2105,7 +2122,7 @@ function renderPayAlert() {
   const alertEl = document.getElementById('payAlert');
   const textEl  = document.getElementById('payAlertText');
   const namesEl = document.getElementById('payAlertNames');
-  if (!alertEl) return;
+  if (!alertEl || !textEl || !namesEl) return;
 
   const unpaid = _mpData.filter(r => ['pending','partial'].includes(r.status));
   const totalDebt = unpaid.reduce((s, r) => s + Math.max(0, (r.expectedAmount||0) - (r.paidAmount||0)), 0);
@@ -2271,6 +2288,8 @@ async function saveSchedPopup() {
     const client = _allClients?.find(c => c.id === clientId);
     if (client) { client.lessonType = lt; client.scheduleDays = scheduleDays; client.schedule = schedule; }
     renderClients();
+    // If schedule tab is visible, refresh it too
+    if (_clientsSubTab === 'schedule') renderSchedule();
     showToast('Розклад збережено ✓', 'success');
   } catch { showToast('Помилка', 'error'); }
 }
@@ -3733,11 +3752,58 @@ async function _bulkPatch(clientId, patch) {
 }
 
 // ── SCHEDULE VIEW ─────────────────────────────────────────────────────────────
-const SCHED_DAYS_FULL = ['','Понеділок','Вівторок','Середа','Четвер','П\'ятниця','Субота','Неділя'];
+const SCHED_DAYS_FULL  = ['','Понеділок','Вівторок','Середа','Четвер','П\'ятниця','Субота','Неділя'];
 const SCHED_DAYS_SHORT = ['','Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+const MONTHS_SHORT_UA  = ['січ','лют','бер','кві','тра','чер','лип','сер','вер','жов','лис','гру'];
+
+let _schedWeekOffset = 0; // 0 = current week, ±N weeks
+
+function _schedWeekMonday(offset) {
+  const now = new Date();
+  const dow = now.getDay() || 7; // 1=Mon..7=Sun
+  const mon = new Date(now);
+  mon.setDate(now.getDate() - (dow - 1) + offset * 7);
+  mon.setHours(0, 0, 0, 0);
+  return mon;
+}
+
+function _schedUpdateWeekLabel() {
+  const mon = _schedWeekMonday(_schedWeekOffset);
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+  const label = `${mon.getDate()} ${MONTHS_SHORT_UA[mon.getMonth()]} — ${sun.getDate()} ${MONTHS_SHORT_UA[sun.getMonth()]} ${sun.getFullYear()}`;
+  const el = document.getElementById('schedWeekLabel');
+  if (el) el.textContent = label;
+}
+
+function changeSchedWeek(delta) {
+  _schedWeekOffset += delta;
+  renderSchedule();
+}
+
+function goToCurrentSchedWeek() {
+  _schedWeekOffset = 0;
+  renderSchedule();
+}
+
+function _refreshSchedTeacherFilter() {
+  const sel = document.getElementById('schedTeacherFilter');
+  if (!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">Всі викладачі</option>';
+  const names = _teachersList.length
+    ? _teachersList.map(t => t.name)
+    : [...new Set((_allClients || []).map(c => c.teacher).filter(Boolean))].sort();
+  names.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    if (t === currentVal) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
 
 function loadSchedule() {
-  if (!_allClients) { loadClients().then(renderSchedule); return; }
+  if (!_allClients) { loadClients().then(() => { _refreshSchedTeacherFilter(); renderSchedule(); }); return; }
+  _refreshSchedTeacherFilter();
   renderSchedule();
 }
 
@@ -3745,22 +3811,13 @@ function renderSchedule() {
   const gridEl = document.getElementById('schedGrid');
   if (!gridEl) return;
 
+  _schedUpdateWeekLabel();
+
   const filterTeacher = document.getElementById('schedTeacherFilter')?.value || '';
   const clients = (_allClients || []).filter(c =>
     c.scheduleDays && c.scheduleDays.length > 0 &&
     (filterTeacher === '' || c.teacher === filterTeacher)
   );
-
-  // Populate teacher filter dropdown
-  const sel = document.getElementById('schedTeacherFilter');
-  if (sel && sel.options.length < 2) {
-    const teachers = [...new Set((_allClients || []).map(c => c.teacher).filter(Boolean))].sort();
-    teachers.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t; opt.textContent = t;
-      sel.appendChild(opt);
-    });
-  }
 
   if (!clients.length) {
     gridEl.innerHTML = '<div class="empty" style="padding:40px">Немає учнів з розкладом' + (filterTeacher ? ` для ${filterTeacher}` : '') + '</div>';
@@ -3772,7 +3829,7 @@ function renderSchedule() {
   clients.forEach(c => c.scheduleDays.forEach(s => slotSet.add(s.time)));
   const slots = [...slotSet].sort();
 
-  // Build grid[time][day] = array of client cards
+  // Build grid[time][day] = [{name, course, color, teacher, clientId}]
   const grid = {};
   slots.forEach(t => { grid[t] = {1:[],2:[],3:[],4:[],5:[],6:[],7:[]}; });
   clients.forEach(c => {
@@ -3780,13 +3837,24 @@ function renderSchedule() {
     c.scheduleDays.forEach(s => {
       const d = parseInt(s.day);
       if (d >= 1 && d <= 7 && grid[s.time]) {
-        grid[s.time][d].push({ name: c.name, course: c.course, color, teacher: c.teacher || '' });
+        grid[s.time][d].push({ name: c.name, course: c.course, color, teacher: c.teacher || '', clientId: c.id });
       }
     });
   });
 
+  // Calculate actual dates for the current week offset
+  const monday = _schedWeekMonday(_schedWeekOffset);
+  const todayStr = new Date().toDateString();
+
   let html = '<table class="sched-tbl"><thead><tr><th class="sched-time">Час</th>';
-  for (let d = 1; d <= 7; d++) html += `<th>${SCHED_DAYS_FULL[d]}</th>`;
+  for (let d = 1; d <= 7; d++) {
+    const colDate = new Date(monday);
+    colDate.setDate(monday.getDate() + (d - 1));
+    const dateStr  = `${colDate.getDate()} ${MONTHS_SHORT_UA[colDate.getMonth()]}`;
+    const isToday  = colDate.toDateString() === todayStr;
+    const todayCss = isToday ? 'background:#f0eeff;color:#6C47FF;' : '';
+    html += `<th style="${todayCss}font-size:12px">${SCHED_DAYS_SHORT[d]}<br><span style="font-weight:400;font-size:11px;color:${isToday?'#6C47FF':'#aaa'}">${dateStr}</span></th>`;
+  }
   html += '</tr></thead><tbody>';
 
   slots.forEach(time => {
@@ -3797,9 +3865,10 @@ function renderSchedule() {
         html += `<td></td>`;
       } else {
         html += `<td>${cards.map(card => {
-          const bgLight = card.color + '22';
+          const bgLight     = card.color + '22';
           const courseLabel = COURSE_LABELS[card.course] || card.course || '';
-          return `<span class="sched-card" style="background:${bgLight};color:${card.color};border:1px solid ${card.color}44" title="${esc(card.teacher)}: ${esc(card.name)} (${courseLabel})">${esc(card.name)}${courseLabel?' · '+courseLabel:''}</span>`;
+          const titleTxt    = `${esc(card.teacher)}: ${esc(card.name)}${courseLabel ? ' ('+courseLabel+')' : ''} — натисніть для редагування`;
+          return `<span class="sched-card" style="background:${bgLight};color:${card.color};border:1px solid ${card.color}44;cursor:pointer" onclick="openSchedPopup(event,${card.clientId})" title="${titleTxt}">${esc(card.name)}${courseLabel?' · '+courseLabel:''}</span>`;
         }).join('')}</td>`;
       }
     }
