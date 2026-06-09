@@ -326,6 +326,9 @@ tr:hover td{background:#faf9ff}
       <button class="sidebar-item" id="sideNav-articles" onclick="showTab('articles')">
         <span class="sidebar-icon">📰</span><span>Статті</span>
       </button>
+      <button class="sidebar-item" id="sideNav-reviews" onclick="showTab('reviews')">
+        <span class="sidebar-icon">⭐</span><span>Відгуки</span>
+      </button>
       <div class="sidebar-section">Налаштування</div>
       <button class="sidebar-item superadmin-only" id="sideNav-dashboard" onclick="showTab('dashboard')" style="display:none">
         <span class="sidebar-icon">📊</span><span>Дашборд</span>
@@ -593,6 +596,60 @@ tr:hover td{background:#faf9ff}
         <div class="modal-footer">
           <button class="btn btn-ghost" onclick="closeArticleModal()">Скасувати</button>
           <button class="btn btn-primary" onclick="saveArticle()">💾 Зберегти</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REVIEWS TAB ── -->
+    <div id="reviewsTab" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <h2 style="font-size:18px;font-weight:800">⭐ Відгуки</h2>
+        <button class="btn btn-primary btn-sm" onclick="openReviewModal(null)">+ Додати відгук</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table" style="min-width:700px">
+          <thead><tr>
+            <th style="width:40px">#</th>
+            <th>Ім'я</th>
+            <th>Роль/Курс</th>
+            <th>Текст відгуку</th>
+            <th style="width:60px">Рейтинг</th>
+            <th style="width:80px">Статус</th>
+            <th style="width:90px"></th>
+          </tr></thead>
+          <tbody id="reviewsBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Review modal -->
+      <div class="modal-overlay" id="reviewModal" style="display:none" onclick="if(event.target===this)closeReviewModal()">
+        <div class="modal-box" style="max-width:520px">
+          <h3><span id="reviewModalTitle">Відгук</span><button class="btn btn-ghost btn-sm" onclick="closeReviewModal()">✕</button></h3>
+          <div class="modal-grid">
+            <div class="modal-group full"><label class="modal-label">Ім'я *</label><input class="modal-input" id="rv_name" placeholder="Марина К."/></div>
+            <div class="modal-group"><label class="modal-label">Ініціали (аватар)</label><input class="modal-input" id="rv_initials" placeholder="МК"/></div>
+            <div class="modal-group"><label class="modal-label">Рейтинг</label>
+              <select class="modal-input" id="rv_rating">
+                <option value="5">★★★★★</option>
+                <option value="4">★★★★</option>
+                <option value="3">★★★</option>
+                <option value="2">★★</option>
+                <option value="1">★</option>
+              </select>
+            </div>
+            <div class="modal-group full"><label class="modal-label">Роль / Курс</label><input class="modal-input" id="rv_role" placeholder="мама Арсенія, 9 років · Scratch"/></div>
+            <div class="modal-group full"><label class="modal-label">Текст відгуку *</label><textarea class="modal-input" id="rv_text" rows="3" placeholder='"Текст відгуку..."'></textarea></div>
+            <div class="modal-group"><label class="modal-label">Статус</label>
+              <select class="modal-input" id="rv_active">
+                <option value="1">✅ Активний</option>
+                <option value="0">🙈 Прихований</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeReviewModal()">Скасувати</button>
+            <button class="btn btn-primary" onclick="saveReview()">💾 Зберегти</button>
+          </div>
         </div>
       </div>
     </div>
@@ -995,6 +1052,22 @@ async function loadMe() {
     document.querySelectorAll('.superadmin-only').forEach(el => {
       el.style.display = currentRole === 'superadmin' ? '' : 'none';
     });
+
+    if (currentRole === 'teacher') {
+      // Hide all sidebar items except clients
+      ['leads','admins','content','courses','curriculum','modules','articles','dashboard'].forEach(t => {
+        const btn = document.getElementById('sideNav-' + t);
+        if (btn) btn.style.display = 'none';
+      });
+      // Navigate directly to attendance sub-tab
+      showTab('clients');
+      // Hide base and payments sub-tabs
+      ['csub-base','csub-payments'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+      showClientsSubTab('attendance');
+    }
   } catch (e) { console.error('loadMe', e); }
 }
 
@@ -1002,12 +1075,12 @@ let _currentTab = 'leads';
 
 function showTab(tab) {
   _currentTab = tab;
-  ['leads','admins','content','clients','courses','curriculum','modules','articles','dashboard'].forEach(t => {
+  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','dashboard'].forEach(t => {
     const el = document.getElementById(t + 'Tab');
     if (el) el.style.display = t === tab ? '' : 'none';
   });
   // Sidebar active state
-  ['leads','admins','content','clients','courses','curriculum','modules','articles','dashboard'].forEach(t => {
+  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','dashboard'].forEach(t => {
     const btn = document.getElementById('sideNav-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
   });
@@ -1026,6 +1099,7 @@ function showTab(tab) {
   if (tab === 'curriculum') loadCurriculumTab();
   if (tab === 'modules')    loadModulesTab();
   if (tab === 'articles')   loadArticlesTab();
+  if (tab === 'reviews')    loadReviewsTab();
   if (tab === 'dashboard')  loadDashboardTab();
 }
 
@@ -1038,7 +1112,8 @@ function reloadCurrentTab() {
       if (_clientsSubTab === 'attendance') loadAttendance();
     });
   }
-  if (_currentTab === 'admins')  renderAdmins();
+  if (_currentTab === 'admins')   renderAdmins();
+  if (_currentTab === 'reviews')  loadReviewsTab();
   loadAlerts();
 }
 
@@ -1097,11 +1172,18 @@ function renderTable() {
     tbody.innerHTML = page.map(l => `
       <tr id="row-${l.id}">
         <td style="color:#aaa;font-size:12px">#${l.id}</td>
-        <td style="font-weight:600">${esc(l.child_name)}</td>
-        <td>${l.age || '—'}</td>
-        <td>${l.course ? `<span class="chip">${COURSE_LABELS[l.course] || l.course}</span>` : '—'}</td>
-        <td><a href="tel:${esc(l.phone)}" class="phone-link">${esc(l.phone)}</a></td>
-        <td>${l.email ? `<a href="mailto:${esc(l.email)}" style="color:#6C47FF">${esc(l.email)}</a>` : '—'}</td>
+        <td style="font-weight:600"><input class="notes-input" style="font-weight:600" value="${esc(l.child_name)}" onblur="saveLeadFields(${l.id},{child_name:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="notes-input" style="width:42px;text-align:center" value="${esc(String(l.age||''))}" placeholder="вік" onblur="saveLeadFields(${l.id},{age:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td>
+          <select class="status-sel" style="min-width:90px" onchange="saveLeadFields(${l.id},{course:this.value})">
+            <option value="">—</option>
+            ${Object.entries(COURSE_LABELS).map(([v,lbl]) =>
+              `<option value="${v}" ${l.course===v?'selected':''}>${lbl}</option>`
+            ).join('')}
+          </select>
+        </td>
+        <td><input class="notes-input" value="${esc(l.phone)}" onblur="saveLeadFields(${l.id},{phone:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td><input class="notes-input" value="${esc(l.email||'')}" placeholder="email" onblur="saveLeadFields(${l.id},{email:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td>
           <select class="status-sel" onchange="changeStatus(${l.id}, this.value)">
             ${Object.entries(STATUS_LABELS).map(([v,lbl]) =>
@@ -1157,6 +1239,21 @@ async function saveNotes(id, notes) {
     const lead = allLeads.find(l => l.id === id);
     if (lead) lead.notes = notes;
     showToast('Нотатки збережено ✓', 'success');
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function saveLeadFields(id, fields) {
+  try {
+    const res = await fetch(`/api/leads/${id}`, {
+      method:  'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body:    JSON.stringify(fields),
+    });
+    if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
+    const data = await res.json();
+    const lead = allLeads.find(l => l.id === id);
+    if (lead && data.lead) Object.assign(lead, data.lead);
+    showToast('Збережено ✓', 'success');
   } catch { showToast('Помилка', 'error'); }
 }
 
@@ -1887,7 +1984,14 @@ function renderAttCalendar() {
   clients.forEach(c => {
     const cData = _attData[String(c.id)] || {};
     const schedSet = clientSched[c.id];
-    html += `<tr><td class="aname" title="${esc(c.phone)}">${esc(c.name)}</td>
+    const vals = Object.values(cData);
+    const absents = vals.filter(v => v === 'absent').length;
+    const makeups = vals.filter(v => v === 'makeup').length;
+    const needsMakeup = absents - makeups;
+    const hint = needsMakeup > 0
+      ? ` <span title="Потрібно відробок: ${needsMakeup}" style="cursor:default;white-space:nowrap">🔔<sup style="color:#e53e3e;font-weight:700">${needsMakeup}</sup></span>`
+      : '';
+    html += `<tr><td class="aname" title="${esc(c.phone)}">${esc(c.name)}${hint}</td>
       <td class="acourse">${c.course ? `<span class="chip" style="font-size:10px">${COURSE_LABELS[c.course]||c.course}</span>` : '—'}</td>`;
     for (let d = 1; d <= daysInMonth; d++) {
       const date = `${_attYear}-${String(_attMonth).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
@@ -2436,7 +2540,9 @@ function renderCoursesGrid() {
       <p style="font-size:13px;color:#555;line-height:1.5;margin-bottom:14px">${esc(c.description||'')}</p>
       <div style="display:flex;gap:8px">
         <button class="btn btn-ghost btn-sm" onclick="openCourseModal('${c.id}')">✏️ Редагувати</button>
-        ${currentRole==='superadmin'?`<button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')">✕ Видалити</button>`:''}
+        ${currentRole==='superadmin'
+          ? `<button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')">✕ Видалити</button>`
+          : `<button class="btn btn-ghost btn-sm" onclick="hideCourse('${c.id}',${c.active!==false})">${c.active!==false?'🙈 Сховати':'👁 Показати'}</button>`}
         <a href="/course.html?c=${c.id}" target="_blank" class="btn btn-ghost btn-sm" style="margin-left:auto">🔗 Переглянути</a>
       </div>
     </div>`).join('');
@@ -2503,6 +2609,21 @@ async function deleteCourse(id) {
     const res = await fetch(`/api/courses/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
     showToast('Курс видалено ✓', 'success');
+    await loadCoursesTab();
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function hideCourse(id, currentlyActive) {
+  const label = currentlyActive ? 'приховати' : 'показати';
+  if (!confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} курс "${id}"?`)) return;
+  try {
+    const res = await fetch(`/api/courses/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ active: !currentlyActive }),
+    });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    showToast(currentlyActive ? 'Курс приховано ✓' : 'Курс показано ✓', 'success');
     await loadCoursesTab();
   } catch { showToast('Помилка', 'error'); }
 }
@@ -2666,6 +2787,10 @@ const SITE_SECTIONS = [
   { key: 'courses',      label: '🎓 Виберіть напрямок (курси)' },
   { key: 'how-it-works', label: '⚙️ Як це працює' },
   { key: 'about',        label: '👥 Про нас' },
+  { key: 'stats',        label: '📊 Результати (статистика)' },
+  { key: 'pricing',      label: '💰 Варіанти навчання (ціни)' },
+  { key: 'certificate',  label: '🏆 Сертифікат' },
+  { key: 'partners',     label: '🛠 Технології (логотипи)' },
   { key: 'reviews',      label: '⭐ Відгуки' },
   { key: 'articles',     label: '📰 Корисні статті (блог)' },
   { key: 'faq',          label: '❓ FAQ' },
@@ -2749,7 +2874,9 @@ function renderArticlesTable() {
       </td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" onclick="openArticleModal(${a.id})">✏️</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteArticle(${a.id})">🗑</button>
+        ${currentRole === 'superadmin'
+          ? `<button class="btn btn-danger btn-sm" onclick="deleteArticle(${a.id})">🗑</button>`
+          : `<button class="btn btn-ghost btn-sm" onclick="hideArticle(${a.id},${a.active!==false})" title="${a.active!==false?'Сховати':'Показати'}">${a.active!==false?'🙈':'👁'}</button>`}
       </td>
     </tr>
   `).join('');
@@ -2829,6 +2956,149 @@ async function deleteArticle(id) {
     showToast('Статтю видалено', 'success');
     loadArticlesTab();
   } catch { showToast('Помилка сервера', 'error'); }
+}
+
+async function hideArticle(id, currentlyActive) {
+  const a = _articles.find(x => x.id === id);
+  const label = currentlyActive ? 'сховати' : 'показати';
+  if (!a || !confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} статтю "${a.title}"?`)) return;
+  try {
+    const res = await fetch(`/api/articles/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ active: !currentlyActive }),
+    });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    showToast(currentlyActive ? 'Статтю приховано ✓' : 'Статтю показано ✓', 'success');
+    loadArticlesTab();
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+// ── REVIEWS TAB ──────────────────────────────────────────────────────────────
+let _reviews = [];
+let _reviewEditId = null;
+
+async function loadReviewsTab() {
+  try {
+    const res = await fetch('/api/reviews', { headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    _reviews = data.reviews || [];
+    renderReviewsTable();
+  } catch { showToast('Помилка завантаження відгуків', 'error'); }
+}
+
+function renderReviewsTable() {
+  const tbody = document.getElementById('reviewsBody');
+  if (!tbody) return;
+  const stars = n => '★'.repeat(Math.max(1, Math.min(5, n || 5)));
+  if (!_reviews.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty" style="padding:30px">Відгуків немає</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = _reviews.map(r => `
+    <tr>
+      <td style="color:#aaa;font-size:12px">#${r.id}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="width:32px;height:32px;border-radius:50%;background:#6C47FF22;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#6C47FF;flex-shrink:0">${esc(r.initials||'?')}</div>
+          <span style="font-weight:600">${esc(r.name)}</span>
+        </div>
+      </td>
+      <td style="font-size:13px;color:#777">${esc(r.role||'—')}</td>
+      <td style="font-size:13px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.text||'')}</td>
+      <td style="color:#f59e0b;font-size:14px">${stars(r.rating)}</td>
+      <td><span class="badge ${r.active!==false?'badge-enrolled':'badge-rejected'}">${r.active!==false?'Активний':'Архів'}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-ghost btn-sm" onclick="openReviewModal(${r.id})">✏️</button>
+        ${currentRole === 'superadmin'
+          ? `<button class="btn btn-danger btn-sm" onclick="deleteReview(${r.id})">🗑</button>`
+          : `<button class="btn btn-ghost btn-sm" onclick="hideReview(${r.id},${r.active!==false})" title="${r.active!==false?'Сховати':'Показати'}">${r.active!==false?'🙈':'👁'}</button>`}
+      </td>
+    </tr>`).join('');
+}
+
+function openReviewModal(id) {
+  _reviewEditId = id;
+  document.getElementById('reviewModalTitle').textContent = id ? 'Редагувати відгук' : 'Новий відгук';
+  if (id) {
+    const r = _reviews.find(x => x.id === id);
+    if (!r) return;
+    document.getElementById('rv_name').value     = r.name     || '';
+    document.getElementById('rv_initials').value = r.initials || '';
+    document.getElementById('rv_role').value     = r.role     || '';
+    document.getElementById('rv_text').value     = r.text     || '';
+    document.getElementById('rv_rating').value   = String(r.rating || 5);
+    document.getElementById('rv_active').value   = r.active !== false ? '1' : '0';
+  } else {
+    document.getElementById('rv_name').value     = '';
+    document.getElementById('rv_initials').value = '';
+    document.getElementById('rv_role').value     = '';
+    document.getElementById('rv_text').value     = '';
+    document.getElementById('rv_rating').value   = '5';
+    document.getElementById('rv_active').value   = '1';
+  }
+  document.getElementById('reviewModal').style.display = 'flex';
+}
+
+function closeReviewModal() {
+  document.getElementById('reviewModal').style.display = 'none';
+  _reviewEditId = null;
+}
+
+async function saveReview() {
+  const name = document.getElementById('rv_name').value.trim();
+  const text = document.getElementById('rv_text').value.trim();
+  if (!name) { showToast('Вкажіть ім\'я', 'error'); return; }
+  if (!text) { showToast('Введіть текст відгуку', 'error'); return; }
+  const body = {
+    name,
+    initials: document.getElementById('rv_initials').value.trim() ||
+              name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase(),
+    role:   document.getElementById('rv_role').value.trim(),
+    text,
+    rating: parseInt(document.getElementById('rv_rating').value) || 5,
+    active: document.getElementById('rv_active').value === '1',
+  };
+  try {
+    const method = _reviewEditId ? 'PATCH' : 'POST';
+    const url    = _reviewEditId ? `/api/reviews/${_reviewEditId}` : '/api/reviews';
+    const res    = await fetch(url, {
+      method, headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Помилка', 'error'); return; }
+    showToast(_reviewEditId ? 'Відгук оновлено ✓' : 'Відгук створено ✓', 'success');
+    closeReviewModal();
+    loadReviewsTab();
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+async function deleteReview(id) {
+  const r = _reviews.find(x => x.id === id);
+  if (!r || !confirm(`Видалити відгук від "${r.name}"?`)) return;
+  try {
+    const res = await fetch(`/api/reviews/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    showToast('Відгук видалено', 'success');
+    loadReviewsTab();
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function hideReview(id, currentlyActive) {
+  const r = _reviews.find(x => x.id === id);
+  const label = currentlyActive ? 'сховати' : 'показати';
+  if (!r || !confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} відгук від "${r.name}"?`)) return;
+  try {
+    const res = await fetch(`/api/reviews/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ active: !currentlyActive }),
+    });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    showToast(currentlyActive ? 'Відгук приховано ✓' : 'Відгук показано ✓', 'success');
+    loadReviewsTab();
+  } catch { showToast('Помилка', 'error'); }
 }
 
 // ── DASHBOARD TAB (superadmin) ────────────────────────────────────────────────

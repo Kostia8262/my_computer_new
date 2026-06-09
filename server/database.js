@@ -76,6 +76,21 @@ module.exports = {
     return { changes: lead ? 1 : 0 };
   },
 
+  updateFields(id, fields) {
+    const leads = load();
+    const lead = leads.find(l => l.id === id);
+    if (!lead) return null;
+    const allowed = ['child_name', 'phone', 'age', 'course', 'email'];
+    allowed.forEach(k => { if (k in fields && fields[k] !== undefined) lead[k] = fields[k]; });
+    lead.updated_at = now();
+    save(leads);
+    return lead;
+  },
+
+  getByPhone(phone) {
+    return load().find(l => l.phone === phone) || null;
+  },
+
   deleteLead(id) {
     const leads = load();
     const idx   = leads.findIndex(l => l.id === id);

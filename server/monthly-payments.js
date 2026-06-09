@@ -28,7 +28,7 @@ module.exports = {
   METHOD_VALUES,
 
   getAllMonths() {
-    return Object.keys(load()).sort().reverse();
+    return Object.keys(load()).sort();
   },
 
   getMonth(ym) {
@@ -70,6 +70,18 @@ module.exports = {
     all[ym].push(record);
     save(all);
     return true;
+  },
+
+  syncClientName(clientId, newName) {
+    const all = load();
+    let changed = false;
+    Object.keys(all).forEach(ym => {
+      all[ym].forEach(r => {
+        if (r.clientId === clientId) { r.clientName = newName; changed = true; }
+      });
+    });
+    if (changed) save(all);
+    return changed;
   },
 
   deleteMonth(ym) {

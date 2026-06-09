@@ -464,6 +464,10 @@ function applyModuleVisibility(modules) {
     'courses':      'courses',
     'how-it-works': 'how-it-works',
     'about':        'about',
+    'stats':        'stats',
+    'pricing':      'pricing',
+    'certificate':  'certificate',
+    'partners':     'partners',
     'reviews':      'reviews',
     'articles':     'articles',
     'faq':          'faq',
@@ -555,6 +559,7 @@ function renderFaq(items) {
 // Load content on page start (after lang is applied)
 loadSiteContent();
 loadCourses();
+loadReviews();
 
 /* ===================================================
    ARTICLES — loads from /api/articles
@@ -655,6 +660,58 @@ if (statsSection) {
       });
     }
   }, { threshold: 0.3 }).observe(statsSection);
+}
+
+/* ===================================================
+   REVIEWS — loads from /api/reviews
+   =================================================== */
+async function loadReviews() {
+  const grid     = document.getElementById('reviewsGrid');
+  const dotsEl   = document.getElementById('reviewsDots');
+  if (!grid) return;
+  try {
+    const res = await fetch('/api/reviews');
+    if (!res.ok) return;
+    const { reviews } = await res.json();
+    const active = (reviews || []).filter(r => r.active !== false);
+    if (!active.length) return;
+    const stars = n => '★'.repeat(Math.max(1, Math.min(5, n || 5)));
+    grid.innerHTML = active.map(r => `
+      <div class="review-card">
+        <div class="review-card__stars">${stars(r.rating)}</div>
+        <p class="review-card__text">${esc(r.text)}</p>
+        <div class="review-card__author">
+          <div class="review-card__avatar">${esc(r.initials || '')}</div>
+          <div>
+            <div class="review-card__name">${esc(r.name)}</div>
+            <div class="review-card__meta">${esc(r.role || '')}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+    if (dotsEl) {
+      dotsEl.innerHTML = active.map((_, i) =>
+        `<span class="reviews__dot${i === 0 ? ' active' : ''}"></span>`).join('');
+    }
+    // Re-attach dot click listeners (track needs to be available)
+    const track = document.getElementById('reviewsTrack');
+    const dots  = dotsEl ? dotsEl.querySelectorAll('.reviews__dot') : [];
+    if (track && dots.length) {
+      track.addEventListener('scroll', () => {
+        const card = track.querySelector('.review-card');
+        if (!card) return;
+        const idx = Math.round(track.scrollLeft / (card.offsetWidth + 14));
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      }, { passive: true });
+      dots.forEach((dot, i) => {
+        dot.addEventListener('click', () => {
+          const card = track.querySelector('.review-card');
+          if (!card) return;
+          track.scrollTo({ left: i * (card.offsetWidth + 14), behavior: 'smooth' });
+        });
+      });
+    }
+  } catch { /* keep empty grid if API fails */ }
 }
 
 /* ===================================================

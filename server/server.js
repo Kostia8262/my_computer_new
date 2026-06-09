@@ -30,6 +30,7 @@ const attendanceDb   = require('./attendance');
 const monthlyPayDb   = require('./monthly-payments');
 const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
+const reviewsDb      = require('./reviews');
 const { sendLeadNotification } = require('./mailer');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
@@ -153,6 +154,32 @@ function requireSuperAdmin(req, res, next) {
   next();
 }
 
+function requireNotTeacher(req, res, next) {
+  const token = req.headers['x-admin-token'];
+  if (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) return next();
+  const admin = adminsDb.findByToken(token);
+  if (admin && admin.role === 'teacher') {
+    return res.status(403).json({ error: 'Forbidden: teacher access restricted' });
+  }
+  next();
+}
+
+// Teacher-role guard: allow only attendance + client read + me
+// req.path inside app.use('/api', ...) is relative to /api (e.g. '/me', '/clients')
+const TEACHER_ALLOWED = ['/me', '/health', '/attendance', '/clients'];
+app.use('/api', (req, res, next) => {
+  const token = req.headers['x-admin-token'];
+  if (!token || (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN)) return next();
+  const admin = adminsDb.findByToken(token);
+  if (!admin || admin.role !== 'teacher') return next();
+  const allowed = TEACHER_ALLOWED.some(p => req.path === p || req.path.startsWith(p + '/') || req.path.startsWith(p + '?'));
+  if (!allowed) return res.status(403).json({ error: 'Forbidden: teacher access restricted' });
+  if (req.path.startsWith('/clients') && req.method !== 'GET') {
+    return res.status(403).json({ error: 'Forbidden: teacher access restricted' });
+  }
+  next();
+});
+
 // ── ROUTES ────────────────────────────────────────────────────────────────────
 
 // Health check
@@ -263,9 +290,18 @@ app.get('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
 // PATCH /api/leads/:id
 app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
   const id = parseInt(req.params.id);
-  const { status, notes } = req.body;
+  const { status, notes, child_name, phone, age, course, email } = req.body;
   const valid = ['new', 'contacted', 'trial_scheduled', 'enrolled', 'rejected'];
   try {
+    // Update editable fields
+    const fieldPatch = {};
+    if (child_name !== undefined) fieldPatch.child_name = sanitize(child_name);
+    if (phone      !== undefined) fieldPatch.phone      = sanitize(phone);
+    if (age        !== undefined) fieldPatch.age        = age ? parseInt(age) || null : null;
+    if (course     !== undefined) fieldPatch.course     = sanitize(course) || null;
+    if (email      !== undefined) fieldPatch.email      = sanitize(email) || null;
+    if (Object.keys(fieldPatch).length) db.updateFields(id, fieldPatch);
+
     if (status) {
       if (!valid.includes(status)) return res.status(400).json({ error: `Статус: ${valid.join(', ')}` });
       db.updateStatus(id, status);
@@ -275,8 +311,8 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
         try {
           const lead = db.getLeadById(id);
           if (lead) {
-            const phone = lead.phone || '';
-            const existing = phone ? clientsDb.getAll().find(c => c.phone === phone) : null;
+            const leadPhone = lead.phone || '';
+            const existing = leadPhone ? clientsDb.getAll().find(c => c.phone === leadPhone) : null;
             if (!existing) {
               const today = new Date().toISOString().slice(0, 10);
               const newClient = clientsDb.create({
@@ -290,7 +326,6 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
                 enrolledDate: today,
                 notes:        lead.notes || '',
               });
-              // Add to current month's payments if the month sheet exists
               const ym = new Date().toISOString().slice(0, 7);
               const monthData = monthlyPayDb.getMonth(ym);
               if (monthData) {
@@ -314,6 +349,29 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
       }
     }
     if (notes !== undefined) db.updateNotes(id, sanitize(notes));
+
+    // Sync name/phone changes to matching client
+    if (fieldPatch.child_name || fieldPatch.phone) {
+      try {
+        const updatedLead = db.getLeadById(id);
+        if (updatedLead) {
+          const matchPhone = updatedLead.phone || '';
+          const matchClient = matchPhone ? clientsDb.getAll().find(c => c.phone === matchPhone) : null;
+          if (matchClient) {
+            const clientPatch = {};
+            if (fieldPatch.child_name) clientPatch.name = fieldPatch.child_name;
+            if (fieldPatch.phone)      clientPatch.phone = fieldPatch.phone;
+            const updated = clientsDb.update(matchClient.id, clientPatch);
+            if (updated && clientPatch.name) {
+              monthlyPayDb.syncClientName(matchClient.id, clientPatch.name);
+            }
+          }
+        }
+      } catch (syncErr) {
+        console.error('[SYNC lead→client]', syncErr.message);
+      }
+    }
+
     res.json({ success: true, lead: db.getLeadById(id) });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -388,9 +446,31 @@ app.post('/api/clients', adminLimiter, requireAdmin, (req, res) => {
 
 app.patch('/api/clients/:id', adminLimiter, requireAdmin, (req, res) => {
   const id = parseInt(req.params.id);
+  const before = clientsDb.getById(id);
+  if (!before) return res.status(404).json({ error: 'Not found' });
   const data = sanitizeClient(req.body);
   const client = clientsDb.update(id, data);
   if (!client) return res.status(404).json({ error: 'Not found' });
+
+  // Sync name change → monthly-payments + matching lead
+  if (data.name && data.name !== before.name) {
+    try {
+      monthlyPayDb.syncClientName(id, data.name);
+    } catch (e) { console.error('[SYNC client→payments]', e.message); }
+    try {
+      const matchPhone = client.phone || '';
+      const matchLead = matchPhone ? db.getByPhone(matchPhone) : null;
+      if (matchLead) db.updateFields(matchLead.id, { child_name: data.name });
+    } catch (e) { console.error('[SYNC client→lead]', e.message); }
+  }
+  // Sync phone change → matching lead
+  if (data.phone && data.phone !== before.phone) {
+    try {
+      const matchLead = db.getByPhone(before.phone);
+      if (matchLead) db.updateFields(matchLead.id, { phone: data.phone });
+    } catch (e) { console.error('[SYNC client phone→lead]', e.message); }
+  }
+
   res.json({ success: true, client });
 });
 
@@ -685,10 +765,47 @@ app.patch('/api/articles/:id', adminLimiter, requireAdmin, (req, res) => {
   res.json({ success: true, article });
 });
 
-app.delete('/api/articles/:id', adminLimiter, requireAdmin, (req, res) => {
+app.delete('/api/articles/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   const id = parseInt(req.params.id) || 0;
   const ok = articlesDb.delete(id);
   if (!ok) return res.status(404).json({ error: 'Статтю не знайдено' });
+  res.json({ success: true });
+});
+
+// ── REVIEWS API ───────────────────────────────────────────────────────────────
+app.get('/api/reviews', (req, res) => {
+  const token = req.headers['x-admin-token'];
+  const isAdmin = (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) || !!adminsDb.findByToken(token);
+  const reviews = isAdmin ? reviewsDb.getAll() : reviewsDb.getActive();
+  res.json({ success: true, reviews });
+});
+
+app.post('/api/reviews', adminLimiter, requireAdmin, (req, res) => {
+  const { name, initials, role, text, rating, active } = req.body;
+  if (!name || !text) return res.status(400).json({ error: 'name та text обов\'язкові' });
+  const review = reviewsDb.create({ name: sanitize(name), initials: sanitize(initials), role: sanitize(role), text: sanitize(text), rating, active });
+  res.status(201).json({ success: true, review });
+});
+
+app.patch('/api/reviews/:id', adminLimiter, requireAdmin, (req, res) => {
+  const id = parseInt(req.params.id) || 0;
+  const { name, initials, role, text, rating, active } = req.body;
+  const patch = {};
+  if (name     !== undefined) patch.name     = sanitize(name);
+  if (initials !== undefined) patch.initials = sanitize(initials);
+  if (role     !== undefined) patch.role     = sanitize(role);
+  if (text     !== undefined) patch.text     = sanitize(text);
+  if (rating   !== undefined) patch.rating   = rating;
+  if (active   !== undefined) patch.active   = active;
+  const review = reviewsDb.update(id, patch);
+  if (!review) return res.status(404).json({ error: 'Not found' });
+  res.json({ success: true, review });
+});
+
+app.delete('/api/reviews/:id', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id) || 0;
+  const ok = reviewsDb.delete(id);
+  if (!ok) return res.status(404).json({ error: 'Not found' });
   res.json({ success: true });
 });
 
