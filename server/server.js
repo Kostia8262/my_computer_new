@@ -112,10 +112,11 @@ const leadsLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Admin: 100 requests per 15 minutes
+// Admin: dashboard makes ~11 requests per load (parallel monthly-payments fetches).
+// 500/15min gives ~45 full dashboard reloads before limiting — plenty for normal use.
 const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 500,
   message: { error: 'Too many requests.' },
 });
 
@@ -398,6 +399,29 @@ app.post('/api/leads', leadsLimiter, (req, res) => {
   } catch (err) {
     console.error('[LEAD ERROR]', err.message);
     res.status(500).json({ error: 'Помилка сервера. Зателефонуйте нам.' });
+  }
+});
+
+// POST /api/leads/admin — admin-only lead creation (no public rate limit)
+app.post('/api/leads/admin', adminLimiter, requireAdmin, (req, res) => {
+  const { child_name, age, phone, course, email, teacher, notes } = req.body;
+  if (!child_name || child_name.trim().length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я (мін. 2 символи)' });
+  if (!phone || String(phone).replace(/\D/g,'').length < 10) return res.status(400).json({ error: 'Невірний формат телефону' });
+  try {
+    const result = db.insertLead({
+      child_name: sanitize(child_name),
+      age:        age ? parseInt(age) || null : null,
+      course:     sanitize(course || '') || null,
+      phone:      sanitize(phone),
+      email:      sanitize(email || '') || null,
+    });
+    const lead = db.getLeadById(result.id);
+    if (teacher) db.updateFields(result.id, { teacher: sanitize(teacher) });
+    if (notes)   db.updateNotes(result.id, sanitize(notes));
+    const fresh = db.getLeadById(result.id);
+    res.status(201).json({ success: true, lead: fresh });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

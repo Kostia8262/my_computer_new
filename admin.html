@@ -430,6 +430,39 @@ tr:hover td{background:#faf9ff}
       <div class="alerts-panel__body" id="alertsBody"></div>
     </div>
 
+    <!-- NEW LEAD MODAL -->
+    <div class="modal-overlay" id="newLeadModal" style="display:none" onclick="if(event.target===this)closeNewLeadModal()">
+      <div class="modal-box" style="max-width:480px">
+        <h3>Нова заявка<button class="btn btn-ghost btn-sm" onclick="closeNewLeadModal()">✕</button></h3>
+        <div class="modal-body">
+          <div class="modal-group"><label class="modal-label">Ім'я дитини *</label><input class="modal-input" id="nl_name" placeholder="Ім'я дитини"/></div>
+          <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="nl_age" type="number" placeholder="7"/></div>
+          <div class="modal-group"><label class="modal-label">Курс</label>
+            <select class="modal-input" id="nl_course">
+              <option value="">— Не вказано —</option>
+              <option value="scratch">Scratch</option>
+              <option value="python">Python</option>
+              <option value="roblox">Roblox</option>
+              <option value="web">Веб-розробка</option>
+              <option value="help">Допоможіть обрати</option>
+            </select>
+          </div>
+          <div class="modal-group"><label class="modal-label">Телефон *</label><input class="modal-input" id="nl_phone" placeholder="+380671234567"/></div>
+          <div class="modal-group"><label class="modal-label">Email</label><input class="modal-input" id="nl_email" type="email" placeholder="email@example.com"/></div>
+          <div class="modal-group"><label class="modal-label">Викладач</label>
+            <select class="modal-input" id="nl_teacher">
+              <option value="">— Не призначено —</option>
+            </select>
+          </div>
+          <div class="modal-group"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="nl_notes" rows="2" placeholder="Нотатки…"></textarea></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeNewLeadModal()">Скасувати</button>
+          <button class="btn btn-primary" onclick="saveNewLead()">Додати заявку</button>
+        </div>
+      </div>
+    </div>
+
     <!-- CLIENT MODAL -->
     <div class="modal-overlay" id="clientModal" style="display:none" onclick="if(event.target===this)closeClientModal()">
       <div class="modal-box">
@@ -1048,6 +1081,7 @@ tr:hover td{background:#faf9ff}
         <option value="web">Веб-розробка</option>
         <option value="help">Допоможіть обрати</option>
       </select>
+      <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">+ Нова заявка</button>
     </div>
 
     <!-- TABLE -->
@@ -1408,16 +1442,77 @@ function gotoPage(p) { currentPage = p; renderTable(); }
 // ── ACTIONS ───────────────────────────────────────────────────────────────────
 async function changeStatus(id, status) {
   try {
-    await fetch(`/api/leads/${id}`, {
+    const res = await fetch(`/api/leads/${id}`, {
       method:  'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
       body:    JSON.stringify({ status }),
     });
+    if (!res.ok) {
+      if (res.status === 401) { doLogout(); return; }
+      const err = await res.json().catch(() => ({}));
+      showToast(err.error || 'Помилка оновлення статусу', 'error');
+      return;
+    }
+    const data = await res.json();
     const lead = allLeads.find(l => l.id === id);
-    if (lead) lead.status = status;
+    if (lead && data.lead) Object.assign(lead, data.lead);
+    else if (lead) lead.status = status;
     renderStats();
-    showToast('Статус оновлено ✓', 'success');
+    renderTable();
+    if (status === 'enrolled') {
+      _allClients = null;
+      showToast('Записано ✓ — учня додано до бази клієнтів', 'success');
+    } else {
+      showToast('Статус оновлено ✓', 'success');
+    }
   } catch { showToast('Помилка', 'error'); }
+}
+
+function openNewLeadModal() {
+  ['nl_name','nl_age','nl_phone','nl_email','nl_notes'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const csel = document.getElementById('nl_course'); if (csel) csel.value = '';
+  const tsel = document.getElementById('nl_teacher');
+  if (tsel) {
+    tsel.innerHTML = `<option value="">— Не призначено —</option>` +
+      _teachersList.map(t => `<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('');
+  }
+  document.getElementById('newLeadModal').style.display = 'flex';
+  setTimeout(() => document.getElementById('nl_name')?.focus(), 50);
+}
+function closeNewLeadModal() {
+  document.getElementById('newLeadModal').style.display = 'none';
+}
+async function saveNewLead() {
+  const name  = document.getElementById('nl_name')?.value.trim();
+  const phone = document.getElementById('nl_phone')?.value.trim();
+  if (!name || name.length < 2) { showToast('Вкажіть ім\'я (мін. 2 символи)', 'error'); return; }
+  if (!phone) { showToast('Вкажіть телефон', 'error'); return; }
+  const body = {
+    child_name: name,
+    age:     parseInt(document.getElementById('nl_age')?.value) || null,
+    course:  document.getElementById('nl_course')?.value || null,
+    phone,
+    email:   document.getElementById('nl_email')?.value.trim() || null,
+    teacher: document.getElementById('nl_teacher')?.value || null,
+    notes:   document.getElementById('nl_notes')?.value.trim() || null,
+  };
+  try {
+    const res = await fetch('/api/leads/admin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Помилка', 'error'); return; }
+    allLeads.unshift(data.lead);
+    closeNewLeadModal();
+    renderStats();
+    renderTable();
+    loadAlerts();
+    showToast('Заявку додано ✓', 'success');
+  } catch { showToast('Помилка сервера', 'error'); }
 }
 
 async function saveNotes(id, notes) {
@@ -3549,7 +3644,7 @@ async function loadDashboardTab() {
     const pendingCount = mpRecords.filter(r => r.status === 'pending').length;
     const pendingAmt   = mpRecords.filter(r => r.status === 'pending')
                            .reduce((s, r) => s + (parseFloat(r.expectedAmount) || 0), 0);
-    const collectRate  = expected > 0 ? Math.round(collected / expected * 100) : 0;
+    const collectRate  = expected > 0 ? Math.round(collected / expected * 100) : (collected > 0 ? 100 : 0);
     const payingCount  = mpRecords.filter(r => r.status === 'paid' || r.status === 'partial').length;
     const avgRevenue   = payingCount > 0 ? Math.round(collected / payingCount) : 0;
 
@@ -3626,23 +3721,54 @@ async function loadDashboardTab() {
         } catch { return { m, v: 0, exp: 0 }; }
       }));
       const maxV = Math.max(1, ...revData.map(x => Math.max(x.v, x.exp)));
-      revenueEl.innerHTML = `<div style="display:flex;align-items:flex-end;gap:6px;height:130px">` +
-        revData.map(({m,v,exp}) => {
-          const hV   = Math.round(v   / maxV * 110);
-          const hExp = Math.round(exp / maxV * 110);
-          const mm   = parseInt(m.slice(5));
-          return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;position:relative" title="${MONTH_NAMES[mm]}: зібрано ${v.toLocaleString('uk-UA')} ₴ / очік. ${exp.toLocaleString('uk-UA')} ₴">
-            <div style="font-size:9px;color:#888;white-space:nowrap">${v>0?(v/1000).toFixed(0)+'к':''}</div>
-            <div style="width:100%;position:relative;height:${Math.max(hV,hExp)}px;display:flex;align-items:flex-end;gap:2px">
-              ${exp>0 ? `<div style="flex:1;background:#e0d9ff;border-radius:3px 3px 0 0;height:${hExp}px;min-height:3px"></div>` : ''}
-              <div style="flex:1;background:${m===ym?'#6C47FF':'#a78bfa'};border-radius:3px 3px 0 0;height:${hV}px;min-height:3px"></div>
-            </div>
-            <div style="font-size:9px;color:#888">${MONTH_NAMES[mm]}</div>
-          </div>`;
-        }).join('') + '</div>' +
+      const barsHtml = revData.map(({m,v,exp}) => {
+        const hV   = Math.round(v   / maxV * 110);
+        const hExp = Math.round(exp / maxV * 110);
+        const mm   = parseInt(m.slice(5));
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px" title="${MONTH_NAMES[mm]}: зібрано ${v.toLocaleString('uk-UA')} ₴ / очік. ${exp.toLocaleString('uk-UA')} ₴">
+          <div style="font-size:9px;color:#888;white-space:nowrap">${v>0?(v/1000).toFixed(0)+'к':''}</div>
+          <div style="width:100%;position:relative;height:${Math.max(hV,hExp)}px;display:flex;align-items:flex-end;gap:2px">
+            ${exp>0 ? `<div style="flex:1;background:#e0d9ff;border-radius:3px 3px 0 0;height:${hExp}px;min-height:3px"></div>` : ''}
+            <div style="flex:1;background:${m===ym?'#6C47FF':'#a78bfa'};border-radius:3px 3px 0 0;height:${hV}px;min-height:3px"></div>
+          </div>
+          <div style="font-size:9px;color:#888">${MONTH_NAMES[mm]}</div>
+        </div>`;
+      }).join('');
+
+      // Trend line via linear regression (SVG overlay, viewBox 0-100 x 0-130)
+      // Bar tops sit at y = 119 - hV  (119 = 130 - ~11px for month label)
+      const trendPts = revData.map(({v}, i) => ({
+        x: (i + 0.5) / 6 * 100,
+        y: 119 - Math.round(v / maxV * 110),
+      }));
+      const tn = trendPts.length;
+      const tsx = trendPts.reduce((s, p) => s + p.x, 0);
+      const tsy = trendPts.reduce((s, p) => s + p.y, 0);
+      const tsxy = trendPts.reduce((s, p) => s + p.x * p.y, 0);
+      const tsx2 = trendPts.reduce((s, p) => s + p.x * p.x, 0);
+      const tden = tn * tsx2 - tsx * tsx;
+      let trendSvg = '';
+      if (tden !== 0 && revData.some(d => d.v > 0)) {
+        const tSlope = (tn * tsxy - tsx * tsy) / tden;
+        const tInt   = (tsy - tSlope * tsx) / tn;
+        const tx1 = trendPts[0].x,  ty1 = tSlope * tx1 + tInt;
+        const tx2 = trendPts[5].x,  ty2 = tSlope * tx2 + tInt;
+        const dots = trendPts.map(p =>
+          `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.2" fill="#f59e0b" opacity="0.9"/>`
+        ).join('');
+        trendSvg = `<svg style="position:absolute;top:0;left:0;width:100%;height:130px;pointer-events:none" viewBox="0 0 100 130" preserveAspectRatio="none">
+          <line x1="${tx1.toFixed(1)}" y1="${ty1.toFixed(1)}" x2="${tx2.toFixed(1)}" y2="${ty2.toFixed(1)}"
+                stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.85"/>
+          ${dots}
+        </svg>`;
+      }
+
+      revenueEl.innerHTML =
+        `<div style="position:relative"><div style="display:flex;align-items:flex-end;gap:6px;height:130px">${barsHtml}</div>${trendSvg}</div>` +
         `<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#888">
           <span><span style="display:inline-block;width:10px;height:10px;background:#a78bfa;border-radius:2px;margin-right:4px"></span>Очікувано</span>
           <span><span style="display:inline-block;width:10px;height:10px;background:#6C47FF;border-radius:2px;margin-right:4px"></span>Зібрано</span>
+          <span><span style="display:inline-block;width:20px;height:2px;background:#f59e0b;border-radius:1px;margin-right:4px;vertical-align:middle"></span>Тренд</span>
         </div>`;
     }
 
