@@ -13,14 +13,6 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://minecraft.mycomputer.education/"/>
   </url>
 
-  <!-- Homepage -->
-  <url>
-    <loc>https://minecraft.mycomputer.education/</loc>
-    <lastmod>2026-06-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
   <!-- Legal / policy pages -->
   <url>
     <loc>https://minecraft.mycomputer.education/docs/privacy-policy.html</loc>
@@ -37,7 +29,7 @@
   </url>
 
   <url>
-    <loc>https://minecraft.mycomputer.education/docs/payment-return.html</loc>
+    <loc>https://minecraft.mycomputer.education/docs/refund-policy.html</loc>
     <lastmod>2026-06-08</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
