@@ -57,13 +57,13 @@ a{color:inherit;text-decoration:none}
 /* ===================================================
    HEADER
    =================================================== */
-.header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid transparent;border-radius:0 0 16px 16px;transition:border-color var(--t),box-shadow var(--t)}
+.header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid transparent;border-radius:0 0 16px 16px;transition:border-color var(--t),box-shadow var(--t)}
 .header.scrolled{border-color:var(--color-border);box-shadow:0 4px 24px rgba(108,71,255,.08),0 1px 4px rgba(0,0,0,.04)}
-.nav{display:flex;align-items:center;height:68px;gap:20px}
+.nav{display:flex;align-items:center;height:68px;gap:12px}
 .nav__logo{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:500;flex-shrink:0;z-index:102;position:relative}
 .nav__logo strong{font-weight:800}
 .nav__menu{display:flex;list-style:none;gap:2px;margin-left:auto}
-.nav__link{font-size:14px;font-weight:500;color:var(--color-text-2);padding:6px 12px;border-radius:var(--r-full);transition:all var(--t)}
+.nav__link{font-size:14px;font-weight:500;color:var(--color-text-2);padding:6px 12px;border-radius:var(--r-full);transition:all var(--t);white-space:nowrap}
 .nav__link:hover{color:var(--color-primary);background:var(--color-primary-light)}
 
 /* Courses dropdown */
@@ -91,7 +91,7 @@ a{color:inherit;text-decoration:none}
 .course-card__footer .btn--ghost-sm:hover{background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.4)}
 
 .nav__actions{display:flex;align-items:center;gap:10px}
-.nav__phone{font-size:14px;font-weight:500;color:var(--color-text-2);transition:color var(--t)}
+.nav__phone{font-size:13px;font-weight:500;color:var(--color-text-2);transition:color var(--t);white-space:nowrap}
 .nav__phone:hover{color:var(--color-primary)}
 
 /* Lang switcher */
@@ -101,28 +101,31 @@ a{color:inherit;text-decoration:none}
 .lang-divider{width:1px;height:14px;background:var(--color-border)}
 
 .nav__burger{
-  display:none;width:40px;height:40px;
+  display:none;width:44px;height:44px;
   align-items:center;justify-content:center;
   background:var(--color-bg-soft);
   border:1.5px solid var(--color-border);
   border-radius:var(--r-md);cursor:pointer;
   margin-left:auto;flex-shrink:0;
-  transition:all var(--t);position:relative;z-index:102;
+  transition:background .25s,border-color .25s,box-shadow .25s;position:relative;z-index:102;
 }
 .nav__burger:hover{background:var(--color-primary-light);border-color:var(--color-primary)}
-.nav__burger[aria-expanded="true"]{background:var(--color-primary-light);border-color:var(--color-primary)}
+.nav__burger[aria-expanded="true"]{
+  background:var(--color-primary);border-color:var(--color-primary);
+  box-shadow:0 4px 16px rgba(108,71,255,.4);
+}
 .nav__burger span{
   display:block;position:absolute;
-  width:18px;height:1.5px;
+  width:20px;height:2px;
   background:var(--color-text);border-radius:2px;
-  transition:all .25s cubic-bezier(.4,0,.2,1);
+  transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s,background .25s,width .2s;
 }
-.nav__burger span:nth-child(1){transform:translateY(-5px)}
-.nav__burger span:nth-child(2){width:13px;transform:translateX(-2px)}
-.nav__burger span:nth-child(3){transform:translateY(5px)}
-.nav__burger[aria-expanded="true"] span:nth-child(1){transform:translateY(0) rotate(45deg);background:var(--color-primary)}
+.nav__burger span:nth-child(1){transform:translateY(-6px)}
+.nav__burger span:nth-child(2){width:14px;transform:translateX(-3px)}
+.nav__burger span:nth-child(3){transform:translateY(6px)}
+.nav__burger[aria-expanded="true"] span:nth-child(1){transform:translateY(0) rotate(45deg);background:#fff;width:20px}
 .nav__burger[aria-expanded="true"] span:nth-child(2){opacity:0;transform:scaleX(0)}
-.nav__burger[aria-expanded="true"] span:nth-child(3){transform:translateY(0) rotate(-45deg);background:var(--color-primary)}
+.nav__burger[aria-expanded="true"] span:nth-child(3){transform:translateY(0) rotate(-45deg);background:#fff;width:20px}
 
 /* ===================================================
    HERO — FIX 3 + FIX 10
