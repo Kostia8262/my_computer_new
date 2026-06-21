@@ -201,13 +201,13 @@ function renderArticle(a, related) {
   document.getElementById('pageContent').innerHTML = `
     <section class="article-hero">
       <div class="container">
-        <a href="javascript:history.length>1?history.back():location.href='/#articles'" class="article-back-btn">
+        <a href="javascript:history.length>1?history.back():location.href='/articles'" class="article-back-btn">
           ← Назад до статей
         </a>
         <nav class="article-breadcrumb" aria-label="Навігація">
           <a href="/">Головна</a>
           <span class="article-breadcrumb-sep">›</span>
-          <a href="/#articles">Статті</a>
+          <a href="/articles">Статті</a>
           <span class="article-breadcrumb-sep">›</span>
           <span>${esc(a.title)}</span>
         </nav>

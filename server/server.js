@@ -1067,6 +1067,10 @@ app.delete('/api/reviews/:id', adminLimiter, requireSuperAdmin, (req, res) => {
 });
 
 // ── ARTICLE PAGES ─────────────────────────────────────────────────────────────
+app.get('/articles', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'articles', 'index.html'));
+});
+
 app.get('/articles/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
