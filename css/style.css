@@ -957,12 +957,12 @@ body.modal-open{overflow:hidden}
 .articles__all-btn:hover{border-color:#A78BFA;background:rgba(108,71,255,.22);color:#c4b5fd}
 
 @media(max-width:900px){
-  .articles-slider{grid-template-columns:repeat(2,1fr)}
+  .articles__slider{grid-template-columns:repeat(2,1fr)}
 }
 @media(max-width:768px){
   .articles-section{padding:56px 0}
-  .articles-slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;grid-template-columns:none}
-  .articles-slider::-webkit-scrollbar{display:none}
+  .articles__slider{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;grid-template-columns:none}
+  .articles__slider::-webkit-scrollbar{display:none}
   .article-card{scroll-snap-align:start;flex-shrink:0;width:300px}
-  .articles-dots{display:flex}
+  .articles__dots{display:flex}
 }

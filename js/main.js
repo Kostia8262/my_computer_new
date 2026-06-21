@@ -592,7 +592,7 @@ async function loadArticles() {
     const res = await fetch('/api/articles');
     if (!res.ok) return;
     const { articles } = await res.json();
-    const active = (articles || []).filter(a => a.active !== false).slice(0, 6);
+    const active = (articles || []).filter(a => a.active !== false).slice(0, 3);
     if (!active.length) { document.getElementById('articles')?.style.setProperty('display','none'); return; }
 
     slider.innerHTML = active.map(a => `
