@@ -355,6 +355,8 @@ async function submitLeadForm(formEl, submitBtnEl) {
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'lead_submitted', lead_course: data.course || 'not_specified' });
     formEl.reset();
     clearAllErrors(formEl);
     // Reset phone placeholder after reset
