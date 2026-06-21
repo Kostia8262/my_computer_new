@@ -595,11 +595,14 @@ async function loadArticles() {
     const active = (articles || []).filter(a => a.active !== false).slice(0, 6);
     if (!active.length) { document.getElementById('articles')?.style.setProperty('display','none'); return; }
 
-    slider.innerHTML = active.map(a => `
+    const LABEL_MAP = {'💡':{label:'Для батьків',cls:'cat-parents'},'🎮':{label:'Для дітей',cls:'cat-kids'},'🚀':{label:'Навчання',cls:'cat-learning'},'💻':{label:'Технології',cls:'cat-tech'},'🏆':{label:'Проєкти',cls:'cat-projects'},'🌐':{label:'Веб',cls:'cat-web'}};
+    slider.innerHTML = active.map(a => {
+      const lbl = LABEL_MAP[a.coverEmoji] || {label: esc(a.category||''), cls:''};
+      return `
       <a class="article-card" href="/articles/${a.slug}" aria-label="${esc(a.title)}">
         <div class="article-card__top">
           <span class="article-card__emoji">${a.coverEmoji || '📄'}</span>
-          <span class="article-card__cat">${esc(a.category || '')}</span>
+          <span class="article-card__cat ${lbl.cls}">${lbl.label || esc(a.category||'')}</span>
         </div>
         <div class="article-card__body">
           <h3 class="article-card__title">${esc(a.title)}</h3>
@@ -610,7 +613,7 @@ async function loadArticles() {
           <span class="article-card__read">Читати →</span>
         </div>
       </a>
-    `).join('');
+    `}).join('');
 
     // Mobile dots
     if (dotsEl && active.length > 1) {

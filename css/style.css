@@ -103,7 +103,8 @@ a{color:inherit;text-decoration:none}
 
 .nav__burger{
   display:none;width:44px;height:44px;
-  align-items:center;justify-content:center;
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;
   background:var(--color-bg-soft);
   border:1.5px solid var(--color-border);
   border-radius:var(--r-md);cursor:pointer;
@@ -116,17 +117,16 @@ a{color:inherit;text-decoration:none}
   box-shadow:0 4px 16px rgba(108,71,255,.4);
 }
 .nav__burger span{
-  display:block;position:absolute;
+  display:block;
   width:20px;height:2px;
   background:var(--color-text);border-radius:2px;
+  transform-origin:center;
   transition:transform .28s cubic-bezier(.4,0,.2,1),opacity .2s,background .25s,width .2s;
 }
-.nav__burger span:nth-child(1){transform:translateY(-6px)}
-.nav__burger span:nth-child(2){width:14px;transform:translateX(-3px)}
-.nav__burger span:nth-child(3){transform:translateY(6px)}
-.nav__burger[aria-expanded="true"] span:nth-child(1){transform:translateY(0) rotate(45deg);background:#fff;width:20px}
+.nav__burger span:nth-child(2){width:14px}
+.nav__burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg);background:#fff;width:20px}
 .nav__burger[aria-expanded="true"] span:nth-child(2){opacity:0;transform:scaleX(0)}
-.nav__burger[aria-expanded="true"] span:nth-child(3){transform:translateY(0) rotate(-45deg);background:#fff;width:20px}
+.nav__burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg);background:#fff;width:20px}
 
 /* ===================================================
    HERO — FIX 3 + FIX 10
