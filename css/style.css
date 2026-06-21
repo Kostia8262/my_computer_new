@@ -962,5 +962,7 @@ body.modal-open{overflow:hidden}
   .articles__slider{gap:16px;padding-bottom:8px;-webkit-overflow-scrolling:touch}
   .article-card{width:300px}
   .articles__dots{display:flex}
-  .articles__footer{flex-direction:column;align-items:flex-start;gap:14px}
+  .articles__footer{flex-direction:column;align-items:center;gap:16px;text-align:center}
+  .articles__footer-text{max-width:100%}
+  .articles__all-btn{width:100%;justify-content:center}
 }

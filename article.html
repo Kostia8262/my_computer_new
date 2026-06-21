@@ -69,13 +69,35 @@
       <span>My Computer <strong>Academy</strong></span>
     </a>
     <ul class="nav__menu" id="navMenu">
-      <li><a href="/#courses" class="nav__link">Курси</a></li>
+      <li class="nav__has-dropdown">
+        <a href="/#courses" class="nav__link nav__link--drop">Курси</a>
+        <div class="nav__dropdown">
+          <a href="/courses/scratch"><span class="nav__dropdown-emoji">🧩</span>Scratch (6–10 років)</a>
+          <a href="/courses/python"><span class="nav__dropdown-emoji">🐍</span>Python (10–14 років)</a>
+          <a href="/courses/roblox"><span class="nav__dropdown-emoji">🎮</span>Roblox (9–14 років)</a>
+          <a href="/courses/web"><span class="nav__dropdown-emoji">🌐</span>Розробка сайтів (12–16 років)</a>
+        </div>
+      </li>
       <li><a href="/#how-it-works" class="nav__link">Як це працює</a></li>
+      <li><a href="/#about" class="nav__link">Про нас</a></li>
       <li><a href="/#reviews" class="nav__link">Відгуки</a></li>
       <li><a href="/#faq" class="nav__link">FAQ</a></li>
+      <li class="nav__lang-mobile">
+        <span class="nav__lang-label">Мова</span>
+        <div class="lang-switcher lang-switcher--burger">
+          <button class="lang-btn active" data-lang="ua">UA</button>
+          <span class="lang-divider"></span>
+          <button class="lang-btn" data-lang="ru">RU</button>
+        </div>
+      </li>
     </ul>
     <div class="nav__actions">
       <a href="tel:+380954624672" class="nav__phone">+38 (095) 462-46-72</a>
+      <div class="lang-switcher" id="langSwitcher">
+        <button class="lang-btn active" data-lang="ua">UA</button>
+        <span class="lang-divider"></span>
+        <button class="lang-btn" data-lang="ru">RU</button>
+      </div>
       <a href="/#contact" class="btn btn--primary btn--sm nav__cta">Записатись</a>
     </div>
     <button class="nav__burger" id="navBurger" aria-label="Меню" aria-expanded="false">
@@ -300,9 +322,35 @@ window.addEventListener('scroll', () => {
 // ── Burger menu ───────────────────────────────────────────────────────────────
 const burger  = document.getElementById('navBurger');
 const navMenu = document.getElementById('navMenu');
+
 burger.addEventListener('click', () => {
   const isOpen = navMenu.classList.toggle('open');
   burger.setAttribute('aria-expanded', String(isOpen));
+});
+
+document.querySelectorAll('.nav__link').forEach(link => {
+  link.addEventListener('click', e => {
+    if (link.classList.contains('nav__link--drop') && window.innerWidth <= 768) {
+      e.preventDefault();
+      link.closest('.nav__has-dropdown')?.classList.toggle('open');
+      return;
+    }
+    navMenu.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+  });
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav')) {
+    navMenu.classList.remove('open');
+    burger.setAttribute('aria-expanded', 'false');
+  }
+});
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === btn.dataset.lang));
+  });
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
