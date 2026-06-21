@@ -38,12 +38,11 @@ const Footer = () => (
                 </div>
 
                 <div className="footer__col">
-                    <h4 className="footer__col-title">Наші послуги</h4>
+                    <h4 className="footer__col-title">Наші сайти</h4>
                     <ul className="footer__nav">
-                        <li><Link to="/" className="footer__nav-link">Для дітей</Link></li>
-                        <li><Link to="/" className="footer__nav-link">Для дорослих</Link></li>
-                        <li><Link to="/" className="footer__nav-link">Розробка сайтів</Link></li>
-                        <li><Link to="/" className="footer__nav-link">Мобільні додатки</Link></li>
+                        <li><a href="https://mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">mycomputer.education</a></li>
+                        <li><a href="https://python.mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Курс Python</a></li>
+                        <li><a href="https://minecraft.mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Курс Minecraft</a></li>
                     </ul>
                 </div>
 

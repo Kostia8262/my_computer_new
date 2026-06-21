@@ -1,0 +1,129 @@
+name: Deploy Old Site (old.mycomputer.education)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'sites/old/**'
+
+concurrency:
+  group: deploy-old
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: sites/old/client/package-lock.json
+
+      - name: Build React app
+        working-directory: sites/old/client
+        env:
+          REACT_APP_API_URL: https://old.mycomputer.education/api/
+          GENERATE_SOURCEMAP: 'false'
+          CI: 'false'
+        run: |
+          npm ci
+          npx react-scripts build
+          echo "=== Build output ==="
+          ls -la build/
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s' "${{ secrets.VPS_SSH_KEY }}" | base64 -d > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts || true
+
+      - name: Unlock VPS client directory
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
+          for attempt in 1 2 3; do
+            ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+              "chattr -R -i /usr/local/lsws/mycomputer.education/html/client/ 2>/dev/null || true && chmod -R 777 /usr/local/lsws/mycomputer.education/html/client/ 2>/dev/null || true" \
+              && break
+            echo "Attempt $attempt failed, retrying in 20s..."
+            sleep 20
+          done
+
+      - name: Sync Django server to VPS
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
+          for attempt in 1 2 3; do
+            rsync -avz --delete \
+              -e "ssh $SSH_OPTS" \
+              --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' \
+              --exclude='db.sqlite3' --exclude='static/' --exclude='media/' \
+              --exclude='venv/' --exclude='.env' \
+              sites/old/server/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/mycomputer.education/html/server/ \
+              && break
+            echo "Attempt $attempt failed, retrying in 20s..."
+            sleep 20
+          done
+
+      - name: Sync React build to VPS
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
+          for attempt in 1 2 3; do
+            rsync -avz --delete \
+              -e "ssh $SSH_OPTS" \
+              sites/old/client/build/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/mycomputer.education/html/client/ \
+              && break
+            echo "Attempt $attempt failed, retrying in 20s..."
+            sleep 20
+          done
+
+      - name: Sync OLS vhost config
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
+          for attempt in 1 2 3; do
+            rsync -avz \
+              -e "ssh $SSH_OPTS" \
+              sites/old/infra/vhconf.conf \
+              ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/conf/vhosts/mycomputer.education/vhconf.conf \
+              && break
+            echo "Attempt $attempt failed, retrying in 20s..."
+            sleep 20
+          done
+
+      - name: Post-deploy on VPS
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
+          for attempt in 1 2 3; do
+            ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH' && break
+          set -e
+          VH=/usr/local/lsws/mycomputer.education/html
+          source $VH/bin/activate
+          cd $VH/server
+          pip install -r requirements.txt --quiet
+          python manage.py migrate --noinput
+          python manage.py collectstatic --noinput
+          python manage.py create_sample_posts || true
+          chown nobody:nogroup $VH/server/db.sqlite3* 2>/dev/null || true
+          chmod 664 $VH/server/db.sqlite3* 2>/dev/null || true
+          chown nobody:nogroup $VH/server 2>/dev/null || true
+          rm -f /tmp/django_errors.log 2>/dev/null || true
+          echo "=== Verifying React build on VPS ==="
+          ls -la $VH/client/index.html
+          echo "=== Restarting OLS ==="
+          /usr/local/lsws/bin/lswsctrl restart
+          echo "Deploy complete: $(date)"
+          ENDSSH
+            echo "Attempt $attempt failed, retrying in 20s..."
+            sleep 20
+          done
+
+      - name: Health check
+        run: |
+          sleep 20
+          curl -f --retry 3 --retry-delay 5 https://old.mycomputer.education/api/health/ \
+            && echo "Health check passed" \
+            || (echo "Health check FAILED — site is down after deploy" && exit 1)

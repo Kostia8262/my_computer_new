@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <!-- Roblox Studio landing — updated 2026-06-15 -->
+  <url>
+    <loc>https://roblox.mycomputer.education/</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://roblox.mycomputer.education/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://roblox.mycomputer.education/?lang=ru"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://roblox.mycomputer.education/"/>
+  </url>
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://roblox.mycomputer.education/</loc>
+    <lastmod>2026-06-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Legal / policy pages -->
+  <url>
+    <loc>https://roblox.mycomputer.education/docs/privacy-policy.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://roblox.mycomputer.education/docs/public-offer.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://roblox.mycomputer.education/docs/payment-return.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://roblox.mycomputer.education/docs/cookie-policy.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://roblox.mycomputer.education/docs/terms.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>
