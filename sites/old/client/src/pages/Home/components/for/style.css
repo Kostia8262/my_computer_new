@@ -1,0 +1,38 @@
+.for {
+    padding-top: 60px;
+}
+
+.for__wrapper {
+    position: relative;
+    border-left: 2px solid var(--white);
+    border-top: 2px solid var(--white);
+    border-top-left-radius: 20px;
+    padding: 40px 0 0 40px;
+}
+
+.for__wrapper h2 {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translate(-50%);
+    color: var(--white);
+    /* font-weight: normal; */
+    background-color: #1E1E33;
+    padding: 0 60px;
+}
+
+.for__list {}
+
+.for__item {
+    color: var(--white);
+    margin-bottom: 20px;
+}
+
+.for__item::before {
+    content: '-';
+    margin-right: 10px;
+}
+
+.for__item span {
+    color: var(--gold);
+}

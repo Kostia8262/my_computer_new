@@ -1,0 +1,158 @@
+.plans .section__heading {
+    margin-bottom: 20px;
+}
+
+.plans__subheading {
+    color: var(--white);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.plans__subheading_left span {
+    color: var(--yellow-background);
+}
+
+.plans__cards {
+    display: flex;
+    justify-content: space-between;
+}
+
+.plan__card {
+    width: 370px;
+    height: 350px;
+    box-sizing: border-box;
+    padding: 42px 15px 15px;
+    position: relative;
+    z-index: 1;
+    background: var(--white);
+    border-radius: 10px;
+    border-top-right-radius: 0;
+    transition: 0.3s;
+}
+
+.plan__card:hover {
+    box-shadow: 0px 0px 25px 0px rgba(255, 255, 255, 0.5);
+}
+
+.plan__card_name {
+    height: 60px;
+    color: var(--dark-blue);
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.plan__card_descriptions {
+    margin-bottom: 40px;
+}
+
+.plan__card_description {
+    color: var(--dark-blue);
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.plan__card_description::before {
+    content: url('../../shared/assets/icons/interface/course_star.svg');
+    margin-right: 16px;
+}
+
+.plan__price {
+    color: var(--dark-blue);
+    margin-bottom: 24px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.plan__price strong {
+    font-size: 22px;
+}
+
+.plan__card_discount {
+    color: #CACACA;
+    margin-left: 15px;
+    font-size: 10px;
+}
+
+.plan__card_price-discount {
+    text-decoration: line-through;
+    font-size: 16px !important;
+}
+
+.plan__card_link {
+    display: inline-block;
+    border-radius: 5px;
+    width: 100%;
+    height: 44px;
+    background-color: var(--yellow-background);
+    box-sizing: border-box;
+    padding: 12px 0;
+    color: var(--dark-blue);
+    font-size: 14px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.plan__card_link:hover {
+    box-shadow: 0px 0px 12px 0px rgba(246, 163, 0, 0.50);
+    background: #FFB800;
+}
+
+.plan__card_link:active {
+    background: #F6A300;
+}
+
+
+.plan__card_level {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100px;
+    height: 26px;
+    text-align: center;
+    border-bottom-left-radius: 5px;
+    background: linear-gradient(#00D923, #5F8C00);
+    color: var(--white);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 26px;
+    text-transform: capitalize;
+}
+
+.plan__card_level.advanced {
+    background: linear-gradient(244.59deg, #FFE100 -0.06%, #FFB700 48.63%, #FFE100 99.95%);
+}
+
+.plan__card_level.expert {
+    background: linear-gradient(88.83deg, #D90000 0%, #B00000 99.33%), linear-gradient(88.83deg, #00D923 0%, #5F8C00 99.33%);
+}
+
+@media screen and (max-width: 567px) {
+    .plans__subheading {
+        display: flex;
+        flex-direction: column-reverse;
+        gap: 15px;
+        font-size: 12px;
+    }
+
+    .plans__cards {
+        flex-direction: column;
+        gap: 20px 0;
+    }
+
+    .plan__card {
+        width: 100%;
+    }
+
+    .plan__card_description {
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .plan__card_description::before {
+        margin-right: 8px;
+        vertical-align: middle;
+        /* font-size: 16px; */
+    }
+
+}

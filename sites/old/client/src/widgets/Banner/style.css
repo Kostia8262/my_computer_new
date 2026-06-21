@@ -1,0 +1,54 @@
+.banner {
+    padding: 0 0 50px;
+}
+
+.banner__wrapper {
+    height: 60px;
+    box-sizing: border-box;
+    padding: 19px 50px;
+    background-color: var(--yellow-background);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.banner__wrapper .banner__icon {
+    width: 30px;
+    height: 30px;
+    background-color: var(--background);
+    color: var(--yellow);
+    border-radius: 2px;
+    font-weight: 900;
+    font-size: 20px;
+    line-height: 30px;
+    margin-right: 15px;
+    text-align: center;
+}
+
+.banner__wrapper p {
+    font-weight: 700;
+    color: var(--background);
+}
+
+
+@media screen and (max-width: 567px) {
+    .banner {
+        padding-bottom: 40px;
+    }
+
+    .banner__wrapper {
+        height: auto;
+        padding-right: 15px;
+        padding-left: 15px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+
+    .banner__wrapper .banner__icon {
+        flex-shrink: 0;
+    }
+
+    .banner__wrapper p {
+        font-size: 12px;
+    }
+}

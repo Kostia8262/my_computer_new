@@ -1,0 +1,120 @@
+.abilities {
+    padding: 0 0 55px;
+}
+
+.abilities__cards {
+    display: flex;
+    justify-content: space-between;
+}
+
+.abilities__card {
+    position: relative;
+    padding-top: 120px;
+}
+
+.abilities__card_head {
+    position: absolute;
+    top: 0;
+    right: -10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--gold-gradient);
+    width: 368px;
+    height: 256px;
+    border-radius: 20px;
+    transition: 0.3s;
+}
+
+.abilities__card_head:hover {
+    box-shadow: 0px 0px 25px 0px rgba(255, 255, 255, 0.80);
+}
+
+.abilities__card_body {
+    box-sizing: border-box;
+    padding-top: 160px;
+    padding-left: 40px;
+    padding-right: 40px;
+    background: var(--white);
+    width: 371px;
+    height: 368px;
+    border-radius: 20px;
+}
+
+.abilities__card h3 {
+    font-size: 22px;
+    color: var(--text-blue);
+    margin-bottom: 18px;
+}
+
+.abilities__card p {
+    color: var(--gray);
+}
+
+.abilities__card_body img {
+    margin-right: 10px;
+}
+
+.abilities__card_spec {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.abilities__card_time {
+    display: flex;
+    margin-right: 20px;
+}
+
+.abilities__card_money {
+    display: flex;
+}
+
+
+
+@media screen and (max-width: 567px) {
+    .abilities .section__heading {
+        margin-bottom: 20px;
+    }
+
+    .abilities__cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .abilities__card {
+        padding-top: 80px;
+        width: 300px;
+    }
+
+    .abilities__card_head {
+        width: 255px;
+        height: 175px;
+        top: 15px;
+        right: 15px;
+        border-radius: 14px;
+    }
+
+    .abilities__card_head img {
+        height: 130px;
+    }
+
+    .abilities__card_body {
+        width: 255px;
+        height: 295px;
+        padding-top: 120px;
+        border-radius: 14px;
+    }
+
+    .abilities__card p {
+        font-size: 12px;
+    }
+
+    .abilities__card_spec {
+        transform: scale(0.8);
+        transform-origin: 0;
+    }
+
+
+
+}

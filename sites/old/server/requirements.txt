@@ -1,0 +1,11 @@
+Django==4.2.5
+djangorestframework==3.14.0
+django-jazzmin==3.0.1
+django-ckeditor==6.7.2
+django-recurrence==1.11.1
+django-import-export==4.3.7
+django-nested-admin==4.1.1
+django-cors-headers==4.7.0
+pillow==10.4.0
+telepot==12.7
+python-dotenv==1.0.1

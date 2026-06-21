@@ -1,0 +1,83 @@
+/* Preloader CSS */
+.preloader {
+  position: fixed;
+  background-color: white;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  transition: 0.5s;
+  filter: contrast(6);
+  transition: opacity 0.5s ease, z-index 0.5s ease;
+}
+
+.preloader--hidden {
+  opacity: 0;
+  z-index: -1;
+}
+
+.preloader_body {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.preloader_icon {
+  position: absolute;
+  text-align: center;
+  font-size: clamp(32px, 10vw, 100px);
+  font-family: 'Raleway-Black', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  margin: 0;
+  color: black;
+  z-index: 999;
+  --placeholder-color: white;
+  text-shadow:
+    4px 4px 60px var(--placeholder-color),
+    -4px -4px 60px var(--placeholder-color),
+    -4px 4px 60px var(--placeholder-color),
+    4px -4px 60px var(--placeholder-color);
+}
+
+@keyframes anim {
+  0% {
+    opacity: 0;
+    filter: blur(500px);
+  }
+  10% {
+    opacity: 0;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(2px);
+  }
+}
+
+.A {
+  filter: blur(2px);
+  animation: anim 2s infinite alternate-reverse;
+  animation-delay: 1s;
+}
+
+.B {
+  opacity: 0;
+  filter: blur(50px);
+  animation: anim 2s infinite alternate;
+  animation-delay: 1s;
+}
+
+@media (max-width: 480px) {
+  .preloader_icon {
+    font-size: 36px;
+    text-shadow:
+      2px 2px 30px var(--placeholder-color),
+      -2px -2px 30px var(--placeholder-color);
+  }
+}

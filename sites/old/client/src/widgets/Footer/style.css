@@ -1,0 +1,260 @@
+footer {
+    background: var(--background);
+    border-top: 1px solid rgba(255, 229, 0, 0.12);
+    margin-top: auto;
+}
+
+/* ---- Top grid ---- */
+
+.footer__grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1.2fr;
+    gap: 48px;
+    padding: 48px 0 40px;
+}
+
+/* Brand column */
+
+.footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer__brand-tagline {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 260px;
+    margin: 0;
+}
+
+.footer__brand-years {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 229, 0, 0.1);
+    border: 1px solid rgba(255, 229, 0, 0.2);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--yellow-background);
+    width: fit-content;
+    margin: 0;
+}
+
+/* Nav columns */
+
+.footer__col-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.footer__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.footer__nav-link {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.footer__nav-link:hover {
+    color: var(--white);
+}
+
+/* Schedule */
+
+.footer__schedule {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer__schedule-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.footer__schedule-days {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+    min-width: 70px;
+}
+
+.footer__schedule-time {
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Contacts */
+
+.footer__contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer__contact-link {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 13px;
+    transition: color 0.2s;
+}
+
+.footer__contact-link:hover {
+    color: var(--yellow-background);
+}
+
+/* ---- Bottom section ---- */
+
+.footer__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 20px 0 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Payment */
+
+.footer__payment {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.footer__payment-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.35);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+}
+
+.footer__payment-methods {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.footer__payment-badge {
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    transition: border-color 0.2s, color 0.2s;
+}
+
+.footer__payment-badge:hover {
+    border-color: rgba(255, 229, 0, 0.35);
+    color: var(--white);
+}
+
+/* Legal links */
+
+.footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+}
+
+.footer__legal-link {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer__legal-link:hover {
+    color: var(--white);
+}
+
+.footer__legal-link:not(:last-child)::after {
+    content: '·';
+    margin: 0 10px;
+    color: rgba(255, 255, 255, 0.2);
+}
+
+/* Copyright + FOP */
+
+.footer__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.footer__copy p {
+    color: rgba(255, 255, 255, 0.38);
+    font-size: 12px;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.footer__fop a {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: underline;
+    text-decoration-color: rgba(255, 255, 255, 0.2);
+    transition: color 0.2s;
+}
+
+.footer__fop a:hover {
+    color: var(--white);
+}
+
+/* ---- Mobile ---- */
+
+@media screen and (max-width: 767px) {
+    .footer__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+        padding: 32px 0 24px;
+    }
+
+    .footer__brand {
+        grid-column: 1 / -1;
+    }
+
+    .footer__brand-tagline {
+        max-width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .footer__grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .footer__legal {
+        gap: 6px 0;
+    }
+
+    .footer__legal-link {
+        font-size: 12px;
+    }
+
+    .footer__copy p {
+        font-size: 11px;
+    }
+}

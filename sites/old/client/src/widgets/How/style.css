@@ -1,0 +1,199 @@
+.how {
+    padding-bottom: 70px;
+    position: relative;
+}
+
+.how__cards {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.how__card {
+    position: relative;
+    background: var(--gold-gradient);
+    width: 245px;
+    height: 160px;
+    padding: 28px 30px 18px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.how__card:hover {
+    box-shadow: 0px 0px 20px 1px #ffa
+}
+
+.how__card:nth-child(even) {
+    left: 150px;
+}
+
+.how__card:nth-child(even):not(:last-of-type)::before {
+    content: '';
+    position: absolute;
+    left: -50%;
+    top: 50%;
+    display: block;
+    width: 245px;
+    height: 160px;
+    border-radius: 20px;
+    border: 6px var(--white) dashed;
+    clip-path: polygon(0 0, 45% 0, 45% 45%, 0 45%);
+}
+
+.how__card:nth-child(odd):not(:last-of-type)::after {
+    content: '';
+    position: absolute;
+    right: -70%;
+    top: 50%;
+    display: block;
+    width: 245px;
+    height: 160px;
+    border-radius: 20px;
+    border: 6px var(--white) dashed;
+    clip-path: polygon(0 0, 45% 0, 45% 45%, 0 45%);
+    clip-path: polygon(35% 0, 100% 0, 100% 45%, 45% 45%);
+    z-index: -1;
+}
+
+.how__card:nth-child(odd) {
+    right: 150px;
+}
+
+.how__card .how__card_icon {
+    margin-bottom: 6px;
+    height: 40px;
+}
+
+.how__card .how__card_pop {
+    position: absolute;
+    z-index: -1;
+    height: 75px;
+    left: 50%;
+    transform: translate(-50%);
+    top: 0;
+    transition: 0.3s;
+}
+
+.how__card:hover .how__card_pop {
+    transform: translate(-50%, -100%);
+}
+
+.how__card p {
+    font-size: 20px;
+    font-weight: 600;
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+}
+
+.how__girl {
+    position: absolute;
+    right: 0;
+    bottom: 100px;
+}
+
+.how__boy {
+    position: absolute;
+    left: 0;
+    top: 100px;
+}
+
+.how__card_mob {
+    display: none;
+}
+
+.planet_s {
+    position: absolute;
+    right: calc(50% - 350px);
+    top: 170px;
+    z-index: -1;
+}
+
+.planet_b {
+    position: absolute;
+    right: calc(50% + 200px);
+    bottom: 224px;
+    z-index: -1;
+}
+
+
+@media screen and (max-width: 567px) {
+    .how {
+        padding-bottom: 20px;
+    }
+
+    .how .section__heading {
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .how h2 {
+        line-height: 22px;
+    }
+
+    .how__card {
+        display: none;
+    }
+
+    .how__card_mob {
+        display: block;
+        border-radius: 10px;
+        background: linear-gradient(46deg, #8F48E6 0%, #683DA0 54.48%, #523680 100%), linear-gradient(46deg, #4B55B9 0%, #5B60A7 54.48%, #333681 100%);
+        display: flex;
+        min-width: 300px;
+        height: 140px;
+        padding-left: 15px;
+        padding-right: 15px;
+        align-items: center;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        margin-bottom: 15px;
+    }
+
+    .how__card_mob span {
+        background: var(--unnamed, linear-gradient(225deg, #FFE100 0%, #FFB700 48.69%, #FFE100 100%));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-feature-settings: 'clig' off, 'liga' off;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 96px;
+        font-style: italic;
+        font-weight: 900;
+        line-height: normal;
+        /* flex-grow: 1; */
+        padding-right: 30px;
+        flex-shrink: 0;
+        display: block;
+        width: 60px;
+        text-align: center;
+
+    }
+
+    /* .how__card_descriptions {
+
+    } */
+    .how__card_mob h3 {
+        color: #FFD701;
+
+        /* black italic */
+        font-family: Nunito;
+        font-size: 16px;
+        font-style: italic;
+        font-weight: 900;
+        line-height: normal;
+        margin-bottom: 10px;
+    }
+
+    .how__card_mob p {
+        color: var(--unnamed, #CACACA);
+        font-feature-settings: 'clig' off, 'liga' off;
+
+        /* Mobile/12 medium */
+        font-family: Nunito;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+    }
+}

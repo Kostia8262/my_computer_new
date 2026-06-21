@@ -1,0 +1,203 @@
+nav {
+    padding: 8px 0 0 0;
+    height: 76px;
+}
+
+.navbar {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+}
+
+.navbar__numbers {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+
+.navbar__numbers a {
+    color: var(--white);
+    vertical-align: middle;
+}
+
+.navbar__numbers a::before {
+    content: url('../../shared/assets/icons/interface/phone_sm.svg');
+    vertical-align: middle;
+    object-fit: contain;
+    background-size: cover;
+    margin-right: 10px;
+}
+
+.navbar__social {
+    display: flex;
+    gap: 15px;
+    margin-left: 60px;
+}
+
+.navbar__social_item a svg,
+.navbar__social_item a svg path {
+    transition: 0.3s;
+}
+
+.navbar__social_item a:hover svg path {
+    fill: var(--yellow-background);
+}
+
+.navbar__social_item a:hover svg {
+    filter: drop-shadow(0 0 30px rgba(255, 214, 0, 0.85));
+}
+
+.navbar__social_item a:active svg path {
+    fill: var(--gold);
+}
+
+.navbar__nav {
+    display: flex;
+    gap: 25px;
+    margin-left: auto;
+}
+
+.navbar__item {
+    display: flex;
+    justify-content: start;
+}
+
+
+.navbar__link {
+    position: relative;
+    z-index: 1;
+    color: var(--white);
+    font-size: 15px;
+    font-weight: 700;
+    text-shadow: 0 0 10px #000;
+    text-transform: uppercase;
+}
+
+.navbar__link:before {
+    content: '';
+    background: var(--background);
+    position: absolute;
+    transform: scaleY(0);
+    /* width: 0; */
+    top: -5px;
+    right: -10px;
+    left: -10px;
+    bottom: -5px;
+    z-index: -1;
+    transition: 0.2s;
+    border-radius: 20px;
+}
+
+.navbar__link:hover::before {
+    transform: scaleY(1);
+}
+
+.navbar__toggler {
+    display: none;
+}
+
+
+button.navbar__link {
+    padding: 0;
+    display: inline-block;
+    background-color: transparent;
+}
+
+#course__toggler {
+    display: flex;
+    align-items: center;
+}
+
+.navbar__drop__icon {
+    display: none;
+    margin-left: auto;
+    transition: 0.3s;
+    transform: rotate(180deg);
+}
+
+@media screen and (max-width: 567px) {
+    nav {
+        height: 55px;
+    }
+
+    .navbar {
+        height: 40px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .logo img {
+        height: 40px;
+    }
+
+    .navbar__social {
+        display: none;
+    }
+
+    .navbar__numbers {
+        font-size: 12px;
+    }
+
+    .navbar__nav {
+        display: none;
+    }
+
+    .navbar.active .navbar__nav {
+        display: block;
+    }
+
+    .navbar__toggler {
+        background-color: transparent;
+        display: block;
+    }
+
+    .navbar__drop__icon {
+        display: block;
+    }
+
+    .navbar__drop__icon.active {
+        transform: rotate(0);
+    }
+
+    .navbar__nav.active {
+        display: flex !important;
+        position: fixed;
+        top: 63px;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        box-sizing: border-box;
+        padding: 20px;
+        background: radial-gradient(66.3% 66.3% at 50% 58.22%, #191C2A 0%, #231F3D 100%);
+        z-index: 99;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .navbar__item {
+        width: 100%;
+    }
+
+    .navbar__nav {
+        justify-content: start;
+    }
+
+    .navbar__link {
+        border-radius: 8px;
+        padding: 10px !important;
+        text-align: left;
+        width: 100%;
+        display: inline-block;
+    }
+
+    .navbar__link:hover {
+        box-shadow: none;
+        background-color: #191A28;
+    }
+
+    .navbar__link:before {
+        display: none;
+    }
+}

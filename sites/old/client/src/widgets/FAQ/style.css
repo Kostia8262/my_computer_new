@@ -1,0 +1,137 @@
+.faq__block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.faq__cards {
+    /*  */
+}
+
+.faq__card {
+    position: relative;
+    margin-bottom: 40px;
+    width: 730px;
+    border-radius: 20px;
+    background: var(--white);
+    /* background: var(--yellow-background); */
+}
+
+.faq__card_back {
+    position: absolute;
+    top: 20px;
+    left: -20px;
+    height: 60px;
+    width: 739px;
+    border-radius: 20px;
+    background: var(--yellow-background);
+    z-index: -1;
+}
+
+.faq__card_body {
+    position: relative;
+    max-height: 0;
+    overflow: hidden;
+    z-index: 200;
+    transition: 0.5s;
+}
+
+.faq__card_title {
+    position: relative;
+    box-sizing: border-box;
+    height: 60px;
+    line-height: 60px;
+    padding: 0 20px;
+    color: var(--background);
+}
+
+.faq__card_title span {
+    position: absolute;
+    right: 20px;
+    font-size: 40px;
+    font-weight: 300;
+    transition: 0.5s;
+}
+
+.faq__card_description {
+    padding: 0 20px 20px;
+    opacity: 0;
+    transition: 0.7s;
+    line-height: 1.2;
+}
+
+.faq__card.active .faq__card_body {
+    display: block;
+    max-height: 150px;
+}
+
+.faq__card.active .faq__card_title span {
+    transform: rotate(45deg);
+}
+
+.faq__card.active .faq__card_description {
+    opacity: 1;
+}
+
+@media screen and (max-width: 567px) {
+    .faq {
+        padding-bottom: 20px;
+    }
+
+    .faq .section__heading {
+        margin-bottom: 20px;
+    }
+
+    .faq__card {
+        border-radius: 8px;
+        margin-bottom: 14px;
+    }
+
+    .faq__block,
+    .faq__cards,
+    .faq__card {
+        width: auto;
+        flex-grow: 1;
+        flex-shrink: 0;
+        flex-basis: 100%;
+    }
+
+    .faq__card_back {
+        display: none;
+    }
+
+    .faq__card_description {
+        font-size: 14px;
+        color: #555555;
+    }
+
+    .faq__card_title {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        padding-right: 55px;
+        font-size: 16px;
+        line-height: 16px;
+        min-height: 60px;
+        height: auto;
+        box-sizing: border-box;
+    }
+
+    .faq__card_title span {
+        top: 50%;
+        transform: translate(0, -50%);
+        font-size: 30px;
+    }
+
+    .faq__card.active .faq__card_title span {
+        transform: translate(0, -50%) rotate(45deg);
+    }
+
+    .faq__card.active .faq__card_body {
+        max-height: 400px;
+    }
+
+    .faq__img {
+        display: none;
+    }
+
+}

@@ -1,0 +1,33 @@
+.about__wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.about__img {
+    padding-top: 20px;
+    flex-grow: 1;
+    flex-basis: 50%;
+    text-align: center;
+}
+
+.about__text {
+    flex-grow: 1;
+    flex-basis: 50%;
+    line-height: 1.2;
+    color: var(--white)
+}
+
+.about__text .section__heading {
+    margin-bottom: 25px;
+}
+
+.about__text blockquote {
+    text-align: right;
+    font-style: italic;
+}
+
+.about__text p,
+.about__text blockquote {
+    margin-bottom: 15px;
+}
