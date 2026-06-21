@@ -16,10 +16,11 @@
     .listing-hero{padding:calc(68px + 48px) 0 52px;background:linear-gradient(160deg,#0e0620 0%,#1e0d52 35%,#3d1a80 70%,#5b21b6 100%);position:relative;overflow:hidden;text-align:center}
     .listing-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
     .listing-hero .container{position:relative;z-index:1}
-    .listing-back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:100px;cursor:pointer;transition:background .2s;text-decoration:none;margin-bottom:20px}
+    .listing-nav-row{display:flex;align-items:center;gap:16px;justify-content:flex-start;margin-bottom:24px;flex-wrap:wrap}
+    .listing-back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:100px;cursor:pointer;transition:background .2s;text-decoration:none;flex-shrink:0}
     .listing-back-btn:hover{background:rgba(255,255,255,.22);color:#fff}
     @media(max-width:768px){.listing-back-btn{font-size:12px;padding:6px 14px}}
-    .listing-breadcrumb{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:rgba(255,255,255,.5);margin-bottom:20px;flex-wrap:wrap}
+    .listing-breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.5);flex-wrap:wrap}
     .listing-breadcrumb a{color:rgba(255,255,255,.75);font-weight:500;text-decoration:none}
     .listing-breadcrumb a:hover{color:#fff}
     .listing-breadcrumb-sep{opacity:.4}
@@ -108,12 +109,14 @@
 <!-- ========== HERO ========== -->
 <section class="listing-hero">
   <div class="container">
-    <a href="/" class="listing-back-btn">← На головну</a>
-    <nav class="listing-breadcrumb" aria-label="Навігація">
-      <a href="/">Головна</a>
-      <span class="listing-breadcrumb-sep">›</span>
-      <span>Статті</span>
-    </nav>
+    <div class="listing-nav-row">
+      <a href="/" class="listing-back-btn">← На головну</a>
+      <nav class="listing-breadcrumb" aria-label="Навігація">
+        <a href="/">Головна</a>
+        <span class="listing-breadcrumb-sep">›</span>
+        <span>Статті</span>
+      </nav>
+    </div>
     <div class="listing-hero__badge">📚 Бібліотека статей</div>
     <h1 class="listing-hero__title">Статті про програмування<br/>для дітей та батьків</h1>
     <p class="listing-hero__sub" id="heroSub">Завантаження…</p>
