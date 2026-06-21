@@ -43,6 +43,7 @@ const Footer = () => (
                         <li><a href="https://mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">mycomputer.education</a></li>
                         <li><a href="https://python.mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Курс Python</a></li>
                         <li><a href="https://minecraft.mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Курс Minecraft</a></li>
+                        <li><a href="https://roblox.mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Курс Roblox</a></li>
                     </ul>
                 </div>
 
