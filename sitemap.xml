@@ -5,7 +5,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://mycomputer.education/</loc>
-    <lastmod>2026-06-08</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://mycomputer.education/"/>
@@ -16,7 +16,7 @@
   <!-- Course pages (both URL formats supported) -->
   <url>
     <loc>https://mycomputer.education/courses/scratch</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://mycomputer.education/courses/scratch"/>
@@ -25,7 +25,7 @@
 
   <url>
     <loc>https://mycomputer.education/courses/python</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://mycomputer.education/courses/python"/>
@@ -34,7 +34,7 @@
 
   <url>
     <loc>https://mycomputer.education/courses/roblox</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://mycomputer.education/courses/roblox"/>
@@ -43,7 +43,7 @@
 
   <url>
     <loc>https://mycomputer.education/courses/web</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="uk" href="https://mycomputer.education/courses/web"/>
@@ -77,7 +77,7 @@
   </url>
   <url>
     <loc>https://mycomputer.education/articles/onlain-chy-oflain-yake-navchannia-krasche</loc>
-    <lastmod>2026-06-09</lastmod>
+    <lastmod>2026-06-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
