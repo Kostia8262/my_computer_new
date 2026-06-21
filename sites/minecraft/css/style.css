@@ -996,8 +996,8 @@ body.modal-open{overflow:hidden}
 
 /* Age tabs */
 .age-tabs{display:flex;gap:8px;margin-bottom:28px;background:rgba(108,71,255,.06);border-radius:12px;padding:5px}
-.age-tab{flex:1;padding:10px 8px;border:none;border-radius:9px;background:transparent;font-size:14px;font-weight:600;color:var(--color-text-2);cursor:pointer;transition:all .2s}
-.age-tab:hover{color:var(--color-text)}
+.age-tab{flex:1;padding:10px 8px;border:none;border-radius:9px;background:transparent;font-size:14px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;transition:all .2s}
+.age-tab:hover{background:rgba(255,255,255,.1);color:rgba(255,255,255,.9)}
 .age-tab.active{background:#fff;color:var(--color-primary);box-shadow:0 2px 8px rgba(108,71,255,.15)}
 
 /* Age programs */
