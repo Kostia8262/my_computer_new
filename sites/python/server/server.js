@@ -424,7 +424,7 @@ app.post('/api/leads', leadsLimiter, (req, res) => {
     if (process.env.MAIN_ADMIN_TOKEN) {
       fetch('https://mycomputer.education/api/leads/admin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${process.env.MAIN_ADMIN_TOKEN}` },
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': process.env.MAIN_ADMIN_TOKEN },
         body: JSON.stringify({ ...sanitized, course: sanitized.course || 'Python (лендинг)', notes: 'Заявка з python.mycomputer.education' }),
       }).catch(() => {});
     }
