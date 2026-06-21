@@ -1,11 +1,13 @@
-name: Deploy to VPS
+name: Deploy Python Landing (python.mycomputer.education)
 
 on:
   push:
     branches: [master]
+    paths:
+      - 'sites/python/**'
 
 concurrency:
-  group: deploy-production
+  group: deploy-python
   cancel-in-progress: true
 
 jobs:
@@ -22,11 +24,11 @@ jobs:
       - name: Deploy
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "cd /var/www/mycomputer-new && git pull origin master && npm install --production --silent && pm2 restart mycomputer-new && echo Deploy complete"
+            "cd /var/www/mycomputer-new && git pull origin master && cd sites/python && npm install --production --silent && pm2 restart python-landing && echo Deploy complete"
 
       - name: Health check
         run: |
           sleep 10
-          curl -f --retry 3 --retry-delay 5 https://mycomputer.education/ \
+          curl -f --retry 3 --retry-delay 5 https://python.mycomputer.education/ \
             && echo "Health check passed" \
             || (echo "Health check FAILED" && exit 1)

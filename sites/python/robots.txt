@@ -1,0 +1,25 @@
+﻿# robots.txt — My Computer Academy
+# https://mycomputer.school
+
+# ── Allow all compliant crawlers ──────────────────────────────────────────────
+User-agent: *
+Allow: /
+
+# Block admin, API and raw data endpoints from indexing
+Disallow: /admin
+Disallow: /admin.html
+Disallow: /api/
+Disallow: /data/
+
+# Block scraper bots that inflate crawl budget without benefit
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# ── Sitemap ───────────────────────────────────────────────────────────────────
+Sitemap: https://mycomputer.school/sitemap.xml

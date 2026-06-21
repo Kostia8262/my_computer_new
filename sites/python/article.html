@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title id="pageTitle">Стаття — My Computer Academy</title>
+  <meta name="description" id="pageDesc" content="Корисні статті про програмування для дітей від My Computer Academy"/>
+  <link rel="stylesheet" href="/css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="icon" href="/favicon.ico"/>
+  <style>
+    .article-hero{padding:calc(68px + 48px) 0 56px;background:linear-gradient(160deg,#0e0620 0%,#1e0d52 35%,#3d1a80 70%,#5b21b6 100%);color:#fff;position:relative;overflow:hidden}
+    .article-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+    .article-hero .container{position:relative;z-index:1}
+    .article-hero__badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:13px;font-weight:700;padding:6px 16px;border-radius:100px;margin-bottom:20px}
+    .article-hero__title{font-size:clamp(26px,5vw,44px);font-weight:900;line-height:1.15;margin-bottom:20px;max-width:780px}
+    .article-hero__meta{display:flex;align-items:center;gap:16px;font-size:14px;color:rgba(255,255,255,.75);flex-wrap:nowrap;white-space:nowrap}
+    .article-hero__meta span{white-space:nowrap}
+    .article-breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.65);margin-bottom:24px;flex-wrap:wrap}
+    .article-breadcrumb a{color:rgba(255,255,255,.85);font-weight:500}
+    .article-breadcrumb a:hover{color:#fff;text-decoration:underline}
+    .article-breadcrumb-sep{opacity:.4}
+    .article-body{padding:64px 0 80px;background:#fff}
+    .article-container{display:grid;grid-template-columns:1fr 320px;gap:48px;max-width:1100px;margin:0 auto;padding:0 24px}
+    .article-content{min-width:0}
+    .article-content h2{font-size:24px;font-weight:800;color:#1a1a2e;margin:36px 0 14px}
+    .article-content h3{font-size:18px;font-weight:700;color:#1a1a2e;margin:28px 0 10px}
+    .article-content p{font-size:16px;color:#444;line-height:1.75;margin-bottom:18px}
+    .article-content ul,
+    .article-content ol{padding-left:24px;margin-bottom:18px}
+    .article-content li{font-size:16px;color:#444;line-height:1.7;margin-bottom:6px}
+    .article-content strong{color:#1a1a2e;font-weight:700}
+    .article-content a{color:#6C47FF;text-decoration:underline}
+    .article-content code{background:#f0eeff;color:#6C47FF;padding:2px 7px;border-radius:5px;font-size:14px;font-family:monospace}
+    .article-sidebar{position:sticky;top:88px;align-self:start}
+    .sidebar-card{background:#13102a;border-radius:16px;padding:24px;border:1px solid rgba(108,71,255,.25);margin-bottom:20px}
+    .sidebar-card h3{font-size:15px;font-weight:700;margin-bottom:14px;color:#fff}
+    .sidebar-link{display:block;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px;color:rgba(255,255,255,.65);font-weight:500;text-decoration:none;transition:color .2s}
+    .sidebar-link:hover{color:#A78BFA}
+    .sidebar-link:last-child{border-bottom:none}
+    .sidebar-cta{background:linear-gradient(160deg,#12082c 0%,#2d1272 50%,#5b21b6 100%);color:#fff;border-radius:16px;padding:24px;text-align:center;margin-bottom:20px;border:1px solid rgba(108,71,255,.3)}
+    .sidebar-cta h3{font-size:16px;font-weight:800;margin-bottom:10px;color:#fff}
+    .sidebar-cta p{font-size:13px;color:rgba(255,255,255,.75);margin-bottom:16px;line-height:1.5}
+    .sidebar-cta button{display:block;width:100%;background:#fff;color:#6C47FF;font-weight:700;font-size:14px;padding:12px;border-radius:10px;text-decoration:none;transition:transform .2s,box-shadow .2s;border:none;cursor:pointer;font-family:inherit}
+    .sidebar-cta button:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+    .article-not-found{text-align:center;padding:100px 20px;color:#888}
+    .article-not-found h1{font-size:32px;font-weight:800;margin-bottom:12px;color:#1a1a2e}
+    @media(max-width:768px){
+      .article-body{padding:40px 0 24px}
+      .article-container{grid-template-columns:1fr}
+      .article-sidebar{position:static}
+      .article-hero{padding:calc(68px + 32px) 0 40px}
+    }
+    /* Modal */
+    .art-modal{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+    .art-modal.open{opacity:1;pointer-events:all}
+    .art-modal__backdrop{position:absolute;inset:0;background:rgba(15,10,40,.55);backdrop-filter:blur(4px)}
+    .art-modal__dialog{position:relative;z-index:1;background:#fff;border-radius:24px;padding:36px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 80px rgba(108,71,255,.2);transform:translateY(16px);transition:transform .25s}
+    .art-modal.open .art-modal__dialog{transform:translateY(0)}
+    .art-modal__close{position:absolute;top:16px;right:16px;width:32px;height:32px;border:none;background:#f0eeff;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6C47FF;transition:background .2s}
+    .art-modal__close:hover{background:#e0d8ff}
+    .art-modal__badge{display:inline-flex;align-items:center;gap:6px;background:#f0eeff;color:#6C47FF;font-size:12px;font-weight:700;padding:4px 12px;border-radius:100px;margin-bottom:12px}
+    .art-modal__badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e;animation:blink 1.4s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+    .art-modal__title{font-size:22px;font-weight:800;color:#1a1a2e;margin-bottom:6px}
+    .art-modal__sub{font-size:14px;color:#666;margin-bottom:24px}
+    @media(max-width:540px){
+      .art-modal__dialog{padding:24px 20px;border-radius:16px;max-width:calc(100% - 32px)}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header class="header" id="header">
+  <nav class="nav container">
+    <a href="/" class="nav__logo">
+      <img src="/android-chrome-192x192.png" alt="" class="nav__logo-img" width="38" height="38" fetchpriority="high"/>
+      <span>My Computer <strong>Academy</strong></span>
+    </a>
+    <ul class="nav__menu" id="navMenu">
+      <li><a href="/#courses" class="nav__link">Курси</a></li>
+      <li><a href="/#how-it-works" class="nav__link">Як це працює</a></li>
+      <li><a href="/#reviews" class="nav__link">Відгуки</a></li>
+      <li><a href="/#faq" class="nav__link">FAQ</a></li>
+    </ul>
+    <div class="nav__actions">
+      <a href="tel:+380954624672" class="nav__phone">+38 (095) 462-46-72</a>
+      <a href="#contact" class="btn btn--primary btn--sm nav__cta">Записатись</a>
+    </div>
+    <button class="nav__burger" id="navBurger" aria-label="Меню" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<div id="pageContent">
+  <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>
+</div>
+
+<!-- ========== FAQ ========== -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="faq__inner">
+      <div class="section-header section-header--left">
+        <div class="section-badge">Часті питання</div>
+        <h2 class="section-title">Часті питання про курси програмування для дітей</h2>
+      </div>
+      <div class="faq__list" id="faqList">
+        <div class="faq-item">
+          <button class="faq-item__question">
+            <span>З якого віку можна починати?</span>
+            <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-item__answer"><p>Приймаємо дітей від 6 років. Для малюків — Scratch, для дітей старшого віку — Python, Roblox, Web розробка. Конкретний курс підберемо на безкоштовній консультації.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__question">
+            <span>Чи потрібні знання програмування?</span>
+            <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-item__answer"><p>Абсолютно ніяких. Всі курси починаються з нуля. Потрібен тільки комп'ютер з інтернетом.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__question">
+            <span>Як проходять онлайн-заняття?</span>
+            <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-item__answer"><p>Заняття у Zoom або Google Meet. Викладач бачить екран дитини, допомагає в реальному часі. Групи до 5 осіб — кожен отримує увагу.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__question">
+            <span>Що якщо дитина пропустить заняття?</span>
+            <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-item__answer"><p>Всі заняття записуються. Пропущений урок можна відпрацювати у інший день, а викладач відповість на питання в чаті.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__question">
+            <span>Скільки тривають курси?</span>
+            <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-item__answer"><p>Дитячі курси тривають 9–18 місяців при 1–2 заняттях на тиждень. Конкретна тривалість залежить від напрямку та навантаження.</p></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-item__question">
+            <span>Які є варіанти оплати?</span>
+            <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="faq-item__answer"><p>Ви можете скористатись прямою оплатою на рахунок ФОП, оплатою через Google Pay, Apple Pay, переказом через платіжний шлюз. Якщо ви за кордоном — розрахуємо вартість у зручній валюті.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CONTACT ========== -->
+<section class="contact" id="contact">
+  <div class="container">
+    <div class="contact__grid">
+
+      <!-- LEFT: intro -->
+      <div class="contact__intro">
+        <h2 class="contact__title">
+          Запишіться на<br/>
+          <span class="gradient-text">пробний урок</span>
+        </h2>
+        <p class="contact__subtitle">Залиш заявку — передзвонимо протягом 30 хвилин, запишемо дитину на безкоштовне перше заняття.</p>
+      </div>
+
+      <!-- RIGHT: form -->
+      <div class="contact__form-wrap">
+        <form class="contact-form" id="artContactForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Ім'я дитини *</label>
+              <input type="text" class="form-input" name="child_name" placeholder="Наприклад: Артем" autocomplete="off" />
+              <span class="field-error" aria-live="polite"></span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Вік</label>
+              <input type="number" class="form-input" name="age" placeholder="9" min="5" max="18" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ваш телефон *</label>
+            <div class="phone-wrap">
+              <select class="form-input phone-code-sel" name="phone_code" aria-label="Код країни">
+                <option value="+380">🇺🇦 +380</option><option value="+48">🇵🇱 +48</option>
+                <option value="+49">🇩🇪 +49</option><option value="+420">🇨🇿 +420</option>
+                <option value="+421">🇸🇰 +421</option><option value="+43">🇦🇹 +43</option>
+                <option value="+44">🇬🇧 +44</option><option value="+1">🇺🇸 +1</option>
+                <option value="+972">🇮🇱 +972</option><option value="+375">🇧🇾 +375</option>
+                <option value="+373">🇲🇩 +373</option><option value="+995">🇬🇪 +995</option>
+                <option value="+7">🇷🇺 +7</option><option value="+33">🇫🇷 +33</option>
+                <option value="+39">🇮🇹 +39</option><option value="+34">🇪🇸 +34</option>
+                <option value="+31">🇳🇱 +31</option><option value="+41">🇨🇭 +41</option>
+                <option value="+46">🇸🇪 +46</option><option value="+47">🇳🇴 +47</option>
+              </select>
+              <input type="tel" class="form-input" name="phone" placeholder="(95) ___-__-__" autocomplete="tel" />
+            </div>
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <div class="form-group" style="display:none">
+            <label class="form-label">Ваш email</label>
+            <input type="email" class="form-input" name="email" placeholder="example@gmail.com" autocomplete="email" />
+            <span class="field-error" aria-live="polite"></span>
+          </div>
+          <button type="submit" class="btn btn--primary btn--full btn--lg" id="artContactSubmit">
+            <span class="btn-text">Записатися на пробний урок безкоштовно</span>
+            <span class="btn-loading" style="display:none">Відправка...</span>
+          </button>
+          <p class="form-note">
+            Натискаючи кнопку, ви погоджуєтесь з
+            <a href="/docs/privacy-policy.html" target="_blank" rel="noopener">політикою конфіденційності</a>.
+          </p>
+        </form>
+        <div class="form-success" id="artContactSuccess" style="display:none">
+          <div class="form-success__icon">🎉</div>
+          <h3>Заявку прийнято!</h3>
+          <p>Передзвонимо протягом 30 хвилин. Дитину чекає безкоштовний пробний урок!</p>
+        </div>
+      </div>
+
+      <!-- CONTACTS BLOCK -->
+      <div class="contact__details">
+        <h4 class="contact__info-title">Телефони</h4>
+        <div class="contact__phones">
+          <div class="contact__phone-row">
+            <a href="tel:+380954624672" class="contact__phone-number">+38 (095) 462-46-72</a>
+            <div class="contact__phone-links">
+              <a href="viber://add?number=380954624672" class="messenger-btn messenger-btn--viber" title="Viber">
+                <svg width="17" height="17" viewBox="-0.5 -0.5 27 25.5" fill="currentColor"><path d="M11.4.2C5.5.4.3 5.7 0 11.6c-.2 3.2.7 6.3 2.6 8.8L.8 23.7c-.2.6.4 1.2 1 1l3.4-1.8c2.4 1.7 5.3 2.6 8.3 2.3 5.9-.5 10.8-5.5 11.4-11.4C25.7 5.8 19.4-.1 11.4.2zm5.4 16.2c-.4.4-.9.6-1.4.6-.3 0-.6-.1-.9-.2-1.5-.7-3-1.7-4.2-2.9-1.2-1.2-2.2-2.7-2.9-4.2-.3-.7-.2-1.6.4-2.1l.8-.8c.3-.3.8-.3 1.1 0l1.7 1.7c.3.3.3.8 0 1.1l-.7.7c-.1.1-.1.3 0 .4.4.8.9 1.5 1.6 2.1.6.6 1.3 1.2 2.1 1.6.1.1.3 0 .4 0l.7-.7c.3-.3.8-.3 1.1 0l1.7 1.7c.3.3.3.8 0 1.1l-.5.9z"/></svg>
+              </a>
+              <a href="https://api.whatsapp.com/send?phone=380954624672" target="_blank" rel="noopener" class="messenger-btn messenger-btn--whatsapp" title="WhatsApp">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a9.87 9.87 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              </a>
+              <a href="https://t.me/Artist8262" target="_blank" rel="noopener" class="messenger-btn messenger-btn--telegram" title="Telegram">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0012 0a12 12 0 00-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 01.171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              </a>
+            </div>
+          </div>
+          <div class="contact__phone-row">
+            <a href="tel:+380682522876" class="contact__phone-number">+38 (068) 252-28-76</a>
+            <div class="contact__phone-links">
+              <a href="https://api.whatsapp.com/send?phone=380682522876" target="_blank" rel="noopener" class="messenger-btn messenger-btn--whatsapp" title="WhatsApp">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a9.87 9.87 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="contact__info-title">Пошта</h4>
+        <a href="mailto:my.computer.academy25@gmail.com" class="contact__email">my.computer.academy25@gmail.com</a>
+
+        <h4 class="contact__info-title">Слідкуйте за нами</h4>
+        <div class="contact__social">
+          <a href="https://www.facebook.com/MyComputerAcademy.Dnipro" target="_blank" rel="noopener" class="contact__social-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+            <span>Facebook</span>
+          </a>
+          <a href="https://www.instagram.com/my_computer_academy_/" target="_blank" rel="noopener" class="contact__social-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            <span>Instagram</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <a href="/" class="nav__logo footer__logo">
+          <img src="/android-chrome-192x192.png" alt="My Computer Academy" class="nav__logo-img" width="38" height="38" loading="lazy" />
+          <span>My Computer <strong>Academy</strong></span>
+        </a>
+        <p class="footer__desc">Онлайн школа програмування для дітей від 6 до 18 років. Дніпро, Україна.</p>
+        <div class="footer__social">
+          <a href="https://www.instagram.com/my_computer_academy_/" target="_blank" rel="noopener" class="social-link" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+          <a href="https://www.facebook.com/MyComputerAcademy.Dnipro" target="_blank" rel="noopener" class="social-link" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+          <a href="https://t.me/Artist8262" target="_blank" class="social-link" aria-label="Telegram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div class="footer__links">
+        <div class="footer__col">
+          <h4>Курси</h4>
+          <ul>
+            <li><a href="#" onclick="openArtModal();return false;">Scratch (6–10 років)</a></li>
+            <li><a href="#" onclick="openArtModal();return false;">Python (7–18 років)</a></li>
+            <li><a href="#" onclick="openArtModal();return false;">Roblox (9–14 років)</a></li>
+            <li><a href="#" onclick="openArtModal();return false;">Веб-розробка (10–18 років)</a></li>
+            <li><a href="#" onclick="openArtModal();return false;">Minecraft (8–14 років)</a></li>
+            <li><a href="#" onclick="openArtModal();return false;">Веб-дизайн (6–18 років)</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Академія</h4>
+          <ul>
+            <li><a href="/#about">Про нас</a></li>
+            <li><a href="/#how-it-works">Як це працює</a></li>
+            <li><a href="/#reviews">Відгуки</a></li>
+            <li><a href="/#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>Контакти</h4>
+          <ul>
+            <li><a href="tel:+380954624672">+38 (095) 462-46-72</a></li>
+            <li><a href="tel:+380682522876">+38 (068) 252-28-76</a></li>
+            <li><a href="mailto:my.computer.academy25@gmail.com">my.computer.academy25@gmail.com</a></li>
+            <li><a href="https://mycomputer.school" target="_blank">mycomputer.school</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer__payments">
+      <span class="footer__payments-label">Оплата:</span>
+      <div class="footer__payment-icons">
+        <span class="pay-badge">WayForPay</span>
+        <span class="pay-badge">Google Pay</span>
+        <span class="pay-badge">Apple Pay</span>
+        <span class="pay-badge">Visa</span>
+        <span class="pay-badge">Mastercard</span>
+      </div>
+    </div>
+    <div class="footer__legal">
+      <a href="/docs/privacy-policy.html" target="_blank" rel="noopener">Політика конфіденційності</a>
+      <a href="/docs/public-offer.html"   target="_blank" rel="noopener">Публічна оферта</a>
+      <a href="/docs/terms.html"          target="_blank" rel="noopener">Правила та умови</a>
+      <a href="/docs/refund-policy.html"  target="_blank" rel="noopener">Правила повернення</a>
+      <a href="/docs/cookie-policy.html"  target="_blank" rel="noopener">Політика куків</a>
+    </div>
+    <div class="footer__bottom">
+      <div class="footer__bottom-left">
+        <p>© 2026 My Computer Academy. Всі права захищені.</p>
+        <p class="footer__fop">ФОП Піменов К.Ю., ІПН 3498404577, м. Дніпро, пр. О. Поля 28а,
+          <a href="tel:+380954624672">+38 (095) 462-46-72</a>,
+          <a href="mailto:my.computer.academy25@gmail.com">my.computer.academy25@gmail.com</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ========== MODAL ========== -->
+<div class="art-modal" id="artModal" role="dialog" aria-modal="true" aria-labelledby="artModalTitle">
+  <div class="art-modal__backdrop" id="artModalBackdrop"></div>
+  <div class="art-modal__dialog">
+    <button class="art-modal__close" id="artModalClose" aria-label="Закрити">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M12 2L2 12M2 2L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="art-modal__badge">Пробний урок безкоштовно</div>
+    <h3 class="art-modal__title" id="artModalTitle">Записатися на урок</h3>
+    <p class="art-modal__sub">Передзвонимо протягом 30 хвилин і підберемо зручний час.</p>
+    <form class="modal-form" id="artModalForm" novalidate>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ім'я дитини *</label>
+          <input type="text" class="form-input" name="child_name" placeholder="Артем" autocomplete="off"/>
+          <span class="field-error" aria-live="polite"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Вік</label>
+          <input type="number" class="form-input" name="age" placeholder="9" min="5" max="18"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ваш телефон *</label>
+        <div class="phone-wrap">
+          <select class="form-input phone-code-sel" name="phone_code" aria-label="Код країни">
+            <option value="+380">🇺🇦 +380</option><option value="+48">🇵🇱 +48</option>
+            <option value="+49">🇩🇪 +49</option><option value="+420">🇨🇿 +420</option>
+            <option value="+44">🇬🇧 +44</option><option value="+1">🇺🇸 +1</option>
+            <option value="+972">🇮🇱 +972</option><option value="+33">🇫🇷 +33</option>
+          </select>
+          <input type="tel" class="form-input" name="phone" placeholder="(95) ___-__-__" autocomplete="tel"/>
+        </div>
+        <span class="field-error" aria-live="polite"></span>
+      </div>
+      <button type="submit" class="btn btn--primary btn--full btn--lg" id="artModalSubmit">
+        <span class="btn-text">Записатися безкоштовно</span>
+        <span class="btn-loading" style="display:none">Відправка...</span>
+      </button>
+      <p class="form-note">Натискаючи кнопку, ви погоджуєтесь з <a href="/docs/privacy-policy.html" target="_blank" rel="noopener">політикою конфіденційності</a>.</p>
+    </form>
+    <div class="form-success modal-success" id="artModalSuccess" style="display:none">
+      <div class="form-success__icon">🎉</div>
+      <h3>Заявку прийнято!</h3>
+      <p>Передзвонимо протягом 30 хвилин. Дитину чекає безкоштовний пробний урок!</p>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ── Header scroll ─────────────────────────────────────────────────────────────
+const header = document.getElementById('header');
+window.addEventListener('scroll', () => {
+  header.classList.toggle('scrolled', window.scrollY > 20);
+}, { passive: true });
+
+// ── Burger menu ───────────────────────────────────────────────────────────────
+const burger  = document.getElementById('navBurger');
+const navMenu = document.getElementById('navMenu');
+burger.addEventListener('click', () => {
+  const isOpen = navMenu.classList.toggle('open');
+  burger.setAttribute('aria-expanded', String(isOpen));
+});
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function formatDate(d) {
+  if (!d) return '';
+  try { return new Date(d).toLocaleDateString('uk-UA', {day:'numeric',month:'long',year:'numeric'}); }
+  catch { return d; }
+}
+
+// ── Article loader ────────────────────────────────────────────────────────────
+async function init() {
+  const pathMatch = window.location.pathname.match(/\/articles\/([^/?#]+)/);
+  const slug = pathMatch ? pathMatch[1] : null;
+  if (!slug) { showNotFound(); return; }
+
+  try {
+    const res = await fetch('/data/articles.json');
+    if (!res.ok) { showNotFound(); return; }
+    const articles = await res.json();
+    const article = articles.find(a => a.slug === slug && a.active !== false);
+    if (!article) { showNotFound(); return; }
+    renderArticle(article, articles.filter(a => a.active !== false && a.id !== article.id).slice(0, 4));
+  } catch { showNotFound(); }
+}
+
+function injectArticleSchema(a) {
+  const schema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        "@id": "https://mycomputer.school/articles/" + a.slug + "#article",
+        "headline": a.title,
+        "description": a.excerpt || a.title,
+        "image": "https://mycomputer.school/og-image.png",
+        "datePublished": a.publishedAt,
+        "dateModified": a.publishedAt,
+        "inLanguage": "uk",
+        "author": {
+          "@type": "Organization",
+          "@id": "https://mycomputer.school/#organization",
+          "name": a.author || "My Computer Academy"
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "My Computer Academy",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://mycomputer.school/android-chrome-192x192.png",
+            "width": 192,
+            "height": 192
+          }
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://mycomputer.school/articles/" + a.slug
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {"@type": "ListItem", "position": 1, "name": "Головна", "item": "https://mycomputer.school/"},
+          {"@type": "ListItem", "position": 2, "name": "Статті", "item": "https://mycomputer.school/#articles"},
+          {"@type": "ListItem", "position": 3, "name": a.title, "item": "https://mycomputer.school/articles/" + a.slug}
+        ]
+      }
+    ]
+  };
+  const el = document.createElement('script');
+  el.type = 'application/ld+json';
+  el.textContent = JSON.stringify(schema);
+  document.head.appendChild(el);
+}
+
+function renderArticle(a, related) {
+  document.title = a.title + ' — My Computer Academy';
+  document.getElementById('pageDesc')?.setAttribute('content', a.excerpt || a.title);
+  injectArticleSchema(a);
+
+  document.getElementById('pageContent').innerHTML = `
+    <section class="article-hero">
+      <div class="container">
+        <nav class="article-breadcrumb" aria-label="Навігація">
+          <a href="/">Головна</a>
+          <span class="article-breadcrumb-sep">›</span>
+          <a href="/#articles">Статті</a>
+        </nav>
+        <div class="article-hero__badge">${a.coverEmoji || '📄'} ${esc(a.category || 'навчання')}</div>
+        <h1 class="article-hero__title">${esc(a.title)}</h1>
+        <div class="article-hero__meta">
+          <span>✍️ ${esc(a.author || 'My Computer Academy')}</span>
+          <span>📅 ${formatDate(a.publishedAt)}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="article-body">
+      <div class="article-container">
+        <main class="article-content">
+          ${a.content || '<p>' + esc(a.excerpt || '') + '</p>'}
+        </main>
+        <aside class="article-sidebar">
+          <div class="sidebar-cta">
+            <h3>Запишіть дитину на курс</h3>
+            <p>Перший урок безкоштовно — спробуйте без зобов'язань!</p>
+            <button type="button" onclick="openArtModal()">Записатись зараз →</button>
+          </div>
+          ${related.length ? `
+          <div class="sidebar-card">
+            <h3>Читайте також</h3>
+            ${related.map(r => `<a class="sidebar-link" href="/articles/${esc(r.slug)}">${r.coverEmoji || '📄'} ${esc(r.title)}</a>`).join('')}
+          </div>` : ''}
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function showNotFound() {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="article-not-found">
+      <h1>Статтю не знайдено</h1>
+      <p>Можливо, вона була видалена або ви помилилися в адресі.</p>
+      <a href="/#articles" class="btn btn--primary" style="display:inline-block;margin-top:24px">← Всі статті</a>
+    </div>
+  `;
+}
+
+// ── FAQ accordion ─────────────────────────────────────────────────────────────
+function initFaq() {
+  const list = document.getElementById('faqList');
+  if (!list) return;
+  list.querySelectorAll('.faq-item__question').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const isOpen = item.classList.contains('active');
+      list.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+      if (!isOpen) item.classList.add('active');
+    });
+  });
+}
+
+init();
+initFaq();
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+const artModal   = document.getElementById('artModal');
+const artBackdrop= document.getElementById('artModalBackdrop');
+const artClose   = document.getElementById('artModalClose');
+
+function openArtModal() {
+  artModal.classList.add('open');
+  document.body.classList.add('modal-open');
+  const first = artModal.querySelector('input:not([type="hidden"])');
+  if (first) setTimeout(() => first.focus(), 80);
+}
+function closeArtModal() {
+  artModal.classList.remove('open');
+  document.body.classList.remove('modal-open');
+}
+if (artBackdrop) artBackdrop.addEventListener('click', closeArtModal);
+if (artClose)    artClose.addEventListener('click', closeArtModal);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeArtModal(); });
+
+// ── Form helpers ──────────────────────────────────────────────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbyiXop44yUyrE1EwWLvr3jzAg41VmRxN20raHe0NRo3uZWdk28mUck0EGVzVOG10OeJVw/exec';
+
+function getFieldError(inp) { return inp.parentElement?.querySelector('.field-error') || null; }
+function setFieldError(inp, msg) {
+  inp.classList.add('form-input--error');
+  const el = getFieldError(inp); if (el) el.textContent = msg;
+}
+function clearFieldError(inp) {
+  inp.classList.remove('form-input--error');
+  const el = getFieldError(inp); if (el) el.textContent = '';
+}
+
+function validateArtForm(form) {
+  let ok = true;
+  const nameEl  = form.querySelector('[name="child_name"]');
+  const phoneEl = form.querySelector('[name="phone"]');
+  if (nameEl && !nameEl.value.trim()) { setFieldError(nameEl, 'Введіть ім\'я дитини'); ok = false; }
+  if (phoneEl) {
+    const digits = phoneEl.value.replace(/\D/g,'');
+    if (digits.length < 7) { setFieldError(phoneEl, 'Введіть номер телефону'); ok = false; }
+  }
+  return ok;
+}
+
+function applyArtPhoneMask(input, codeEl) {
+  if (codeEl && codeEl.value !== '+380') return;
+  let v = input.value.replace(/\D/g, '');
+  if (v.startsWith('380')) v = v.slice(3);
+  else if (v.startsWith('38')) v = v.slice(2);
+  else if (v.startsWith('0'))  v = v.slice(1);
+  v = v.slice(0, 9);
+  let f = '';
+  if (v.length > 0) f = '(' + v.substring(0,2);
+  if (v.length >= 2) f += ') ' + v.substring(2,5);
+  if (v.length >= 5) f += '-' + v.substring(5,7);
+  if (v.length >= 7) f += '-' + v.substring(7,9);
+  input.value = f;
+}
+
+document.querySelectorAll('.phone-wrap').forEach(wrap => {
+  const codeEl  = wrap.querySelector('.phone-code-sel');
+  const phoneEl = wrap.querySelector('[name="phone"]');
+  if (!phoneEl) return;
+  phoneEl.addEventListener('input', () => applyArtPhoneMask(phoneEl, codeEl));
+  if (codeEl) codeEl.addEventListener('change', () => { phoneEl.value=''; phoneEl.placeholder = codeEl.value==='+380' ? '(95) ___-__-__' : 'XXX XXX XXXX'; });
+});
+
+async function submitArtForm(form, submitBtn, successEl) {
+  if (!validateArtForm(form)) return;
+  const btnText    = submitBtn.querySelector('.btn-text');
+  const btnLoading = submitBtn.querySelector('.btn-loading');
+  submitBtn.disabled = true;
+  btnText.style.display    = 'none';
+  btnLoading.style.display = 'inline';
+
+  const codeEl   = form.querySelector('[name="phone_code"]');
+  const code     = codeEl ? codeEl.value : '+380';
+  const rawPhone = (form.querySelector('[name="phone"]')?.value || '').replace(/\D/g,'');
+  const data = {
+    child_name: form.querySelector('[name="child_name"]')?.value.trim() || '',
+    age:        form.querySelector('[name="age"]')?.value || '',
+    phone:      code + rawPhone,
+    source:     'article_' + (window.location.pathname.split('/').pop() || 'unknown'),
+  };
+
+  try {
+    if (GAS_URL) {
+      await new Promise(resolve => {
+        const frameName = '_gas_' + Date.now();
+        const iframe = document.createElement('iframe');
+        iframe.name = frameName; iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        const gasForm = document.createElement('form');
+        gasForm.method = 'GET'; gasForm.action = GAS_URL; gasForm.target = frameName;
+        [['token','mca_lead_2026'],['child_name',data.child_name],['age',data.age],['phone',data.phone],['email',''],['course',data.source]].forEach(([n,v]) => {
+          const inp = document.createElement('input'); inp.type='hidden'; inp.name=n; inp.value=v;
+          gasForm.appendChild(inp);
+        });
+        document.body.appendChild(gasForm);
+        const cleanup = () => { try{document.body.removeChild(gasForm);}catch(_){} try{document.body.removeChild(iframe);}catch(_){} resolve(); };
+        iframe.addEventListener('load', cleanup, {once:true});
+        setTimeout(cleanup, 5000);
+        gasForm.submit();
+      });
+    }
+    form.reset();
+    if (successEl) { form.style.display = 'none'; successEl.style.display = ''; }
+    else { form.style.display = 'none'; setTimeout(() => { form.style.display=''; closeArtModal(); }, 2400); }
+  } catch(err) {
+    console.error('Form submit error:', err);
+  } finally {
+    submitBtn.disabled = false;
+    btnText.style.display    = 'inline';
+    btnLoading.style.display = 'none';
+  }
+}
+
+// Modal form submit
+const artModalForm   = document.getElementById('artModalForm');
+const artModalSubmit = document.getElementById('artModalSubmit');
+const artModalSuccess= document.getElementById('artModalSuccess');
+if (artModalForm) {
+  artModalForm.addEventListener('input', e => { if (e.target.classList.contains('form-input')) clearFieldError(e.target); });
+  artModalForm.addEventListener('submit', e => { e.preventDefault(); submitArtForm(artModalForm, artModalSubmit, artModalSuccess); });
+}
+
+// Contact form submit
+const artContactForm   = document.getElementById('artContactForm');
+const artContactSubmit = document.getElementById('artContactSubmit');
+const artContactSuccess= document.getElementById('artContactSuccess');
+if (artContactForm) {
+  artContactForm.addEventListener('input', e => { if (e.target.classList.contains('form-input')) clearFieldError(e.target); });
+  artContactForm.addEventListener('submit', e => { e.preventDefault(); submitArtForm(artContactForm, artContactSubmit, artContactSuccess); });
+}
+</script>
+</body>
+</html>
