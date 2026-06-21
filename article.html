@@ -63,11 +63,38 @@
       .article-sidebar{position:static}
       .article-hero{padding:calc(68px + 32px) 0 44px}
       .article-sidebar .sidebar-cta{margin-top:0;margin-bottom:20px;border-radius:20px}
-      .article-sidebar .sidebar-card{background:#0d1117;border:1px solid rgba(255,255,255,.07);border-radius:20px;padding:22px}
-      .article-sidebar .sidebar-card h3{color:#fff;font-size:16px;font-weight:700;margin-bottom:16px;letter-spacing:.01em}
-      .article-sidebar .sidebar-link{color:rgba(255,255,255,.88);border-bottom:1px solid rgba(255,255,255,.07);font-size:14px;padding:14px 0;line-height:1.5;font-weight:400}
+      .article-sidebar .sidebar-card{
+        background:linear-gradient(180deg,#141824 0%,#0d1117 100%);
+        border:1px solid rgba(167,139,250,.15);
+        border-top:2.5px solid #6C47FF;
+        border-radius:20px;
+        padding:22px;
+      }
+      .article-sidebar .sidebar-card h3{
+        color:#fff;font-size:16px;font-weight:700;
+        margin-bottom:16px;letter-spacing:.01em;
+        display:flex;align-items:center;gap:8px;
+      }
+      .article-sidebar .sidebar-card h3::before{
+        content:'';display:inline-block;width:3px;height:16px;
+        background:linear-gradient(180deg,#6C47FF,#A78BFA);
+        border-radius:2px;flex-shrink:0;
+      }
+      .article-sidebar .sidebar-link{
+        display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+        color:rgba(255,255,255,.75);
+        border-bottom:1px solid rgba(255,255,255,.06);
+        font-size:14px;padding:13px 0;line-height:1.5;font-weight:400;
+        text-decoration:none;transition:color .2s,background .2s;
+        border-radius:6px;margin:0 -6px;padding-left:6px;padding-right:6px;
+      }
       .article-sidebar .sidebar-link:last-child{border-bottom:none}
-      .article-sidebar .sidebar-link:hover{color:#fff}
+      .article-sidebar .sidebar-link:hover{color:#A78BFA;background:rgba(108,71,255,.08)}
+      .article-sidebar .sidebar-link::after{
+        content:'→';font-size:13px;color:rgba(167,139,250,.4);
+        flex-shrink:0;margin-top:2px;transition:color .2s,transform .2s;
+      }
+      .article-sidebar .sidebar-link:hover::after{color:#A78BFA;transform:translateX(3px)}
     }
   </style>
 </head>
