@@ -31,7 +31,8 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" /></noscript>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="preload" as="style" href="/css/style.css" />
+  <link rel="stylesheet" href="/css/style.css" fetchpriority="high" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -735,8 +736,8 @@
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label" data-ru="Курс">Курс</label>
-            <select class="form-input form-select" name="course">
+            <label class="form-label" for="course-contact" data-ru="Курс">Курс</label>
+            <select id="course-contact" class="form-input form-select" name="course">
               <option value="" disabled selected data-ru="Какой курс интересует?">Який курс цікавить?</option>
               <option value="scratch" data-ru="Scratch (6–10 лет)">Scratch (6–10 років)</option>
               <option value="python"  data-ru="Python (10–14 лет)">Python (10–14 років)</option>
@@ -1156,8 +1157,8 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label" data-ru="Курс">Курс</label>
-        <select class="form-input form-select" name="course">
+        <label class="form-label" for="course-modal" data-ru="Курс">Курс</label>
+        <select id="course-modal" class="form-input form-select" name="course">
           <option value="" disabled selected data-ru="Какой курс интересует?">Який курс цікавить?</option>
           <option value="scratch" data-ru="Scratch (6–10 лет)">Scratch (6–10 років)</option>
           <option value="python"  data-ru="Python (10–14 лет)">Python (10–14 років)</option>
