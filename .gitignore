@@ -1,5 +1,13 @@
 **/node_modules/
-**/data/
+**/data/leads.json
+**/data/clients.json
+**/data/payments.json
+**/data/monthly-payments.json
+**/data/reviews.json
+**/data/admins.json
+**/data/courses.json
+**/data/attendance.json
+**/data/content.json
 **/.env
 *.log
 .DS_Store
