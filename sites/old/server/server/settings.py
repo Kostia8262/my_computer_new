@@ -27,9 +27,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-ey=&bou-n$qc6-s456mjn
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['mycomputer.education', '62.72.21.71', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['old.mycomputer.education', 'mycomputer.education', '62.72.21.71', 'localhost', '127.0.0.1']
 
-CSRF_TRUSTED_ORIGINS = ['https://mycomputer.education']
+CSRF_TRUSTED_ORIGINS = ['https://old.mycomputer.education', 'https://mycomputer.education']
 
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_ALL_ORIGINS = True

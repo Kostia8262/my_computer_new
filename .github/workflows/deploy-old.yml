@@ -110,6 +110,7 @@ jobs:
           chown nobody:nogroup $VH/server/db.sqlite3* 2>/dev/null || true
           chmod 664 $VH/server/db.sqlite3* 2>/dev/null || true
           chown nobody:nogroup $VH/server 2>/dev/null || true
+          chmod 755 $VH/server 2>/dev/null || true
           rm -f /tmp/django_errors.log 2>/dev/null || true
           echo "=== Verifying React build on VPS ==="
           ls -la $VH/client/index.html
