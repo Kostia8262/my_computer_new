@@ -48,7 +48,7 @@ jobs:
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
           for attempt in 1 2 3; do
             ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-              "chattr -R -i /usr/local/lsws/mycomputer.education/html/client/ 2>/dev/null || true && chmod -R 777 /usr/local/lsws/mycomputer.education/html/client/ 2>/dev/null || true" \
+              "chattr -R -i /usr/local/lsws/old.mycomputer.education/html/client/ 2>/dev/null || true && chmod -R 777 /usr/local/lsws/old.mycomputer.education/html/client/ 2>/dev/null || true" \
               && break
             echo "Attempt $attempt failed, retrying in 20s..."
             sleep 20
@@ -63,7 +63,7 @@ jobs:
               --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' \
               --exclude='db.sqlite3' --exclude='static/' --exclude='media/' \
               --exclude='venv/' --exclude='.env' \
-              sites/old/server/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/mycomputer.education/html/server/ \
+              sites/old/server/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/old.mycomputer.education/html/server/ \
               && break
             echo "Attempt $attempt failed, retrying in 20s..."
             sleep 20
@@ -75,7 +75,7 @@ jobs:
           for attempt in 1 2 3; do
             rsync -avz --delete \
               -e "ssh $SSH_OPTS" \
-              sites/old/client/build/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/mycomputer.education/html/client/ \
+              sites/old/client/build/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/old.mycomputer.education/html/client/ \
               && break
             echo "Attempt $attempt failed, retrying in 20s..."
             sleep 20
@@ -88,7 +88,7 @@ jobs:
             rsync -avz \
               -e "ssh $SSH_OPTS" \
               sites/old/infra/vhconf.conf \
-              ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/conf/vhosts/mycomputer.education/vhconf.conf \
+              ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/conf/vhosts/old.mycomputer.education/vhconf.conf \
               && break
             echo "Attempt $attempt failed, retrying in 20s..."
             sleep 20
@@ -100,7 +100,7 @@ jobs:
           for attempt in 1 2 3; do
             ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH' && break
           set -e
-          VH=/usr/local/lsws/mycomputer.education/html
+          VH=/usr/local/lsws/old.mycomputer.education/html
           source $VH/bin/activate
           cd $VH/server
           pip install -r requirements.txt --quiet
