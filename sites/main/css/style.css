@@ -903,15 +903,28 @@ body.modal-open{overflow:hidden}
 /* ===================================================
    CERTIFICATE SECTION
    =================================================== */
-.certificate-section{background:var(--dark-bg);padding:80px 0;border-top:1px solid rgba(255,255,255,.06)}
-.cert-section__inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.certificate-section{
+  background:linear-gradient(135deg,#080514 0%,#110826 40%,#1c0d48 70%,#0e061e 100%);
+  padding:80px 0;border-top:1px solid rgba(255,255,255,.06);
+  position:relative;overflow:hidden}
+.certificate-section::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(108,71,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(108,71,255,.05) 1px,transparent 1px);
+  background-size:52px 52px}
+.certificate-section::after{
+  content:'';position:absolute;pointer-events:none;
+  width:560px;height:560px;border-radius:50%;
+  background:radial-gradient(circle,rgba(108,71,255,.18) 0%,transparent 70%);
+  top:50%;right:-80px;transform:translateY(-50%)}
+.cert-section__inner{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;position:relative;z-index:1}
 .cert-section__title{font-size:clamp(24px,3.5vw,36px);font-weight:800;color:#fff;margin-bottom:16px;line-height:1.2}
 .cert-section__desc{color:rgba(255,255,255,.6);font-size:16px;line-height:1.7;margin-bottom:24px}
 .cert-section__list{list-style:none;display:flex;flex-direction:column;gap:12px}
 .cert-section__list li{display:flex;align-items:flex-start;gap:10px;font-size:15px;color:rgba(255,255,255,.75)}
 .cert-section__list li::before{content:'✓';background:#6C47FF;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
 
-.cert-section__cards{display:flex;justify-content:flex-start}
+.cert-section__cards{display:flex;justify-content:center}
 .cert-preview{border-radius:16px;padding:28px 24px;display:flex;flex-direction:column;gap:10px;border:1px solid rgba(255,255,255,.12);position:relative;overflow:hidden;max-width:340px;width:100%}
 .cert-preview--silver{background:linear-gradient(135deg,#0f0f1f,#1e1e30);border-color:rgba(160,160,200,.25)}
 .cert-preview__header{display:flex;align-items:center;gap:10px}
