@@ -46,6 +46,8 @@
       padding:12px 28px;border-radius:var(--r-full);border:1px solid rgba(255,255,255,.25);
       cursor:pointer;transition:all .2s;backdrop-filter:blur(8px)}
     .course-hero__actions .btn--ghost-inv:hover{background:rgba(255,255,255,.2)}
+    .course-hero__back{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.75);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:16px;transition:color .2s,gap .2s}
+    .course-hero__back:hover{color:#fff;gap:8px}
 
     /* Curriculum */
     .course-curriculum{padding:72px 0}
@@ -383,6 +385,7 @@ function renderCourse(c) {
         </div>
         <div class="course-hero__inner">
           <div>
+            <a href="/#courses" class="course-hero__back">← Всі курси</a>
             <div class="course-hero__badge">${c.emoji} ${c.badge}</div>
             <h1 class="course-hero__title">${c.title}</h1>
             <p class="course-hero__subtitle">${c.subtitle}</p>
@@ -394,7 +397,6 @@ function renderCourse(c) {
             </div>
             <div class="course-hero__actions">
               <button class="btn--primary-inv open-modal-btn">Записатись на пробний урок</button>
-              <a href="/#courses" class="btn--ghost-inv">← Всі курси</a>
             </div>
           </div>
           <div class="course-hero__visual">${c.emoji}</div>
