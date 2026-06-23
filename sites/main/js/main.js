@@ -711,6 +711,9 @@ function animateCounter(el, target, duration = 1600) {
   };
   requestAnimationFrame(step);
 }
+document.querySelectorAll('.stats__number[data-founded]').forEach(el => {
+  el.dataset.target = new Date().getFullYear() - parseInt(el.dataset.founded);
+});
 const statsSection = document.querySelector('.stats');
 let statsAnimated = false;
 if (statsSection) {
