@@ -258,7 +258,7 @@ a{color:inherit;text-decoration:none}
 .course-card__body{padding:22px 28px 26px;flex:1;display:flex;flex-direction:column}
 .course-card__title{font-size:19px;font-weight:800;margin-bottom:10px;color:#fff}
 .course-card__desc{font-size:14px;color:rgba(255,255,255,.55);line-height:1.7;margin-bottom:16px}
-.course-card__features{list-style:none;display:flex;flex-direction:column;gap:7px;flex:1}
+.course-card__features{list-style:none;display:flex;flex-direction:column;gap:7px;flex:1;padding-bottom:20px}
 .course-card__features li{font-size:14px;font-weight:500;color:rgba(255,255,255,.8)}
 .course-card__footer{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:20px;margin-top:auto;border-top:1px solid rgba(255,255,255,.08)}
 .course-card__info{display:flex;flex-direction:column;gap:4px;font-size:13px;color:rgba(255,255,255,.45)}
