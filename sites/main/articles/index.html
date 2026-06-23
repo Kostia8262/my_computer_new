@@ -42,13 +42,14 @@
     .listing-body{background:#0D0C1A;padding:40px 0 88px;min-height:50vh}
     .listing-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
     .listing-count{font-size:13px;color:rgba(255,255,255,.35)}
-    .listing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+    .listing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+    .listing-grid .article-card{width:auto;flex-shrink:1;scroll-snap-align:none}
     .listing-empty{text-align:center;padding:80px 20px}
     .listing-empty__icon{font-size:52px;margin-bottom:20px}
     .listing-empty h3{font-size:20px;font-weight:800;color:rgba(255,255,255,.65);margin-bottom:8px}
     .listing-empty p{font-size:14px;color:rgba(255,255,255,.35)}
     @media(max-width:960px){.listing-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:768px){.listing-grid .article-card{width:auto;flex-shrink:1;scroll-snap-align:none}}
+    @media(max-width:768px){.listing-grid{gap:16px}}
     @media(max-width:640px){
       .listing-grid{grid-template-columns:1fr}
       .listing-hero{padding:calc(68px + 28px) 0 40px}
