@@ -359,7 +359,7 @@ const COURSES = {
     duration: '3 місяці',
     format: 'Група до 6 дітей',
     lessons: '24 заняття',
-    price: 'від 3 600 ₴/міс.',
+    price: 'від 1 800 ₴/міс.',
     age: '6–10 років',
     curriculum: [
       { num:'Модуль 1', title:'Знайомство зі Scratch', desc:'Інтерфейс редактора, спрайти, сцени. Перші команди руху та зовнішнього вигляду.' },
@@ -386,7 +386,7 @@ const COURSES = {
     duration: '4 місяці',
     format: 'Група до 5 дітей',
     lessons: '32 заняття',
-    price: 'від 3 600 ₴/міс.',
+    price: 'від 1 800 ₴/міс.',
     age: '10–14 років',
     curriculum: [
       { num:'Модуль 1', title:'Основи Python', desc:'Змінні, типи даних, введення з клавіатури. Перші програми: калькулятор, вікторина, конвертер.' },
@@ -413,7 +413,7 @@ const COURSES = {
     duration: '3 місяці',
     format: 'Група до 6 дітей',
     lessons: '24 заняття',
-    price: 'від 3 600 ₴/міс.',
+    price: 'від 1 800 ₴/міс.',
     age: '9–14 років',
     curriculum: [
       { num:'Модуль 1', title:'Roblox Studio', desc:'Інтерфейс редактора, базові деталі (Parts), BasePlate, властивості та матеріали.' },
@@ -440,7 +440,7 @@ const COURSES = {
     duration: '5 місяців',
     format: 'Група до 5 дітей',
     lessons: '40 занять',
-    price: 'від 3 600 ₴/міс.',
+    price: 'від 1 800 ₴/міс.',
     age: '12–16 років',
     curriculum: [
       { num:'Модуль 1', title:'HTML5', desc:'Структура сторінки, теги, семантика. Перша веб-сторінка — від заголовку до підвалу.' },
@@ -542,6 +542,63 @@ function renderCourse(c) {
             <div class="course-info-box__cta">
               <button class="btn btn--primary btn--lg" style="width:100%;justify-content:center" onclick="document.getElementById('modalCourseSelect').value='${c.id}';document.getElementById('signupModal').classList.add('open');document.body.style.overflow='hidden'">Записатись зараз →</button>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section class="pricing" id="pricing">
+      <div class="container">
+        <div class="pricing__header">
+          <h2 class="pricing__title">Варіанти навчання</h2>
+          <div class="pricing__meta">
+            <span class="pricing__meta-left">Курси стартують <strong>кожного місяця</strong></span>
+            <span class="pricing__meta-right">Ми підберемо Вам групу або індивідуального педагога під Ваш рівень та напрямок</span>
+          </div>
+        </div>
+        <div class="pricing__grid">
+          <div class="pricing-card">
+            <div class="pricing-card__badge">ДЛЯ СТАРТУ</div>
+            <h3 class="pricing-card__title">Одинарні дитячі групи</h3>
+            <ul class="pricing-card__features">
+              <li>9–18 місяців, один раз на тиждень, 90 хв</li>
+              <li>Доступ до матеріалів назавжди</li>
+              <li>Мала група до 5 дітей</li>
+            </ul>
+            <div class="pricing-card__price">
+              <div class="pricing-card__price-label">від</div>
+              <div class="pricing-card__price-val">1 800 <span>грн/міс</span></div>
+            </div>
+            <button class="pricing-card__btn open-modal-btn">Записатись на пробне</button>
+          </div>
+          <div class="pricing-card pricing-card--featured">
+            <div class="pricing-card__badge">ОПТИМАЛЬНИЙ</div>
+            <h3 class="pricing-card__title">Подвійні групи та інд. навчання</h3>
+            <ul class="pricing-card__features">
+              <li>9–18 місяців, два рази на тиждень, по 90 хвилин</li>
+              <li>Мала група до 5 дітей</li>
+              <li>Доступ до матеріалів назавжди</li>
+            </ul>
+            <div class="pricing-card__price">
+              <div class="pricing-card__price-label">від</div>
+              <div class="pricing-card__price-val">3 600 <span>грн/міс</span></div>
+            </div>
+            <button class="pricing-card__btn open-modal-btn">Записатись на пробне</button>
+          </div>
+          <div class="pricing-card">
+            <div class="pricing-card__badge">ДЛЯ ДОРОСЛИХ</div>
+            <h3 class="pricing-card__title">Індивідуальний дорослий курс</h3>
+            <ul class="pricing-card__features">
+              <li>Індивідуально 2–3 рази на тиждень</li>
+              <li>Доступ до матеріалів курсу назавжди</li>
+              <li>Від півтора до восьми місяців</li>
+            </ul>
+            <div class="pricing-card__price">
+              <div class="pricing-card__price-label">від</div>
+              <div class="pricing-card__price-val">9 450 <span>грн/курс</span> <del class="pricing-card__price-old">12 000</del></div>
+            </div>
+            <button class="pricing-card__btn open-modal-btn">Записатись на пробне</button>
           </div>
         </div>
       </div>
