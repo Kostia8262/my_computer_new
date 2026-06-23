@@ -69,14 +69,31 @@
     .course-for__card p{font-size:13px;color:var(--color-text-2);line-height:1.55}
 
     /* Info block — dark theme */
-    .course-info{padding:64px 0;background:#0c0b18}
-    .course-info__inner{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
-    .course-info-box{background:rgba(255,255,255,.06);border-radius:var(--r-xl);padding:32px;border:1px solid rgba(255,255,255,.1)}
-    .course-info-box h3{font-size:18px;font-weight:800;margin-bottom:20px;color:#fff}
-    .course-info-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
-    .course-info-row:last-child{border-bottom:none}
-    .course-info-row span:first-child{color:rgba(255,255,255,.55);font-weight:500}
+    .course-info{padding:72px 0;background:#07050f;position:relative;overflow:hidden}
+    .course-info::before{content:'';position:absolute;inset:0;pointer-events:none;
+      background-image:linear-gradient(rgba(108,71,255,.05) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(108,71,255,.05) 1px,transparent 1px);
+      background-size:52px 52px}
+    .course-info::after{content:'';position:absolute;width:480px;height:480px;border-radius:50%;
+      background:radial-gradient(circle,rgba(108,71,255,.12) 0%,transparent 70%);
+      top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+    .course-info__inner{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:stretch;position:relative;z-index:1}
+    .course-info-box{
+      background:linear-gradient(145deg,rgba(255,255,255,.07) 0%,rgba(255,255,255,.03) 100%);
+      border-radius:var(--r-xl);padding:32px;
+      border:1px solid rgba(255,255,255,.1);
+      box-shadow:0 24px 64px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
+      display:flex;flex-direction:column;position:relative;overflow:hidden}
+    .course-info-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+      background:linear-gradient(90deg,#6C47FF,#9B76FF);border-radius:3px 3px 0 0}
+    .course-info-box h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;
+      color:rgba(255,255,255,.4);margin-bottom:22px;padding-top:6px}
+    .course-info-row{display:flex;justify-content:space-between;align-items:center;
+      padding:12px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:14px}
+    .course-info-row:last-of-type{border-bottom:none}
+    .course-info-row span:first-child{color:rgba(255,255,255,.45);font-weight:500}
     .course-info-row span:last-child{font-weight:700;color:#fff}
+    .course-info-box__cta{margin-top:auto;padding-top:24px}
 
     /* CTA */
     .course-cta{padding:72px 0;background:linear-gradient(135deg,#6C47FF 0%,#9B76FF 100%);text-align:center;color:#fff}
@@ -433,7 +450,7 @@ function renderCourse(c) {
             <div class="course-info-row"><span>Пробний урок</span><span>Безкоштовно</span></div>
             <div class="course-info-row"><span>Оплата</span><span>WayForPay · Картка · ФОП</span></div>
             <div class="course-info-row"><span>Місто</span><span>Дніпро / Онлайн</span></div>
-            <div style="margin-top:24px">
+            <div class="course-info-box__cta">
               <button class="btn btn--primary btn--lg" style="width:100%;justify-content:center" onclick="document.getElementById('modalCourseSelect').value='${c.id}';document.getElementById('signupModal').classList.add('open');document.body.style.overflow='hidden'">Записатись зараз →</button>
             </div>
           </div>
