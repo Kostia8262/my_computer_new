@@ -625,6 +625,45 @@ async function loadArticles() {
         dotsEl.querySelectorAll('.articles-dot').forEach((d, i) => d.classList.toggle('active', i === idx));
       }, { passive: true });
     }
+
+    // Desktop pagination
+    const prevBtn = document.getElementById('articlesPrev');
+    const nextBtn = document.getElementById('articlesNext');
+    const pgDotsEl = document.getElementById('articlesPgDots');
+    const CARDS_PER_PAGE = 3;
+    const totalPages = Math.ceil(active.length / CARDS_PER_PAGE);
+    let currentPage = 0;
+
+    if (prevBtn && nextBtn && totalPages > 1) {
+      if (pgDotsEl) {
+        pgDotsEl.innerHTML = Array.from({length: totalPages}, (_, i) =>
+          `<button class="articles__pg-dot${i===0?' active':''}" data-page="${i}" aria-label="Сторінка ${i+1}"></button>`
+        ).join('');
+        pgDotsEl.querySelectorAll('.articles__pg-dot').forEach(d => {
+          d.addEventListener('click', () => goToPage(+d.dataset.page));
+        });
+      }
+
+      function getPageScrollLeft(page) {
+        const cards = slider.querySelectorAll('.article-card');
+        const target = cards[page * CARDS_PER_PAGE];
+        return target ? target.offsetLeft : 0;
+      }
+
+      function goToPage(page) {
+        currentPage = Math.max(0, Math.min(page, totalPages - 1));
+        slider.scrollTo({ left: getPageScrollLeft(currentPage), behavior: 'smooth' });
+        prevBtn.disabled = currentPage === 0;
+        nextBtn.disabled = currentPage >= totalPages - 1;
+        pgDotsEl?.querySelectorAll('.articles__pg-dot').forEach((d, i) => d.classList.toggle('active', i === currentPage));
+      }
+
+      prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
+      nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
+      goToPage(0);
+    } else if (prevBtn && nextBtn) {
+      document.getElementById('articlesPagination')?.style.setProperty('display', 'none');
+    }
   } catch(e) { /* silent fail */ }
 }
 
