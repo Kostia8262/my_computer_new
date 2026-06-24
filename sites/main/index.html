@@ -472,6 +472,8 @@
 
     </div>
 
+      <div class="courses__fade courses__fade--r" aria-hidden="true"></div>
+      <div class="courses__fade courses__fade--l" aria-hidden="true"></div>
     </div><!-- /.courses__slider-wrap -->
 
     <!-- Pagination -->
@@ -1443,9 +1445,10 @@
     });
 
     // Sync dots/arrows on scroll + left-edge fade
+    var sliderWrap = g.closest('.courses__slider-wrap');
     function onScroll() {
       activeDot();
-      g.classList.toggle('is-scrolled', g.scrollLeft > 10);
+      if (sliderWrap) sliderWrap.classList.toggle('is-scrolled', g.scrollLeft > 10);
     }
     g.addEventListener('scroll', onScroll, { passive: true });
 
