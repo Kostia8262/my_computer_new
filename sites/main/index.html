@@ -1179,20 +1179,15 @@
     </button>
     <div class="modal__header">
       <h3 class="modal__title" id="payModalTitle">Оплата навчання</h3>
-      <p class="modal__subtitle">Оберіть або введіть суму та натисніть «Перейти до оплати»</p>
-    </div>
-    <div class="pay-quick">
-      <button class="pay-quick__btn" data-amount="1800">1 800 ₴<span>1 місяць</span></button>
-      <button class="pay-quick__btn" data-amount="3600">3 600 ₴<span>2 місяці</span></button>
-      <button class="pay-quick__btn" data-amount="5400">5 400 ₴<span>3 місяці</span></button>
+      <p class="modal__subtitle">Введіть суму та натисніть «Перейти до оплати»</p>
     </div>
     <div class="form-group">
       <label class="form-label" for="payAmount">Сума (грн) *</label>
       <input type="number" class="form-input" id="payAmount" min="1" max="100000" placeholder="1800" />
     </div>
     <div class="form-group">
-      <label class="form-label" for="payDescription">Призначення <span style="font-weight:400;color:var(--color-text-muted)">(необов'язково)</span></label>
-      <input type="text" class="form-input" id="payDescription" placeholder="Scratch, серпень" maxlength="100" />
+      <label class="form-label" for="payDescription">Призначення *</label>
+      <input type="text" class="form-input" id="payDescription" placeholder="Оплата за консультації з програмування" maxlength="100" value="Оплата за консультації з програмування" />
     </div>
     <button class="btn btn--primary btn--full btn--lg" id="paySubmitBtn">
       <span id="payBtnText">Перейти до оплати →</span>
@@ -1236,14 +1231,6 @@
     document.getElementById('payModalClose').addEventListener('click', closePayModal);
     document.getElementById('payModalBackdrop').addEventListener('click', closePayModal);
 
-    document.querySelectorAll('.pay-quick__btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.pay-quick__btn').forEach(function(b) { b.classList.remove('is-active'); });
-        btn.classList.add('is-active');
-        document.getElementById('payAmount').value = btn.dataset.amount;
-      });
-    });
-
     document.getElementById('paySubmitBtn').addEventListener('click', async function() {
       var amount = parseFloat(document.getElementById('payAmount').value);
       var desc   = document.getElementById('payDescription').value.trim();
@@ -1254,6 +1241,11 @@
       errEl.style.display = 'none';
       if (!amount || amount < 1) {
         errEl.textContent = 'Введіть суму оплати';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (!desc) {
+        errEl.textContent = 'Введіть призначення платежу';
         errEl.style.display = 'block';
         return;
       }
