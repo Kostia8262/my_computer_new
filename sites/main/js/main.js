@@ -60,6 +60,18 @@ burger.addEventListener('click', () => {
   }
 });
 
+// Dropdown toggle (mobile)
+document.querySelectorAll('.nav__item--has-dropdown').forEach(function(item){
+  var toggle = item.querySelector('.nav__link--dropdown-toggle');
+  if(!toggle) return;
+  toggle.addEventListener('click', function(e){
+    if(window.innerWidth <= 768){
+      e.preventDefault();
+      item.classList.toggle('is-open');
+    }
+  });
+});
+
 document.querySelectorAll('.nav__link').forEach(link => {
   link.addEventListener('click', (e) => {
     // Toggle courses dropdown on mobile / click; anchor links close menu

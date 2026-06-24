@@ -76,6 +76,18 @@ burger.addEventListener('click', () => {
   burger.setAttribute('aria-expanded', String(isOpen));
 });
 
+// Dropdown toggle (mobile)
+document.querySelectorAll('.nav__item--has-dropdown').forEach(function(item){
+  var toggle = item.querySelector('.nav__link--dropdown-toggle');
+  if(!toggle) return;
+  toggle.addEventListener('click', function(e){
+    if(window.innerWidth <= 768){
+      e.preventDefault();
+      item.classList.toggle('is-open');
+    }
+  });
+});
+
 document.querySelectorAll('.nav__link').forEach(link => {
   link.addEventListener('click', () => {
     navMenu.classList.remove('open');
