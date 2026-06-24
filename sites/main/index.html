@@ -1376,66 +1376,123 @@
 <script src="js/main.js" defer></script>
 <script>
 (function() {
-  var PER_PAGE = 4;
+  var CARD_STEP = 276; // 260px card + 16px gap
   var currentAge = 'all';
-  var currentPage = 1;
 
-  function getVisible() {
-    var all = Array.from(document.querySelectorAll('#coursesGrid .course-card'));
-    return currentAge === 'all' ? all : all.filter(function(c) { return c.dataset.age === currentAge; });
+  function grid() { return document.getElementById('coursesGrid'); }
+  function cards() { return Array.from(document.querySelectorAll('#coursesGrid .course-card')); }
+
+  function applyFilter() {
+    cards().forEach(function(c) {
+      var show = currentAge === 'all' || c.dataset.age === currentAge;
+      c.classList.toggle('course-card--hidden', !show);
+    });
+    var g = grid();
+    g.scrollLeft = 0;
+    updateDots();
+    updateArrows();
   }
 
-  function render() {
-    var visible = getVisible();
-    var totalPages = Math.max(1, Math.ceil(visible.length / PER_PAGE));
-    if (currentPage > totalPages) currentPage = totalPages;
-    var start = (currentPage - 1) * PER_PAGE;
-    var end   = start + PER_PAGE;
+  function updateArrows() {
+    var g = grid();
+    document.getElementById('coursesPrev').disabled = g.scrollLeft < 1;
+    document.getElementById('coursesNext').disabled = g.scrollLeft >= g.scrollWidth - g.clientWidth - 1;
+  }
 
-    var all = document.querySelectorAll('#coursesGrid .course-card');
-    all.forEach(function(c) { c.classList.add('course-card--hidden'); });
-    visible.slice(start, end).forEach(function(c) { c.classList.remove('course-card--hidden'); });
-
-    // Pagination controls
-    var pagination = document.getElementById('coursesPagination');
-    pagination.style.display = totalPages <= 1 ? 'none' : 'flex';
-    document.getElementById('coursesPrev').disabled = currentPage === 1;
-    document.getElementById('coursesNext').disabled = currentPage === totalPages;
-
+  function updateDots() {
+    var g = grid();
+    var visible = cards().filter(function(c) { return !c.classList.contains('course-card--hidden'); });
+    var perView = Math.max(1, Math.round(g.clientWidth / CARD_STEP));
+    var totalDots = Math.max(1, Math.ceil(visible.length / perView));
     var nums = document.getElementById('coursesPageNums');
     nums.innerHTML = '';
-    for (var i = 1; i <= totalPages; i++) {
+    for (var i = 0; i < totalDots; i++) {
       var btn = document.createElement('button');
-      btn.className = 'courses__page-num' + (i === currentPage ? ' courses__page-num--active' : '');
-      btn.textContent = i;
-      btn.dataset.p = i;
+      btn.className = 'courses__page-num' + (i === 0 ? ' courses__page-num--active' : '');
+      btn.dataset.dot = i;
+      btn.setAttribute('aria-label', 'Слайд ' + (i + 1));
       nums.appendChild(btn);
     }
+    document.getElementById('coursesPagination').style.display = totalDots <= 1 ? 'none' : 'flex';
+  }
+
+  function activeDot() {
+    var g = grid();
+    var visible = cards().filter(function(c) { return !c.classList.contains('course-card--hidden'); });
+    var perView = Math.max(1, Math.round(g.clientWidth / CARD_STEP));
+    var idx = Math.round(g.scrollLeft / (CARD_STEP * perView));
+    document.querySelectorAll('#coursesPageNums .courses__page-num').forEach(function(d, i) {
+      d.classList.toggle('courses__page-num--active', i === idx);
+    });
+    updateArrows();
   }
 
   document.addEventListener('DOMContentLoaded', function() {
-    render();
+    var g = grid();
+    applyFilter();
 
     // Tabs
     document.querySelectorAll('.courses__tab').forEach(function(tab) {
       tab.addEventListener('click', function() {
         document.querySelectorAll('.courses__tab').forEach(function(t) {
-          t.classList.remove('courses__tab--active'); t.setAttribute('aria-selected','false');
+          t.classList.remove('courses__tab--active');
+          t.setAttribute('aria-selected', 'false');
         });
-        this.classList.add('courses__tab--active'); this.setAttribute('aria-selected','true');
+        this.classList.add('courses__tab--active');
+        this.setAttribute('aria-selected', 'true');
         currentAge = this.dataset.tab;
-        currentPage = 1;
-        render();
+        applyFilter();
       });
     });
 
-    // Pagination
-    document.getElementById('coursesPrev').addEventListener('click', function() { currentPage--; render(); });
-    document.getElementById('coursesNext').addEventListener('click', function() { currentPage++; render(); });
+    // Arrow buttons
+    document.getElementById('coursesPrev').addEventListener('click', function() {
+      var perView = Math.max(1, Math.round(g.clientWidth / CARD_STEP));
+      g.scrollBy({ left: -CARD_STEP * perView, behavior: 'smooth' });
+    });
+    document.getElementById('coursesNext').addEventListener('click', function() {
+      var perView = Math.max(1, Math.round(g.clientWidth / CARD_STEP));
+      g.scrollBy({ left: CARD_STEP * perView, behavior: 'smooth' });
+    });
+
+    // Dot navigation
     document.getElementById('coursesPageNums').addEventListener('click', function(e) {
       var btn = e.target.closest('.courses__page-num');
-      if (btn) { currentPage = parseInt(btn.dataset.p); render(); }
+      if (!btn) return;
+      var perView = Math.max(1, Math.round(g.clientWidth / CARD_STEP));
+      var dot = parseInt(btn.dataset.dot);
+      g.scrollTo({ left: dot * CARD_STEP * perView, behavior: 'smooth' });
     });
+
+    // Sync dots/arrows on scroll
+    g.addEventListener('scroll', activeDot, { passive: true });
+
+    // Mouse drag-to-scroll
+    var isDragging = false;
+    var dragStartX = 0;
+    var dragScrollLeft = 0;
+
+    g.addEventListener('mousedown', function(e) {
+      if (e.button !== 0) return;
+      isDragging = true;
+      dragStartX = e.pageX - g.offsetLeft;
+      dragScrollLeft = g.scrollLeft;
+      g.classList.add('is-grabbing');
+    });
+    window.addEventListener('mouseup', function() {
+      isDragging = false;
+      g.classList.remove('is-grabbing');
+    });
+    g.addEventListener('mousemove', function(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      var x = e.pageX - g.offsetLeft;
+      g.scrollLeft = dragScrollLeft - (x - dragStartX) * 1.2;
+    });
+    // Prevent click on cards after drag
+    g.addEventListener('click', function(e) {
+      if (Math.abs(g.scrollLeft - dragScrollLeft) > 5) e.stopPropagation();
+    }, true);
   });
 })();
 </script>
