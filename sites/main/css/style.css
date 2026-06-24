@@ -649,9 +649,8 @@ a{color:inherit;text-decoration:none}
   .benefit-card__number{font-size:40px}
   .benefit-card--featured .benefit-card__number{font-size:52px}
 
-  /* Courses */
-  .courses__grid{grid-template-columns:1fr}
-  .course-card{flex:0 0 220px}
+  /* Courses — tablet: 2–3 cards */
+  .course-card{flex:0 0 230px}
   .course-card__desc{display:none}
 
   /* Steps */
@@ -717,6 +716,8 @@ a{color:inherit;text-decoration:none}
   .footer__links{grid-template-columns:1fr}
   .partners__logos{gap:20px}
   .benefits__grid{grid-template-columns:1fr}
+  /* Courses phone — peek slider 1.5 cards: card = (vw-32px)/1.5 - 16px ≈ 57vw */
+  .course-card{flex:0 0 57vw}
 }
 
 /* ===================================================
