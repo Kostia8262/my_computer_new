@@ -454,10 +454,7 @@ async function loadCourses() {
             <div class="course-card__info">
               <span>${esc(c.description ? c.description.slice(0,60)+'…' : '')}</span>
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" style="text-align:center;justify-content:center">${currentLang === 'ru' ? 'Бесплатный пробный' : 'Безкоштовне пробне'}</a>
-              <a href="${courseUrl}" class="btn--ghost-sm" style="text-align:center">${currentLang === 'ru' ? 'Подробнее' : 'Детальніше'}</a>
-            </div>
+            <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" style="display:block;text-align:center">${currentLang === 'ru' ? 'Бесплатный пробный' : 'Безкоштовне пробне'}</a>
           </div>
         </div>
       </div>`;
