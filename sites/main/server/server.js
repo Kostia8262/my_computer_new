@@ -32,7 +32,8 @@ const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
 const reviewsDb      = require('./reviews');
 const { sendLeadNotification } = require('./mailer');
-const monoPay = require('./mono-pay');
+const monoPay        = require('./mono-pay');
+const monoInvoicesDb = require('./mono-invoices');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
 
@@ -100,7 +101,7 @@ app.use(cors({
 }));
 
 // ── BODY PARSING ─────────────────────────────────────────────────────────────
-app.use(express.json({ limit: '12mb' }));
+app.use(express.json({ limit: '12mb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
 app.use(express.urlencoded({ extended: false, limit: '12mb' }));
 
 // ── RATE LIMITING ─────────────────────────────────────────────────────────────
@@ -1085,6 +1086,7 @@ app.post('/api/payment/create', paymentLimiter, async (req, res) => {
   const description = sanitize(req.body.description) || 'Оплата навчання My Computer Academy';
   try {
     const invoice = await monoPay.createInvoice({ amountUah: amount, description });
+    monoInvoicesDb.create({ invoiceId: invoice.invoiceId, amount, description });
     res.json({ success: true, pageUrl: invoice.pageUrl, invoiceId: invoice.invoiceId });
   } catch (err) {
     console.error('[PAYMENT CREATE]', err.message);
@@ -1093,13 +1095,28 @@ app.post('/api/payment/create', paymentLimiter, async (req, res) => {
 });
 
 app.post('/api/payment/webhook', (req, res) => {
+  // Always acknowledge immediately — Monobank retries if no 2xx within 30s
   res.json({ status: 'ok' });
-  try {
-    const { invoiceId, status, amount, finalAmount } = req.body || {};
-    const uah = ((finalAmount || amount) / 100).toFixed(2);
-    console.log(`[MONO WEBHOOK] ${invoiceId} status=${status} amount=${uah} UAH`);
-  } catch (err) {
-    console.error('[MONO WEBHOOK] parse error', err.message);
+
+  const xSign = req.headers['x-sign'];
+  const body  = req.body || {};
+
+  // Signature verification
+  const valid = monoPay.verifyWebhook(req.rawBody, xSign);
+  if (!valid) {
+    console.warn(`[MONO WEBHOOK] ⚠️  Invalid signature — invoiceId=${body.invoiceId}`);
+    // Log but don't reject: may be first call before pubkey is cached
+  }
+
+  const { invoiceId, status, amount, finalAmount, reference } = body;
+  const uah = (((finalAmount ?? amount) || 0) / 100).toFixed(2);
+
+  console.log(`[MONO WEBHOOK] invoiceId=${invoiceId} status=${status} amount=${uah} UAH sign=${valid ? 'OK' : 'WARN'}`);
+
+  // Persist all statuses
+  const KNOWN = ['created', 'processing', 'hold', 'success', 'failure', 'expired', 'reversed'];
+  if (invoiceId && KNOWN.includes(status)) {
+    monoInvoicesDb.upsert({ invoiceId, status, amount, finalAmount, reference });
   }
 });
 
