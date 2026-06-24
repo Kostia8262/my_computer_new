@@ -213,8 +213,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <form class="modal-form" id="artModalForm" novalidate>
       <div class="form-row">
         <div class="form-group">
-          <label class="form-label">Ім'я дитини *</label>
-          <input type="text" class="form-input" name="child_name" placeholder="Артем" autocomplete="off"/>
+          <label class="form-label">Ваше ім'я *</label>
+          <input type="text" class="form-input" name="child_name" placeholder="Іван" autocomplete="off"/>
           <span class="field-error" aria-live="polite"></span>
         </div>
         <div class="form-group">
@@ -456,7 +456,7 @@ function validateForm(form) {
   let ok = true;
   const name = form.querySelector('[name="child_name"]');
   const phone = form.querySelector('[name="phone"]');
-  if (name && !name.value.trim()) { setFieldError(name, 'Введіть ім\'я дитини'); ok = false; }
+  if (name && !name.value.trim()) { setFieldError(name, 'Введіть ваше ім\'я'); ok = false; }
   if (phone && phone.value.replace(/\D/g,'').length < 7) { setFieldError(phone, 'Введіть номер телефону'); ok = false; }
   return ok;
 }

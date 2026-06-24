@@ -208,8 +208,8 @@
         <form class="contact-form" id="articleContactForm" novalidate>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Ім'я дитини *</label>
-              <input type="text" class="form-input" name="child_name" placeholder="Наприклад: Артем" autocomplete="off"/>
+              <label class="form-label">Ваше ім'я *</label>
+              <input type="text" class="form-input" name="child_name" placeholder="Наприклад: Іван" autocomplete="off"/>
               <span class="field-error" aria-live="polite"></span>
             </div>
             <div class="form-group">
@@ -539,7 +539,7 @@ document.querySelectorAll('.faq-item__question').forEach(btn => {
     const nameEl  = form.querySelector('[name="child_name"]');
     const phoneEl = form.querySelector('[name="phone"]');
     let ok = true;
-    if (!nameEl?.value.trim()) { setErr(nameEl, 'Введіть ім\'я дитини'); ok = false; }
+    if (!nameEl?.value.trim()) { setErr(nameEl, 'Введіть ваше ім\'я'); ok = false; }
     if ((phoneEl?.value || '').replace(/\D/g,'').length < 7) { setErr(phoneEl, 'Введіть номер телефону'); ok = false; }
     if (!ok) return;
 
