@@ -31,7 +31,7 @@ const monthlyPayDb   = require('./monthly-payments');
 const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
 const reviewsDb      = require('./reviews');
-const { sendLeadNotification } = require('./mailer');
+const { sendLeadNotification, sendPaymentNotification } = require('./mailer');
 const monoPay        = require('./mono-pay');
 const monoInvoicesDb = require('./mono-invoices');
 const wfp            = require('./wayforpay');
@@ -1118,7 +1118,16 @@ app.post('/api/payment/webhook', (req, res) => {
   // Persist all statuses
   const KNOWN = ['created', 'processing', 'hold', 'success', 'failure', 'expired', 'reversed'];
   if (invoiceId && KNOWN.includes(status)) {
-    monoInvoicesDb.upsert({ invoiceId, status, amount, finalAmount, reference });
+    const rec = monoInvoicesDb.upsert({ invoiceId, status, amount, finalAmount, reference });
+    if (status === 'success') {
+      sendPaymentNotification({
+        provider: 'mono',
+        amount: finalAmount ?? amount,
+        description: rec && rec.description,
+        orderId: invoiceId,
+        status,
+      }).catch(() => {});
+    }
   }
 });
 
@@ -1152,10 +1161,20 @@ app.post('/api/payment/wfp-create', paymentLimiter, (req, res) => {
 app.post('/api/payment/wfp-webhook', (req, res) => {
   const body   = req.body || {};
   const valid  = wfp.verifyWebhook(body);
-  const { orderReference, transactionStatus, amount } = body;
+  const { orderReference, transactionStatus, amount, productName, reasonCode } = body;
   console.log(`[WFP WEBHOOK] order=${orderReference} status=${transactionStatus} amount=${amount} sign=${valid ? 'OK' : 'WARN'}`);
   // WayForPay requires a signed response
   res.json(wfp.buildWebhookResponse(orderReference, 'accept'));
+  if (transactionStatus === 'Approved') {
+    const desc = Array.isArray(productName) ? productName[0] : (productName || '');
+    sendPaymentNotification({
+      provider: 'wfp',
+      amount: parseFloat(amount),
+      description: desc,
+      orderId: orderReference,
+      status: transactionStatus,
+    }).catch(() => {});
+  }
 });
 
 // ── ARTICLE PAGES ─────────────────────────────────────────────────────────────

@@ -104,4 +104,50 @@ Email: ${lead.email || '—'}
   }
 }
 
-module.exports = { sendLeadNotification };
+async function sendPaymentNotification({ provider, amount, description, orderId, status }) {
+  const t = getTransporter();
+  if (!t) return;
+
+  const to   = process.env.NOTIFY_EMAIL || process.env.SMTP_USER;
+  const from = `"My Computer Academy" <${process.env.SMTP_USER}>`;
+  const time = new Date().toLocaleString('uk-UA', { timeZone: 'Europe/Kiev' });
+  const providerLabel = provider === 'mono' ? 'Monobank (plata)' : 'WayForPay';
+  const amountStr = amount ? `${(amount / (provider === 'mono' ? 100 : 1)).toFixed(2)} грн` : '—';
+
+  const html = `
+<!DOCTYPE html>
+<html lang="uk">
+<head><meta charset="UTF-8"/></head>
+<body style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px">
+  <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">
+    <div style="background:#00b14f;padding:20px 28px">
+      <h2 style="color:#fff;margin:0;font-size:18px">💳 Нова оплата — My Computer Academy</h2>
+    </div>
+    <div style="padding:24px 28px">
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td style="padding:8px 0;color:#888;width:140px">Сума</td><td style="padding:8px 0;font-weight:600;font-size:18px">${amountStr}</td></tr>
+        <tr><td style="padding:8px 0;color:#888">Призначення</td><td style="padding:8px 0">${description || '—'}</td></tr>
+        <tr><td style="padding:8px 0;color:#888">Платіжна система</td><td style="padding:8px 0">${providerLabel}</td></tr>
+        <tr><td style="padding:8px 0;color:#888">ID замовлення</td><td style="padding:8px 0;font-size:12px;color:#888">${orderId || '—'}</td></tr>
+        <tr><td style="padding:8px 0;color:#888">Час</td><td style="padding:8px 0">${time}</td></tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const text = `Нова оплата: ${amountStr}\nПризначення: ${description || '—'}\nСистема: ${providerLabel}\nID: ${orderId || '—'}\nЧас: ${time}`;
+
+  try {
+    await t.sendMail({
+      from, to,
+      subject: `💳 Оплата ${amountStr} — ${description || 'My Computer Academy'}`,
+      text, html,
+    });
+    console.log(`[MAIL] Payment notification sent to ${to} — ${amountStr} via ${providerLabel}`);
+  } catch (err) {
+    console.error(`[MAIL ERROR] Payment notification failed:`, err.message);
+  }
+}
+
+module.exports = { sendLeadNotification, sendPaymentNotification };
