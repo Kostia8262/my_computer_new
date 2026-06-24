@@ -24,7 +24,7 @@ jobs:
       - name: Deploy
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "cd /var/www/mycomputer-new && git pull origin master && cd sites/main && npm install --production --silent && pm2 restart mycomputer-new && echo Deploy complete"
+            "cd /var/www/mycomputer-new && git fetch origin master && git reset --hard origin/master && cd sites/main && npm install --production --silent && pm2 restart mycomputer-new && echo Deploy complete"
 
       - name: Health check
         run: |

@@ -8,6 +8,7 @@
 **/data/courses.json
 **/data/attendance.json
 **/data/content.json
+**/data/articles.json
 **/.env
 *.log
 .DS_Store
