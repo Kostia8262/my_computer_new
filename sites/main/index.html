@@ -1069,11 +1069,11 @@
         <span data-ru="Онлайн-оплата картой">Онлайн-оплата карткою</span>
       </button>
       <div class="footer__pay-logos">
-        <img src="/img/pay/visa.svg" alt="Visa" height="18" loading="lazy" />
-        <img src="/img/pay/mc.svg" alt="Mastercard" height="18" loading="lazy" />
-        <img src="/img/pay/apple-pay.svg" alt="Apple Pay" height="18" loading="lazy" />
-        <img src="/img/pay/google-pay.svg" alt="Google Pay" height="18" loading="lazy" />
-        <img src="/img/pay/plata-footer.svg" alt="plata by mono" height="18" loading="lazy" />
+        <span class="pay-logo-pill"><img src="/img/pay/visa.svg" alt="Visa" height="16" loading="lazy" /></span>
+        <span class="pay-logo-pill"><img src="/img/pay/mc.svg" alt="Mastercard" height="16" loading="lazy" /></span>
+        <span class="pay-logo-pill"><img src="/img/pay/apple-pay.svg" alt="Apple Pay" height="16" loading="lazy" /></span>
+        <span class="pay-logo-pill"><img src="/img/pay/google-pay.svg" alt="Google Pay" height="16" loading="lazy" /></span>
+        <span class="pay-logo-pill"><img src="/img/pay/plata-footer.svg" alt="plata by mono" height="16" loading="lazy" /></span>
       </div>
     </div>
     <!-- Legal links row -->
@@ -1221,13 +1221,13 @@
 <script>
 (function() {
   function openPayModal() {
-    document.getElementById('payModal').classList.add('is-open');
-    document.body.style.overflow = 'hidden';
+    document.getElementById('payModal').classList.add('open');
+    document.body.classList.add('modal-open');
     document.getElementById('payAmount').focus();
   }
   function closePayModal() {
-    document.getElementById('payModal').classList.remove('is-open');
-    document.body.style.overflow = '';
+    document.getElementById('payModal').classList.remove('open');
+    document.body.classList.remove('modal-open');
     document.getElementById('payError').style.display = 'none';
   }
 
