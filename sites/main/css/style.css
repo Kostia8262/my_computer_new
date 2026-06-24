@@ -654,8 +654,7 @@ a{color:inherit;text-decoration:none}
   .benefit-card__number{font-size:40px}
   .benefit-card--featured .benefit-card__number{font-size:52px}
 
-  /* Courses — tablet: natural height, 2–3 cards */
-  .courses__grid{align-items:flex-start}
+  /* Courses — tablet: 2–3 cards, equal height */
   .course-card{flex:0 0 230px}
 
   /* Steps */
