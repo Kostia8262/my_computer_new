@@ -247,9 +247,22 @@ a{color:inherit;text-decoration:none}
 
 .course-card__header{padding:28px 28px 22px}
 .course-card__header--scratch{background:linear-gradient(135deg,rgba(255,152,0,.2),rgba(255,111,0,.12))}
-.course-card__header--python {background:linear-gradient(135deg,rgba(33,150,243,.2),rgba(3,169,244,.12))}
-.course-card__header--roblox {background:linear-gradient(135deg,rgba(76,175,80,.2),rgba(0,200,83,.12))}
-.course-card__header--web    {background:linear-gradient(135deg,rgba(233,30,99,.2),rgba(156,39,176,.12))}
+.course-card__header--python    {background:linear-gradient(135deg,rgba(33,150,243,.2),rgba(3,169,244,.12))}
+.course-card__header--roblox    {background:linear-gradient(135deg,rgba(76,175,80,.2),rgba(0,200,83,.12))}
+.course-card__header--web       {background:linear-gradient(135deg,rgba(233,30,99,.2),rgba(156,39,176,.12))}
+.course-card__header--construct {background:linear-gradient(135deg,rgba(255,152,0,.2),rgba(255,193,7,.12))}
+.course-card__header--graphic   {background:linear-gradient(135deg,rgba(244,67,54,.2),rgba(233,30,99,.12))}
+.course-card__header--pc        {background:linear-gradient(135deg,rgba(0,188,212,.2),rgba(0,150,136,.12))}
+.course-card__header--blog      {background:linear-gradient(135deg,rgba(103,58,183,.2),rgba(63,81,181,.12))}
+/* ── COURSES PAGINATION ── */
+.courses__pagination{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:32px}
+.courses__page-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
+.courses__page-btn:hover:not(:disabled){background:rgba(255,255,255,.1);color:#fff}
+.courses__page-btn:disabled{opacity:.3;cursor:default}
+.courses__page-nums{display:flex;gap:6px}
+.courses__page-num{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.courses__page-num:hover{background:rgba(255,255,255,.1);color:#fff}
+.courses__page-num--active{background:#fff;color:#1a1a2e;border-color:#fff}
 
 .course-card__header-row{display:flex;align-items:flex-start;justify-content:space-between}
 .course-card__badges{display:flex;flex-direction:column;align-items:flex-end;gap:6px}

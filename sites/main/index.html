@@ -389,7 +389,123 @@
         </div>
       </div>
 
+      <div class="course-card" data-age="10-14">
+        <div class="course-card__header course-card__header--construct">
+          <div class="course-card__emoji">🕹️</div>
+          <div class="course-card__age-badge">10–14 років</div>
+        </div>
+        <div class="course-card__body">
+          <h3 class="course-card__title">Construct: розробка ігор без коду</h3>
+          <p class="course-card__desc">Створюй справжні ігри без програмування. Construct дозволяє зробити платформер, стрілялку або аркаду — і одразу опублікувати в інтернеті.</p>
+          <ul class="course-card__features">
+            <li>✓ Ігрова логіка через події та дії</li>
+            <li>✓ Фізика, анімація, звукові ефекти</li>
+            <li>✓ Публікація гри онлайн у фіналі</li>
+          </ul>
+          <div class="course-card__footer">
+            <div class="course-card__info">
+              <span>⏱ 3 місяці</span>
+              <span>👥 Група до 5 осіб</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <a href="#" class="btn--ghost-sm">Детальніше</a>
+              <a href="#" class="btn btn--primary btn--sm open-modal">Записатись</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-card" data-age="6-10">
+        <div class="course-card__header course-card__header--graphic">
+          <div class="course-card__emoji">🎨</div>
+          <div class="course-card__age-badge">6–12 років</div>
+        </div>
+        <div class="course-card__body">
+          <h3 class="course-card__title">Графіка та анімація</h3>
+          <p class="course-card__desc">Цифровий малюнок, анімація персонажів та основи дизайну. Курс для тих, хто хоче поєднати творчість і технології.</p>
+          <ul class="course-card__features">
+            <li>✓ Цифровий малюнок та кольорознавство</li>
+            <li>✓ Анімація кадр за кадром</li>
+            <li>✓ Власний анімований проєкт у фіналі</li>
+          </ul>
+          <div class="course-card__footer">
+            <div class="course-card__info">
+              <span>⏱ 3 місяці</span>
+              <span>👥 Група до 5 осіб</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <a href="#" class="btn--ghost-sm">Детальніше</a>
+              <a href="#" class="btn btn--primary btn--sm open-modal">Записатись</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-card" data-age="6-10">
+        <div class="course-card__header course-card__header--pc">
+          <div class="course-card__emoji">💻</div>
+          <div class="course-card__age-badge">6–10 років</div>
+        </div>
+        <div class="course-card__body">
+          <h3 class="course-card__title">Базовий курс роботи з ПК</h3>
+          <p class="course-card__desc">Перший крок у світ комп'ютерів. Діти освоюють клавіатуру, мишу, файлову систему, текстові редактори та безпечний інтернет.</p>
+          <ul class="course-card__features">
+            <li>✓ Швидкий набір тексту (сліпий метод)</li>
+            <li>✓ Word, Paint, базові програми</li>
+            <li>✓ Безпека в інтернеті</li>
+          </ul>
+          <div class="course-card__footer">
+            <div class="course-card__info">
+              <span>⏱ 2 місяці</span>
+              <span>👥 Група до 5 осіб</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <a href="#" class="btn--ghost-sm">Детальніше</a>
+              <a href="#" class="btn btn--primary btn--sm open-modal">Записатись</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="course-card" data-age="14-18">
+        <div class="course-card__header course-card__header--blog">
+          <div class="course-card__emoji">✍️</div>
+          <div class="course-card__age-badge">12–17 років</div>
+        </div>
+        <div class="course-card__body">
+          <h3 class="course-card__title">Створення блогу та сайту</h3>
+          <p class="course-card__desc">Від ідеї до власного онлайн-простору. Учні створюють блог або портфоліо з нуля — без фреймворків, лише HTML, CSS і натхнення.</p>
+          <ul class="course-card__features">
+            <li>✓ Структура та дизайн сторінки</li>
+            <li>✓ Контент, SEO-основи, домен</li>
+            <li>✓ Публікація власного сайту</li>
+          </ul>
+          <div class="course-card__footer">
+            <div class="course-card__info">
+              <span>⏱ 2 місяці</span>
+              <span>👥 Група до 5 осіб</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <a href="#" class="btn--ghost-sm">Детальніше</a>
+              <a href="#" class="btn btn--primary btn--sm open-modal">Записатись</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    <!-- Pagination -->
+    <div class="courses__pagination" id="coursesPagination">
+      <button class="courses__page-btn" id="coursesPrev" aria-label="Попередня сторінка">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="courses__page-nums" id="coursesPageNums"></div>
+      <button class="courses__page-btn" id="coursesNext" aria-label="Наступна сторінка">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4L10 8L6 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
   </div>
 </section>
 
@@ -1256,25 +1372,69 @@
 
 <script src="js/main.js" defer></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  var tabs = document.querySelectorAll('.courses__tab');
-  var cards = document.querySelectorAll('#coursesGrid .course-card');
-  tabs.forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      var age = this.dataset.tab;
-      tabs.forEach(function(t) { t.classList.remove('courses__tab--active'); t.setAttribute('aria-selected','false'); });
-      this.classList.add('courses__tab--active');
-      this.setAttribute('aria-selected','true');
-      cards.forEach(function(card) {
-        if (age === 'all' || card.dataset.age === age) {
-          card.classList.remove('course-card--hidden');
-        } else {
-          card.classList.add('course-card--hidden');
-        }
+(function() {
+  var PER_PAGE = 4;
+  var currentAge = 'all';
+  var currentPage = 1;
+
+  function getVisible() {
+    var all = Array.from(document.querySelectorAll('#coursesGrid .course-card'));
+    return currentAge === 'all' ? all : all.filter(function(c) { return c.dataset.age === currentAge; });
+  }
+
+  function render() {
+    var visible = getVisible();
+    var totalPages = Math.max(1, Math.ceil(visible.length / PER_PAGE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    var start = (currentPage - 1) * PER_PAGE;
+    var end   = start + PER_PAGE;
+
+    var all = document.querySelectorAll('#coursesGrid .course-card');
+    all.forEach(function(c) { c.classList.add('course-card--hidden'); });
+    visible.slice(start, end).forEach(function(c) { c.classList.remove('course-card--hidden'); });
+
+    // Pagination controls
+    var pagination = document.getElementById('coursesPagination');
+    pagination.style.display = totalPages <= 1 ? 'none' : 'flex';
+    document.getElementById('coursesPrev').disabled = currentPage === 1;
+    document.getElementById('coursesNext').disabled = currentPage === totalPages;
+
+    var nums = document.getElementById('coursesPageNums');
+    nums.innerHTML = '';
+    for (var i = 1; i <= totalPages; i++) {
+      var btn = document.createElement('button');
+      btn.className = 'courses__page-num' + (i === currentPage ? ' courses__page-num--active' : '');
+      btn.textContent = i;
+      btn.dataset.p = i;
+      nums.appendChild(btn);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    render();
+
+    // Tabs
+    document.querySelectorAll('.courses__tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.courses__tab').forEach(function(t) {
+          t.classList.remove('courses__tab--active'); t.setAttribute('aria-selected','false');
+        });
+        this.classList.add('courses__tab--active'); this.setAttribute('aria-selected','true');
+        currentAge = this.dataset.tab;
+        currentPage = 1;
+        render();
       });
     });
+
+    // Pagination
+    document.getElementById('coursesPrev').addEventListener('click', function() { currentPage--; render(); });
+    document.getElementById('coursesNext').addEventListener('click', function() { currentPage++; render(); });
+    document.getElementById('coursesPageNums').addEventListener('click', function(e) {
+      var btn = e.target.closest('.courses__page-num');
+      if (btn) { currentPage = parseInt(btn.dataset.p); render(); }
+    });
   });
-});
+})();
 </script>
 <script>
 (function() {
