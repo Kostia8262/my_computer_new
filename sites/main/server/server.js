@@ -32,6 +32,7 @@ const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
 const reviewsDb      = require('./reviews');
 const { sendLeadNotification } = require('./mailer');
+const monoPay = require('./mono-pay');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
 
@@ -108,6 +109,14 @@ const leadsLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
   message: { error: 'Забагато запитів. Спробуйте через 15 хвилин.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const paymentLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 6,
+  message: { error: 'Забагато запитів. Зачекайте хвилину.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
@@ -1064,6 +1073,41 @@ app.delete('/api/reviews/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   const ok = reviewsDb.delete(id);
   if (!ok) return res.status(404).json({ error: 'Not found' });
   res.json({ success: true });
+});
+
+// ── MONOBANK PAYMENT ─────────────────────────────────────────────────────────
+
+app.post('/api/payment/create', paymentLimiter, async (req, res) => {
+  const amount = parseFloat(req.body.amount);
+  if (!amount || amount < 1 || amount > 100000) {
+    return res.status(400).json({ error: 'Невірна сума. Від 1 до 100 000 грн.' });
+  }
+  const description = sanitize(req.body.description) || 'Оплата навчання My Computer Academy';
+  try {
+    const invoice = await monoPay.createInvoice({ amountUah: amount, description });
+    res.json({ success: true, pageUrl: invoice.pageUrl, invoiceId: invoice.invoiceId });
+  } catch (err) {
+    console.error('[PAYMENT CREATE]', err.message);
+    res.status(502).json({ error: 'Не вдалося створити платіж. Спробуйте ще раз.' });
+  }
+});
+
+app.post('/api/payment/webhook', (req, res) => {
+  res.json({ status: 'ok' });
+  try {
+    const { invoiceId, status, amount, finalAmount } = req.body || {};
+    const uah = ((finalAmount || amount) / 100).toFixed(2);
+    console.log(`[MONO WEBHOOK] ${invoiceId} status=${status} amount=${uah} UAH`);
+  } catch (err) {
+    console.error('[MONO WEBHOOK] parse error', err.message);
+  }
+});
+
+app.get('/payment/success', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'payment-success.html'));
+});
+app.get('/payment/fail', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'payment-fail.html'));
 });
 
 // ── ARTICLE PAGES ─────────────────────────────────────────────────────────────

@@ -1062,15 +1062,18 @@
         </div>
       </div>
     </div>
-    <!-- Payment methods -->
-    <div class="footer__payments">
-      <span class="footer__payments-label" data-ru="Оплата:">Оплата:</span>
-      <div class="footer__payment-icons">
-        <span class="pay-badge">WayForPay</span>
-        <span class="pay-badge">Google Pay</span>
-        <span class="pay-badge">Apple Pay</span>
-        <span class="pay-badge">Visa</span>
-        <span class="pay-badge">Mastercard</span>
+    <!-- Online payment -->
+    <div class="footer__pay-section">
+      <button class="btn-plata" id="openPayModal">
+        <img src="/img/pay/plata.svg" alt="plata by mono" height="20" loading="lazy" />
+        <span data-ru="Онлайн-оплата картой">Онлайн-оплата карткою</span>
+      </button>
+      <div class="footer__pay-logos">
+        <img src="/img/pay/visa.svg" alt="Visa" height="18" loading="lazy" />
+        <img src="/img/pay/mc.svg" alt="Mastercard" height="18" loading="lazy" />
+        <img src="/img/pay/apple-pay.svg" alt="Apple Pay" height="18" loading="lazy" />
+        <img src="/img/pay/google-pay.svg" alt="Google Pay" height="18" loading="lazy" />
+        <img src="/img/pay/plata-footer.svg" alt="plata by mono" height="18" loading="lazy" />
       </div>
     </div>
     <!-- Legal links row -->
@@ -1167,6 +1170,40 @@
   </div>
 </div>
 
+<!-- ========== PAYMENT MODAL ========== -->
+<div class="modal" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payModalTitle">
+  <div class="modal__backdrop" id="payModalBackdrop"></div>
+  <div class="modal__dialog">
+    <button class="modal__close" id="payModalClose" aria-label="Закрити">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M14 4L4 14M4 4L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="modal__header">
+      <h3 class="modal__title" id="payModalTitle">Оплата навчання</h3>
+      <p class="modal__subtitle">Оберіть або введіть суму та натисніть «Перейти до оплати»</p>
+    </div>
+    <div class="pay-quick">
+      <button class="pay-quick__btn" data-amount="1800">1 800 ₴<span>1 місяць</span></button>
+      <button class="pay-quick__btn" data-amount="3600">3 600 ₴<span>2 місяці</span></button>
+      <button class="pay-quick__btn" data-amount="5400">5 400 ₴<span>3 місяці</span></button>
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="payAmount">Сума (грн) *</label>
+      <input type="number" class="form-input" id="payAmount" min="1" max="100000" placeholder="1800" />
+    </div>
+    <div class="form-group">
+      <label class="form-label" for="payDescription">Призначення <span style="font-weight:400;color:var(--color-text-muted)">(необов'язково)</span></label>
+      <input type="text" class="form-input" id="payDescription" placeholder="Scratch, серпень" maxlength="100" />
+    </div>
+    <button class="btn btn--primary btn--full btn--lg" id="paySubmitBtn">
+      <span id="payBtnText">Перейти до оплати →</span>
+    </button>
+    <div id="payError" class="pay-error" style="display:none"></div>
+    <div class="pay-modal-footer">
+      <img src="/img/pay/plata.svg" alt="plata by mono" height="16" loading="lazy" />
+    </div>
+  </div>
+</div>
+
 <!-- Result notification modal -->
 <div id="resultNotify" class="result-notify" aria-live="polite" style="display:none">
   <div class="result-notify__inner" id="resultNotifyInner">
@@ -1181,5 +1218,67 @@
 </div>
 
 <script src="js/main.js" defer></script>
+<script>
+(function() {
+  function openPayModal() {
+    document.getElementById('payModal').classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('payAmount').focus();
+  }
+  function closePayModal() {
+    document.getElementById('payModal').classList.remove('is-open');
+    document.body.style.overflow = '';
+    document.getElementById('payError').style.display = 'none';
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('openPayModal').addEventListener('click', openPayModal);
+    document.getElementById('payModalClose').addEventListener('click', closePayModal);
+    document.getElementById('payModalBackdrop').addEventListener('click', closePayModal);
+
+    document.querySelectorAll('.pay-quick__btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.pay-quick__btn').forEach(function(b) { b.classList.remove('is-active'); });
+        btn.classList.add('is-active');
+        document.getElementById('payAmount').value = btn.dataset.amount;
+      });
+    });
+
+    document.getElementById('paySubmitBtn').addEventListener('click', async function() {
+      var amount = parseFloat(document.getElementById('payAmount').value);
+      var desc   = document.getElementById('payDescription').value.trim();
+      var errEl  = document.getElementById('payError');
+      var btn    = document.getElementById('paySubmitBtn');
+      var btnTxt = document.getElementById('payBtnText');
+
+      errEl.style.display = 'none';
+      if (!amount || amount < 1) {
+        errEl.textContent = 'Введіть суму оплати';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true;
+      btnTxt.textContent = 'Зачекайте...';
+
+      try {
+        var resp = await fetch('/api/payment/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: amount, description: desc })
+        });
+        var data = await resp.json();
+        if (!resp.ok) throw new Error(data.error || 'Помилка оплати');
+        window.location.href = data.pageUrl;
+      } catch (e) {
+        errEl.textContent = e.message;
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btnTxt.textContent = 'Перейти до оплати →';
+      }
+    });
+  });
+})();
+</script>
 </body>
 </html>

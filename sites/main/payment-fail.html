@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Помилка оплати — My Computer Academy</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    body{display:flex;flex-direction:column;min-height:100vh;background:var(--color-bg)}
+    .pay-result{flex:1;display:flex;align-items:center;justify-content:center;padding:60px 20px;text-align:center}
+    .pay-result__box{max-width:440px}
+    .pay-result__icon{font-size:64px;line-height:1;margin-bottom:24px}
+    .pay-result__title{font-size:28px;font-weight:800;margin-bottom:12px;color:var(--color-text)}
+    .pay-result__text{color:var(--color-text-muted);font-size:16px;line-height:1.6;margin-bottom:32px}
+    .pay-result__actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  </style>
+</head>
+<body>
+  <div class="pay-result">
+    <div class="pay-result__box">
+      <div class="pay-result__icon">❌</div>
+      <h1 class="pay-result__title">Оплата не пройшла</h1>
+      <p class="pay-result__text">Щось пішло не так. Спробуйте ще раз або зверніться до нас напряму.</p>
+      <div class="pay-result__actions">
+        <a href="/" class="btn btn--primary btn--lg">Спробувати знову</a>
+        <a href="tel:+380954624672" class="btn btn--ghost btn--lg">Зателефонувати</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
