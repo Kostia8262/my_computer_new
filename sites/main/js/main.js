@@ -428,26 +428,35 @@ async function loadCourses() {
     if (!active.length) return;
     const el = document.getElementById('coursesGrid');
     if (!el) return;
-    const COLOR_CLASS = { scratch: 'course-card__header--scratch', python: 'course-card__header--python', roblox: 'course-card__header--roblox', web: 'course-card__header--web' };
+    const COLOR_CLASS = {
+      scratch: 'course-card__header--scratch', python:  'course-card__header--python',
+      roblox:  'course-card__header--roblox',  web:     'course-card__header--web',
+      construct:'course-card__header--construct',graphic:'course-card__header--graphic',
+      pc:      'course-card__header--pc',       blog:    'course-card__header--blog',
+    };
     el.innerHTML = active.map(c => {
       const hClass = COLOR_CLASS[c.id] || '';
       const hStyle = hClass ? '' : `style="background:${esc(c.color || '#6C47FF')}"`;
-      return `<div class="course-card" style="cursor:pointer" onclick="location.href='/courses/${esc(c.id)}'">
+      const ageGroup = esc(c.age_group || '');
+      const courseUrl = `/course.html?c=${esc(c.id)}`;
+      return `<div class="course-card" data-age="${ageGroup}">
         <div class="course-card__header ${hClass}" ${hStyle}>
-          <div class="course-card__emoji">${c.emoji || ''}</div>
+          <div class="course-card__emoji">${esc(c.emoji || '')}</div>
           <div class="course-card__age-badge">${esc(c.age)}</div>
         </div>
         <div class="course-card__body">
           <h3 class="course-card__title">${esc(c.name)}</h3>
-          <p class="course-card__desc">${esc(c.description)}</p>
+          <ul class="course-card__features">
+            <li>⏱ ${esc(c.duration)}</li>
+            <li>👥 Група до ${esc(String(c.groupSize))} осіб</li>
+          </ul>
           <div class="course-card__footer">
             <div class="course-card__info">
-              <span>⏱ ${esc(c.duration)}</span>
-              <span>👥 Група до ${c.groupSize} осіб</span>
+              <span>${esc(c.description ? c.description.slice(0,60)+'…' : '')}</span>
             </div>
-            <div style="display:flex;gap:8px;align-items:center">
-              <a href="/courses/${esc(c.id)}" class="btn--ghost-sm" onclick="event.stopPropagation()">${currentLang === 'ru' ? 'Подробнее' : 'Детальніше'}</a>
-              <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" onclick="event.stopPropagation()">${currentLang === 'ru' ? 'Записаться' : 'Записатись'}</a>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" style="text-align:center;justify-content:center">${currentLang === 'ru' ? 'Бесплатный пробный' : 'Безкоштовне пробне'}</a>
+              <a href="${courseUrl}" class="btn--ghost-sm" style="text-align:center">${currentLang === 'ru' ? 'Подробнее' : 'Детальніше'}</a>
             </div>
           </div>
         </div>
@@ -457,6 +466,8 @@ async function loadCourses() {
       e.preventDefault();
       openModal(btn.dataset.course || '');
     }));
+    // Re-run tab filter after courses load
+    if (window.__coursesFilter) window.__coursesFilter();
 
     // Update nav dropdown
     const navDrop = document.querySelector('#coursesNavItem .nav__dropdown');

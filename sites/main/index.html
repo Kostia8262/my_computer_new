@@ -1427,6 +1427,8 @@
     updateArrows();
   }
 
+  window.__coursesFilter = applyFilter;
+
   document.addEventListener('DOMContentLoaded', function() {
     var g = grid();
     applyFilter();
@@ -1464,8 +1466,13 @@
       g.scrollTo({ left: dot * CARD_STEP * perView, behavior: 'smooth' });
     });
 
-    // Sync dots/arrows on scroll
-    g.addEventListener('scroll', activeDot, { passive: true });
+    // Sync dots/arrows on scroll + left-edge fade
+    var wrap = g.closest('.courses__slider-wrap');
+    function onScroll() {
+      activeDot();
+      if (wrap) wrap.classList.toggle('is-scrolled', g.scrollLeft > 10);
+    }
+    g.addEventListener('scroll', onScroll, { passive: true });
 
     // Mouse drag-to-scroll
     var isDragging = false;

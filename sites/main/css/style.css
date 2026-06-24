@@ -242,6 +242,10 @@ a{color:inherit;text-decoration:none}
 
 /* ── SLIDER LAYOUT ── */
 .courses__slider-wrap{position:relative;z-index:1}
+/* fade edges: right always, left when scrolled (toggled via JS) */
+.courses__slider-wrap::after{content:'';position:absolute;top:0;right:0;bottom:4px;width:90px;background:linear-gradient(to right,transparent,#0D0C1A 90%);pointer-events:none;z-index:5;border-radius:0 var(--r-xl) var(--r-xl) 0}
+.courses__slider-wrap::before{content:'';position:absolute;top:0;left:0;bottom:4px;width:60px;background:linear-gradient(to left,transparent,#0D0C1A 90%);pointer-events:none;z-index:5;opacity:0;transition:opacity .3s}
+.courses__slider-wrap.is-scrolled::before{opacity:1}
 .courses__grid{display:flex;gap:16px;align-items:stretch;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none;padding-bottom:4px;scroll-behavior:smooth}
 .courses__grid::-webkit-scrollbar{display:none}
 .courses__grid.is-grabbing{cursor:grabbing;scroll-behavior:auto}
@@ -274,13 +278,13 @@ a{color:inherit;text-decoration:none}
 .course-card__emoji{font-size:32px;line-height:1}
 .popular-badge{background:var(--color-primary);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:var(--r-full);white-space:nowrap;box-shadow:0 2px 8px rgba(108,71,255,.5)}
 .course-card__age-badge{background:rgba(255,255,255,.14);backdrop-filter:blur(4px);font-size:11px;font-weight:700;padding:4px 10px;border-radius:var(--r-full);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.15);white-space:nowrap}
-.course-card__body{padding:16px 18px 20px;flex:1;display:flex;flex-direction:column}
-.course-card__title{font-size:15px;font-weight:800;margin-bottom:10px;color:#fff;line-height:1.35}
+.course-card__body{padding:14px 16px 16px;flex:1;display:flex;flex-direction:column;gap:0}
+.course-card__title{font-size:14px;font-weight:800;margin:0 0 8px;color:#fff;line-height:1.35}
 .course-card__desc{display:none}
-.course-card__features{list-style:none;display:flex;flex-direction:column;gap:6px;flex:1;padding-bottom:14px}
-.course-card__features li{font-size:13px;font-weight:500;color:rgba(255,255,255,.75)}
-.course-card__footer{display:flex;flex-direction:column;gap:8px;padding-top:14px;margin-top:auto;border-top:1px solid rgba(255,255,255,.08)}
-.course-card__info{display:flex;gap:10px;font-size:12px;color:rgba(255,255,255,.4);flex-wrap:wrap}
+.course-card__features{list-style:none;display:flex;flex-direction:column;gap:6px;margin:0 0 auto}
+.course-card__features li{font-size:12px;font-weight:500;color:rgba(255,255,255,.7);line-height:1.4}
+.course-card__footer{display:flex;flex-direction:column;gap:6px;padding-top:12px;margin-top:12px;border-top:1px solid rgba(255,255,255,.08)}
+.course-card__info{display:flex;gap:8px;font-size:11px;color:rgba(255,255,255,.38);flex-wrap:wrap;margin-bottom:4px}
 .course-card__info span{white-space:nowrap}
 
 /* ===================================================
@@ -649,9 +653,9 @@ a{color:inherit;text-decoration:none}
   .benefit-card__number{font-size:40px}
   .benefit-card--featured .benefit-card__number{font-size:52px}
 
-  /* Courses — tablet: 2–3 cards */
+  /* Courses — tablet: natural height, 2–3 cards */
+  .courses__grid{align-items:flex-start}
   .course-card{flex:0 0 230px}
-  .course-card__desc{display:none}
 
   /* Steps */
   .steps{flex-direction:column;align-items:flex-start;gap:10px}

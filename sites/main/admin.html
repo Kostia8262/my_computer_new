@@ -558,7 +558,15 @@ tr:hover td{background:#faf9ff}
           <div class="modal-group"><label class="modal-label">ID курсу *</label><input class="modal-input" id="crs_id" placeholder="scratch"/></div>
           <div class="modal-group"><label class="modal-label">Emoji</label><input class="modal-input" id="crs_emoji" placeholder="🧩" style="font-size:20px"/></div>
           <div class="modal-group full"><label class="modal-label">Назва курсу *</label><input class="modal-input" id="crs_name" placeholder="Scratch: візуальне програмування"/></div>
-          <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="crs_age" placeholder="6–10 років"/></div>
+          <div class="modal-group"><label class="modal-label">Вік (текст)</label><input class="modal-input" id="crs_age" placeholder="6–10 років"/></div>
+          <div class="modal-group"><label class="modal-label">Вікова група (фільтр)</label>
+            <select class="modal-input" id="crs_age_group">
+              <option value="">— не вказано —</option>
+              <option value="6-10">6–10 років</option>
+              <option value="10-14">10–14 років</option>
+              <option value="14-18">14–18 років</option>
+            </select>
+          </div>
           <div class="modal-group"><label class="modal-label">Тривалість</label><input class="modal-input" id="crs_duration" placeholder="3 місяці"/></div>
           <div class="modal-group"><label class="modal-label">К-сть занять</label><input class="modal-input" type="number" id="crs_lessonsCount" placeholder="24"/></div>
           <div class="modal-group"><label class="modal-label">Розмір групи</label><input class="modal-input" type="number" id="crs_groupSize" placeholder="6"/></div>
@@ -3126,14 +3134,16 @@ function openCourseModal(id) {
   fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el) el.value = ''; });
   document.getElementById('crs_color').value = '#6C47FF';
   document.getElementById('crs_active').value = 'true';
+  document.getElementById('crs_age_group').value = '';
   document.getElementById('courseModalTitle').textContent = id ? 'Редагувати курс' : 'Новий курс';
   document.getElementById('crs_id').disabled = !!id;
   if (id) {
     const c = _allCourses?.find(x => x.id === id);
     if (c) {
       fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el && c[f] != null) el.value = c[f]; });
-      document.getElementById('crs_color').value  = c.color  || '#6C47FF';
-      document.getElementById('crs_active').value = String(c.active !== false);
+      document.getElementById('crs_color').value     = c.color     || '#6C47FF';
+      document.getElementById('crs_active').value    = String(c.active !== false);
+      document.getElementById('crs_age_group').value = c.age_group || '';
     }
   }
   document.getElementById('courseModal').style.display = 'flex';
@@ -3151,6 +3161,7 @@ async function saveCourse() {
     name,
     emoji:        document.getElementById('crs_emoji')?.value.trim()        || '📚',
     age:          document.getElementById('crs_age')?.value.trim()          || '',
+    age_group:    document.getElementById('crs_age_group')?.value           || '',
     duration:     document.getElementById('crs_duration')?.value.trim()     || '',
     lessonsCount: document.getElementById('crs_lessonsCount')?.value        || 0,
     groupSize:    document.getElementById('crs_groupSize')?.value           || 0,

@@ -38,6 +38,7 @@ module.exports = {
       name:         data.name        || '',
       emoji:        data.emoji       || '📚',
       age:          data.age         || '',
+      age_group:    data.age_group   || '',
       duration:     data.duration    || '',
       lessonsCount: parseInt(data.lessonsCount) || 0,
       groupSize:    parseInt(data.groupSize)    || 0,
@@ -58,7 +59,7 @@ module.exports = {
     const courses = load();
     const idx = courses.findIndex(c => c.id === id);
     if (idx === -1) return null;
-    const allowed = ['name','emoji','age','duration','lessonsCount','groupSize','price','description','color','active','curriculum'];
+    const allowed = ['name','emoji','age','age_group','duration','lessonsCount','groupSize','price','description','color','active','curriculum'];
     const patch = {};
     allowed.forEach(k => { if (k in data) patch[k] = data[k]; });
     if ('lessonsCount' in patch) patch.lessonsCount = parseInt(patch.lessonsCount) || 0;
