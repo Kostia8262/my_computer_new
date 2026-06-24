@@ -276,9 +276,16 @@
       <h2 class="section-title" data-ru="Выбери направление">Обери напрямок</h2>
       <p class="section-subtitle" data-ru="Курсы разработаны с учётом возраста и уровня подготовки ребёнка.">Курси розроблені з урахуванням віку та рівня підготовки дитини.</p>
     </div>
+    <div class="courses__tabs" role="tablist" aria-label="Вік">
+      <button class="courses__tab courses__tab--active" data-tab="all" role="tab" aria-selected="true">Всі курси</button>
+      <button class="courses__tab" data-tab="6-10" role="tab" aria-selected="false">6–10 років</button>
+      <button class="courses__tab" data-tab="10-14" role="tab" aria-selected="false">10–14 років</button>
+      <button class="courses__tab" data-tab="14-18" role="tab" aria-selected="false">14–18 років</button>
+    </div>
+
     <div class="courses__grid" id="coursesGrid">
 
-      <div class="course-card">
+      <div class="course-card" data-age="6-10">
         <div class="course-card__header course-card__header--scratch">
           <div class="course-card__emoji">🧩</div>
           <div class="course-card__age-badge" data-ru="6–10 лет">6–10 років</div>
@@ -304,7 +311,7 @@
         </div>
       </div>
 
-      <div class="course-card course-card--popular">
+      <div class="course-card course-card--popular" data-age="10-14">
         <div class="course-card__header course-card__header--python">
           <div class="course-card__emoji">🐍</div>
           <div class="course-card__age-badge" data-ru="10–14 лет">10–14 років</div>
@@ -330,7 +337,7 @@
         </div>
       </div>
 
-      <div class="course-card">
+      <div class="course-card" data-age="10-14">
         <div class="course-card__header course-card__header--roblox">
           <div class="course-card__emoji">🎮</div>
           <div class="course-card__age-badge" data-ru="9–14 лет">9–14 років</div>
@@ -356,7 +363,7 @@
         </div>
       </div>
 
-      <div class="course-card">
+      <div class="course-card" data-age="14-18">
         <div class="course-card__header course-card__header--web">
           <div class="course-card__emoji">🌐</div>
           <div class="course-card__age-badge" data-ru="12–16 лет">12–16 років</div>
@@ -1248,6 +1255,27 @@
 </div>
 
 <script src="js/main.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var tabs = document.querySelectorAll('.courses__tab');
+  var cards = document.querySelectorAll('#coursesGrid .course-card');
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var age = this.dataset.tab;
+      tabs.forEach(function(t) { t.classList.remove('courses__tab--active'); t.setAttribute('aria-selected','false'); });
+      this.classList.add('courses__tab--active');
+      this.setAttribute('aria-selected','true');
+      cards.forEach(function(card) {
+        if (age === 'all' || card.dataset.age === age) {
+          card.classList.remove('course-card--hidden');
+        } else {
+          card.classList.add('course-card--hidden');
+        }
+      });
+    });
+  });
+});
+</script>
 <script>
 (function() {
   function openWfpModal() {
