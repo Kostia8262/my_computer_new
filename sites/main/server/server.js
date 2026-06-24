@@ -34,6 +34,7 @@ const reviewsDb      = require('./reviews');
 const { sendLeadNotification } = require('./mailer');
 const monoPay        = require('./mono-pay');
 const monoInvoicesDb = require('./mono-invoices');
+const wfp            = require('./wayforpay');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
 
@@ -1126,6 +1127,35 @@ app.get('/payment/success', (req, res) => {
 });
 app.get('/payment/fail', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'payment-fail.html'));
+});
+
+// ── WAYFORPAY ─────────────────────────────────────────────────────────────────
+
+// Returns signed params; client POSTs them as a form to WayForPay
+app.post('/api/payment/wfp-create', paymentLimiter, (req, res) => {
+  const amount = parseFloat(req.body.amount);
+  if (!amount || amount < 1 || amount > 100000) {
+    return res.status(400).json({ error: 'Невірна сума. Від 1 до 100 000 грн.' });
+  }
+  const description = sanitize(req.body.description) || 'Оплата навчання My Computer Academy';
+  const orderRef    = `mca-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  try {
+    const params = wfp.buildPurchaseParams({ amountUah: amount, description, orderRef });
+    res.json({ success: true, params });
+  } catch (err) {
+    console.error('[WFP CREATE]', err.message);
+    res.status(502).json({ error: err.message });
+  }
+});
+
+// WayForPay webhook (service URL)
+app.post('/api/payment/wfp-webhook', (req, res) => {
+  const body   = req.body || {};
+  const valid  = wfp.verifyWebhook(body);
+  const { orderReference, transactionStatus, amount } = body;
+  console.log(`[WFP WEBHOOK] order=${orderReference} status=${transactionStatus} amount=${amount} sign=${valid ? 'OK' : 'WARN'}`);
+  // WayForPay requires a signed response
+  res.json(wfp.buildWebhookResponse(orderReference, 'accept'));
 });
 
 // ── ARTICLE PAGES ─────────────────────────────────────────────────────────────
