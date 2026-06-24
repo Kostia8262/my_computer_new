@@ -122,6 +122,7 @@ const paymentLimiter = rateLimit({
   message: { error: 'Забагато запитів. Зачекайте хвилину.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 // Admin: dashboard makes ~11 requests per load (parallel monthly-payments fetches).
@@ -1142,7 +1143,8 @@ app.get('/payment/fail', (req, res) => {
 
 // Returns signed params; client POSTs them as a form to WayForPay
 app.post('/api/payment/wfp-create', paymentLimiter, (req, res) => {
-  const amount = parseFloat(req.body.amount);
+  const amount = parseFloat(req.body && req.body.amount);
+  console.log(`[WFP CREATE] amount=${amount} body=${JSON.stringify(req.body)}`);
   if (!amount || amount < 1 || amount > 100000) {
     return res.status(400).json({ error: 'Невірна сума. Від 1 до 100 000 грн.' });
   }
@@ -1152,7 +1154,7 @@ app.post('/api/payment/wfp-create', paymentLimiter, (req, res) => {
     const params = wfp.buildPurchaseParams({ amountUah: amount, description, orderRef });
     res.json({ success: true, params });
   } catch (err) {
-    console.error('[WFP CREATE]', err.message);
+    console.error('[WFP CREATE ERROR]', err.message);
     res.status(502).json({ error: err.message });
   }
 });
