@@ -1051,10 +1051,10 @@ body.modal-open{overflow:hidden}
 
 /* ========== NAV DROPDOWN ========== */
 .nav__item--has-dropdown{position:relative}
-.nav__link--dropdown-toggle{display:flex;align-items:center;gap:5px;cursor:pointer;background:none;border:none;font:inherit;color:inherit;padding:0}
+.nav__link--dropdown-toggle{display:flex;align-items:center;gap:5px;cursor:pointer;background:none;border:none}
 .nav__chevron{flex-shrink:0;transition:transform .2s}
 .nav__item--has-dropdown:hover .nav__chevron,.nav__item--has-dropdown.is-open .nav__chevron{transform:rotate(180deg)}
-.nav__dropdown{display:none;list-style:none;margin:0;padding:8px;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);min-width:260px;background:#1c1a30;border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:200}
+.nav__dropdown{display:none;opacity:1!important;pointer-events:auto!important;list-style:none;margin:0;padding:8px;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%);min-width:260px;background:#1c1a30;border:1px solid rgba(255,255,255,.08);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.5);z-index:200}
 .nav__item--has-dropdown:hover .nav__dropdown,.nav__item--has-dropdown.is-open .nav__dropdown{display:block}
 .nav__dropdown li{margin:0}
 .nav__dropdown-link{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:rgba(255,255,255,.82);text-decoration:none;font-size:13px;font-weight:500;transition:background .15s,color .15s;white-space:nowrap}
