@@ -659,9 +659,9 @@ a{color:inherit;text-decoration:none}
 
   /* Steps */
   .steps{flex-direction:column;align-items:flex-start;gap:0}
-  .step{text-align:left;display:flex;gap:14px;align-items:flex-start;padding:6px 0 6px 12px}
+  .step{text-align:left;display:flex;gap:14px;align-items:flex-start;padding:14px 0 6px 12px}
   .step__number{margin:0;flex-shrink:0;width:48px;height:48px;font-size:16px}
-  .step__connector{width:2px;height:44px;margin:0 0 0 35px;background:linear-gradient(180deg,var(--color-primary-light),var(--color-primary))}
+  .step__connector{width:2px;height:36px;margin:0 0 0 35px;background:linear-gradient(180deg,var(--color-primary-light),var(--color-primary))}
   .step__connector::after{right:-5px;top:auto;bottom:-6px}
 
   /* Stats */
