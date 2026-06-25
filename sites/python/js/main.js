@@ -321,7 +321,7 @@ document.querySelectorAll('.phone-wrap').forEach(wrap => {
 /* ===================================================
    FORM SUBMIT — shared handler for both forms
    =================================================== */
-async function submitLeadForm(formEl, submitBtnEl) {
+function submitLeadForm(formEl, submitBtnEl) {
   if (!validateForm(formEl)) {
     const firstErr = formEl.querySelector('.form-input--error');
     if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -345,9 +345,15 @@ async function submitLeadForm(formEl, submitBtnEl) {
     course:     formEl.querySelector('[name="course"]')?.value || '',
     phone:      fullPhone,
     email:      formEl.querySelector('[name="email"]')?.value.trim() || '',
+    source:     'landing',
   };
 
-  // Fire-and-forget to Google Sheets (non-blocking, does not delay form response)
+  // sendBeacon sends application/x-www-form-urlencoded — no CORS preflight required
+  // Works cross-origin without OLS needing to proxy OPTIONS requests
+  const params = new URLSearchParams(data);
+  navigator.sendBeacon('https://mycomputer.education/api/leads', params);
+
+  // Also send to Google Sheets (non-blocking side effect)
   if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL.includes('script.google.com')) {
     const gasFrame = document.createElement('iframe');
     gasFrame.name = '_gas_' + Date.now();
@@ -365,40 +371,24 @@ async function submitLeadForm(formEl, submitBtnEl) {
     setTimeout(() => { try { document.body.removeChild(gasFrame); document.body.removeChild(gasForm); } catch(_) {} }, 6000);
   }
 
-  try {
-    const res = await fetch('https://mycomputer.education/api/leads', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(data),
-    });
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: 'lead_submitted', lead_course: data.course || 'not_specified' });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  formEl.reset();
+  clearAllErrors(formEl);
+  formEl.querySelectorAll('.phone-wrap').forEach(wrap => {
+    const p = wrap.querySelector('[name="phone"]');
+    if (p) p.placeholder = '(0__) ___-__-__';
+  });
+  showResultNotify(
+    'success',
+    currentLang === 'ua' ? 'Заявку прийнято!' : 'Заявка принята!',
+    currentLang === 'ua' ? 'Передзвонимо протягом 30 хвилин. Дитину чекає безкоштовний пробний урок!' : 'Перезвоним в течение 30 минут. Ребёнка ждёт бесплатный пробный урок!'
+  );
 
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({ event: 'lead_submitted', lead_course: data.course || 'not_specified' });
-    formEl.reset();
-    clearAllErrors(formEl);
-    formEl.querySelectorAll('.phone-wrap').forEach(wrap => {
-      const p = wrap.querySelector('[name="phone"]');
-      if (p) p.placeholder = '(0__) ___-__-__';
-    });
-    showResultNotify(
-      'success',
-      currentLang === 'ua' ? 'Заявку прийнято!' : 'Заявка принята!',
-      currentLang === 'ua' ? 'Передзвонимо протягом 30 хвилин. Дитину чекає безкоштовний пробний урок!' : 'Перезвоним в течение 30 минут. Ребёнка ждёт бесплатный пробный урок!'
-    );
-  } catch (err) {
-    console.error('Lead submit error:', err);
-    showResultNotify(
-      'error',
-      currentLang === 'ua' ? 'Помилка зв\'язку' : 'Ошибка связи',
-      currentLang === 'ua' ? 'Зателефонуйте нам: +38 (095) 462-46-72' : 'Позвоните нам: +38 (095) 462-46-72'
-    );
-  } finally {
-    submitBtnEl.disabled     = false;
-    btnText.style.display    = 'inline';
-    btnLoading.style.display = 'none';
-  }
+  submitBtnEl.disabled     = false;
+  btnText.style.display    = 'inline';
+  btnLoading.style.display = 'none';
 }
 
 // Main contact form

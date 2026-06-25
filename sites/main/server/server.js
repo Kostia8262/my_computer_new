@@ -96,11 +96,23 @@ app.use(helmet({
 }));
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
-app.use(cors({
-  origin: ALLOWED_ORIGIN === '*' ? '*' : ALLOWED_ORIGIN.split(',').map(s => s.trim()),
+function corsOrigin(origin, callback) {
+  if (!origin) return callback(null, true);
+  if (
+    ALLOWED_ORIGIN === '*' ||
+    origin === 'https://mycomputer.education' ||
+    /^https:\/\/[a-z0-9-]+\.mycomputer\.education$/.test(origin)
+  ) return callback(null, true);
+  const allowed = ALLOWED_ORIGIN.split(',').map(s => s.trim()).filter(Boolean);
+  callback(allowed.includes(origin) ? null : new Error('CORS'), allowed.includes(origin));
+}
+const corsOpts = {
+  origin: corsOrigin,
   methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-admin-token'],
-}));
+};
+app.options('*', cors(corsOpts));
+app.use(cors(corsOpts));
 
 // ── BODY PARSING ─────────────────────────────────────────────────────────────
 app.use(express.json({ limit: '12mb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
