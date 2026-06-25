@@ -700,7 +700,7 @@ function renderCourse(c) {
             <div class="course-info-row"><span>Оплата</span><span>WayForPay · Картка · ФОП</span></div>
             <div class="course-info-row"><span>Місто</span><span>Дніпро / Онлайн</span></div>
             <div class="course-info-box__cta">
-              <button class="btn btn--primary btn--lg" style="width:100%;justify-content:center" onclick="document.getElementById('modalCourseSelect').value='${c.id}';document.getElementById('signupModal').classList.add('open');document.body.style.overflow='hidden'">Записатись зараз →</button>
+              <button class="btn btn--primary btn--lg" style="width:100%;justify-content:center" onclick="document.getElementById('signupModal').classList.add('open');document.body.style.overflow='hidden'">Записатись зараз →</button>
             </div>
           </div>
         </div>
@@ -871,7 +871,6 @@ function renderCourse(c) {
   // Wire up open-modal buttons
   document.querySelectorAll('.open-modal-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.getElementById('modalCourseSelect').value = c.id;
       document.getElementById('signupModal').classList.add('open');
       document.body.style.overflow = 'hidden';
     });
@@ -963,11 +962,19 @@ document.addEventListener('submit', async (e) => {
   if (e.target.id !== 'courseContactForm') return;
   e.preventDefault();
   const form = e.target;
+  const data = Object.fromEntries(new FormData(form));
+
+  let valid = true;
+  const nameErr = form.querySelector('[name="child_name"]').closest('.form-group').querySelector('.field-error');
+  const phoneErr = form.querySelector('[name="phone"]').closest('.form-group').querySelector('.field-error');
+  if (!data.child_name || !data.child_name.trim()) { nameErr.textContent = "Введіть ваше ім'я"; valid = false; } else { nameErr.textContent = ''; }
+  if (!data.phone || !data.phone.trim()) { phoneErr.textContent = 'Введіть номер телефону'; valid = false; } else { phoneErr.textContent = ''; }
+  if (!valid) return;
+
   const btn = document.getElementById('courseSubmitBtn');
   btn.querySelector('.btn-text').style.display = 'none';
   btn.querySelector('.btn-loading').style.display = '';
   btn.disabled = true;
-  const data = Object.fromEntries(new FormData(form));
   try {
     await fetch('/api/leads', {
       method: 'POST',
@@ -1033,11 +1040,19 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal
 document.getElementById('modalForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const form = e.target;
+  const data = Object.fromEntries(new FormData(form));
+
+  let valid = true;
+  const nameErr = form.querySelector('[name="child_name"]').closest('.form-group').querySelector('.field-error');
+  const phoneErr = form.querySelector('[name="phone"]').closest('.form-group').querySelector('.field-error');
+  if (!data.child_name || !data.child_name.trim()) { nameErr.textContent = "Введіть ваше ім'я"; valid = false; } else { nameErr.textContent = ''; }
+  if (!data.phone || !data.phone.trim()) { phoneErr.textContent = 'Введіть номер телефону'; valid = false; } else { phoneErr.textContent = ''; }
+  if (!valid) return;
+
   const submitBtn = document.getElementById('modalSubmitBtn');
   submitBtn.querySelector('.btn-text').style.display = 'none';
   submitBtn.querySelector('.btn-loading').style.display = '';
   submitBtn.disabled = true;
-  const data = Object.fromEntries(new FormData(form));
   const courseSlug = window.location.pathname.split('/').pop() || new URLSearchParams(window.location.search).get('c') || '';
   try {
     await fetch('/api/leads', {
