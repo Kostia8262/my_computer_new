@@ -1191,13 +1191,17 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// Prefer static /courses/{slug}.html; fall back to dynamic course.html for DB courses
+// scratch/python/roblox/web use the dynamic course.html (hardcoded COURSES data + DB fallback)
+// construct/graphic/pc/blog and any future DB-only courses use static /courses/{slug}.html
+const DYNAMIC_COURSE_SLUGS = new Set(['scratch', 'python', 'roblox', 'web']);
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  if (DYNAMIC_COURSE_SLUGS.has(slug) || coursesDb.getAll().some(c => c.id === slug)) {
+    return res.sendFile(path.join(__dirname, '..', 'course.html'));
+  }
   const staticPath = path.join(__dirname, '..', 'courses', `${slug}.html`);
   if (fs.existsSync(staticPath)) return res.sendFile(staticPath);
-  if (coursesDb.getAll().some(c => c.id === slug)) return res.sendFile(path.join(__dirname, '..', 'course.html'));
   res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
 });
 
