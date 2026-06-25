@@ -45,7 +45,7 @@ function buildPurchaseParams({ amountUah, description, orderRef }) {
     returnUrl:          `${baseUrl}/payment/success`,
     serviceUrl:         `${baseUrl}/api/payment/wfp-webhook`,
     orderReference:     orderRef,
-    orderDate:          String(orderDate),
+    orderDate:          orderDate,
     amount,
     currency,
     productName:        [productName],
