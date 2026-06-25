@@ -1192,7 +1192,7 @@ app.get('/articles/:slug', (req, res) => {
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
 // Serve the single course.html for all /courses/:slug SEO URLs
-const COURSE_SLUGS = ['scratch', 'python', 'roblox', 'web'];
+const COURSE_SLUGS = ['scratch', 'python', 'roblox', 'web', 'construct', 'graphic', 'pc', 'blog'];
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
