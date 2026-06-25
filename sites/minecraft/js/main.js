@@ -321,7 +321,6 @@ document.querySelectorAll('.phone-wrap').forEach(wrap => {
    =================================================== */
 async function submitLeadForm(formEl, submitBtnEl) {
   if (!validateForm(formEl)) {
-    // Scroll to first error
     const firstErr = formEl.querySelector('.form-input--error');
     if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
@@ -333,14 +332,6 @@ async function submitLeadForm(formEl, submitBtnEl) {
   btnText.style.display    = 'none';
   btnLoading.style.display = 'inline';
 
-  // Fire conversion immediately after valid submission (before async GAS send)
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({
-    event:     'generate_lead',
-    form_name: formEl.id || 'lead_form',
-  });
-
-  // Build full phone: code + digits
   const codeEl   = formEl.querySelector('[name="phone_code"]');
   const code     = codeEl ? codeEl.value : '+380';
   const rawPhone = (formEl.querySelector('[name="phone"]')?.value || '').replace(/\D/g, '');
@@ -354,75 +345,37 @@ async function submitLeadForm(formEl, submitBtnEl) {
     email:      formEl.querySelector('[name="email"]')?.value.trim() || '',
   };
 
+  // Fire-and-forget to Google Sheets (non-blocking, does not delay form response)
+  if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL.includes('script.google.com')) {
+    const gasFrame = document.createElement('iframe');
+    gasFrame.name = '_gas_' + Date.now();
+    gasFrame.style.display = 'none';
+    const gasForm = document.createElement('form');
+    gasForm.method = 'GET';
+    gasForm.action = GOOGLE_SHEETS_URL;
+    gasForm.target = gasFrame.name;
+    [['token','mca_lead_2026'],['child_name',data.child_name],['age',data.age],['course',data.course],['phone',data.phone]].forEach(([n,v]) => {
+      const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = n; inp.value = v; gasForm.appendChild(inp);
+    });
+    document.body.appendChild(gasFrame);
+    document.body.appendChild(gasForm);
+    gasForm.submit();
+    setTimeout(() => { try { document.body.removeChild(gasFrame); document.body.removeChild(gasForm); } catch(_) {} }, 6000);
+  }
+
   try {
-    if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL.includes('script.google.com')) {
-      try {
-        // Hidden iframe form submit — follows all GAS redirects, no CORS issues
-        await new Promise(resolve => {
-          const frameName = '_gas_' + Date.now();
-          const iframe = document.createElement('iframe');
-          iframe.name = frameName;
-          iframe.style.display = 'none';
-          document.body.appendChild(iframe);
+    const res = await fetch('https://mycomputer.education/api/leads', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(data),
+    });
 
-          const form = document.createElement('form');
-          form.method = 'GET';
-          form.action = GOOGLE_SHEETS_URL;
-          form.target = frameName;
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-          [
-            ['token',      'mca_lead_2026'],
-            ['child_name', data.child_name],
-            ['age',        data.age],
-            ['course',     data.course],
-            ['phone',      data.phone],
-            ['email',      data.email],
-          ].forEach(([name, value]) => {
-            const inp = document.createElement('input');
-            inp.type = 'hidden'; inp.name = name; inp.value = value;
-            form.appendChild(inp);
-          });
-
-          document.body.appendChild(form);
-
-          const cleanup = () => {
-            try { document.body.removeChild(form); } catch(_) {}
-            try { document.body.removeChild(iframe); } catch(_) {}
-            resolve();
-          };
-
-          iframe.addEventListener('load', cleanup, { once: true });
-          setTimeout(cleanup, 5000);
-
-          form.submit();
-        });
-      } catch (gsErr) { console.warn('Google Sheets error:', gsErr); }
-    }
-
-    if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-      const msg = `🎓 Нова заявка!\n👤 ${data.child_name}\n📱 ${data.phone}` +
-        (data.age    ? `\n🎂 Вік: ${data.age}`    : '') +
-        (data.course ? `\n📚 Курс: ${data.course}` : '');
-      try {
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg }),
-        });
-      } catch (tgErr) { console.warn('Telegram error:', tgErr); }
-    }
-
-    try {
-      await fetch('https://mycomputer.education/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ child_name: data.child_name, age: data.age, course: data.course, phone: data.phone, email: data.email, source: 'landing' }),
-      });
-    } catch (apiErr) { console.warn('API error:', apiErr); }
-
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({ event: 'lead_submitted', lead_course: data.course || 'not_specified' });
     formEl.reset();
     clearAllErrors(formEl);
-    // Reset phone placeholder after reset
     formEl.querySelectorAll('.phone-wrap').forEach(wrap => {
       const p = wrap.querySelector('[name="phone"]');
       if (p) p.placeholder = '(0__) ___-__-__';
