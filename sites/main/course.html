@@ -884,6 +884,28 @@ async function init() {
     return;
   }
   renderCourse(course);
+
+  // Update <head> so each course URL gets its own title/description/canonical for SEO
+  document.title = `${course.title} — My Computer Academy`;
+  const descEl = document.querySelector('meta[name="description"]');
+  if (descEl) descEl.setAttribute('content', course.subtitle);
+
+  const canonUrl = `https://mycomputer.education/courses/${course.id}`;
+  let canon = document.querySelector('link[rel="canonical"]');
+  if (!canon) { canon = document.createElement('link'); canon.rel = 'canonical'; document.head.appendChild(canon); }
+  canon.href = canonUrl;
+
+  let ogUrl = document.querySelector('meta[property="og:url"]');
+  if (!ogUrl) { ogUrl = document.createElement('meta'); ogUrl.setAttribute('property', 'og:url'); document.head.appendChild(ogUrl); }
+  ogUrl.setAttribute('content', canonUrl);
+
+  let ogTitle = document.querySelector('meta[property="og:title"]');
+  if (!ogTitle) { ogTitle = document.createElement('meta'); ogTitle.setAttribute('property', 'og:title'); document.head.appendChild(ogTitle); }
+  ogTitle.setAttribute('content', `${course.title} — My Computer Academy`);
+
+  let ogDesc = document.querySelector('meta[property="og:description"]');
+  if (!ogDesc) { ogDesc = document.createElement('meta'); ogDesc.setAttribute('property', 'og:description'); document.head.appendChild(ogDesc); }
+  ogDesc.setAttribute('content', course.subtitle);
 }
 
 init();
