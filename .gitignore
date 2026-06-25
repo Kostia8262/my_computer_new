@@ -11,6 +11,7 @@ sites/main/Логотипи*/
 **/data/attendance.json
 **/data/content.json
 **/data/articles.json
+**/data/mono-invoices.json
 **/.env
 *.log
 .DS_Store
