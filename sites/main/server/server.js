@@ -1191,9 +1191,8 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// scratch/python/roblox/web use the dynamic course.html (hardcoded COURSES data + DB fallback)
-// construct/graphic/pc/blog and any future DB-only courses use static /courses/{slug}.html
-const DYNAMIC_COURSE_SLUGS = new Set(['scratch', 'python', 'roblox', 'web']);
+// All 8 courses use the dynamic course.html template (COURSES object + DB fallback)
+const DYNAMIC_COURSE_SLUGS = new Set(['scratch', 'python', 'roblox', 'web', 'construct', 'graphic', 'pc', 'blog']);
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
