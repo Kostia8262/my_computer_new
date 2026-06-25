@@ -2,122 +2,51 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <!-- Homepage — updated 2026-06-15 -->
+  <!-- Python landing homepage -->
   <url>
-    <loc>https://mycomputer.school/</loc>
-    <lastmod>2026-06-15</lastmod>
+    <loc>https://python.mycomputer.education/</loc>
+    <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
-    <xhtml:link rel="alternate" hreflang="uk" href="https://mycomputer.school/"/>
-    <xhtml:link rel="alternate" hreflang="ru" href="https://mycomputer.school/?lang=ru"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://mycomputer.school/"/>
+    <xhtml:link rel="alternate" hreflang="uk" href="https://python.mycomputer.education/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="https://python.mycomputer.education/?lang=ru"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://python.mycomputer.education/"/>
   </url>
 
   <!-- Legal / policy pages -->
   <url>
-    <loc>https://mycomputer.school/docs/privacy-policy.html</loc>
+    <loc>https://python.mycomputer.education/docs/privacy-policy.html</loc>
     <lastmod>2026-06-08</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
-    <loc>https://mycomputer.school/docs/public-offer.html</loc>
+    <loc>https://python.mycomputer.education/docs/public-offer.html</loc>
     <lastmod>2026-06-08</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
-    <loc>https://mycomputer.school/docs/terms.html</loc>
+    <loc>https://python.mycomputer.education/docs/terms.html</loc>
     <lastmod>2026-06-08</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
-    <loc>https://mycomputer.school/docs/refund-policy.html</loc>
+    <loc>https://python.mycomputer.education/docs/refund-policy.html</loc>
     <lastmod>2026-06-08</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.3</priority>
   </url>
 
   <url>
-    <loc>https://mycomputer.school/docs/cookie-policy.html</loc>
+    <loc>https://python.mycomputer.education/docs/cookie-policy.html</loc>
     <lastmod>2026-06-08</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <!-- Articles -->
-  <url>
-    <loc>https://mycomputer.school/articles/chomu-vchyty-dytynu-prohramuvanniu-2026</loc>
-    <lastmod>2026-06-01</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/scratch-dlia-ditei-6-10-rokiv</loc>
-    <lastmod>2026-06-03</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/python-dlia-pidlitkiv-vid-nulia-do-bota</loc>
-    <lastmod>2026-06-05</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/roblox-studio-yak-hra-peretvoriuietsia-na-navchannia</loc>
-    <lastmod>2026-06-07</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/onlain-chy-oflain-yake-navchannia-krasche</loc>
-    <lastmod>2026-06-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/yak-obraty-kursy-prohramuvannia-dlia-dytyny</loc>
-    <lastmod>2026-06-11</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/scratch-chy-python-dlia-dytyni</loc>
-    <lastmod>2026-06-12</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/chomu-dytyna-kydie-kursy-prohramuvannia</loc>
-    <lastmod>2026-06-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/veb-rozrobka-dlia-pidlitkiv-z-nulia</loc>
-    <lastmod>2026-06-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <url>
-    <loc>https://mycomputer.school/articles/prohramuvannia-bez-matematyky</loc>
-    <lastmod>2026-06-15</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.3</priority>
   </url>
 
 </urlset>
