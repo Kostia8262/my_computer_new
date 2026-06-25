@@ -1203,8 +1203,8 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// All 8 courses use the dynamic course.html template (COURSES object + DB fallback)
-const DYNAMIC_COURSE_SLUGS = new Set(['scratch', 'python', 'roblox', 'web', 'construct', 'graphic', 'pc', 'blog']);
+// All courses use the dynamic course.html template (COURSES object + DB fallback)
+const DYNAMIC_COURSE_SLUGS = new Set(['scratch', 'python', 'roblox', 'web', 'construct', 'graphic', 'pc', 'blog', 'minecraft']);
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));

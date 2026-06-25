@@ -23,7 +23,8 @@
     .course-hero--construct{background:linear-gradient(135deg,#065f46 0%,#059669 40%,#10b981 100%)}
     .course-hero--graphic  {background:linear-gradient(135deg,#9d174d 0%,#db2777 40%,#ec4899 100%)}
     .course-hero--pc       {background:linear-gradient(135deg,#164e63 0%,#0891b2 40%,#06b6d4 100%)}
-    .course-hero--blog     {background:linear-gradient(135deg,#9a3412 0%,#ea580c 40%,#f97316 100%)}
+    .course-hero--blog      {background:linear-gradient(135deg,#9a3412 0%,#ea580c 40%,#f97316 100%)}
+    .course-hero--minecraft {background:linear-gradient(135deg,#15803d 0%,#16a34a 40%,#22c55e 100%)}
     .course-hero__inner{display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center;position:relative;z-index:1}
     .course-breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.6);margin-bottom:24px}
     .course-breadcrumb a{color:rgba(255,255,255,.85);font-weight:500}
@@ -146,6 +147,7 @@
           <li><a href="/courses/pc"        class="nav__dropdown-link"><span class="nav__dropdown-emoji">💻</span><span class="nav__dropdown-name">Базовий ПК</span><span class="nav__dropdown-age">6–10 р.</span></a></li>
           <li><a href="/courses/python"    class="nav__dropdown-link"><span class="nav__dropdown-emoji">🐍</span><span class="nav__dropdown-name">Python</span><span class="nav__dropdown-age">10–14 р.</span></a></li>
           <li><a href="/courses/roblox"    class="nav__dropdown-link"><span class="nav__dropdown-emoji">🎮</span><span class="nav__dropdown-name">Roblox</span><span class="nav__dropdown-age">9–14 р.</span></a></li>
+          <li><a href="/courses/minecraft" class="nav__dropdown-link"><span class="nav__dropdown-emoji">⛏️</span><span class="nav__dropdown-name">Minecraft</span><span class="nav__dropdown-age">9–14 р.</span></a></li>
           <li><a href="/courses/construct" class="nav__dropdown-link"><span class="nav__dropdown-emoji">🎲</span><span class="nav__dropdown-name">Construct 3</span><span class="nav__dropdown-age">10–14 р.</span></a></li>
           <li><a href="/courses/web"       class="nav__dropdown-link"><span class="nav__dropdown-emoji">🌐</span><span class="nav__dropdown-name">Веб-розробка</span><span class="nav__dropdown-age">14–18 р.</span></a></li>
           <li><a href="/courses/blog"      class="nav__dropdown-link"><span class="nav__dropdown-emoji">✍️</span><span class="nav__dropdown-name">Блог та сайт</span><span class="nav__dropdown-age">14–18 р.</span></a></li>
@@ -206,7 +208,7 @@
             <li><a href="https://python.mycomputer.education" target="_blank" rel="noopener">Python (7–18 років)</a></li>
             <li><a href="https://roblox.mycomputer.education" target="_blank" rel="noopener">Roblox (9–14 років)</a></li>
             <li><a href="/courses/web">Веб-розробка (10–18 років)</a></li>
-            <li><a href="https://minecraft.mycomputer.education" target="_blank" rel="noopener">Minecraft (8–14 років)</a></li>
+            <li><a href="/courses/minecraft">Minecraft (9–14 років)</a></li>
           </ul>
         </div>
         <div class="footer__col">
@@ -561,6 +563,33 @@ const COURSES = {
       { title:'Фундамент для IT', desc:'Базовий ПК — відмінна підготовка до курсу Scratch або графіки.' },
     ],
   },
+  minecraft: {
+    id: 'minecraft',
+    emoji: '⛏️',
+    color: '#22c55e',
+    badge: '9–14 років',
+    title: 'Minecraft: програмування в грі',
+    subtitle: 'Любиш будувати в Minecraft? Навчись створювати моди та міні-ігри! Діти 9–14 років вивчають Python через улюблену гру — автоматизують будівництво, створюють механіки та випускають власний мод у фіналі курсу.',
+    duration: '3 місяці',
+    format: 'Група до 5 дітей',
+    lessons: '24 заняття',
+    price: 'від 1 800 ₴/міс.',
+    age: '9–14 років',
+    curriculum: [
+      { num:'Модуль 1', title:'Знайомство з Minecraft Python API', desc:'Підключення mcpi до Minecraft Java Edition. Перші команди: отримати позицію гравця, поставити блок. Привіт, світ у Minecraft!' },
+      { num:'Модуль 2', title:'Змінні, типи, введення/виведення', desc:'Числа, рядки, координати блоків. Зчитуємо позицію гравця, малюємо в світі Minecraft реальні фігури за координатами.' },
+      { num:'Модуль 3', title:'Умови та розгалуження', desc:'Логіка if/else: реагуємо на дії гравця. Створюємо пастки та таємні двері — блок змінюється за умовою або часом.' },
+      { num:'Модуль 4', title:'Цикли: автоматичне будівництво', desc:'for та while для будівництва стін, пірамід, лабіринтів. Будуємо за секунди те, що вручну займало б години.' },
+      { num:'Модуль 5', title:'Функції та генерація карт', desc:'Власні функції build_house(), build_tower(). Списки координат для генерації випадкових світів та унікальних рельєфів.' },
+      { num:'Фінал', title:'Власний мод', desc:'Дитина створює повноцінний мод: унікальні механіки, міні-гра або генератор світу — і презентує його батькам.' },
+    ],
+    forCards: [
+      { title:'Фанатам Minecraft', desc:'Перетворимо улюблену гру на навичку розробника.' },
+      { title:'9–14 років', desc:'Ідеальний вік для опанування Python через гейміфікацію.' },
+      { title:'Без досвіду', desc:'Починаємо з нуля — попереднє знання програмування не потрібно.' },
+      { title:'Практика одразу', desc:'Кожна нова команда Python миттєво видна у світі Minecraft.' },
+    ],
+  },
   blog: {
     id: 'blog',
     emoji: '✍️',
@@ -788,6 +817,7 @@ function renderCourse(c) {
                   <option value="scratch">Scratch (6–10 років)</option>
                   <option value="python">Python (10–14 років)</option>
                   <option value="roblox">Roblox (9–14 років)</option>
+                  <option value="minecraft">Minecraft (9–14 років)</option>
                   <option value="web">Веб-розробка (12–16 років)</option>
                   <option value="construct">Construct 3 — розробка ігор (10–14 років)</option>
                   <option value="graphic">Графіка та анімація (6–12 років)</option>
