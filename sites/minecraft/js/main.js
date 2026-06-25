@@ -412,6 +412,14 @@ async function submitLeadForm(formEl, submitBtnEl) {
       } catch (tgErr) { console.warn('Telegram error:', tgErr); }
     }
 
+    try {
+      await fetch('https://mycomputer.education/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ child_name: data.child_name, age: data.age, course: data.course, phone: data.phone, email: data.email, source: 'landing' }),
+      });
+    } catch (apiErr) { console.warn('API error:', apiErr); }
+
     formEl.reset();
     clearAllErrors(formEl);
     // Reset phone placeholder after reset

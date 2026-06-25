@@ -287,33 +287,33 @@
         <div class="form-group">
           <label class="form-label">Вік</label>
           <input type="number" class="form-input" name="age" placeholder="9" min="5" max="18"/>
+          <span class="field-error" aria-live="polite"></span>
         </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Курс</label>
-        <select class="form-input form-select" name="course" id="modalCourseSelect">
-          <option value="" disabled selected>Який курс цікавить?</option>
-          <option value="scratch">Scratch (6–10 років)</option>
-          <option value="python">Python (10–14 років)</option>
-          <option value="roblox">Roblox (9–14 років)</option>
-          <option value="web">Веб-розробка (12–16 років)</option>
-          <option value="help">Допоможіть обрати</option>
-        </select>
       </div>
       <div class="form-group">
         <label class="form-label">Ваш телефон *</label>
         <div class="phone-wrap">
-          <select class="form-input phone-code-sel" name="phone_code">
+          <select class="form-input phone-code-sel" name="phone_code" aria-label="Код країни">
             <option value="+380">🇺🇦 +380</option><option value="+48">🇵🇱 +48</option>
-            <option value="+49">🇩🇪 +49</option><option value="+44">🇬🇧 +44</option>
-            <option value="+1">🇺🇸 +1</option>
+            <option value="+49">🇩🇪 +49</option><option value="+420">🇨🇿 +420</option>
+            <option value="+421">🇸🇰 +421</option><option value="+43">🇦🇹 +43</option>
+            <option value="+44">🇬🇧 +44</option><option value="+1">🇺🇸 +1</option>
+            <option value="+972">🇮🇱 +972</option><option value="+375">🇧🇾 +375</option>
+            <option value="+373">🇲🇩 +373</option><option value="+995">🇬🇪 +995</option>
+            <option value="+7">🇷🇺 +7</option><option value="+33">🇫🇷 +33</option>
+            <option value="+39">🇮🇹 +39</option><option value="+34">🇪🇸 +34</option>
+            <option value="+31">🇳🇱 +31</option><option value="+41">🇨🇭 +41</option>
+            <option value="+46">🇸🇪 +46</option><option value="+47">🇳🇴 +47</option>
           </select>
-          <input type="tel" class="form-input" name="phone" placeholder="(95) ___-__-__" autocomplete="tel"/>
+          <input type="tel" class="form-input" name="phone" placeholder="(0__) ___-__-__" autocomplete="tel"/>
         </div>
         <span class="field-error" aria-live="polite"></span>
       </div>
-      <button type="submit" class="btn btn--primary btn--full btn--lg" id="submitBtn">
-        <span class="btn-text">Записатися на пробний урок безкоштовно</span>
+      <div class="form-group" style="display:none">
+        <input type="email" class="form-input" name="email" placeholder="example@gmail.com" autocomplete="email"/>
+      </div>
+      <button type="submit" class="btn btn--primary btn--full btn--lg" id="modalSubmitBtn">
+        <span class="btn-text">Записатися безкоштовно</span>
         <span class="btn-loading" style="display:none">Відправка...</span>
       </button>
       <div class="form-messengers">
@@ -325,7 +325,7 @@
   </div>
 </div>
     </form>
-    <div class="form-success" id="formSuccess" style="display:none">
+    <div class="form-success" id="modalSuccess" style="display:none">
       <div class="form-success__icon">🎉</div>
       <h3>Заявку прийнято!</h3>
       <p>Передзвонимо протягом 30 хвилин. Дитину чекає безкоштовний пробний урок!</p>
@@ -799,12 +799,19 @@ function renderCourse(c) {
               <div class="form-group">
                 <label class="form-label">Ваш телефон *</label>
                 <div class="phone-wrap">
-                  <select class="form-input phone-code-sel" name="phone_code">
+                  <select class="form-input phone-code-sel" name="phone_code" aria-label="Код країни">
                     <option value="+380">🇺🇦 +380</option><option value="+48">🇵🇱 +48</option>
-                    <option value="+49">🇩🇪 +49</option><option value="+44">🇬🇧 +44</option>
-                    <option value="+1">🇺🇸 +1</option>
+                    <option value="+49">🇩🇪 +49</option><option value="+420">🇨🇿 +420</option>
+                    <option value="+421">🇸🇰 +421</option><option value="+43">🇦🇹 +43</option>
+                    <option value="+44">🇬🇧 +44</option><option value="+1">🇺🇸 +1</option>
+                    <option value="+972">🇮🇱 +972</option><option value="+375">🇧🇾 +375</option>
+                    <option value="+373">🇲🇩 +373</option><option value="+995">🇬🇪 +995</option>
+                    <option value="+7">🇷🇺 +7</option><option value="+33">🇫🇷 +33</option>
+                    <option value="+39">🇮🇹 +39</option><option value="+34">🇪🇸 +34</option>
+                    <option value="+31">🇳🇱 +31</option><option value="+41">🇨🇭 +41</option>
+                    <option value="+46">🇸🇪 +46</option><option value="+47">🇳🇴 +47</option>
                   </select>
-                  <input type="tel" class="form-input" name="phone" placeholder="(95) ___-__-__" autocomplete="tel"/>
+                  <input type="tel" class="form-input" name="phone" placeholder="(0__) ___-__-__" autocomplete="tel"/>
                 </div>
                 <span class="field-error" aria-live="polite"></span>
               </div>
@@ -935,7 +942,7 @@ document.addEventListener('submit', async (e) => {
     await fetch('/api/leads', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: data.child_name, age: data.age, course: data.course, phone: (data.phone_code || '+380') + data.phone, source: 'website' }),
+      body: JSON.stringify({ child_name: data.child_name, age: data.age, course: data.course, phone: (data.phone_code || '+380') + data.phone, source: 'website' }),
     });
   } catch {}
   document.getElementById('courseFormSuccess').style.display = '';
@@ -996,19 +1003,20 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal
 document.getElementById('modalForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const form = e.target;
-  const submitBtn = document.getElementById('submitBtn');
+  const submitBtn = document.getElementById('modalSubmitBtn');
   submitBtn.querySelector('.btn-text').style.display = 'none';
   submitBtn.querySelector('.btn-loading').style.display = '';
   submitBtn.disabled = true;
   const data = Object.fromEntries(new FormData(form));
+  const courseSlug = window.location.pathname.split('/').pop() || new URLSearchParams(window.location.search).get('c') || '';
   try {
     await fetch('/api/leads', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ name: data.child_name, age: data.age, course: data.course, phone: (data.phone_code||'+380') + data.phone, email: data.email||'', source:'website' }),
+      body: JSON.stringify({ child_name: data.child_name, age: data.age, course: courseSlug, phone: (data.phone_code||'+380') + data.phone, email: data.email||'', source:'website' }),
     });
   } catch {}
-  document.getElementById('formSuccess').style.display = '';
+  document.getElementById('modalSuccess').style.display = '';
   form.style.display = 'none';
 });
 </script>
