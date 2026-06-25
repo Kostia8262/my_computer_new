@@ -346,10 +346,9 @@ function submitLeadForm(formEl, submitBtnEl) {
     source:     'landing',
   };
 
-  // sendBeacon sends application/x-www-form-urlencoded — no CORS preflight required
-  // Works cross-origin without OLS needing to proxy OPTIONS requests
+  // Same-origin POST — no CORS; lander server forwards to main admin server-side
   const params = new URLSearchParams(data);
-  navigator.sendBeacon('https://mycomputer.education/api/leads', params);
+  navigator.sendBeacon('/api/leads', params);
 
   // Also send to Google Sheets (non-blocking side effect)
   if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL.includes('script.google.com')) {

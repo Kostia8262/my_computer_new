@@ -63,6 +63,7 @@ function loadContent() {
 function saveContent(data) { fs.writeFileSync(CONTENT_FILE, JSON.stringify(data, null, 2), 'utf8'); }
 
 const app            = express();
+app.set('trust proxy', 1);
 const PORT           = process.env.PORT || 3000;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 // Support both SUPERADMIN_TOKEN (new) and ADMIN_TOKEN (legacy)
@@ -110,6 +111,7 @@ const leadsLimiter = rateLimit({
   message: { error: 'Забагато запитів. Спробуйте через 15 хвилин.' },
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 // Admin: dashboard makes ~11 requests per load (parallel monthly-payments fetches).
