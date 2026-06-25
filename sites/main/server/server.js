@@ -1191,14 +1191,14 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// Serve the single course.html for all /courses/:slug SEO URLs
-const COURSE_SLUGS = ['scratch', 'python', 'roblox', 'web', 'construct', 'graphic', 'pc', 'blog'];
+// Prefer static /courses/{slug}.html; fall back to dynamic course.html for DB courses
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  const known = COURSE_SLUGS.includes(slug) || coursesDb.getAll().some(c => c.id === slug);
-  if (!known) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  res.sendFile(path.join(__dirname, '..', 'course.html'));
+  const staticPath = path.join(__dirname, '..', 'courses', `${slug}.html`);
+  if (fs.existsSync(staticPath)) return res.sendFile(staticPath);
+  if (coursesDb.getAll().some(c => c.id === slug)) return res.sendFile(path.join(__dirname, '..', 'course.html'));
+  res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
 });
 
 // ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────

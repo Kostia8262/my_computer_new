@@ -36,7 +36,7 @@ function buildPurchaseParams({ amountUah, description, orderRef }) {
   );
 
   return {
-    transactionType:    'PURCHASE',
+    transactionType:    'CREATE_INVOICE',
     merchantAccount:    merchant,
     merchantDomainName: domain,
     merchantSignature:  signature,
