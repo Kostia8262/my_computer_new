@@ -78,4 +78,34 @@ function buildWebhookResponse(orderRef, status) {
   return { orderReference: orderRef, status, time, signature: sig };
 }
 
-module.exports = { buildPurchaseParams, verifyWebhook, buildWebhookResponse };
+// Server-side invoice creation: POSTs signed params to WayForPay, returns invoiceUrl for client redirect
+function createInvoice({ amountUah, description, orderRef }) {
+  return new Promise((resolve, reject) => {
+    const params = buildPurchaseParams({ amountUah, description, orderRef });
+    const body   = JSON.stringify(params);
+    const req    = https.request(
+      {
+        hostname: 'api.wayforpay.com',
+        path:     '/api',
+        method:   'POST',
+        headers:  { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+      },
+      (res) => {
+        let data = '';
+        res.on('data', (c) => { data += c; });
+        res.on('end', () => {
+          try {
+            const json = JSON.parse(data);
+            if (json.invoiceUrl) resolve({ invoiceUrl: json.invoiceUrl });
+            else reject(new Error(json.reason || String(json.reasonCode) || 'WayForPay error'));
+          } catch (e) { reject(e); }
+        });
+      }
+    );
+    req.on('error', reject);
+    req.write(body);
+    req.end();
+  });
+}
+
+module.exports = { buildPurchaseParams, createInvoice, verifyWebhook, buildWebhookResponse };

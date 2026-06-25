@@ -1141,8 +1141,8 @@ app.get('/payment/fail', (req, res) => {
 
 // ── WAYFORPAY ─────────────────────────────────────────────────────────────────
 
-// Returns signed params; client POSTs them as a form to WayForPay
-app.post('/api/payment/wfp-create', paymentLimiter, (req, res) => {
+// Creates WayForPay invoice server-side and returns invoiceUrl; client redirects to it
+app.post('/api/payment/wfp-create', paymentLimiter, async (req, res) => {
   const amount = parseFloat(req.body && req.body.amount);
   console.log(`[WFP CREATE] amount=${amount} body=${JSON.stringify(req.body)}`);
   if (!amount || amount < 1 || amount > 100000) {
@@ -1151,8 +1151,8 @@ app.post('/api/payment/wfp-create', paymentLimiter, (req, res) => {
   const description = sanitize(req.body.description) || 'Оплата навчання My Computer Academy';
   const orderRef    = `mca-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   try {
-    const params = wfp.buildPurchaseParams({ amountUah: amount, description, orderRef });
-    res.json({ success: true, params });
+    const { invoiceUrl } = await wfp.createInvoice({ amountUah: amount, description, orderRef });
+    res.json({ success: true, pageUrl: invoiceUrl });
   } catch (err) {
     console.error('[WFP CREATE ERROR]', err.message);
     res.status(502).json({ error: err.message });

@@ -14,6 +14,8 @@
   <meta property="og:locale" content="uk_UA" />
   <meta property="og:site_name" content="My Computer Academy" />
   <meta property="og:image" content="https://mycomputer.education/og-image.png" />
+  <meta property="og:image:secure_url" content="https://mycomputer.education/og-image.png" />
+  <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:alt" content="My Computer Academy — Онлайн школа програмування для дітей" />
@@ -37,6 +39,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
   <meta name="theme-color" content="#6C47FF" />
   <!-- Google Tag Manager -->
   <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-T4K3XPPL');</script>
@@ -1339,8 +1342,6 @@
     </div>
   </div>
 </div>
-<!-- hidden form for WayForPay POST redirect -->
-<form id="wfpForm" method="POST" action="https://api.wayforpay.com/api" style="display:none"></form>
 
 <!-- Result notification modal -->
 <div id="resultNotify" class="result-notify" aria-live="polite" style="display:none">
@@ -1525,25 +1526,7 @@
         var data = await resp.json();
         if (!resp.ok) throw new Error(data.error || 'Помилка оплати');
 
-        // Build and submit hidden POST form to WayForPay
-        var form = document.getElementById('wfpForm');
-        form.innerHTML = '';
-        var params = data.params;
-        Object.keys(params).forEach(function(key) {
-          var val = params[key];
-          if (Array.isArray(val)) {
-            val.forEach(function(v) {
-              var input = document.createElement('input');
-              input.type = 'hidden'; input.name = key; input.value = v;
-              form.appendChild(input);
-            });
-          } else {
-            var input = document.createElement('input');
-            input.type = 'hidden'; input.name = key; input.value = val;
-            form.appendChild(input);
-          }
-        });
-        form.submit();
+        window.location.href = data.pageUrl;
       } catch (e) {
         errEl.textContent = e.message; errEl.style.display = 'block';
         btn.disabled = false; btnTxt.textContent = 'Перейти до оплати →';
