@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /admin/
 Disallow: /api/admin/
 
-Sitemap: https://mycomputer.education/api/sitemap.xml
+Sitemap: https://old.mycomputer.education/sitemap.xml
