@@ -451,7 +451,7 @@ async function loadCourses() {
       const hStyle = hClass ? '' : `style="background:${esc(c.color || '#6C47FF')}"`;
       const ageGroup = esc(c.age_group || '');
       const courseUrl = `/course.html?c=${esc(c.id)}`;
-      return `<div class="course-card" data-age="${ageGroup}">
+      return `<div class="course-card" data-age="${ageGroup}" data-url="/courses/${esc(c.id)}">
         <div class="course-card__header ${hClass}" ${hStyle}>
           <div class="course-card__emoji">${esc(c.emoji || '')}</div>
           <div class="course-card__age-badge">${esc(c.age)}</div>
@@ -473,8 +473,12 @@ async function loadCourses() {
     }).join('');
     el.querySelectorAll('.open-modal').forEach(btn => btn.addEventListener('click', e => {
       e.preventDefault();
+      e.stopPropagation();
       openModal(btn.dataset.course || '');
     }));
+    el.querySelectorAll('.course-card').forEach(card => {
+      card.addEventListener('click', () => { if (card.dataset.url) window.location.href = card.dataset.url; });
+    });
     // Re-run tab filter after courses load
     if (window.__coursesFilter) window.__coursesFilter();
 

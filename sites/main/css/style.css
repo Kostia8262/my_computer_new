@@ -254,7 +254,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .courses__slider-wrap.is-scrolled .courses__fade--l{opacity:1}
 
 /* ── COMPACT CARD ── */
-.course-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-xl);overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s;display:flex;flex-direction:column;flex:0 0 260px}
+.course-card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-xl);overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s;display:flex;flex-direction:column;flex:0 0 260px;cursor:pointer}
 .course-card:hover{box-shadow:0 12px 40px rgba(0,0,0,.4);transform:translateY(-3px);border-color:rgba(108,71,255,.4)}
 .course-card--popular{border-color:rgba(108,71,255,.5);box-shadow:0 0 0 2px rgba(108,71,255,.15)}
 
