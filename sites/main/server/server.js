@@ -38,6 +38,19 @@ const wfp            = require('./wayforpay');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
 
+// ── COURSE SEED DATA ──────────────────────────────────────────────────────────
+const COURSE_SEED = [
+  { id: 'scratch',   name: 'Scratch: візуальне програмування',   emoji: '🧩', age: '6–10 років',  age_group: '6-10',  duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#f59e0b', description: 'Перший крок у програмування через гру. Діти створюють анімації, інтерактивні історії та прості ігри за допомогою блочного коду.' },
+  { id: 'graphic',   name: 'Графіка та анімація',                emoji: '🎨', age: '6–12 років',  age_group: '6-10',  duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#ec4899', description: 'Цифровий малюнок, анімація персонажів та основи дизайну. Курс для тих, хто хоче поєднати творчість і технології.' },
+  { id: 'pc',        name: 'Базовий курс роботи з ПК',           emoji: '💻', age: '6–10 років',  age_group: '6-10',  duration: '2 місяці',  lessonsCount: 16, groupSize: 5, price: 3600, color: '#64748b', description: 'Перший крок у світ комп\'ютерів. Діти освоюють клавіатуру, мишу, файлову систему, текстові редактори та безпечний інтернет.' },
+  { id: 'python',    name: 'Python: справжнє програмування',     emoji: '🐍', age: '10–14 років', age_group: '10-14', duration: '4 місяці',  lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.' },
+  { id: 'roblox',    name: 'Roblox: розробка ігор',              emoji: '🎮', age: '9–14 років',  age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#ef4444', description: 'Мова Lua, 3D-дизайн власних світів та публікація гри для мільйонів гравців платформи.' },
+  { id: 'minecraft', name: 'Minecraft: програмування в грі',     emoji: '⛏️', age: '9–14 років',  age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#22c55e', description: 'Любиш будувати в Minecraft? Навчись створювати моди та міні-ігри! Діти вивчають Python та логіку програмування через улюблену гру.' },
+  { id: 'construct', name: 'Construct: розробка ігор без коду',  emoji: '🕹️', age: '10–14 років', age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#8b5cf6', description: 'Створюй справжні ігри без програмування. Construct дозволяє зробити платформер, стрілялку або аркаду — і одразу опублікувати в інтернеті.' },
+  { id: 'web',       name: 'Розробка сайтів: HTML, CSS, JS',     emoji: '🌐', age: '12–16 років', age_group: '14-18', duration: '5 місяців', lessonsCount: 40, groupSize: 5, price: 3600, color: '#6c47ff', description: 'Створюй сайти з нуля. Від першої сторінки до повноцінного адаптивного проекту — все покроково з реальними задачами.' },
+  { id: 'blog',      name: 'Створення блогу та сайту',           emoji: '✍️', age: '12–17 років', age_group: '14-18', duration: '2 місяці',  lessonsCount: 16, groupSize: 5, price: 3600, color: '#f97316', description: 'Від ідеї до власного онлайн-простору. Учні створюють блог або портфоліо з нуля — без фреймворків, лише HTML, CSS і натхнення.' },
+];
+
 // ── STARTUP SEED (test teachers + demo clients) ───────────────────────────────
 (function seedTestData() {
   try {
@@ -45,6 +58,10 @@ const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
       adminsDb.create('Богдан Коваль',   'teacher', { hourlyRate: 150, lessonDuration: 60, phone: '+380501234567', notes: 'Веб-розробка, Python' });
       adminsDb.create('Аліна Петренко',  'teacher', { hourlyRate: 130, lessonDuration: 60, phone: '+380671234568', notes: 'Scratch, Roblox' });
       console.log('✅  Seeded 2 test teachers');
+    }
+    if (!coursesDb.getAll().length) {
+      COURSE_SEED.forEach(c => coursesDb.create(c));
+      console.log('✅  Seeded 9 courses');
     }
     if (!clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
       [

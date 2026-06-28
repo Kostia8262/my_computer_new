@@ -35,9 +35,13 @@ const { sendLeadNotification } = require('./mailer');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
 
-// ── STARTUP SEED (test teachers + demo clients) ───────────────────────────────
+// ── STARTUP SEED (teachers + clients + course) ────────────────────────────────
 (function seedTestData() {
   try {
+    if (!coursesDb.getAll().length) {
+      coursesDb.create({ id: 'roblox', name: 'Roblox: розробка ігор', emoji: '🎮', age: '9–14 років', age_group: '10-14', duration: '3 місяці', lessonsCount: 24, groupSize: 5, price: 3600, color: '#ef4444', description: 'Мова Lua, 3D-дизайн власних світів та публікація гри для мільйонів гравців платформи.' });
+      console.log('✅  Seeded roblox course');
+    }
     if (!adminsDb.getAll().some(a => a.role === 'teacher')) {
       adminsDb.create('Богдан Коваль',   'teacher', { hourlyRate: 150, lessonDuration: 60, phone: '+380501234567', notes: 'Веб-розробка, Python' });
       adminsDb.create('Аліна Петренко',  'teacher', { hourlyRate: 130, lessonDuration: 60, phone: '+380671234568', notes: 'Scratch, Roblox' });

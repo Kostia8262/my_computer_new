@@ -35,9 +35,13 @@ const { sendLeadNotification } = require('./mailer');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
 
-// ── STARTUP SEED (test teachers + demo clients) ───────────────────────────────
+// ── STARTUP SEED (teachers + clients + course) ────────────────────────────────
 (function seedTestData() {
   try {
+    if (!coursesDb.getAll().length) {
+      coursesDb.create({ id: 'python', name: 'Python: справжнє програмування', emoji: '🐍', age: '10–14 років', age_group: '10-14', duration: '4 місяці', lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.' });
+      console.log('✅  Seeded python course');
+    }
     if (!adminsDb.getAll().some(a => a.role === 'teacher')) {
       adminsDb.create('Богдан Коваль',   'teacher', { hourlyRate: 150, lessonDuration: 60, phone: '+380501234567', notes: 'Веб-розробка, Python' });
       adminsDb.create('Аліна Петренко',  'teacher', { hourlyRate: 130, lessonDuration: 60, phone: '+380671234568', notes: 'Scratch, Roblox' });
