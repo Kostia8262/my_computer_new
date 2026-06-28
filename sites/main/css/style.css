@@ -244,7 +244,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 
 /* ── SLIDER LAYOUT ── */
 .courses__slider-wrap{position:relative;z-index:1}
-.courses__grid{display:flex;flex-wrap:nowrap;gap:16px;align-items:stretch;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none;padding-top:20px;padding-bottom:8px;scroll-behavior:smooth}
+.courses__grid{display:flex;flex-wrap:nowrap;gap:16px;align-items:stretch;overflow-x:auto;overflow-y:visible;scrollbar-width:none;-webkit-overflow-scrolling:touch;cursor:grab;user-select:none;padding-top:20px;padding-bottom:8px;scroll-behavior:smooth;touch-action:pan-x}
 .courses__grid::-webkit-scrollbar{display:none}
 .courses__grid.is-grabbing{cursor:grabbing;scroll-behavior:auto}
 /* Gradient overlays — separate divs to avoid mask-image WebKit clipping bug */
