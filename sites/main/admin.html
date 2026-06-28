@@ -1031,7 +1031,6 @@ tr:hover td{background:#faf9ff}
       <div class="cms-subtabs">
         <button class="cms-subtab active" id="cmsTabPricing" onclick="showCmsSection('pricing')">💰 Варіанти навчання</button>
         <button class="cms-subtab" id="cmsTabFaq" onclick="showCmsSection('faq')">❓ Питання та відповіді</button>
-        <button class="cms-subtab" id="cmsTabCourses" onclick="showCmsSection('courses')">📚 Курси</button>
       </div>
 
       <!-- PRICING SECTION -->
@@ -1055,17 +1054,6 @@ tr:hover td{background:#faf9ff}
         <div id="faqEditor"><div class="empty" style="padding:30px">Завантаження...</div></div>
       </div>
 
-      <!-- COURSES SECTION -->
-      <div id="cmsCourses" class="cms-section" style="display:none">
-        <div class="cms-section-title">
-          📚 Курси
-          <div style="display:flex;gap:8px;margin-left:auto">
-            <button class="btn btn-ghost btn-sm" onclick="addCourse()">+ Додати курс</button>
-            <button class="btn btn-primary btn-sm" onclick="saveCourses()">💾 Зберегти</button>
-          </div>
-        </div>
-        <div id="coursesEditor"><div class="empty" style="padding:30px">Завантаження...</div></div>
-      </div>
     </div>
 
     <!-- LEADS TAB -->
@@ -2816,7 +2804,7 @@ function parseCSVRow(line) {
 let _cmsData = null;
 
 function showCmsSection(section) {
-  ['Pricing','Faq','Courses'].forEach(s => {
+  ['Pricing','Faq'].forEach(s => {
     document.getElementById('cms' + s).style.display = s.toLowerCase() === section ? '' : 'none';
     document.getElementById('cmsTab' + s).classList.toggle('active', s.toLowerCase() === section);
   });
@@ -2828,7 +2816,6 @@ async function loadContentData() {
     _cmsData = await res.json();
     renderPricingEditor(_cmsData.pricing || []);
     renderFaqEditor(_cmsData.faq || []);
-    renderCoursesEditor(_cmsData.courses || []);
   } catch { showToast('Помилка завантаження контенту', 'error'); }
 }
 
