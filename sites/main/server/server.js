@@ -1362,6 +1362,18 @@ app.get('/articles/:slug', (req, res) => {
 const DYNAMIC_COURSE_SLUGS = new Set(['scratch', 'python', 'roblox', 'web', 'construct', 'graphic', 'pc', 'blog', 'minecraft']);
 const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'), 'utf8');
 
+const COURSE_SEO_TITLES = {
+  scratch:   'Курс Scratch для дітей — My Computer Academy',
+  python:    'Курс Python для дітей — My Computer Academy',
+  roblox:    'Курс Roblox Studio для дітей — My Computer Academy',
+  minecraft: 'Курс Minecraft для дітей — My Computer Academy',
+  web:       'Курс Веб-розробки для підлітків — My Computer Academy',
+  construct: 'Курс розробки ігор Construct 3 — My Computer Academy',
+  graphic:   'Курс Графіки та анімації — My Computer Academy',
+  pc:        'Базовий курс ПК для дітей — My Computer Academy',
+  blog:      'Курс Створення блогу та сайту — My Computer Academy',
+};
+
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
@@ -1374,7 +1386,8 @@ app.get('/courses/:slug', (req, res) => {
     return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
   }
 
-  const name   = course ? course.name : 'Курс';
+  const name      = course ? course.name : 'Курс';
+  const seoTitle  = COURSE_SEO_TITLES[slug] || `${name} — My Computer Academy`;
   const rawDesc = course && course.description
     ? course.description
     : 'Детальна інформація про курс програмування для дітей у My Computer Academy';
@@ -1421,13 +1434,13 @@ app.get('/courses/:slug', (req, res) => {
   const html = COURSE_HTML_TPL
     .replace(
       '<title>Курс — My Computer Academy</title>',
-      `<title>${escHtml(name)} — My Computer Academy</title>`
+      `<title>${escHtml(seoTitle)}</title>`
     )
     .replace(
       '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
       `<meta name="description" content="${escHtml(desc)}"/>
   <link rel="canonical" href="${pageUrl}"/>
-  <meta property="og:title" content="${escHtml(name)} — My Computer Academy"/>
+  <meta property="og:title" content="${escHtml(seoTitle)}"/>
   <meta property="og:description" content="${escHtml(desc)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="website"/>
