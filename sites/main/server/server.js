@@ -1365,11 +1365,11 @@ app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
 
-  const staticPath = path.join(__dirname, '..', 'courses', `${slug}.html`);
-  if (fs.existsSync(staticPath)) return res.sendFile(staticPath);
-
   const course = coursesDb.getAll().find(c => c.id === slug);
   if (!course && !DYNAMIC_COURSE_SLUGS.has(slug)) {
+    // Unknown slug: try static file fallback, then 404
+    const staticPath = path.join(__dirname, '..', 'courses', `${slug}.html`);
+    if (fs.existsSync(staticPath)) return res.sendFile(staticPath);
     return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
   }
 
