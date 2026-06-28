@@ -76,20 +76,13 @@ burger.addEventListener('click', () => {
   burger.setAttribute('aria-expanded', String(isOpen));
 });
 
-// Dropdown toggle (mobile)
-document.querySelectorAll('.nav__item--has-dropdown').forEach(function(item){
-  var toggle = item.querySelector('.nav__link--dropdown-toggle');
-  if(!toggle) return;
-  toggle.addEventListener('click', function(e){
-    if(window.innerWidth <= 768){
-      e.preventDefault();
-      item.classList.toggle('is-open');
-    }
-  });
-});
-
 document.querySelectorAll('.nav__link').forEach(link => {
-  link.addEventListener('click', () => {
+  link.addEventListener('click', (e) => {
+    if (link.classList.contains('nav__link--drop') && window.innerWidth <= 768) {
+      e.preventDefault();
+      link.closest('.nav__has-dropdown').classList.toggle('open');
+      return;
+    }
     navMenu.classList.remove('open');
     burger.setAttribute('aria-expanded', 'false');
   });
