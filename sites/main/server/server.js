@@ -1350,6 +1350,7 @@ app.get('/articles/:slug', (req, res) => {
   <meta property="og:description" content="${escHtml(excerpt)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="article"/>
+  <meta property="og:image" content="https://mycomputer.education/og-image.png"/>
   <meta property="og:locale" content="uk_UA"/>`
     );
 
@@ -1430,6 +1431,7 @@ app.get('/courses/:slug', (req, res) => {
   <meta property="og:description" content="${escHtml(desc)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="website"/>
+  <meta property="og:image" content="https://mycomputer.education/og-image.png"/>
   <meta property="og:locale" content="uk_UA"/>`
     )
     .replace('</head>', `  <script type="application/ld+json">${jsonLd}</script>\n</head>`);
