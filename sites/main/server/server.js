@@ -1331,14 +1331,40 @@ app.get('/courses/:slug', (req, res) => {
   const siteUrl = 'https://mycomputer.education';
   const pageUrl = `${siteUrl}/courses/${slug}`;
 
+  const durationMonths = course && course.duration
+    ? parseInt(course.duration) || null : null;
+  const isoPeriod = durationMonths ? `P${durationMonths}M` : null;
+
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
     '@type': 'Course',
     name,
     description: rawDesc,
-    provider: { '@type': 'Organization', name: 'My Computer Academy', url: siteUrl },
     url: pageUrl,
     inLanguage: 'uk',
+    educationalLevel: 'Beginner',
+    ...(course && course.age ? { typicalAgeRange: course.age } : {}),
+    provider: {
+      '@type': 'EducationalOrganization',
+      name: 'My Computer Academy',
+      url: siteUrl,
+      telephone: '+380954624672',
+      address: { '@type': 'PostalAddress', addressLocality: 'Дніпро', addressCountry: 'UA' },
+    },
+    ...(isoPeriod ? {
+      hasCourseInstance: {
+        '@type': 'CourseInstance',
+        courseMode: 'online',
+        duration: isoPeriod,
+        inLanguage: 'uk',
+      }
+    } : {}),
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'UAH',
+      availability: 'https://schema.org/InStock',
+      url: `${siteUrl}/#contact`,
+    },
   });
 
   const html = COURSE_HTML_TPL
