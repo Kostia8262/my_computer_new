@@ -165,6 +165,10 @@ function getRole(token) {
 // Safe ID pattern — prevents path traversal / injection
 const SAFE_ID_RE = /^[a-z0-9_-]{1,64}$/i;
 
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
   const role  = getRole(token);
@@ -1073,10 +1077,35 @@ app.delete('/api/reviews/:id', adminLimiter, requireSuperAdmin, (req, res) => {
 });
 
 // ── ARTICLE PAGES ─────────────────────────────────────────────────────────────
+const ARTICLE_HTML_TPL_MC = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
+
 app.get('/articles/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  res.sendFile(path.join(__dirname, '..', 'article.html'));
+
+  const article = articlesDb.getBySlug(slug);
+  if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
+
+  const title     = article.title || 'Стаття';
+  const excerpt   = (article.excerpt || '').slice(0, 160);
+  const siteUrl   = 'https://minecraft.mycomputer.education';
+  const pageUrl   = `${siteUrl}/articles/${slug}`;
+  const fullTitle = `${title} — My Computer Academy`;
+
+  const html = ARTICLE_HTML_TPL_MC
+    .replace('<title id="pageTitle">Стаття — My Computer Academy</title>',
+             `<title id="pageTitle">${escHtml(fullTitle)}</title>`)
+    .replace('<meta name="description" id="pageDesc" content="Корисні статті про програмування для дітей від My Computer Academy"/>',
+             `<meta name="description" id="pageDesc" content="${escHtml(excerpt) || 'Корисні статті про програмування для дітей від My Computer Academy'}"/>
+  <link rel="canonical" href="${pageUrl}"/>
+  <meta property="og:title" content="${escHtml(fullTitle)}"/>
+  <meta property="og:description" content="${escHtml(excerpt)}"/>
+  <meta property="og:url" content="${pageUrl}"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:locale" content="uk_UA"/>`);
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
