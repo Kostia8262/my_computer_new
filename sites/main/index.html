@@ -33,8 +33,8 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" /></noscript>
-  <link rel="preload" as="style" href="/css/style.css?v=4" />
-  <link rel="stylesheet" href="/css/style.css?v=4" fetchpriority="high" />
+  <link rel="preload" as="style" href="/css/style.css?v=5" />
+  <link rel="stylesheet" href="/css/style.css?v=5" fetchpriority="high" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -294,7 +294,7 @@
     <div class="courses__slider-wrap">
     <div class="courses__grid" id="coursesGrid">
 
-      <div class="course-card" data-age="6-10">
+      <div class="course-card" data-age="6-10" data-url="/courses/scratch">
         <div class="course-card__header course-card__header--scratch">
           <div class="course-card__emoji">🧩</div>
           <div class="course-card__age-badge" data-ru="6–10 лет">6–10 років</div>
@@ -317,7 +317,7 @@
         </div>
       </div>
 
-      <div class="course-card course-card--popular" data-age="10-14">
+      <div class="course-card course-card--popular" data-age="10-14" data-url="/courses/python">
         <div class="course-card__header course-card__header--python">
           <div class="course-card__emoji">🐍</div>
           <div class="course-card__age-badge" data-ru="10–14 лет">10–14 років</div>
@@ -340,7 +340,7 @@
         </div>
       </div>
 
-      <div class="course-card" data-age="10-14">
+      <div class="course-card" data-age="10-14" data-url="/courses/roblox">
         <div class="course-card__header course-card__header--roblox">
           <div class="course-card__emoji">🎮</div>
           <div class="course-card__age-badge" data-ru="9–14 лет">9–14 років</div>
@@ -363,7 +363,7 @@
         </div>
       </div>
 
-      <div class="course-card" data-age="10-14">
+      <div class="course-card" data-age="10-14" data-url="/courses/minecraft">
         <div class="course-card__header course-card__header--minecraft">
           <div class="course-card__emoji">⛏️</div>
           <div class="course-card__age-badge" data-ru="9–14 лет">9–14 років</div>
@@ -386,7 +386,7 @@
         </div>
       </div>
 
-      <div class="course-card" data-age="14-18">
+      <div class="course-card" data-age="14-18" data-url="/courses/web">
         <div class="course-card__header course-card__header--web">
           <div class="course-card__emoji">🌐</div>
           <div class="course-card__age-badge" data-ru="12–16 лет">12–16 років</div>
@@ -409,7 +409,7 @@
         </div>
       </div>
 
-      <div class="course-card" data-age="10-14">
+      <div class="course-card" data-age="10-14" data-url="/courses/construct">
         <div class="course-card__header course-card__header--construct">
           <div class="course-card__emoji">🕹️</div>
           <div class="course-card__age-badge">10–14 років</div>
@@ -432,7 +432,7 @@
         </div>
       </div>
 
-      <div class="course-card" data-age="6-10">
+      <div class="course-card" data-age="6-10" data-url="/courses/graphic">
         <div class="course-card__header course-card__header--graphic">
           <div class="course-card__emoji">🎨</div>
           <div class="course-card__age-badge">6–12 років</div>
@@ -455,7 +455,7 @@
         </div>
       </div>
 
-      <div class="course-card" data-age="6-10">
+      <div class="course-card" data-age="6-10" data-url="/courses/pc">
         <div class="course-card__header course-card__header--pc">
           <div class="course-card__emoji">💻</div>
           <div class="course-card__age-badge">6–10 років</div>
@@ -478,7 +478,7 @@
         </div>
       </div>
 
-      <div class="course-card" data-age="14-18">
+      <div class="course-card" data-age="14-18" data-url="/courses/blog">
         <div class="course-card__header course-card__header--blog">
           <div class="course-card__emoji">✍️</div>
           <div class="course-card__age-badge">12–17 років</div>
@@ -1380,7 +1380,7 @@
   <div class="result-notify__bar"><div class="result-notify__progress" id="resultNotifyProgress"></div></div>
 </div>
 
-<script src="js/main.js?v=5" defer></script>
+<script src="js/main.js?v=6" defer></script>
 <script>
 (function() {
   var CARD_STEP = 276; // 260px card + 16px gap
@@ -1503,13 +1503,29 @@
       var x = e.pageX - g.offsetLeft;
       g.scrollLeft = dragScrollLeft - (x - dragStartX) * 1.2;
     });
-    // Keep dragScrollLeft in sync on touch so tap-after-swipe isn't blocked
-    g.addEventListener('touchstart', function() {
+    // Touch tap-to-navigate: track start position, navigate on touchend if < 12px movement
+    var tapStartX = 0, tapStartY = 0;
+    g.addEventListener('touchstart', function(e) {
       dragScrollLeft = g.scrollLeft;
+      tapStartX = e.touches[0].clientX;
+      tapStartY = e.touches[0].clientY;
     }, { passive: true });
-    // Prevent click on cards after drag
+    g.addEventListener('touchend', function(e) {
+      var card = e.target.closest('.course-card');
+      if (!card || e.target.closest('.open-modal')) return;
+      var url = card.dataset.url;
+      if (!url) return;
+      var dx = Math.abs(e.changedTouches[0].clientX - tapStartX);
+      var dy = Math.abs(e.changedTouches[0].clientY - tapStartY);
+      if (dx < 12 && dy < 12) window.location.href = url;
+    }, { passive: true });
+    // Desktop click-to-navigate (drag guard protects against false positives)
     g.addEventListener('click', function(e) {
-      if (Math.abs(g.scrollLeft - dragScrollLeft) > 5) e.stopPropagation();
+      if (Math.abs(g.scrollLeft - dragScrollLeft) > 5) { e.stopPropagation(); return; }
+      var card = e.target.closest('.course-card');
+      if (!card || e.target.closest('.open-modal')) return;
+      var url = card.dataset.url;
+      if (url) window.location.href = url;
     }, true);
   });
 })();

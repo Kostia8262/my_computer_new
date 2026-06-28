@@ -476,19 +476,6 @@ async function loadCourses() {
       e.stopPropagation();
       openModal(btn.dataset.course || '');
     }));
-    el.querySelectorAll('.course-card').forEach(card => {
-      // Desktop: click navigates (drag guard handles false-positive prevention)
-      card.addEventListener('click', () => { if (card.dataset.url) window.location.href = card.dataset.url; });
-      // Mobile: touchend navigates — bypasses the grid's click capture drag guard
-      let _tx = 0, _ty = 0;
-      card.addEventListener('touchstart', e => { _tx = e.touches[0].clientX; _ty = e.touches[0].clientY; }, { passive: true });
-      card.addEventListener('touchend', e => {
-        if (e.target.closest('.open-modal')) return;
-        const dx = Math.abs(e.changedTouches[0].clientX - _tx);
-        const dy = Math.abs(e.changedTouches[0].clientY - _ty);
-        if (dx < 10 && dy < 10 && card.dataset.url) window.location.href = card.dataset.url;
-      }, { passive: true });
-    });
     // Re-run tab filter after courses load
     if (window.__coursesFilter) window.__coursesFilter();
 
