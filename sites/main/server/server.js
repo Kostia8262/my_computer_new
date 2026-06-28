@@ -246,6 +246,27 @@ const adminLimiter = rateLimit({
   message: { error: 'Too many requests.' },
 });
 
+// ── HOMEPAGE LANGUAGE SSR ─────────────────────────────────────────────────────
+const MAIN_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const MAIN_META_RU = {
+  title: 'Школа программирования и IT-курсов для детей — My Computer Academy | Minecraft, Scratch, Python, Roblox',
+  desc:  'Компьютерные курсы для детей от 6 до 18 лет по всей Украине. Scratch, Python, Roblox Studio, Веб-разработка. Малые группы до 5 человек. Первый урок бесплатно.',
+};
+app.get(['/', '/index.html'], (req, res, next) => {
+  if (req.query.lang !== 'ru') return next();
+  const m = MAIN_META_RU;
+  const html = MAIN_INDEX_TPL
+    .replace(/<html lang="uk">/, '<html lang="ru">')
+    .replace(/<title>[^<]*<\/title>/, `<title>${escHtml(m.title)}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
+    .replace(/(<meta property="og:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
+    .replace(/(<meta property="og:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,
