@@ -651,7 +651,9 @@ async function loadArticles() {
     const totalPages = Math.ceil(active.length / CARDS_PER_PAGE);
     let currentPage = 0;
 
+    const paginationEl = document.getElementById('articlesPagination');
     if (window.innerWidth >= 769 && prevBtn && nextBtn && totalPages > 1) {
+      if (paginationEl) paginationEl.removeAttribute('hidden');
       if (pgDotsEl) {
         pgDotsEl.innerHTML = Array.from({length: totalPages}, (_, i) =>
           `<button class="articles__pg-dot${i===0?' active':''}" data-page="${i}" aria-label="Сторінка ${i+1}"></button>`
@@ -678,11 +680,8 @@ async function loadArticles() {
       prevBtn.addEventListener('click', () => goToPage(currentPage - 1));
       nextBtn.addEventListener('click', () => goToPage(currentPage + 1));
       goToPage(0);
-    } else if (prevBtn && nextBtn) {
-      document.getElementById('articlesPagination')?.style.setProperty('display', 'none', 'important');
-    }
-    if (window.innerWidth < 769) {
-      document.getElementById('articlesPagination')?.style.setProperty('display', 'none', 'important');
+    } else {
+      if (paginationEl) paginationEl.hidden = true;
     }
   } catch(e) { /* silent fail */ }
 }
