@@ -91,15 +91,33 @@ const CONTENT_SEED = {
 
 // ── COURSE SEED DATA ──────────────────────────────────────────────────────────
 const COURSE_SEED = [
-  { id: 'scratch',   name: 'Scratch: візуальне програмування',   emoji: '🧩', age: '6–10 років',  age_group: '6-10',  duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#f59e0b', description: 'Перший крок у програмування через гру. Діти створюють анімації, інтерактивні історії та прості ігри за допомогою блочного коду.' },
-  { id: 'graphic',   name: 'Графіка та анімація',                emoji: '🎨', age: '6–12 років',  age_group: '6-10',  duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#ec4899', description: 'Цифровий малюнок, анімація персонажів та основи дизайну. Курс для тих, хто хоче поєднати творчість і технології.' },
-  { id: 'pc',        name: 'Базовий курс роботи з ПК',           emoji: '💻', age: '6–10 років',  age_group: '6-10',  duration: '2 місяці',  lessonsCount: 16, groupSize: 5, price: 3600, color: '#64748b', description: 'Перший крок у світ комп\'ютерів. Діти освоюють клавіатуру, мишу, файлову систему, текстові редактори та безпечний інтернет.' },
-  { id: 'python',    name: 'Python: справжнє програмування',     emoji: '🐍', age: '10–14 років', age_group: '10-14', duration: '4 місяці',  lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.' },
-  { id: 'roblox',    name: 'Roblox: розробка ігор',              emoji: '🎮', age: '9–14 років',  age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#ef4444', description: 'Мова Lua, 3D-дизайн власних світів та публікація гри для мільйонів гравців платформи.' },
-  { id: 'minecraft', name: 'Minecraft: програмування в грі',     emoji: '⛏️', age: '9–14 років',  age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#22c55e', description: 'Любиш будувати в Minecraft? Навчись створювати моди та міні-ігри! Діти вивчають Python та логіку програмування через улюблену гру.' },
-  { id: 'construct', name: 'Construct: розробка ігор без коду',  emoji: '🕹️', age: '10–14 років', age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#8b5cf6', description: 'Створюй справжні ігри без програмування. Construct дозволяє зробити платформер, стрілялку або аркаду — і одразу опублікувати в інтернеті.' },
-  { id: 'web',       name: 'Розробка сайтів: HTML, CSS, JS',     emoji: '🌐', age: '12–16 років', age_group: '14-18', duration: '5 місяців', lessonsCount: 40, groupSize: 5, price: 3600, color: '#6c47ff', description: 'Створюй сайти з нуля. Від першої сторінки до повноцінного адаптивного проекту — все покроково з реальними задачами.' },
-  { id: 'blog',      name: 'Створення блогу та сайту',           emoji: '✍️', age: '12–17 років', age_group: '14-18', duration: '2 місяці',  lessonsCount: 16, groupSize: 5, price: 3600, color: '#f97316', description: 'Від ідеї до власного онлайн-простору. Учні створюють блог або портфоліо з нуля — без фреймворків, лише HTML, CSS і натхнення.' },
+  { id: 'scratch',   name: 'Scratch: візуальне програмування',  emoji: '🧩', age: '6–10 років',  age_group: '6-10',  duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#f59e0b', popular: false,
+    description: 'Перший крок у програмування через гру. Діти створюють анімації, інтерактивні історії та прості ігри за допомогою блочного коду.',
+    features: [{ua:'✓ Створення персонажів і сцен',     ru:'✓ Создание персонажей и сцен'},{ua:'✓ Логіка та алгоритми через гру',  ru:'✓ Логика и алгоритмы через игру'},{ua:'✓ Власна гра у фіналі курсу',      ru:'✓ Собственная игра в финале курса'}] },
+  { id: 'graphic',   name: 'Графіка та анімація',               emoji: '🎨', age: '6–12 років',  age_group: '6-10',  duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#ec4899', popular: false,
+    description: 'Цифровий малюнок, анімація персонажів та основи дизайну. Курс для тих, хто хоче поєднати творчість і технології.',
+    features: [{ua:'✓ Цифровий малюнок та кольорознавство', ru:'✓ Цифровой рисунок и цветоведение'},{ua:'✓ Анімація кадр за кадром',            ru:'✓ Анимация кадр за кадром'},{ua:'✓ Власний анімований проєкт у фіналі', ru:'✓ Собственный анимированный проект в финале'}] },
+  { id: 'pc',        name: 'Базовий курс роботи з ПК',          emoji: '💻', age: '6–10 років',  age_group: '6-10',  duration: '2 місяці',  lessonsCount: 16, groupSize: 5, price: 3600, color: '#64748b', popular: false,
+    description: 'Перший крок у світ комп\'ютерів. Діти освоюють клавіатуру, мишу, файлову систему, текстові редактори та безпечний інтернет.',
+    features: [{ua:'✓ Швидкий набір тексту (сліпий метод)', ru:'✓ Быстрый набор текста (слепой метод)'},{ua:'✓ Word, Paint, базові програми',         ru:'✓ Word, Paint, базовые программы'},{ua:'✓ Безпека в інтернеті',                  ru:'✓ Безопасность в интернете'}] },
+  { id: 'python',    name: 'Python: справжнє програмування',    emoji: '🐍', age: '10–14 років', age_group: '10-14', duration: '4 місяці',  lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', popular: true,
+    description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.',
+    features: [{ua:'✓ Змінні, функції, цикли',          ru:'✓ Переменные, функции, циклы'},{ua:'✓ Pygame — розробка ігор',           ru:'✓ Pygame — разработка игр'},{ua:'✓ Telegram-бот у фіналі курсу',     ru:'✓ Telegram-бот в финале курса'}] },
+  { id: 'roblox',    name: 'Roblox: розробка ігор',             emoji: '🎮', age: '9–14 років',  age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#ef4444', popular: false,
+    description: 'Любиш Roblox? Навчись його створювати! Діти вивчають Lua, будують власні світи та публікують ігри для мільйонів гравців.',
+    features: [{ua:'✓ Lua — мова для Roblox Studio',    ru:'✓ Lua — язык для Roblox Studio'},{ua:'✓ 3D-дизайн та фізика ігор',         ru:'✓ 3D-дизайн и физика игр'},{ua:'✓ Публікація гри в Roblox',          ru:'✓ Публикация игры в Roblox'}] },
+  { id: 'minecraft', name: 'Minecraft: програмування в грі',    emoji: '⛏️', age: '9–14 років',  age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#22c55e', popular: false,
+    description: 'Любиш будувати в Minecraft? Навчись створювати моди та міні-ігри! Діти вивчають Python та логіку програмування через улюблену гру.',
+    features: [{ua:'✓ Python для Minecraft (mcpi)',      ru:'✓ Python для Minecraft (mcpi)'},{ua:'✓ Автоматизація будівництва',         ru:'✓ Автоматизация строительства'},{ua:'✓ Власний мод у фіналі курсу',       ru:'✓ Собственный мод в финале'}] },
+  { id: 'construct', name: 'Construct: розробка ігор без коду', emoji: '🕹️', age: '10–14 років', age_group: '10-14', duration: '3 місяці',  lessonsCount: 24, groupSize: 5, price: 3600, color: '#8b5cf6', popular: false,
+    description: 'Створюй справжні ігри без програмування. Construct дозволяє зробити платформер, стрілялку або аркаду — і одразу опублікувати в інтернеті.',
+    features: [{ua:'✓ Ігрова логіка через події та дії', ru:'✓ Игровая логика через события и действия'},{ua:'✓ Фізика, анімація, звукові ефекти',  ru:'✓ Физика, анимация, звуковые эффекты'},{ua:'✓ Публікація гри онлайн у фіналі',   ru:'✓ Публикация игры онлайн в финале'}] },
+  { id: 'web',       name: 'Розробка сайтів: HTML, CSS, JS',    emoji: '🌐', age: '12–16 років', age_group: '14-18', duration: '5 місяців', lessonsCount: 40, groupSize: 5, price: 3600, color: '#6c47ff', popular: false,
+    description: 'Створюй сайти з нуля. Від першої сторінки до повноцінного адаптивного проекту — все покроково з реальними задачами.',
+    features: [{ua:'✓ HTML5, CSS3, Flexbox/Grid',        ru:'✓ HTML5, CSS3, Flexbox/Grid'},{ua:'✓ JavaScript — інтерактивність',     ru:'✓ JavaScript — интерактивность'},{ua:'✓ Персональний сайт-портфоліо',      ru:'✓ Персональный сайт-портфолио'}] },
+  { id: 'blog',      name: 'Створення блогу та сайту',          emoji: '✍️', age: '12–17 років', age_group: '14-18', duration: '2 місяці',  lessonsCount: 16, groupSize: 5, price: 3600, color: '#f97316', popular: false,
+    description: 'Від ідеї до власного онлайн-простору. Учні створюють блог або портфоліо з нуля — без фреймворків, лише HTML, CSS і натхнення.',
+    features: [{ua:'✓ Структура та дизайн сторінки',    ru:'✓ Структура и дизайн страницы'},{ua:'✓ Контент, SEO-основи, домен',        ru:'✓ Контент, SEO-основы, домен'},{ua:'✓ Публікація власного сайту',        ru:'✓ Публикация собственного сайта'}] },
 ];
 
 // ── STARTUP SEED (test teachers + demo clients) ───────────────────────────────
@@ -118,6 +136,16 @@ const COURSE_SEED = [
     if (!coursesDb.getAll().length) {
       COURSE_SEED.forEach(c => coursesDb.create(c));
       console.log('✅  Seeded 9 courses');
+    } else {
+      let patched = 0;
+      coursesDb.getAll().forEach(c => {
+        const seed = COURSE_SEED.find(s => s.id === c.id);
+        if (seed && (!c.features || !c.features.length)) {
+          coursesDb.update(c.id, { features: seed.features, popular: seed.popular || false });
+          patched++;
+        }
+      });
+      if (patched) console.log(`✅  Patched features/popular on ${patched} courses`);
     }
     if (!clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
       [

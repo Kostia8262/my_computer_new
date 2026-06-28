@@ -432,32 +432,37 @@ async function loadCourses() {
     const el = document.getElementById('coursesGrid');
     if (!el) return;
     const COLOR_CLASS = {
-      scratch: 'course-card__header--scratch', python:  'course-card__header--python',
-      roblox:  'course-card__header--roblox',  web:     'course-card__header--web',
-      construct:'course-card__header--construct',graphic:'course-card__header--graphic',
-      pc:      'course-card__header--pc',       blog:    'course-card__header--blog',
+      scratch:  'course-card__header--scratch',  python:    'course-card__header--python',
+      roblox:   'course-card__header--roblox',   web:       'course-card__header--web',
+      construct:'course-card__header--construct', graphic:   'course-card__header--graphic',
+      pc:       'course-card__header--pc',        blog:      'course-card__header--blog',
+      minecraft:'course-card__header--minecraft',
     };
     el.innerHTML = active.map(c => {
-      const hClass = COLOR_CLASS[c.id] || '';
-      const hStyle = hClass ? '' : `style="background:${esc(c.color || '#6C47FF')}"`;
+      const hClass   = COLOR_CLASS[c.id] || '';
+      const hStyle   = hClass ? '' : `style="background:${esc(c.color || '#6C47FF')}"`;
       const ageGroup = esc(c.age_group || '');
-      const courseUrl = `/course.html?c=${esc(c.id)}`;
-      return `<div class="course-card" data-age="${ageGroup}" data-url="/courses/${esc(c.id)}">
+      const popular  = c.popular ? ' course-card--popular' : '';
+      const feats    = (c.features || []).map(f => {
+        const text = typeof f === 'string' ? f : (currentLang === 'ru' ? (f.ru || f.ua || '') : (f.ua || ''));
+        return `<li>${esc(text)}</li>`;
+      }).join('');
+      const btnLabel = currentLang === 'ru' ? 'Бесплатный пробный' : 'Безкоштовне пробне';
+      return `<div class="course-card${popular}" data-age="${ageGroup}" data-url="/courses/${esc(c.id)}">
         <div class="course-card__header ${hClass}" ${hStyle}>
           <div class="course-card__emoji">${esc(c.emoji || '')}</div>
           <div class="course-card__age-badge">${esc(c.age)}</div>
         </div>
         <div class="course-card__body">
           <h3 class="course-card__title">${esc(c.name)}</h3>
-          <ul class="course-card__features">
-            <li>⏱ ${esc(c.duration)}</li>
-            <li>👥 Група до ${esc(String(c.groupSize))} осіб</li>
-          </ul>
+          <p class="course-card__desc">${esc(c.description || '')}</p>
+          <ul class="course-card__features">${feats}</ul>
           <div class="course-card__footer">
             <div class="course-card__info">
-              <span>${esc(c.description ? c.description.slice(0,60)+'…' : '')}</span>
+              <span>⏱ ${esc(c.duration)}</span>
+              <span>👥 Група до ${esc(String(c.groupSize))} осіб</span>
             </div>
-            <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" style="display:block;text-align:center">${currentLang === 'ru' ? 'Бесплатный пробный' : 'Безкоштовне пробне'}</a>
+            <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" style="display:block;text-align:center">${btnLabel}</a>
           </div>
         </div>
       </div>`;
