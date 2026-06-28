@@ -294,6 +294,10 @@ function getRole(token) {
 // Safe ID pattern — prevents path traversal / injection
 const SAFE_ID_RE = /^[a-z0-9_-]{1,64}$/i;
 
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
   const role  = getRole(token);
@@ -1304,17 +1308,58 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// All courses use the dynamic course.html template (COURSES object + DB fallback)
 const DYNAMIC_COURSE_SLUGS = new Set(['scratch', 'python', 'roblox', 'web', 'construct', 'graphic', 'pc', 'blog', 'minecraft']);
+const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'), 'utf8');
+
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  if (DYNAMIC_COURSE_SLUGS.has(slug) || coursesDb.getAll().some(c => c.id === slug)) {
-    return res.sendFile(path.join(__dirname, '..', 'course.html'));
-  }
+
   const staticPath = path.join(__dirname, '..', 'courses', `${slug}.html`);
   if (fs.existsSync(staticPath)) return res.sendFile(staticPath);
-  res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+
+  const course = coursesDb.getAll().find(c => c.id === slug);
+  if (!course && !DYNAMIC_COURSE_SLUGS.has(slug)) {
+    return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  }
+
+  const name   = course ? course.name : 'Курс';
+  const rawDesc = course && course.description
+    ? course.description
+    : 'Детальна інформація про курс програмування для дітей у My Computer Academy';
+  const desc   = rawDesc.slice(0, 160);
+  const siteUrl = 'https://mycomputer.education';
+  const pageUrl = `${siteUrl}/courses/${slug}`;
+
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name,
+    description: rawDesc,
+    provider: { '@type': 'Organization', name: 'My Computer Academy', url: siteUrl },
+    url: pageUrl,
+    inLanguage: 'uk',
+  });
+
+  const html = COURSE_HTML_TPL
+    .replace(
+      '<title>Курс — My Computer Academy</title>',
+      `<title>${escHtml(name)} — My Computer Academy</title>`
+    )
+    .replace(
+      '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
+      `<meta name="description" content="${escHtml(desc)}"/>
+  <link rel="canonical" href="${pageUrl}"/>
+  <meta property="og:title" content="${escHtml(name)} — My Computer Academy"/>
+  <meta property="og:description" content="${escHtml(desc)}"/>
+  <meta property="og:url" content="${pageUrl}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:locale" content="uk_UA"/>`
+    )
+    .replace('</head>', `  <script type="application/ld+json">${jsonLd}</script>\n</head>`);
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────
