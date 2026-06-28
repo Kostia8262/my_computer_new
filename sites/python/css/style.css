@@ -700,7 +700,15 @@ a{color:inherit;text-decoration:none}
   /* Form row stacked on mobile */
   .form-row{grid-template-columns:1fr}
   .contact-form{padding:22px 16px}
-  .modal__dialog{padding:24px 20px;max-height:95vh}
+  .modal__dialog{padding:20px 18px;width:calc(100% - 20px);max-height:95vh}
+  .modal__header{margin-bottom:14px}
+  .modal-form .form-row,.contact-form .form-row{margin-bottom:12px}
+  .modal-form .form-row .form-group,.contact-form .form-row .form-group{margin-bottom:0}
+  .modal-form .form-group,.contact-form .form-group{margin-bottom:12px}
+  .form-messengers{margin-top:10px}
+  .form-messengers__links{flex-wrap:nowrap;gap:5px}
+  .form-messenger-btn{padding:5px 9px;font-size:11.5px;gap:3px}
+  .form-messenger-btn svg{width:13px;height:13px;flex-shrink:0}
 
   /* Footer */
   .footer__inner{grid-template-columns:1fr;gap:32px}
