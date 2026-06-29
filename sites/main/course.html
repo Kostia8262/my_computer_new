@@ -1065,6 +1065,14 @@ async function init() {
     if (apiCourse) course = apiToRender(apiCourse);
   }
 
+  // Override curriculum with live DB data so admin edits reflect on the page
+  if (course) {
+    const apiCourse = apiCourses.find(c => c.id === key);
+    if (apiCourse && Array.isArray(apiCourse.curriculum) && apiCourse.curriculum.length) {
+      course = { ...course, curriculum: apiCourse.curriculum };
+    }
+  }
+
   if (!course) {
     document.getElementById('courseMain').innerHTML =
       '<div class="container" style="padding:80px 0;text-align:center"><h2>Курс не знайдено</h2><a href="/" class="btn btn--primary" style="margin-top:20px">На головну</a></div>';
