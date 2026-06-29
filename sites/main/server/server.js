@@ -30,6 +30,7 @@ const attendanceDb   = require('./attendance');
 const monthlyPayDb   = require('./monthly-payments');
 const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
+const CURRICULA      = require('./curricula');
 const reviewsDb      = require('./reviews');
 const { sendLeadNotification, sendPaymentNotification } = require('./mailer');
 const monoPay        = require('./mono-pay');
@@ -134,18 +135,28 @@ const COURSE_SEED = [
       console.log('✅  Seeded pricing + FAQ content');
     }
     if (!coursesDb.getAll().length) {
-      COURSE_SEED.forEach(c => coursesDb.create(c));
+      COURSE_SEED.forEach(c => coursesDb.create({ ...c, curriculum: CURRICULA[c.id] || [] }));
       console.log('✅  Seeded 9 courses');
     } else {
       let patched = 0;
       coursesDb.getAll().forEach(c => {
         const seed = COURSE_SEED.find(s => s.id === c.id);
+        const patch = {};
         if (seed && (!c.features || !c.features.length)) {
-          coursesDb.update(c.id, { features: seed.features, popular: seed.popular || false });
+          patch.features = seed.features;
+          patch.popular  = seed.popular || false;
+        }
+        const hasPlaceholder = !c.curriculum || !c.curriculum.length ||
+          c.curriculum.some(m => m.num === 'Фінал' || (m.num && m.num.startsWith('Модуль')));
+        if (hasPlaceholder && CURRICULA[c.id]) {
+          patch.curriculum = CURRICULA[c.id];
+        }
+        if (Object.keys(patch).length) {
+          coursesDb.update(c.id, patch);
           patched++;
         }
       });
-      if (patched) console.log(`✅  Patched features/popular on ${patched} courses`);
+      if (patched) console.log(`✅  Patched ${patched} courses (features/popular/curriculum)`);
     }
     if (!clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
       [
