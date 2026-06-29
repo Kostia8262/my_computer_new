@@ -511,7 +511,7 @@ const COURSES = {
       { num:'Тема 3',  title:'Історія та стандарти', desc:'Розвиток інтернету, WWW, XHTML, блокові та лінійні елементи, заголовки H1-H6, редактори та браузери.' },
       { num:'Тема 4',  title:'Основи CSS', desc:'Синтаксис CSS, правила каскадності, групування та успадкування стилів, пріоритети.' },
       { num:'Тема 5',  title:'Селектори CSS', desc:'Комбіновані селектори, групування та успадкування, пріоритети стилів у CSS.' },
-      { num:'Тема 6',  title:'Посилання та шляхи', desc:'Елемент <a>, відносні та абсолютні шляхи, URL/URN, фрагменти сторінки, іменування папок.' },
+      { num:'Тема 6',  title:'Посилання та шляхи', desc:'Тег посилання, відносні та абсолютні шляхи, URL/URN, фрагменти сторінки, іменування папок.' },
       { num:'Тема 7',  title:'Списки, символи, метадані', desc:'Марковані та нумеровані списки, Unicode, MIME-типи, метадані KEYWORDS та DESCRIPTION, SEO-основи.' },
       { num:'Тема 8',  title:'CSS. Блокова модель та позиціонування', desc:'Box model, border/margin/padding, обтікання, навігація, Relative/Absolute/Flex/Fixed.' },
       { num:'Тема 9',  title:'Шрифти та текст', desc:'Шрифтове та текстове оформлення, вирівнювання, інтерліньяж, кернінг, колір, написання текстів для Web.' },
@@ -778,9 +778,9 @@ function renderCourse(c) {
 
   const currHtml = c.curriculum.map(m => `
     <div class="curriculum-card">
-      <div class="curriculum-card__num">${m.num}</div>
-      <div class="curriculum-card__title">${m.title}</div>
-      <div class="curriculum-card__desc">${m.desc}</div>
+      <div class="curriculum-card__num">${esc(m.num)}</div>
+      <div class="curriculum-card__title">${esc(m.title)}</div>
+      <div class="curriculum-card__desc">${esc(m.desc)}</div>
     </div>`).join('');
 
   const forHtml = c.forCards.map(f => `
