@@ -1472,6 +1472,11 @@ app.get('/test-500', (req, res, next) => {
   next(new Error('Test 500 error'));
 });
 
+// Redirect legacy /course/:id URLs (old URL pattern) to homepage
+app.get('/course/:id', (req, res) => {
+  res.redirect(301, '/');
+});
+
 // 404 — everything else that wasn't caught by static files or API
 app.use((req, res) => {
   if (req.path.startsWith('/api/')) {
