@@ -1208,23 +1208,6 @@ app.get('/test-500', (req, res, next) => {
   next(new Error('Test 500 error'));
 });
 
-// 404 — everything else that wasn't caught by static files or API
-app.use((req, res) => {
-  if (req.path.startsWith('/api/')) {
-    return res.status(404).json({ error: 'Endpoint not found' });
-  }
-  res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-});
-
-// 500 — unhandled server errors
-app.use((err, req, res, _next) => {
-  console.error('[SERVER ERROR]', err);
-  if (req.path.startsWith('/api/')) {
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-  res.status(500).sendFile(path.join(__dirname, '..', '500.html'));
-});
-
 // ── ONLINE PAYMENT ───────────────────────────────────────────────────────────
 app.post('/api/payment/create', async (req, res) => {
   const amount = parseFloat(req.body && req.body.amount);
@@ -1241,6 +1224,23 @@ app.post('/api/payment/wfp-create', async (req, res) => {
     const result = await wfp.createInvoice({ amountUah: amount, description: req.body.description || 'Оплата навчання My Computer Academy', orderRef: `wfp-${Date.now()}` });
     res.json({ pageUrl: result.invoiceUrl });
   } catch (e) { res.status(502).json({ error: e.message || 'Помилка WayForPay' }); }
+});
+
+// 404 — everything else that wasn't caught by static files or API
+app.use((req, res) => {
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'Endpoint not found' });
+  }
+  res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+});
+
+// 500 — unhandled server errors
+app.use((err, req, res, _next) => {
+  console.error('[SERVER ERROR]', err);
+  if (req.path.startsWith('/api/')) {
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+  res.status(500).sendFile(path.join(__dirname, '..', '500.html'));
 });
 
 // ── START ─────────────────────────────────────────────────────────────────────
