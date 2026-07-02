@@ -58,15 +58,21 @@ export const BlogDetail = () => {
     return (
         <BlogDetailWrapper>
             <Helmet>
-                <title>{post.title} | Академія Мій Комп'ютер</title>
+                <title>{post.title} | Академія Мій Комп'ютер Дніпро</title>
                 <meta name="description" content={post.description} />
-                <link rel="canonical" href={`https://mycomputer.education/posts/${id}/`} />
+                <meta name="keywords" content={`${post.title}, програмування Дніпро, IT навчання, Академія Мій Комп'ютер, курси для дітей`} />
+                <link rel="canonical" href={`https://old.mycomputer.education/posts/${id}/`} />
                 <meta property="og:type" content="article" />
-                <meta property="og:url" content={`https://mycomputer.education/posts/${id}/`} />
+                <meta property="og:url" content={`https://old.mycomputer.education/posts/${id}/`} />
                 <meta property="og:title" content={post.title} />
                 <meta property="og:description" content={post.description} />
                 {post.image && <meta property="og:image" content={post.image} />}
-                <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
+                <script type="application/ld+json">{JSON.stringify({
+                    ...articleSchema,
+                    url: `https://old.mycomputer.education/posts/${id}/`,
+                    author: { '@type': 'Organization', name: "Академія Мій Комп'ютер", url: 'https://old.mycomputer.education' },
+                    publisher: { '@type': 'Organization', name: "Академія Мій Комп'ютер", logo: { '@type': 'ImageObject', url: 'https://old.mycomputer.education/og-image.png' } },
+                })}</script>
             </Helmet>
             <Container>
                 <Box display="flex" alignItems={'center'} sx={{mb: {xs: 3, md: 5 }}}>

@@ -17,9 +17,14 @@ export const Blog = () => {
     return (
         <BlogWrapper>
             <Helmet>
-                <title>Блог | Академія Мій Комп'ютер Дніпро</title>
-                <meta name="description" content="Статті про програмування, веб-дизайн та IT від викладачів Академії Мій Комп'ютер у Дніпрі." />
-                <link rel="canonical" href="https://mycomputer.education/posts/" />
+                <title>Блог про програмування та IT | Академія Мій Комп'ютер Дніпро</title>
+                <meta name="description" content="Статті про програмування, веб-дизайн та IT від викладачів Академії Мій Комп'ютер у Дніпрі. Корисні поради для дітей, батьків та початківців." />
+                <meta name="keywords" content="блог програмування, статті про IT, програмування для дітей, веб-дизайн навчання, Академія Мій Комп'ютер, IT поради Дніпро" />
+                <link rel="canonical" href="https://old.mycomputer.education/posts/" />
+                <meta property="og:url" content="https://old.mycomputer.education/posts/" />
+                <meta property="og:title" content="Блог про програмування та IT | Академія Мій Комп'ютер Дніпро" />
+                <meta property="og:description" content="Статті про програмування, веб-дизайн та IT від викладачів Академії Мій Комп'ютер." />
+                <meta property="og:image" content="https://old.mycomputer.education/og-image.png" />
             </Helmet>
             <Container>
                 <Box display="flex" alignItems={'center'} sx={{mb: {xs: 3, md: 5 }}}>

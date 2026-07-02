@@ -33,21 +33,24 @@ export const Course = () => {
     return (
         <div>
             <Helmet>
-                <title>Академія Мій Комп'ютер Дніпро | Курс {course?.name ?? ''}</title>
-                <meta name="description" content={`${course?.name ?? 'Курс'} — навчання для дітей і дорослих у Академії Мій Комп'ютер, Дніпро. Досвідчені викладачі, онлайн та офлайн.`} />
-                <link rel="canonical" href={`https://mycomputer.education/course/${params.id}/`} />
-                <meta property="og:url" content={`https://mycomputer.education/course/${params.id}/`} />
-                <meta property="og:title" content={`Курс ${course?.name ?? ''} | Академія Мій Комп'ютер Дніпро`} />
+                <title>{course?.name ? `${course.name} — курс у Дніпрі | Академія Мій Комп'ютер` : "Академія Мій Комп'ютер Дніпро | Курси"}</title>
+                <meta name="description" content={course?.name ? `Курс ${course.name} в Академії Мій Комп'ютер Дніпро. ${course.description ? course.description.slice(0, 110) + '.' : 'Навчання для дітей і дорослих онлайн та офлайн. Досвідчені викладачі, малі групи, сертифікат.'}` : "Курси програмування для дітей і дорослих у Дніпрі."} />
+                <meta name="keywords" content={course?.name ? `${course.name}, курс ${course.name} Дніпро, ${course.name} онлайн, навчання ${course.name}, Академія Мій Комп'ютер, курси програмування Дніпро, IT курси для дітей` : "курси програмування Дніпро, IT курси для дітей, Академія Мій Комп'ютер"} />
+                <link rel="canonical" href={`https://old.mycomputer.education/course/${params.id}/`} />
+                <meta property="og:url" content={`https://old.mycomputer.education/course/${params.id}/`} />
+                <meta property="og:title" content={course?.name ? `${course.name} — курс у Дніпрі | Академія Мій Комп'ютер` : "Академія Мій Комп'ютер Дніпро"} />
+                <meta property="og:description" content={course?.name ? `Курс ${course.name} в Академії Мій Комп'ютер Дніпро. Навчання онлайн та офлайн, малі групи, сертифікат.` : ''} />
+                <meta property="og:image" content="https://old.mycomputer.education/og-image.png" />
                 {course && <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',
                     '@type': 'Course',
                     name: course.name,
                     description: course.description || `Курс ${course.name} для дітей і дорослих`,
-                    url: `https://mycomputer.education/course/${params.id}/`,
+                    url: `https://old.mycomputer.education/course/${params.id}/`,
                     provider: {
                         '@type': 'Organization',
                         name: "Академія Мій Комп'ютер",
-                        url: 'https://mycomputer.education',
+                        url: 'https://old.mycomputer.education',
                     },
                     ...(course.levels?.length && {
                         offers: course.levels.map(l => ({

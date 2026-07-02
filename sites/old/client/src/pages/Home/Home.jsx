@@ -25,12 +25,14 @@ export const Home = () => {
     return (
         <div>
             <Helmet>
-                <title>Академія Мій Комп'ютер Дніпро | Курси програмування</title>
+                <title>Академія Мій Комп'ютер Дніпро | Курси програмування для дітей і дорослих</title>
                 <meta name="description" content="Академія Мій Комп'ютер Дніпро — курси програмування, веб-дизайну та IT для дітей і дорослих. Понад 27 років досвіду. Онлайн та офлайн. Записуйтесь!" />
-                <link rel="canonical" href="https://mycomputer.education/" />
-                <meta property="og:url" content="https://mycomputer.education/" />
-                <meta property="og:title" content="Академія Мій Комп'ютер Дніпро | Курси програмування" />
+                <meta name="keywords" content="курси програмування Дніпро, IT курси для дітей, курси веб-дизайну Дніпро, навчання програмуванню, Академія Мій Комп'ютер, курси для дорослих Дніпро, Python курс, Scratch для дітей, онлайн курси IT" />
+                <link rel="canonical" href="https://old.mycomputer.education/" />
+                <meta property="og:url" content="https://old.mycomputer.education/" />
+                <meta property="og:title" content="Академія Мій Комп'ютер Дніпро | Курси програмування для дітей і дорослих" />
                 <meta property="og:description" content="Курси програмування, веб-дизайну та IT для дітей і дорослих. Понад 27 років досвіду. Онлайн та офлайн." />
+                <meta property="og:image" content="https://old.mycomputer.education/og-image.png" />
             </Helmet>
             <HomeHeader />
             <Course courses={courses} />
