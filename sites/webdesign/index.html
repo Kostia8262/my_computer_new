@@ -47,8 +47,8 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" /></noscript>
-  <link rel="preload" as="style" href="css/style.css?v=20260703" />
-  <link rel="stylesheet" href="css/style.css?v=20260703" />
+  <link rel="preload" as="style" href="css/style.css?v=20260703b" />
+  <link rel="stylesheet" href="css/style.css?v=20260703b" />
   <link rel="icon" type="image/x-icon" href="favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png" />
@@ -148,6 +148,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="hero__visual">
         <div class="hero__mockup">
+          <!-- Decorative floating shapes -->
+          <div class="mockup-deco mockup-deco--palette" aria-hidden="true">
+            <svg width="78" height="68" viewBox="0 0 78 68" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M39 4C20 4 4 16 4 31C4 46 16 58 32 58C37 58 40 54.5 40 50.5C40 48.5 41 46.8 42.5 46C44 45.2 46 44.5 48.5 44.5C62 44.5 74 36 74 25C74 13 58 4 39 4Z" fill="rgba(20,14,40,0.85)" stroke="rgba(108,71,255,0.55)" stroke-width="1.5"/>
+              <circle cx="19" cy="31" r="5.5" fill="#FF6B35"/>
+              <circle cx="30" cy="17" r="5.5" fill="#FFD166"/>
+              <circle cx="46" cy="14" r="5.5" fill="#06D6A0"/>
+              <circle cx="60" cy="26" r="5.5" fill="#0EA5E9"/>
+              <circle cx="55" cy="42" r="4.5" fill="#6C47FF"/>
+              <circle cx="39" cy="52" r="3" fill="rgba(255,255,255,0.15)"/>
+            </svg>
+          </div>
+          <div class="mockup-deco mockup-deco--brush" aria-hidden="true">
+            <svg width="28" height="110" viewBox="0 0 28 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="9" y="2" width="10" height="62" rx="5" fill="url(#brushHandle)"/>
+              <defs><linearGradient id="brushHandle" x1="9" y1="2" x2="19" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#9b72ff"/><stop offset="1" stop-color="#6C47FF"/></linearGradient></defs>
+              <rect x="7" y="57" width="14" height="9" rx="2" fill="#4a30cc"/>
+              <ellipse cx="14" cy="57" rx="7" ry="3" fill="#5a3de0"/>
+              <path d="M7 66 C5 76 4 88 14 108 C24 88 23 76 21 66 Z" fill="url(#bristles)"/>
+              <defs><linearGradient id="bristles" x1="14" y1="66" x2="14" y2="108" gradientUnits="userSpaceOnUse"><stop stop-color="#c4b5fd"/><stop offset="1" stop-color="#a78bfa" stop-opacity="0.4"/></linearGradient></defs>
+              <path d="M9 68 C8 80 8 92 14 104 C20 92 20 80 19 68 Z" fill="rgba(232,221,255,0.35)"/>
+            </svg>
+          </div>
+          <div class="mockup-deco mockup-deco--pencil" aria-hidden="true">
+            <svg width="22" height="85" viewBox="0 0 22 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="5" y="6" width="12" height="58" rx="2" fill="#FFD166"/>
+              <rect x="5" y="6" width="12" height="6" rx="2" fill="#e0b84e"/>
+              <rect x="5" y="2" width="12" height="8" rx="2" fill="#bbb"/>
+              <polygon points="5,64 17,64 11,80" fill="#FFAD60"/>
+              <polygon points="8,72 14,72 11,80" fill="#2a1a06"/>
+              <line x1="5" y1="64" x2="17" y2="64" stroke="#e0b84e" stroke-width="1"/>
+            </svg>
+          </div>
           <div class="mockup-window">
             <div class="mockup-bar">
               <span class="dot dot--red"></span>
@@ -156,54 +189,68 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <span class="mockup-title">portfolio.fig — Figma</span>
             </div>
             <div class="mockup-design">
-              <div class="md-sidebar">
-                <div class="md-layer-group">Layers</div>
-                <div class="md-layer md-layer--active"><span class="md-arrow">▸</span>Hero</div>
-                <div class="md-layer md-layer--indent"><span class="md-arrow">▸</span>Heading</div>
-                <div class="md-layer md-layer--indent"><span class="md-arrow">▸</span>Button</div>
-                <div class="md-layer"><span class="md-arrow">▸</span>Navbar</div>
-                <div class="md-layer"><span class="md-arrow">▸</span>Cards</div>
-                <div class="md-layer"><span class="md-arrow">▸</span>Footer</div>
+              <div class="md-toolbar">
+                <div class="md-tool md-tool--logo">✦</div>
+                <div class="md-tool-sep"></div>
+                <div class="md-tool md-tool--active" title="Move">↖</div>
+                <div class="md-tool" title="Frame">⊡</div>
+                <div class="md-tool" title="Pen">✒</div>
+                <div class="md-tool" title="Text">T</div>
+                <div class="md-tool" title="Shape">○</div>
+                <div class="md-tool-sep"></div>
+                <div class="md-tool md-zoom">75%</div>
+                <div class="md-avatar"></div>
               </div>
-              <div class="md-canvas">
-                <div class="md-frame">
-                  <div class="md-frame-nav">
-                    <div class="md-logo-box"></div>
-                    <div class="md-nav-links">
-                      <div class="md-nav-link"></div>
-                      <div class="md-nav-link"></div>
-                      <div class="md-nav-link"></div>
-                    </div>
-                    <div class="md-nav-btn"></div>
-                  </div>
-                  <div class="md-frame-hero">
-                    <div class="md-h1"></div>
-                    <div class="md-h1 md-h1--short"></div>
-                    <div class="md-p"></div>
-                    <div class="md-frame-btns">
-                      <div class="md-cta-btn"></div>
-                      <div class="md-ghost-btn"></div>
-                    </div>
-                  </div>
-                  <div class="md-frame-cards">
-                    <div class="md-fcard"><div class="md-fcard-img md-fcard-img--purple"></div><div class="md-fcard-line"></div><div class="md-fcard-line md-fcard-line--short"></div></div>
-                    <div class="md-fcard"><div class="md-fcard-img md-fcard-img--orange"></div><div class="md-fcard-line"></div><div class="md-fcard-line md-fcard-line--short"></div></div>
-                    <div class="md-fcard"><div class="md-fcard-img md-fcard-img--green"></div><div class="md-fcard-line"></div><div class="md-fcard-line md-fcard-line--short"></div></div>
-                  </div>
+              <div class="md-body">
+                <div class="md-sidebar">
+                  <div class="md-layer-group">Layers</div>
+                  <div class="md-layer md-layer--active"><span class="md-arrow">▸</span>Hero</div>
+                  <div class="md-layer md-layer--indent"><span class="md-arrow">▸</span>Heading</div>
+                  <div class="md-layer md-layer--indent"><span class="md-arrow">▸</span>Button</div>
+                  <div class="md-layer"><span class="md-arrow">▸</span>Navbar</div>
+                  <div class="md-layer"><span class="md-arrow">▸</span>Cards</div>
+                  <div class="md-layer"><span class="md-arrow">▸</span>Footer</div>
                 </div>
-                <div class="md-selection"></div>
-              </div>
-              <div class="md-props">
-                <div class="md-prop-label">Fill</div>
-                <div class="md-swatches">
-                  <div class="md-swatch" style="background:#6C47FF"></div>
-                  <div class="md-swatch" style="background:#FF6B35"></div>
-                  <div class="md-swatch" style="background:#FFD166"></div>
-                  <div class="md-swatch" style="background:#06D6A0"></div>
+                <div class="md-canvas">
+                  <div class="md-frame">
+                    <div class="md-frame-nav">
+                      <div class="md-logo-box"></div>
+                      <div class="md-nav-links">
+                        <div class="md-nav-link"></div>
+                        <div class="md-nav-link"></div>
+                        <div class="md-nav-link"></div>
+                      </div>
+                      <div class="md-nav-btn"></div>
+                    </div>
+                    <div class="md-frame-hero">
+                      <div class="md-h1"></div>
+                      <div class="md-h1 md-h1--short"></div>
+                      <div class="md-p"></div>
+                      <div class="md-frame-btns">
+                        <div class="md-cta-btn"></div>
+                        <div class="md-ghost-btn"></div>
+                      </div>
+                    </div>
+                    <div class="md-frame-cards">
+                      <div class="md-fcard"><div class="md-fcard-img md-fcard-img--purple"></div><div class="md-fcard-line"></div><div class="md-fcard-line md-fcard-line--short"></div></div>
+                      <div class="md-fcard"><div class="md-fcard-img md-fcard-img--orange"></div><div class="md-fcard-line"></div><div class="md-fcard-line md-fcard-line--short"></div></div>
+                      <div class="md-fcard"><div class="md-fcard-img md-fcard-img--green"></div><div class="md-fcard-line"></div><div class="md-fcard-line md-fcard-line--short"></div></div>
+                    </div>
+                  </div>
+                  <div class="md-selection"></div>
                 </div>
-                <div class="md-prop-label" style="margin-top:8px">W / H</div>
-                <div class="md-prop-input">1440</div>
-                <div class="md-prop-input">900</div>
+                <div class="md-props">
+                  <div class="md-prop-label">Fill</div>
+                  <div class="md-swatches">
+                    <div class="md-swatch" style="background:#6C47FF"></div>
+                    <div class="md-swatch" style="background:#FF6B35"></div>
+                    <div class="md-swatch" style="background:#FFD166"></div>
+                    <div class="md-swatch" style="background:#06D6A0"></div>
+                  </div>
+                  <div class="md-prop-label" style="margin-top:8px">W / H</div>
+                  <div class="md-prop-input">1440</div>
+                  <div class="md-prop-input">900</div>
+                </div>
               </div>
             </div>
           </div>
