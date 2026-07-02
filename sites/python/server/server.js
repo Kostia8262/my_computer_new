@@ -32,6 +32,8 @@ const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
 const reviewsDb      = require('./reviews');
 const { sendLeadNotification } = require('./mailer');
+const monoPay = require('./mono-pay');
+const wfp     = require('./wayforpay');
 
 const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
 
@@ -1228,6 +1230,24 @@ app.use((err, req, res, _next) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
   res.status(500).sendFile(path.join(__dirname, '..', '500.html'));
+});
+
+// ── ONLINE PAYMENT ───────────────────────────────────────────────────────────
+app.post('/api/payment/create', async (req, res) => {
+  const amount = parseFloat(req.body && req.body.amount);
+  if (!amount || amount < 1 || amount > 100000) return res.status(400).json({ error: 'Невірна сума. Від 1 до 100 000 грн.' });
+  try {
+    const invoice = await monoPay.createInvoice({ amountUah: amount, description: req.body.description || 'Оплата навчання My Computer Academy' });
+    res.json({ pageUrl: invoice.pageUrl });
+  } catch (e) { res.status(502).json({ error: 'Не вдалося створити платіж. Спробуйте ще раз.' }); }
+});
+app.post('/api/payment/wfp-create', async (req, res) => {
+  const amount = parseFloat(req.body && req.body.amount);
+  if (!amount || amount < 1 || amount > 100000) return res.status(400).json({ error: 'Невірна сума. Від 1 до 100 000 грн.' });
+  try {
+    const result = await wfp.createInvoice({ amountUah: amount, description: req.body.description || 'Оплата навчання My Computer Academy', orderRef: `wfp-${Date.now()}` });
+    res.json({ pageUrl: result.invoiceUrl });
+  } catch (e) { res.status(502).json({ error: e.message || 'Помилка WayForPay' }); }
 });
 
 // ── START ─────────────────────────────────────────────────────────────────────

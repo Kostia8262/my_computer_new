@@ -1172,15 +1172,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
       </div>
     </div>
-    <!-- Payment methods -->
-    <div class="footer__payments">
-      <span class="footer__payments-label" data-ru="Оплата:">Оплата:</span>
-      <div class="footer__payment-icons">
-        <span class="pay-badge">WayForPay</span>
-        <span class="pay-badge">Google Pay</span>
-        <span class="pay-badge">Apple Pay</span>
-        <span class="pay-badge">Visa</span>
-        <span class="pay-badge">Mastercard</span>
+    <!-- Online payment -->
+    <div class="footer__pay-section">
+      <div class="footer__pay-btns">
+        <button class="btn-plata" id="openPayModal" data-provider="mono">
+          <img src="/img/pay/plata.svg" alt="plata by mono" height="20" loading="lazy" />
+          <span data-ru="Онлайн-оплата картой">Онлайн-оплата карткою</span>
+        </button>
+        <button class="btn-wfp" id="openWfpModal" data-provider="wfp">
+          <img src="/img/pay/wayforpay.png" alt="WayForPay" height="18" loading="lazy" />
+        </button>
+      </div>
+      <div class="footer__pay-logos">
+        <span class="pay-logo-pill"><img src="/img/pay/visa.svg" alt="Visa" height="16" loading="lazy" /></span>
+        <span class="pay-logo-pill"><img src="/img/pay/mc.svg" alt="Mastercard" height="16" loading="lazy" /></span>
+        <span class="pay-logo-pill"><img src="/img/pay/apple-pay.svg" alt="Apple Pay" height="16" loading="lazy" /></span>
+        <span class="pay-logo-pill"><img src="/img/pay/google-pay.svg" alt="Google Pay" height="16" loading="lazy" /></span>
       </div>
     </div>
     <!-- Legal links row -->
@@ -1295,6 +1302,72 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="result-notify__bar"><div class="result-notify__progress" id="resultNotifyProgress"></div></div>
 </div>
 
+<!-- ========== PAYMENT MODAL ========== -->
+<div class="modal" id="payModal" role="dialog" aria-modal="true" aria-labelledby="payModalTitle">
+  <div class="modal__backdrop" id="payModalBackdrop"></div>
+  <div class="modal__dialog">
+    <button class="modal__close" id="payModalClose" aria-label="Закрити"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M14 4L4 14M4 4L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <div class="modal__header">
+      <h3 class="modal__title" id="payModalTitle">Оплата навчання</h3>
+      <p class="modal__subtitle">Введіть суму та натисніть «Перейти до оплати»</p>
+    </div>
+    <div class="form-group"><label class="form-label" for="payAmount">Сума (грн) *</label><input type="number" class="form-input" id="payAmount" min="1" max="100000" placeholder="3600" /></div>
+    <div class="form-group"><label class="form-label" for="payDescription">Призначення *</label><input type="text" class="form-input" id="payDescription" placeholder="Оплата за навчання" maxlength="100" value="Оплата за навчання" /></div>
+    <button class="btn btn--primary btn--full btn--lg" id="paySubmitBtn"><span id="payBtnText">Перейти до оплати →</span></button>
+    <div id="payError" class="pay-error" style="display:none"></div>
+    <div class="pay-modal-footer"><img src="/img/pay/plata.svg" alt="plata by mono" height="16" loading="lazy" /></div>
+  </div>
+</div>
+<!-- ========== WAYFORPAY MODAL ========== -->
+<div class="modal" id="wfpModal" role="dialog" aria-modal="true" aria-labelledby="wfpModalTitle">
+  <div class="modal__backdrop" id="wfpModalBackdrop"></div>
+  <div class="modal__dialog">
+    <button class="modal__close" id="wfpModalClose" aria-label="Закрити"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M14 4L4 14M4 4L14 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    <div class="modal__header">
+      <h3 class="modal__title" id="wfpModalTitle">Оплата через WayForPay</h3>
+      <p class="modal__subtitle">Введіть суму та натисніть «Перейти до оплати»</p>
+    </div>
+    <div class="form-group"><label class="form-label" for="wfpAmount">Сума (грн) *</label><input type="number" class="form-input" id="wfpAmount" min="1" max="100000" placeholder="3600" /></div>
+    <div class="form-group"><label class="form-label" for="wfpDescription">Призначення *</label><input type="text" class="form-input" id="wfpDescription" placeholder="Оплата за навчання" maxlength="100" value="Оплата за навчання" /></div>
+    <button class="btn btn--primary btn--full btn--lg" id="wfpSubmitBtn"><span id="wfpBtnText">Перейти до оплати →</span></button>
+    <div id="wfpError" class="pay-error" style="display:none"></div>
+    <div class="pay-modal-footer"><img src="/img/pay/wayforpay.png" alt="WayForPay" height="16" loading="lazy" /></div>
+  </div>
+</div>
+<script>
+(function() {
+  function openPayModal()  { document.getElementById('payModal').classList.add('open');  document.body.classList.add('modal-open');    document.getElementById('payAmount').focus(); }
+  function closePayModal() { document.getElementById('payModal').classList.remove('open'); document.body.classList.remove('modal-open'); document.getElementById('payError').style.display='none'; }
+  function openWfpModal()  { document.getElementById('wfpModal').classList.add('open');  document.body.classList.add('modal-open');    document.getElementById('wfpAmount').focus(); }
+  function closeWfpModal() { document.getElementById('wfpModal').classList.remove('open'); document.body.classList.remove('modal-open'); document.getElementById('wfpError').style.display='none'; }
+  document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('openPayModal').addEventListener('click', openPayModal);
+    document.getElementById('payModalClose').addEventListener('click', closePayModal);
+    document.getElementById('payModalBackdrop').addEventListener('click', closePayModal);
+    document.getElementById('openWfpModal').addEventListener('click', openWfpModal);
+    document.getElementById('wfpModalClose').addEventListener('click', closeWfpModal);
+    document.getElementById('wfpModalBackdrop').addEventListener('click', closeWfpModal);
+    document.getElementById('paySubmitBtn').addEventListener('click', async function() {
+      var amount=parseFloat(document.getElementById('payAmount').value), desc=document.getElementById('payDescription').value.trim(), errEl=document.getElementById('payError'), btn=document.getElementById('paySubmitBtn'), btnTxt=document.getElementById('payBtnText');
+      errEl.style.display='none';
+      if (!amount||amount<1){errEl.textContent='Введіть суму оплати';errEl.style.display='block';return;}
+      if (!desc){errEl.textContent='Введіть призначення платежу';errEl.style.display='block';return;}
+      btn.disabled=true; btnTxt.textContent='Зачекайте...';
+      try { var resp=await fetch('/api/payment/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:amount,description:desc})}); var data=await resp.json(); if(!resp.ok)throw new Error(data.error||'Помилка оплати'); window.location.href=data.pageUrl; }
+      catch(e){errEl.textContent=e.message;errEl.style.display='block';btn.disabled=false;btnTxt.textContent='Перейти до оплати →';}
+    });
+    document.getElementById('wfpSubmitBtn').addEventListener('click', async function() {
+      var amount=parseFloat(document.getElementById('wfpAmount').value), desc=document.getElementById('wfpDescription').value.trim(), errEl=document.getElementById('wfpError'), btn=document.getElementById('wfpSubmitBtn'), btnTxt=document.getElementById('wfpBtnText');
+      errEl.style.display='none';
+      if (!amount||amount<1){errEl.textContent='Введіть суму оплати';errEl.style.display='block';return;}
+      if (!desc){errEl.textContent='Введіть призначення';errEl.style.display='block';return;}
+      btn.disabled=true; btnTxt.textContent='Зачекайте...';
+      try { var resp=await fetch('/api/payment/wfp-create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({amount:amount,description:desc})}); var data=await resp.json(); if(!resp.ok)throw new Error(data.error||'Помилка оплати'); window.location.href=data.pageUrl; }
+      catch(e){errEl.textContent=e.message;errEl.style.display='block';btn.disabled=false;btnTxt.textContent='Перейти до оплати →';}
+    });
+  });
+})();
+</script>
 <script src="js/main.js?v=20260629" defer></script>
 </body>
 </html>
