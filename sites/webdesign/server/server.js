@@ -413,6 +413,15 @@ app.post('/api/leads', leadsLimiter, (req, res) => {
     const result = db.insertLead(sanitized);
     console.log(`[LEAD #${result.id}] ${sanitized.child_name} | ${sanitized.phone} | ${sanitized.course || '—'}`);
 
+    // Forward to main admin panel (non-blocking)
+    if (process.env.MAIN_ADMIN_TOKEN) {
+      fetch('https://mycomputer.education/api/leads/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': process.env.MAIN_ADMIN_TOKEN },
+        body: JSON.stringify({ ...sanitized, course: sanitized.course || 'Веб-дизайн (лендинг)', notes: 'Заявка з webdesign.mycomputer.education' }),
+      }).catch(() => {});
+    }
+
     // Send email notification (non-blocking — lead is saved regardless)
     sendLeadNotification({ ...sanitized, id: result.id }).catch(() => {});
 

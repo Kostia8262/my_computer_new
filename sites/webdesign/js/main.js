@@ -343,6 +343,16 @@ async function submitLeadForm(formEl, submitBtnEl) {
   };
 
   try {
+    // Send to local server — stores in DB, sends email, forwards to main admin
+    const params = new URLSearchParams({
+      child_name: data.child_name,
+      age:        data.age,
+      course:     data.course || 'Веб-дизайн (лендинг)',
+      phone:      data.phone,
+      email:      data.email,
+    });
+    navigator.sendBeacon('/api/leads', params);
+
     if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL.includes('script.google.com')) {
       try {
         // Hidden iframe form submit — follows all GAS redirects, no CORS issues
