@@ -158,16 +158,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               <span class="dot dot--red"></span>
               <span class="dot dot--yellow"></span>
               <span class="dot dot--green"></span>
-              <span class="mockup-title">student_project.py</span>
+              <span class="mockup-title">mc_house.py</span>
             </div>
             <div class="mockup-code">
-              <div class="code-line"><span class="c-keyword">import</span> <span class="c-module">turtle</span></div>
-              <div class="code-line"><span class="c-comment"># Малюємо зірку!</span></div>
-              <div class="code-line"><span class="c-var">t</span> <span class="c-op">=</span> <span class="c-module">turtle</span><span class="c-op">.</span><span class="c-func">Turtle</span><span class="c-punc">()</span></div>
-              <div class="code-line"><span class="c-keyword">for</span> i <span class="c-keyword">in</span> <span class="c-func">range</span><span class="c-punc">(</span><span class="c-num">5</span><span class="c-punc">):</span></div>
-              <div class="code-line indent"><span class="c-var">t</span><span class="c-op">.</span><span class="c-func">forward</span><span class="c-punc">(</span><span class="c-num">100</span><span class="c-punc">)</span></div>
-              <div class="code-line indent"><span class="c-var">t</span><span class="c-op">.</span><span class="c-func">right</span><span class="c-punc">(</span><span class="c-num">144</span><span class="c-punc">)</span></div>
-              <div class="code-line"><span class="c-comment"># ⭐ Готово!</span></div>
+              <div class="code-line"><span class="c-keyword">from</span> <span class="c-module">mcpi.minecraft</span> <span class="c-keyword">import</span> <span class="c-module">Minecraft</span></div>
+              <div class="code-line"><span class="c-comment"># 🏠 Будуємо будинок!</span></div>
+              <div class="code-line"><span class="c-var">mc</span> <span class="c-op">=</span> <span class="c-module">Minecraft</span><span class="c-op">.</span><span class="c-func">create</span><span class="c-punc">()</span></div>
+              <div class="code-line"><span class="c-var">pos</span> <span class="c-op">=</span> <span class="c-var">mc</span><span class="c-op">.</span><span class="c-module">player</span><span class="c-op">.</span><span class="c-func">getTilePos</span><span class="c-punc">()</span></div>
+              <div class="code-line"><span class="c-var">mc</span><span class="c-op">.</span><span class="c-func">setBlocks</span><span class="c-punc">(</span></div>
+              <div class="code-line indent"><span class="c-var">pos</span><span class="c-op">.</span><span class="c-module">x</span><span class="c-punc">,</span> <span class="c-var">pos</span><span class="c-op">.</span><span class="c-module">y</span><span class="c-punc">,</span> <span class="c-var">pos</span><span class="c-op">.</span><span class="c-module">z</span><span class="c-punc">,</span></div>
+              <div class="code-line indent"><span class="c-var">pos</span><span class="c-op">.</span><span class="c-module">x</span><span class="c-op">+</span><span class="c-num">5</span><span class="c-punc">,</span> <span class="c-var">pos</span><span class="c-op">.</span><span class="c-module">y</span><span class="c-op">+</span><span class="c-num">4</span><span class="c-punc">,</span> <span class="c-var">pos</span><span class="c-op">.</span><span class="c-module">z</span><span class="c-op">+</span><span class="c-num">5</span><span class="c-punc">,</span></div>
+              <div class="code-line indent"><span class="c-num">4</span><span class="c-punc">)</span>  <span class="c-comment"># Cobblestone</span></div>
+              <div class="code-line"><span class="c-comment"># ⛏️ Готово!</span></div>
               <div class="code-cursor"></div>
             </div>
           </div>
