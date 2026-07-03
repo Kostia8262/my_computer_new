@@ -79,6 +79,16 @@ const CONTENT_SEED = {
       priceUnit: { ua: 'грн/курс', ru: 'грн/курс' },
     },
   ],
+  seo: {
+    pages: [
+      {
+        id: 'main',
+        label: 'Головна сторінка (mycomputer.education)',
+        heading: 'Школа програмування для дітей у Дніпрі — My Computer Academy',
+        text: 'My Computer Academy — це онлайн та офлайн школа програмування для дітей від 6 до 18 років у Дніпрі. Scratch, Python, Roblox Studio, Веб-розробка HTML CSS JS. Перший пробний урок безкоштовно.',
+      },
+    ],
+  },
   faq: [
     { id:1, question:{ ua:'З якого віку можна починати?',       ru:'С какого возраста можно начинать?' },       answer:{ ua:'Приймаємо дітей від 6 років. Для малюків — Scratch, для дітей старшого віку — Python, Roblox, Web розробка. Конкретний курс підберемо на безкоштовній консультації.', ru:'Принимаем детей от 6 лет. Для малышей — Scratch, для детей постарше — Python, Roblox, Web разработка. Конкретный курс подберём на бесплатной консультации.' } },
     { id:2, question:{ ua:'Чи потрібні знання програмування?',  ru:'Нужны ли знания программирования?' },        answer:{ ua:'Абсолютно ніяких. Всі курси починаються з нуля. Потрібен тільки комп\'ютер з інтернетом.', ru:'Абсолютно никаких. Все курсы начинаются с нуля. Нужен только компьютер с интернетом.' } },
@@ -263,17 +273,27 @@ const MAIN_META_RU = {
   title: 'Школа программирования и IT-курсов для детей — My Computer Academy | Minecraft, Scratch, Python, Roblox',
   desc:  'Компьютерные курсы для детей от 6 до 18 лет по всей Украине. Scratch, Python, Roblox Studio, Веб-разработка. Малые группы до 5 человек. Первый урок бесплатно.',
 };
-app.get(['/', '/index.html'], (req, res, next) => {
-  if (req.query.lang !== 'ru') return next();
-  const m = MAIN_META_RU;
-  const html = MAIN_INDEX_TPL
-    .replace(/<html lang="uk">/, '<html lang="ru">')
-    .replace(/<title>[^<]*<\/title>/, `<title>${escHtml(m.title)}</title>`)
-    .replace(/(<meta name="description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
-    .replace(/(<meta property="og:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
-    .replace(/(<meta property="og:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
-    .replace(/(<meta name="twitter:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
-    .replace(/(<meta name="twitter:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
+app.get(['/', '/index.html'], (req, res) => {
+  // Build SEO block from content.json
+  const seoPages = loadContent().seo?.pages || [];
+  const mainSeo  = seoPages.find(p => p.id === 'main') || {};
+  const seoBlock = (mainSeo.heading || mainSeo.text)
+    ? `<div class="visually-hidden" aria-hidden="true">${mainSeo.heading ? `<h2>${escHtml(mainSeo.heading)}</h2>` : ''}${mainSeo.text ? `<p>${escHtml(mainSeo.text)}</p>` : ''}</div>`
+    : '';
+
+  let html = MAIN_INDEX_TPL.replace('<!-- SEO_BLOCK_MAIN -->', seoBlock);
+
+  if (req.query.lang === 'ru') {
+    const m = MAIN_META_RU;
+    html = html
+      .replace(/<html lang="uk">/, '<html lang="ru">')
+      .replace(/<title>[^<]*<\/title>/, `<title>${escHtml(m.title)}</title>`)
+      .replace(/(<meta name="description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
+      .replace(/(<meta property="og:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
+      .replace(/(<meta property="og:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
+      .replace(/(<meta name="twitter:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
+      .replace(/(<meta name="twitter:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
+  }
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
 });
@@ -1120,7 +1140,7 @@ app.get('/api/content', (req, res) => {
 // Admin: update a section (pricing | faq | courses | modules)
 app.put('/api/content/:section', adminLimiter, requireAdmin, (req, res) => {
   const { section } = req.params;
-  const allowed = ['pricing', 'faq', 'courses', 'modules'];
+  const allowed = ['pricing', 'faq', 'courses', 'modules', 'seo'];
   if (!allowed.includes(section)) return res.status(400).json({ error: 'Unknown section' });
   const data = loadContent();
   data[section] = req.body;

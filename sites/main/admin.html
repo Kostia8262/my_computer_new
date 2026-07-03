@@ -362,6 +362,9 @@ tr:hover td{background:#faf9ff}
       <button class="sidebar-item" id="sideNav-reviews" onclick="showTab('reviews')">
         <span class="sidebar-icon">⭐</span><span>Відгуки</span>
       </button>
+      <button class="sidebar-item" id="sideNav-seo" onclick="showTab('seo')">
+        <span class="sidebar-icon">🔍</span><span>SEO тексти</span>
+      </button>
       <div class="sidebar-section">Налаштування</div>
       <button class="sidebar-item management-visible" id="sideNav-dashboard" onclick="showTab('dashboard')" style="display:none">
         <span class="sidebar-icon">📊</span><span>Дашборд</span>
@@ -730,6 +733,33 @@ tr:hover td{background:#faf9ff}
             <button class="btn btn-ghost" onclick="closeReviewModal()">Скасувати</button>
             <button class="btn btn-primary" onclick="saveReview()">💾 Зберегти</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO TEXTS TAB -->
+    <div id="seoTab" style="display:none">
+      <div style="display:flex;align-items:center;margin-bottom:20px">
+        <h2 style="font-size:18px;font-weight:800">🔍 SEO тексти</h2>
+      </div>
+      <p style="font-size:13px;color:#888;margin-bottom:24px;max-width:640px">Ці тексти приховані від відвідувачів сайту, але індексуються пошуковими системами. Використовуйте для ключових слів, географічних запитів та семантичного охоплення.</p>
+
+      <div class="cms-section" style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:24px;max-width:760px">
+        <div class="cms-section-title" style="margin-bottom:6px">🏠 Головна сторінка</div>
+        <p style="font-size:12px;color:#aaa;margin-bottom:20px">mycomputer.education — блок вставляється між секціями, прихований через CSS</p>
+
+        <div style="margin-bottom:16px">
+          <label class="modal-label">Заголовок H2 <span style="font-weight:400;opacity:.6">(необов'язково)</span></label>
+          <input class="modal-input" id="seo_main_heading" placeholder="Школа програмування для дітей у Дніпрі — My Computer Academy"/>
+        </div>
+        <div style="margin-bottom:20px">
+          <label class="modal-label">Текст абзацу <span style="font-weight:400;opacity:.6">(необов'язково)</span></label>
+          <textarea class="modal-input" id="seo_main_text" rows="4" placeholder="My Computer Academy — це онлайн та офлайн школа програмування для дітей від 6 до 18 років..."></textarea>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <button class="btn btn-primary btn-sm" onclick="saveSeoTexts()">Зберегти</button>
+          <span id="seoSaveOk" style="font-size:13px;color:#22c55e;display:none">✓ Збережено!</span>
+          <span id="seoSaveErr" style="font-size:13px;color:#ef4444;display:none">Помилка збереження</span>
         </div>
       </div>
     </div>
@@ -1303,12 +1333,12 @@ let _currentTab = 'leads';
 function showTab(tab) {
   _currentTab = tab;
   localStorage.setItem(STORAGE_TAB_KEY, tab);
-  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','dashboard'].forEach(t => {
+  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
     const el = document.getElementById(t + 'Tab');
     if (el) el.style.display = t === tab ? '' : 'none';
   });
   // Sidebar active state
-  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','dashboard'].forEach(t => {
+  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
     const btn = document.getElementById('sideNav-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
   });
@@ -1330,6 +1360,7 @@ function showTab(tab) {
   if (tab === 'modules')    loadModulesTab();
   if (tab === 'articles')   loadArticlesTab();
   if (tab === 'reviews')    loadReviewsTab();
+  if (tab === 'seo')        loadSeoTab();
   if (tab === 'dashboard')  loadDashboardTab();
 }
 
@@ -4653,6 +4684,49 @@ async function loadTeacherSalary() {
       breakdownEl.innerHTML = '<div style="color:#aaa;font-size:12px;margin-top:6px">Учнів у цього викладача не знайдено</div>';
     }
   } catch { resultEl.textContent = '⚠️ Помилка'; }
+}
+
+// ── SEO TEXTS ────────────────────────────────────────────────────────────────
+let _seoData = null;
+
+async function loadSeoTab() {
+  if (_seoData) { renderSeoTab(); return; }
+  try {
+    const r = await authFetch('/api/content');
+    const d = await r.json();
+    _seoData = d.seo || { pages: [] };
+    renderSeoTab();
+  } catch(e) { console.error('SEO load error:', e); }
+}
+
+function renderSeoTab() {
+  const main = (_seoData?.pages || []).find(p => p.id === 'main') || {};
+  const h = document.getElementById('seo_main_heading');
+  const t = document.getElementById('seo_main_text');
+  if (h) h.value = main.heading || '';
+  if (t) t.value = main.text    || '';
+}
+
+async function saveSeoTexts() {
+  const heading = (document.getElementById('seo_main_heading')?.value || '').trim();
+  const text    = (document.getElementById('seo_main_text')?.value    || '').trim();
+  const pages   = [{ id: 'main', label: 'Головна сторінка (mycomputer.education)', heading, text }];
+  _seoData = { pages };
+  const okEl  = document.getElementById('seoSaveOk');
+  const errEl = document.getElementById('seoSaveErr');
+  try {
+    const r = await authFetch('/api/content/seo', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pages }),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    okEl.style.display = ''; errEl.style.display = 'none';
+    setTimeout(() => { okEl.style.display = 'none'; }, 2500);
+  } catch(e) {
+    errEl.style.display = ''; okEl.style.display = 'none';
+    setTimeout(() => { errEl.style.display = 'none'; }, 3000);
+  }
 }
 
 // ── AUTO LOGIN if token saved ─────────────────────────────────────────────────
