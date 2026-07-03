@@ -95,6 +95,14 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://mycomputer.education/courses/minecraft"/>
   </url>
 
+  <!-- Blog / Articles listing -->
+  <url>
+    <loc>https://mycomputer.education/articles</loc>
+    <lastmod>2026-07-03</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Blog / Articles -->
   <url>
     <loc>https://mycomputer.education/articles/chomu-vchyty-dytynu-prohramuvanniu-2026</loc>
@@ -123,6 +131,24 @@
   <url>
     <loc>https://mycomputer.education/articles/onlain-chy-oflain-yake-navchannia-krasche</loc>
     <lastmod>2026-06-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mycomputer.education/articles/kursy-prohramuvannia-dlia-ditei</loc>
+    <lastmod>2026-07-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mycomputer.education/articles/scratch-python-chy-roblox</loc>
+    <lastmod>2026-07-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://mycomputer.education/articles/minecraft-ta-python-prohramuvannia-dlia-ditei</loc>
+    <lastmod>2026-07-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
