@@ -1806,7 +1806,7 @@ app.get('/test-500', (req, res, next) => {
 });
 
 // Redirect legacy /course/:id URLs (old URL pattern) to homepage
-app.get('/course/:id', (req, res) => {
+app.get(['/course/:id', '/course/:id/'], (req, res) => {
   res.redirect(301, '/');
 });
 
