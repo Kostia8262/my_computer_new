@@ -1348,6 +1348,58 @@ app.get('/articles/:slug', (req, res) => {
   const pageUrl  = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
 
+  const publishedIso = article.publishedAt
+    ? new Date(article.publishedAt).toISOString() : new Date().toISOString();
+
+  const articleJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: fullTitle,
+        description: excerpt,
+        inLanguage: 'uk',
+        isPartOf: { '@id': `${siteUrl}/#website` },
+        breadcrumb: { '@id': `${pageUrl}#breadcrumb` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${pageUrl}#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, item: { '@id': `${siteUrl}/`, name: 'Головна' } },
+          { '@type': 'ListItem', position: 2, item: { '@id': `${siteUrl}/articles`, name: 'Статті' } },
+          { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name: title } },
+        ],
+      },
+      {
+        '@type': 'Article',
+        '@id': `${pageUrl}#article`,
+        headline: title,
+        description: excerpt,
+        url: pageUrl,
+        inLanguage: 'uk',
+        datePublished: publishedIso,
+        dateModified: publishedIso,
+        author: {
+          '@type': 'Organization',
+          name: article.author || 'My Computer Academy',
+          url: siteUrl,
+        },
+        publisher: {
+          '@type': 'Organization',
+          '@id': `${siteUrl}/#organization`,
+          name: 'My Computer Academy',
+          url: siteUrl,
+          logo: { '@type': 'ImageObject', url: `${siteUrl}/android-chrome-192x192.png` },
+        },
+        isPartOf: { '@id': `${pageUrl}#webpage` },
+        image: `${siteUrl}/og-image.png`,
+      },
+    ],
+  });
+
   const html = ARTICLE_HTML_TPL
     .replace(
       '<title id="pageTitle">Стаття — My Computer Academy</title>',
@@ -1362,7 +1414,12 @@ app.get('/articles/:slug', (req, res) => {
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="article"/>
   <meta property="og:image" content="https://mycomputer.education/og-image.png"/>
-  <meta property="og:locale" content="uk_UA"/>`
+  <meta property="og:locale" content="uk_UA"/>
+  <script type="application/ld+json">${articleJsonLd}</script>`
+    )
+    .replace(
+      '>Стаття — My Computer Academy</h1>',
+      `>${escHtml(title)}</h1>`
     );
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
