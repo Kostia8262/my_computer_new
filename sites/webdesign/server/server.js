@@ -421,7 +421,12 @@ app.post('/api/leads', leadsLimiter, (req, res) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-admin-token': process.env.MAIN_ADMIN_TOKEN },
         body: JSON.stringify({ ...sanitized, course: sanitized.course || 'Веб-дизайн (лендинг)', notes: 'Заявка з webdesign.mycomputer.education' }),
-      }).catch(() => {});
+      }).then(r => {
+        if (!r.ok) r.text().then(t => console.error(`[FORWARD] HTTP ${r.status}: ${t.slice(0, 200)}`));
+        else console.log(`[FORWARD] Lead forwarded to main admin OK`);
+      }).catch(err => console.error('[FORWARD] fetch error:', err.message));
+    } else {
+      console.warn('[FORWARD] MAIN_ADMIN_TOKEN not set — lead not forwarded to main admin');
     }
 
     // Send email notification (non-blocking — lead is saved regardless)
