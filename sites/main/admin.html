@@ -739,26 +739,60 @@ tr:hover td{background:#faf9ff}
 
     <!-- SEO TEXTS TAB -->
     <div id="seoTab" style="display:none">
-      <div style="display:flex;align-items:center;margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:12px">
         <h2 style="font-size:18px;font-weight:800">🔍 SEO тексти</h2>
+        <button class="btn btn-sm" style="background:#f3f0ff;color:#6C47FF;border:1px solid #ddd8ff;font-size:13px" onclick="_seoData=null;loadSeoTab()">↺ Оновити</button>
       </div>
-      <p style="font-size:13px;color:#888;margin-bottom:24px;max-width:640px">Ці тексти приховані від відвідувачів сайту, але індексуються пошуковими системами. Використовуйте для ключових слів, географічних запитів та семантичного охоплення.</p>
+      <p style="font-size:13px;color:#888;margin-bottom:28px">Ці тексти <strong>приховані від відвідувачів</strong> сайту, але індексуються пошуковими системами. Використовуйте для ключових слів, географічних запитів та семантичного охоплення.</p>
 
-      <div class="cms-section" style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:24px;max-width:760px">
-        <div class="cms-section-title" style="margin-bottom:6px">🏠 Головна сторінка</div>
-        <p style="font-size:12px;color:#aaa;margin-bottom:20px">mycomputer.education — блок вставляється між секціями, прихований через CSS</p>
-
-        <div style="margin-bottom:16px">
-          <label class="modal-label">Заголовок H2 <span style="font-weight:400;opacity:.6">(необов'язково)</span></label>
-          <input class="modal-input" id="seo_main_heading" placeholder="Школа програмування для дітей у Дніпрі — My Computer Academy"/>
+      <!-- MAIN PAGE -->
+      <div style="background:#fff;border:1px solid #e8e4ff;border-radius:14px;padding:28px 32px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span style="font-size:20px">🏠</span>
+          <span style="font-size:16px;font-weight:700;color:#1a1a2e">Головна сторінка</span>
+          <span style="font-size:12px;background:#f3f0ff;color:#6C47FF;padding:2px 10px;border-radius:20px;font-weight:500">mycomputer.education</span>
         </div>
+        <p style="font-size:12.5px;color:#aaa;margin-bottom:24px">Блок вставляється між секціями сторінки. Прихований від користувачів через CSS, але видимий пошуковим роботам.</p>
+
         <div style="margin-bottom:20px">
-          <label class="modal-label">Текст абзацу <span style="font-weight:400;opacity:.6">(необов'язково)</span></label>
-          <textarea class="modal-input" id="seo_main_text" rows="4" placeholder="My Computer Academy — це онлайн та офлайн школа програмування для дітей від 6 до 18 років..."></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <label style="font-size:13px;font-weight:600;color:#374151">Заголовок H2 <span style="font-weight:400;color:#9ca3af">(необов'язково)</span></label>
+            <span id="seo_heading_count" style="font-size:12px;color:#9ca3af">0 символів</span>
+          </div>
+          <input id="seo_main_heading"
+            style="width:100%;box-sizing:border-box;padding:12px 16px;font-size:15px;border:1.5px solid #e5e7eb;border-radius:10px;font-family:inherit;outline:none;transition:border .2s;color:#1a1a2e"
+            onfocus="this.style.borderColor='#6C47FF'" onblur="this.style.borderColor='#e5e7eb'"
+            oninput="document.getElementById('seo_heading_count').textContent=this.value.length+' символів'"
+            placeholder="Школа програмування для дітей у Дніпрі — My Computer Academy"/>
         </div>
-        <div style="display:flex;align-items:center;gap:14px">
-          <button class="btn btn-primary btn-sm" onclick="saveSeoTexts()">Зберегти</button>
-          <span id="seoSaveOk" style="font-size:13px;color:#22c55e;display:none">✓ Збережено!</span>
+
+        <div style="margin-bottom:24px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <label style="font-size:13px;font-weight:600;color:#374151">Текст абзацу <span style="font-weight:400;color:#9ca3af">(необов'язково)</span></label>
+            <span id="seo_text_count" style="font-size:12px;color:#9ca3af">0 символів</span>
+          </div>
+          <textarea id="seo_main_text"
+            rows="6"
+            style="width:100%;box-sizing:border-box;padding:14px 16px;font-size:15px;line-height:1.7;border:1.5px solid #e5e7eb;border-radius:10px;font-family:inherit;outline:none;transition:border .2s;resize:vertical;color:#1a1a2e"
+            onfocus="this.style.borderColor='#6C47FF'" onblur="this.style.borderColor='#e5e7eb'"
+            oninput="document.getElementById('seo_text_count').textContent=this.value.length+' символів'"
+            placeholder="My Computer Academy — це онлайн та офлайн школа програмування для дітей від 6 до 18 років у Дніпрі. Scratch, Python, Roblox Studio, Веб-розробка HTML CSS JS. Перший пробний урок безкоштовно."></textarea>
+          <p style="font-size:12px;color:#9ca3af;margin-top:6px">Рекомендовано 100–300 символів. Вживайте географічні запити (Дніпро), назви курсів та цільову аудиторію.</p>
+        </div>
+
+        <!-- PREVIEW -->
+        <div id="seo_preview_wrap" style="background:#f9f8ff;border:1px solid #e8e4ff;border-radius:10px;padding:16px 18px;margin-bottom:24px;display:none">
+          <p style="font-size:11.5px;font-weight:600;color:#6C47FF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Попередній перегляд (як бачить краулер)</p>
+          <div style="border-left:3px solid #6C47FF;padding-left:14px">
+            <p id="seo_preview_heading" style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:6px;display:none"></p>
+            <p id="seo_preview_text" style="font-size:14px;color:#374151;line-height:1.7"></p>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <button class="btn btn-primary" style="padding:11px 28px;font-size:14px;font-weight:600" onclick="saveSeoTexts()">Зберегти</button>
+          <button class="btn btn-sm" style="background:#f9f8ff;color:#6C47FF;border:1px solid #ddd8ff;font-size:13px;padding:9px 18px" onclick="toggleSeoPreview()">👁 Переглянути</button>
+          <span id="seoSaveOk"  style="font-size:13px;color:#22c55e;display:none">✓ Збережено!</span>
           <span id="seoSaveErr" style="font-size:13px;color:#ef4444;display:none">Помилка збереження</span>
         </div>
       </div>
@@ -4703,8 +4737,29 @@ function renderSeoTab() {
   const main = (_seoData?.pages || []).find(p => p.id === 'main') || {};
   const h = document.getElementById('seo_main_heading');
   const t = document.getElementById('seo_main_text');
-  if (h) h.value = main.heading || '';
-  if (t) t.value = main.text    || '';
+  if (h) {
+    h.value = main.heading || '';
+    const hc = document.getElementById('seo_heading_count');
+    if (hc) hc.textContent = h.value.length + ' символів';
+  }
+  if (t) {
+    t.value = main.text || '';
+    const tc = document.getElementById('seo_text_count');
+    if (tc) tc.textContent = t.value.length + ' символів';
+  }
+}
+
+function toggleSeoPreview() {
+  const wrap = document.getElementById('seo_preview_wrap');
+  if (!wrap) return;
+  const heading = (document.getElementById('seo_main_heading')?.value || '').trim();
+  const text    = (document.getElementById('seo_main_text')?.value    || '').trim();
+  if (!heading && !text) { wrap.style.display = 'none'; return; }
+  const ph = document.getElementById('seo_preview_heading');
+  const pt = document.getElementById('seo_preview_text');
+  if (ph) { ph.textContent = heading; ph.style.display = heading ? '' : 'none'; }
+  if (pt) pt.textContent = text;
+  wrap.style.display = wrap.style.display === 'none' ? '' : 'none';
 }
 
 async function saveSeoTexts() {
