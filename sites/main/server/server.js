@@ -1462,6 +1462,32 @@ const COURSE_SEO_TITLES = {
   blog:      'Курс Створення блогу та сайту — My Computer Academy',
 };
 
+// ── COURSE SEO DESCRIPTIONS (140-160 chars) ───────────────────────────────────
+const COURSE_SEO_DESCS = {
+  scratch:   'Курс Scratch для дітей 6–10 років у Дніпрі. Ігрове програмування: анімації, ігри, логіка. Онлайн та офлайн у малих групах до 5 учнів. Перший урок безкоштовно.',
+  python:    'Курс Python для дітей 10–14 років у Дніпрі. Ігри на Pygame, Telegram-боти, реальний код. Онлайн та офлайн у малих групах до 5 учнів. Перший урок безкоштовно.',
+  roblox:    'Курс Roblox Studio для дітей 9–14 років у Дніпрі. Lua, 3D-дизайн, власна гра для мільйонів. Онлайн та офлайн у малих групах до 5 учнів. Перший урок безкоштовно.',
+  minecraft: 'Курс Minecraft Education для дітей 9–14 років у Дніпрі. Python для Minecraft, автобудівництво, власний мод. Онлайн та офлайн у групах до 5 учнів. Перший урок безкоштовно.',
+  web:       'Курс веб-розробки HTML, CSS, JavaScript для підлітків 12–16 років у Дніпрі. Від першої сторінки до портфоліо-сайту. Онлайн та офлайн у групах до 5 учнів.',
+  construct: 'Курс Construct 3 для дітей 10–14 років у Дніпрі. Платформери та аркади без коду, публікація гри онлайн. Онлайн та офлайн у малих групах до 5 учнів.',
+  graphic:   'Курс цифрової графіки та анімації для дітей 6–12 років у Дніпрі. Растрова та векторна графіка, 3D, анімація персонажів. Онлайн та офлайн у групах до 5 учнів.',
+  pc:        'Базовий курс комп\'ютерної грамотності для дітей 6–10 років у Дніпрі. Клавіатура, Word, безпека в інтернеті. Онлайн та офлайн у малих групах до 5 учнів.',
+  blog:      'Курс створення блогу та сайту для підлітків 12–17 років у Дніпрі. HTML, CSS, SEO, публікація з доменом. Онлайн та офлайн у малих групах до 5 учнів.',
+};
+
+// ── COURSE SEO TEXT BLOCKS (visually-hidden, crawler-visible) ─────────────────
+const COURSE_SEO_TEXTS = {
+  scratch:   'Курс Scratch для дітей у Дніпрі від школи програмування My Computer Academy. Scratch — ідеальна перша мова для дітей від 6 років: блоки замість коду, анімовані персонажі, власні ігри та інтерактивні проєкти. Учні розвивають алгоритмічне мислення, логіку та творчість одночасно. Заняття в малих групах до 5 учнів гарантують індивідуальну увагу. Зручний розклад: 1–2 рази на тиждень по 90 хвилин. Онлайн через Zoom або офлайн у Дніпрі. Курс для дітей 6–10 років, тривалість 3 місяці, 24 заняття. Перший урок безкоштовно — запишіться вже сьогодні.',
+  python:    'Курс Python для дітей та підлітків у Дніпрі від My Computer Academy. Python — одна з найпопулярніших мов у світі, яку використовують Google, NASA та Instagram. Учні 10–14 років пишуть реальний код: ігри на Pygame, автоматизація, Telegram-бот у фіналі. Алгоритми, функції, цикли, робота з файлами та API. Мала група до 5 учнів, онлайн та офлайн у Дніпрі. Тривалість — 4 місяці, 32 заняття. Перший урок безкоштовно.',
+  roblox:    'Курс Roblox Studio для дітей у Дніпрі від My Computer Academy. Roblox — платформа з мільярдами гравців. Учні 9–14 років вивчають Lua, будують 3D-світи з фізикою та у фіналі публікують гру для реальних гравців. Курс розвиває просторове мислення та логіку. Мала група до 5 учнів, 24 уроки за 3 місяці. Онлайн та офлайн у Дніпрі. Перший урок безкоштовно.',
+  minecraft: 'Курс Minecraft Education для дітей у Дніпрі від My Computer Academy. Учні 9–14 років, які люблять Minecraft, навчаються Python через улюблену гру. Бібліотека mcpi: автоматизація будівництва, структури кодом, алгоритми. Власний мод у фіналі курсу. Шлях від гравця до розробника. Мала група до 5 учнів, 24 заняття за 3 місяці. Онлайн та офлайн у Дніпрі. Перший урок безкоштовно.',
+  web:       'Курс веб-розробки для підлітків у Дніпрі від My Computer Academy. Учні 12–16 років навчаються HTML5, CSS3, Flexbox, Grid, JavaScript з нуля. Від першої сторінки до адаптивного портфоліо-сайту з інтерактивними елементами. Реальні проєкти на кожному занятті. Веб-розробка — одна з найбільш затребуваних IT-спеціальностей. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 40 занять за 5 місяців. Перший урок безкоштовно.',
+  construct: 'Курс розробки ігор на Construct 3 для дітей у Дніпрі від My Computer Academy. Учні 10–14 років створюють платформери, аркади та стрілялки через систему подій і дій — без написання коду. Ігрова логіка, фізика, анімація та звукові ефекти. У фіналі — власна гра опублікована в інтернеті. Онлайн та офлайн у Дніпрі, групи до 5 учнів, 24 уроки за 3 місяці. Перший урок безкоштовно.',
+  graphic:   'Курс цифрової графіки та анімації для дітей у Дніпрі від My Computer Academy. Учні 6–12 років вивчають растрову та векторну графіку, цифровий малюнок, кольорознавство, анімацію кадр за кадром та основи 3D. Курс для юних художників і дизайнерів. Власний анімований проєкт у фіналі. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 24 уроки за 3 місяці. Перший урок безкоштовно.',
+  pc:        'Базовий курс роботи з комп\'ютером для дітей у Дніпрі від My Computer Academy. Курс для дітей 6–10 років: клавіатура, миша, файлова система Windows, Word, Paint, безпека в інтернеті, захист від шкідливих сайтів. Швидкий набір тексту сліпим методом. Ідеальний старт у світ цифрових технологій. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 16 занять за 2 місяці. Перший урок безкоштовно.',
+  blog:      'Курс створення блогу та особистого сайту для підлітків у Дніпрі від My Computer Academy. Учні 12–17 років навчаються HTML, CSS та основам SEO, щоб створити власний онлайн-простір: блог, портфоліо або творчу сторінку. Без складних фреймворків — чистий HTML і CSS, структура, дизайн, публікація з доменом. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 16 занять за 2 місяці. Перший урок безкоштовно.',
+};
+
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
@@ -1479,7 +1505,8 @@ app.get('/courses/:slug', (req, res) => {
   const rawDesc = course && course.description
     ? course.description
     : 'Детальна інформація про курс програмування для дітей у My Computer Academy';
-  const desc   = rawDesc.slice(0, 160);
+  // Use hardcoded SEO desc (140-160 chars) when DB description is too short
+  const desc = rawDesc.length >= 130 ? rawDesc.slice(0, 160) : (COURSE_SEO_DESCS[slug] || rawDesc.slice(0, 160));
   const siteUrl = 'https://mycomputer.education';
   const pageUrl = `${siteUrl}/courses/${slug}`;
 
@@ -1487,70 +1514,88 @@ app.get('/courses/:slug', (req, res) => {
     ? parseInt(course.duration) || null : null;
   const isoPeriod = durationMonths ? `P${durationMonths}M` : null;
 
-  const orgRef = { '@type': 'EducationalOrganization', '@id': `${siteUrl}/#organization` };
+  const faqData = loadContent().faq || [];
+  const graphItems = [
+    {
+      '@type': 'WebPage',
+      '@id': `${pageUrl}/#webpage`,
+      url: pageUrl,
+      name: seoTitle,
+      description: desc,
+      inLanguage: 'uk',
+      isPartOf: { '@id': `${siteUrl}/#website` },
+      breadcrumb: { '@id': `${pageUrl}/#breadcrumb` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      '@id': `${pageUrl}/#breadcrumb`,
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, item: { '@id': siteUrl + '/', name: 'Головна' } },
+        { '@type': 'ListItem', position: 2, item: { '@id': siteUrl + '/#courses', name: 'Курси' } },
+        { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
+      ],
+    },
+    {
+      '@type': 'EducationalOrganization',
+      '@id': `${siteUrl}/#organization`,
+      name: 'My Computer Academy',
+      url: siteUrl,
+      telephone: '+380954624672',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'просп. Олександра Поля, 28',
+        addressLocality: 'Дніпро',
+        postalCode: '49101',
+        addressCountry: 'UA',
+      },
+    },
+    {
+      '@type': 'Course',
+      '@id': `${pageUrl}/#course`,
+      name,
+      description: rawDesc,
+      url: pageUrl,
+      inLanguage: 'uk',
+      educationalLevel: 'Beginner',
+      ...(course && course.age ? { typicalAgeRange: course.age } : {}),
+      provider: { '@id': `${siteUrl}/#organization` },
+      ...(isoPeriod ? {
+        hasCourseInstance: {
+          '@type': 'CourseInstance',
+          courseMode: 'online',
+          duration: isoPeriod,
+          inLanguage: 'uk',
+        }
+      } : {}),
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: 'UAH',
+        availability: 'https://schema.org/InStock',
+        url: `${siteUrl}/#contact`,
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.9',
+        bestRating: '5',
+        worstRating: '1',
+        reviewCount: '127',
+      },
+    },
+  ];
 
-  const jsonLd = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'WebPage',
-        '@id': `${pageUrl}/#webpage`,
-        url: pageUrl,
-        name: seoTitle,
-        description: desc,
-        inLanguage: 'uk',
-        isPartOf: { '@id': `${siteUrl}/#website` },
-        breadcrumb: { '@id': `${pageUrl}/#breadcrumb` },
-      },
-      {
-        '@type': 'BreadcrumbList',
-        '@id': `${pageUrl}/#breadcrumb`,
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, item: { '@id': siteUrl + '/', name: 'Головна' } },
-          { '@type': 'ListItem', position: 2, item: { '@id': siteUrl + '/#courses', name: 'Курси' } },
-          { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
-        ],
-      },
-      {
-        '@type': 'Course',
-        '@id': `${pageUrl}/#course`,
-        name,
-        description: rawDesc,
-        url: pageUrl,
-        inLanguage: 'uk',
-        educationalLevel: 'Beginner',
-        ...(course && course.age ? { typicalAgeRange: course.age } : {}),
-        provider: {
-          '@type': 'EducationalOrganization',
-          name: 'My Computer Academy',
-          url: siteUrl,
-          telephone: '+380954624672',
-          address: { '@type': 'PostalAddress', addressLocality: 'Дніпро', addressCountry: 'UA' },
-        },
-        ...(isoPeriod ? {
-          hasCourseInstance: {
-            '@type': 'CourseInstance',
-            courseMode: 'online',
-            duration: isoPeriod,
-            inLanguage: 'uk',
-          }
-        } : {}),
-        offers: {
-          '@type': 'Offer',
-          priceCurrency: 'UAH',
-          availability: 'https://schema.org/InStock',
-          url: `${siteUrl}/#contact`,
-        },
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: '4.9',
-          bestRating: '5',
-          worstRating: '1',
-          reviewCount: '127',
-        },
-      },
-    ],
-  });
+  if (faqData.length) {
+    graphItems.push({
+      '@type': 'FAQPage',
+      '@id': `${pageUrl}/#faq`,
+      mainEntity: faqData.slice(0, 5).map(f => ({
+        '@type': 'Question',
+        name: f.question.ua,
+        acceptedAnswer: { '@type': 'Answer', text: f.answer.ua },
+      })),
+    });
+  }
+
+  const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graphItems });
 
   const html = COURSE_HTML_TPL
     .replace(
@@ -1571,6 +1616,12 @@ app.get('/courses/:slug', (req, res) => {
     .replace(
       '>Курс програмування для дітей — My Computer Academy</h1>',
       `>${escHtml(name)}</h1>`
+    )
+    .replace(
+      '<!-- SEO_BLOCK_COURSE -->',
+      COURSE_SEO_TEXTS[slug]
+        ? `<div class="vh-seo" aria-hidden="true"><p>${escHtml(COURSE_SEO_TEXTS[slug])}</p></div>`
+        : ''
     )
     .replace('</head>', `  <script type="application/ld+json">${jsonLd}</script>\n</head>`);
 
