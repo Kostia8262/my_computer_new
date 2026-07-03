@@ -642,14 +642,14 @@ const COURSES = {
     id: 'pc',
     emoji: '💻',
     color: '#06b6d4',
-    badge: '6–10 років',
+    badge: '6–18 років',
     title: 'Базовий курс ПК',
-    subtitle: 'Курс для дітей 6–10 років, які тільки починають роботу з комп\'ютером. Навчимо правильно тримати мишку, швидко друкувати, працювати у Windows та залишатись у безпеці в інтернеті.',
-    duration: '2 місяці',
-    format: 'Група до 5 дітей',
-    lessons: '16 занять',
+    subtitle: 'Курс для дітей та підлітків 6–18 років, які починають роботу з комп\'ютером. Навчимо правильно тримати мишку, швидко друкувати, працювати у Windows та залишатись у безпеці в інтернеті.',
+    duration: '6 місяців',
+    format: 'Група до 6 дітей',
+    lessons: '52 заняття',
     price: 'від 1 800 ₴/міс.',
-    age: '6–10 років',
+    age: '6–18 років',
     curriculum: [
       { num:'Тема 1',  title:'MS Windows. Початок роботи', desc:'Робочий стіл, робота з мишею та клавіатурою. Управління вікнами: відкриття, переміщення, зміна розміру.' },
       { num:'Тема 2',  title:'Організація зберігання інформації', desc:'Структура зберігання на ПК. Носії інформації (CD, DVD, флеш, SD). Створення папок і навігація.' },
@@ -669,7 +669,7 @@ const COURSES = {
       { num:'Тема 16', title:'Підведення підсумків', desc:'Електронний документообіг, віруси та антивіруси, встановлення програм, оновлення драйверів, автозавантаження.' },
     ],
     forCards: [
-      { title:'6–10 років', desc:'Ідеальний перший курс для дітей молодшого шкільного віку.' },
+      { title:'6–18 років', desc:'Підходить як молодшим школярам, так і підліткам — старт з нуля.' },
       { title:'Абсолютним новачкам', desc:'Навіть якщо дитина ніколи не тримала мишку — починаємо з нуля.' },
       { title:'Ігрова форма', desc:'Заняття інтерактивні — онлайн-тренажери, квізи та практичні завдання.' },
       { title:'Фундамент для IT', desc:'Базовий ПК — відмінна підготовка до курсу Scratch або графіки.' },
@@ -1065,11 +1065,17 @@ async function init() {
     if (apiCourse) course = apiToRender(apiCourse);
   }
 
-  // Override curriculum with live DB data so admin edits reflect on the page
+  // Override with live DB data so admin edits reflect on the page
   if (course) {
     const apiCourse = apiCourses.find(c => c.id === key);
-    if (apiCourse && Array.isArray(apiCourse.curriculum) && apiCourse.curriculum.length) {
-      course = { ...course, curriculum: apiCourse.curriculum };
+    if (apiCourse) {
+      if (Array.isArray(apiCourse.curriculum) && apiCourse.curriculum.length) course.curriculum = apiCourse.curriculum;
+      if (apiCourse.duration)          course.duration = apiCourse.duration;
+      if (apiCourse.groupSize > 0)     course.format   = `Група до ${apiCourse.groupSize} дітей`;
+      if (apiCourse.lessonsCount > 0)  course.lessons  = `${apiCourse.lessonsCount} занять`;
+      if (apiCourse.price > 0)         course.price    = `від ${apiCourse.price} ₴/міс.`;
+      if (apiCourse.age)               { course.badge  = apiCourse.age; course.age = apiCourse.age; }
+      if (apiCourse.description)       course.subtitle = apiCourse.description;
     }
   }
 

@@ -574,6 +574,7 @@ tr:hover td{background:#faf9ff}
           <div class="modal-group"><label class="modal-label">Ціна (₴/міс)</label><input class="modal-input" type="number" id="crs_price" placeholder="3600"/></div>
           <div class="modal-group"><label class="modal-label">Колір (hex)</label><input class="modal-input" type="color" id="crs_color" value="#6C47FF"/></div>
           <div class="modal-group full"><label class="modal-label">Опис</label><textarea class="modal-input" id="crs_description" rows="3" placeholder="Короткий опис для лендингу..."></textarea></div>
+          <div class="modal-group full"><label class="modal-label">Особливості курсу <span style="font-weight:400;opacity:.6">(по одному рядку — відображаються на картці)</span></label><textarea class="modal-input" id="crs_features" rows="4" placeholder="✓ Основи роботи з ПК&#10;✓ Word, Excel, PowerPoint&#10;✓ Безпека в інтернеті"></textarea></div>
           <div class="modal-group"><label class="modal-label">Статус</label>
             <select class="modal-input" id="crs_active">
               <option value="true">✅ Активний</option>
@@ -3120,9 +3121,10 @@ function openCourseModal(id) {
   _editingCourse = id;
   const fields = ['id','name','emoji','age','duration','lessonsCount','groupSize','price','description'];
   fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el) el.value = ''; });
-  document.getElementById('crs_color').value = '#6C47FF';
-  document.getElementById('crs_active').value = 'true';
+  document.getElementById('crs_color').value    = '#6C47FF';
+  document.getElementById('crs_active').value   = 'true';
   document.getElementById('crs_age_group').value = '';
+  document.getElementById('crs_features').value  = '';
   document.getElementById('courseModalTitle').textContent = id ? 'Редагувати курс' : 'Новий курс';
   document.getElementById('crs_id').disabled = !!id;
   if (id) {
@@ -3132,6 +3134,9 @@ function openCourseModal(id) {
       document.getElementById('crs_color').value     = c.color     || '#6C47FF';
       document.getElementById('crs_active').value    = String(c.active !== false);
       document.getElementById('crs_age_group').value = c.age_group || '';
+      if (Array.isArray(c.features)) {
+        document.getElementById('crs_features').value = c.features.map(f => typeof f === 'string' ? f : (f.ua || '')).join('\n');
+      }
     }
   }
   document.getElementById('courseModal').style.display = 'flex';
@@ -3157,6 +3162,7 @@ async function saveCourse() {
     description:  document.getElementById('crs_description')?.value.trim() || '',
     color:        document.getElementById('crs_color')?.value               || '#6C47FF',
     active:       document.getElementById('crs_active')?.value === 'true',
+    features:     (document.getElementById('crs_features')?.value || '').split('\n').map(s => s.trim()).filter(Boolean),
   };
   try {
     const url    = _editingCourse ? `/api/courses/${_editingCourse}` : '/api/courses';
