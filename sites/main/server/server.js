@@ -144,6 +144,10 @@ const COURSE_SEED = [
       saveContent({ ..._cnt, ...CONTENT_SEED });
       console.log('✅  Seeded pricing + FAQ content');
     }
+    if (!_cnt.seo) {
+      saveContent({ ...loadContent(), seo: CONTENT_SEED.seo });
+      console.log('✅  Seeded SEO content');
+    }
     if (!coursesDb.getAll().length) {
       COURSE_SEED.forEach(c => coursesDb.create({ ...c, curriculum: CURRICULA[c.id] || [] }));
       console.log('✅  Seeded 9 courses');
