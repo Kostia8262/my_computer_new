@@ -240,7 +240,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .courses__tab{padding:10px 22px;border-radius:var(--r-full);border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.7);font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
 .courses__tab:hover{background:rgba(255,255,255,.08);color:#fff}
 .courses__tab--active{background:#fff;color:#1a1a2e;border-color:#fff}
-.course-card--hidden{display:none}
+.course-card.course-card--hidden{display:none}
 
 /* ── SLIDER LAYOUT ── */
 .courses__slider-wrap{position:relative;z-index:1}
