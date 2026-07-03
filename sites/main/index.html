@@ -455,10 +455,10 @@
         </div>
       </div>
 
-      <div class="course-card" data-age="6-10" data-url="/courses/pc">
+      <div class="course-card" data-age="all" data-url="/courses/pc">
         <div class="course-card__header course-card__header--pc">
           <div class="course-card__emoji">💻</div>
-          <div class="course-card__age-badge">6–10 років</div>
+          <div class="course-card__age-badge">6–18 років</div>
         </div>
         <div class="course-card__body">
           <h3 class="course-card__title">Базовий курс роботи з ПК</h3>
@@ -470,8 +470,8 @@
           </ul>
           <div class="course-card__footer">
             <div class="course-card__info">
-              <span>⏱ 2 місяці</span>
-              <span>👥 Група до 5 осіб</span>
+              <span>⏱ 6 місяців</span>
+              <span>👥 Група до 6 осіб</span>
             </div>
             <a href="#" class="btn btn--primary btn--sm open-modal" style="display:block;text-align:center">Безкоштовне пробне</a>
           </div>
@@ -1147,14 +1147,14 @@
     {
       "@type": "Course",
       "@id": "https://mycomputer.education/#course-pc",
-      "name": "Базовий курс роботи з ПК для дітей 6–10 років",
-      "description": "Перший курс роботи з комп'ютером для дітей 6–10 років. Клавіатура, миша, файлова система, Word, Paint та безпека в інтернеті.",
+      "name": "Базовий курс роботи з ПК для дітей та підлітків 6–18 років",
+      "description": "Курс роботи з комп'ютером для дітей та підлітків 6–18 років. Клавіатура, миша, файлова система, Word, Paint, PowerPoint та безпека в інтернеті. 52 заняття по 90 хвилин.",
       "provider": {"@id": "https://mycomputer.education/#organization"},
       "educationalLevel": "Beginner",
-      "typicalAgeRange": "6-10",
+      "typicalAgeRange": "6-18",
       "inLanguage": "uk",
       "url": "https://mycomputer.education/courses/pc",
-      "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online", "duration": "P2M", "inLanguage": "uk"},
+      "hasCourseInstance": {"@type": "CourseInstance", "courseMode": "online", "duration": "P6M", "inLanguage": "uk"},
       "offers": {"@type": "Offer", "priceCurrency": "UAH", "availability": "https://schema.org/InStock", "url": "https://mycomputer.education/#contact"}
     },
     {
@@ -1456,7 +1456,7 @@
 
   function applyFilter() {
     cards().forEach(function(c) {
-      var show = currentAge === 'all' || c.dataset.age === currentAge;
+      var show = currentAge === 'all' || c.dataset.age === currentAge || c.dataset.age === 'all';
       c.classList.toggle('course-card--hidden', !show);
     });
     var g = grid();
@@ -1705,7 +1705,7 @@
 </script>
 <div class="visually-hidden" aria-hidden="true">
   <p>My Computer Academy — онлайн IT-школа програмування та комп'ютерних курсів для дітей і підлітків від 6 до 18 років. Навчаємо онлайн у малих групах до 5 осіб по всій Україні та для українців за кордоном. Перший пробний урок безкоштовно.</p>
-  <p>Напрямки навчання: Scratch — візуальне блокове програмування для дітей 6–10 років; Python — мова програмування для підлітків 10–14 років, розробка Telegram-ботів та ігор Pygame; розробка ігор у Roblox Studio на мові Lua для дітей 9–14 років; програмування в Minecraft через Python та mcpi для підлітків; розробка ігор у Construct 3 без коду — платформери, аркади, стрілялки; HTML CSS JavaScript веб-розробка та створення адаптивних сайтів; графічний дизайн та цифрова покадрова анімація для дітей 6–12 років; базовий курс роботи з комп'ютером для початківців 6–10 років; створення блогу та персонального сайту-портфоліо для підлітків 12–17 років.</p>
+  <p>Напрямки навчання: Scratch — візуальне блокове програмування для дітей 6–10 років; Python — мова програмування для підлітків 10–14 років, розробка Telegram-ботів та ігор Pygame; розробка ігор у Roblox Studio на мові Lua для дітей 9–14 років; програмування в Minecraft через Python та mcpi для підлітків; розробка ігор у Construct 3 без коду — платформери, аркади, стрілялки; HTML CSS JavaScript веб-розробка та створення адаптивних сайтів; графічний дизайн та цифрова покадрова анімація для дітей 6–12 років; базовий курс роботи з комп'ютером для дітей та підлітків 6–18 років; створення блогу та персонального сайту-портфоліо для підлітків 12–17 років.</p>
   <p>Курси програмування для дітей онлайн. IT курси для дітей Дніпро. Школа програмування для школярів. Курси Python для дітей. Розробка ігор Roblox для дітей. Minecraft програмування для підлітків. Графічний дизайн для дітей онлайн. Курси Scratch для дошкільнят. Веб-розробка для підлітків. IT навчання для дітей онлайн Україна.</p>
 </div>
 </body>
