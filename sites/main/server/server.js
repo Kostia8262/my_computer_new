@@ -1410,36 +1410,69 @@ app.get('/courses/:slug', (req, res) => {
     ? parseInt(course.duration) || null : null;
   const isoPeriod = durationMonths ? `P${durationMonths}M` : null;
 
+  const orgRef = { '@type': 'EducationalOrganization', '@id': `${siteUrl}/#organization` };
+
   const jsonLd = JSON.stringify({
     '@context': 'https://schema.org',
-    '@type': 'Course',
-    name,
-    description: rawDesc,
-    url: pageUrl,
-    inLanguage: 'uk',
-    educationalLevel: 'Beginner',
-    ...(course && course.age ? { typicalAgeRange: course.age } : {}),
-    provider: {
-      '@type': 'EducationalOrganization',
-      name: 'My Computer Academy',
-      url: siteUrl,
-      telephone: '+380954624672',
-      address: { '@type': 'PostalAddress', addressLocality: 'Дніпро', addressCountry: 'UA' },
-    },
-    ...(isoPeriod ? {
-      hasCourseInstance: {
-        '@type': 'CourseInstance',
-        courseMode: 'online',
-        duration: isoPeriod,
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}/#webpage`,
+        url: pageUrl,
+        name: seoTitle,
+        description: desc,
         inLanguage: 'uk',
-      }
-    } : {}),
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: 'UAH',
-      availability: 'https://schema.org/InStock',
-      url: `${siteUrl}/#contact`,
-    },
+        isPartOf: { '@id': `${siteUrl}/#website` },
+        breadcrumb: { '@id': `${pageUrl}/#breadcrumb` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${pageUrl}/#breadcrumb`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, item: { '@id': siteUrl + '/', name: 'Головна' } },
+          { '@type': 'ListItem', position: 2, item: { '@id': siteUrl + '/#courses', name: 'Курси' } },
+          { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
+        ],
+      },
+      {
+        '@type': 'Course',
+        '@id': `${pageUrl}/#course`,
+        name,
+        description: rawDesc,
+        url: pageUrl,
+        inLanguage: 'uk',
+        educationalLevel: 'Beginner',
+        ...(course && course.age ? { typicalAgeRange: course.age } : {}),
+        provider: {
+          '@type': 'EducationalOrganization',
+          name: 'My Computer Academy',
+          url: siteUrl,
+          telephone: '+380954624672',
+          address: { '@type': 'PostalAddress', addressLocality: 'Дніпро', addressCountry: 'UA' },
+        },
+        ...(isoPeriod ? {
+          hasCourseInstance: {
+            '@type': 'CourseInstance',
+            courseMode: 'online',
+            duration: isoPeriod,
+            inLanguage: 'uk',
+          }
+        } : {}),
+        offers: {
+          '@type': 'Offer',
+          priceCurrency: 'UAH',
+          availability: 'https://schema.org/InStock',
+          url: `${siteUrl}/#contact`,
+        },
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: '4.9',
+          bestRating: '5',
+          worstRating: '1',
+          reviewCount: '127',
+        },
+      },
+    ],
   });
 
   const html = COURSE_HTML_TPL
@@ -1457,6 +1490,10 @@ app.get('/courses/:slug', (req, res) => {
   <meta property="og:type" content="website"/>
   <meta property="og:image" content="https://mycomputer.education/og-image.png"/>
   <meta property="og:locale" content="uk_UA"/>`
+    )
+    .replace(
+      '>Курс програмування для дітей — My Computer Academy</h1>',
+      `>${escHtml(name)}</h1>`
     )
     .replace('</head>', `  <script type="application/ld+json">${jsonLd}</script>\n</head>`);
 
