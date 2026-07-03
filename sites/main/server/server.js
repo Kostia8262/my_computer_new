@@ -1787,9 +1787,16 @@ app.get('/courses/:slug', (req, res) => {
     )
     .replace(
       '<!-- SEO_BLOCK_COURSE -->',
-      COURSE_SEO_TEXTS[slug]
-        ? `<div class="vh-seo" aria-hidden="true"><p>${escHtml(COURSE_SEO_TEXTS[slug])}</p></div>`
-        : ''
+      (() => {
+        const seoText = COURSE_SEO_TEXTS[slug] ? `<p>${escHtml(COURSE_SEO_TEXTS[slug])}</p>` : '';
+        const items = CURRICULA[slug] || [];
+        const currHtml = items.length
+          ? `<ul>${items.map(m => `<li><strong>${escHtml(m.num)}: ${escHtml(m.title)}</strong> — ${escHtml(m.desc)}</li>`).join('')}</ul>`
+          : '';
+        return (seoText || currHtml)
+          ? `<div class="vh-seo" aria-hidden="true">${seoText}${currHtml}</div>`
+          : '';
+      })()
     )
     .replace('</head>', `  <script type="application/ld+json">${jsonLd}</script>\n</head>`);
 
