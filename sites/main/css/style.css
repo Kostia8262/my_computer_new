@@ -1126,3 +1126,16 @@ body.modal-open{overflow:hidden}
   background:#1a1a2e;opacity:.55;
   bottom:36px;left:42px;
 }
+/* Background UI decoration cards (behind photo) */
+.h-deco--browser{
+  top:-8px;right:-28px;
+  filter:drop-shadow(0 6px 18px rgba(108,71,255,.07));
+}
+.h-deco--code-card{
+  bottom:48px;left:-30px;
+  filter:drop-shadow(0 6px 18px rgba(108,71,255,.07));
+}
+.h-deco--score-card{
+  top:58px;left:12px;
+  filter:drop-shadow(0 4px 12px rgba(108,71,255,.08));
+}
