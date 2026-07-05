@@ -1114,15 +1114,15 @@ body.modal-open{overflow:hidden}
   background:#6C47FF;opacity:.75;
   top:10px;right:10px;
 }
-/* </> code icon — left side */
-.h-deco--code{bottom:80px;left:-4px}
-/* Star sparkle — top area */
+/* </> code icon — left side (dark, like headline) */
+.h-deco--code{bottom:80px;left:-4px;color:#1a1a2e}
+/* Star sparkle — top area (purple) */
 .h-deco--star{top:36px;left:42px}
-/* Wave squiggle — top-right */
-.h-deco--wave{top:22px;right:0}
-/* Small dot — bottom left */
+/* Wave squiggle — bottom-right corner */
+.h-deco--wave{bottom:28px;right:2px}
+/* Small dot — bottom left (dark) */
 .h-deco--dot-bl{
   width:10px;height:10px;border-radius:50%;
-  background:#6C47FF;opacity:.4;
+  background:#1a1a2e;opacity:.55;
   bottom:36px;left:42px;
 }

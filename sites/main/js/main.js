@@ -903,7 +903,7 @@ function showToast(msg, type = 'success') {
   if (!wrap) return;
 
   const decos = Array.from(wrap.querySelectorAll('.h-deco[data-depth]'));
-  const MAX_PX = 18; // max displacement in pixels
+  const MAX_PX = 36; // max displacement in pixels
   const LERP   = 0.07; // smoothing (lower = smoother/slower)
 
   let targetX = 0, targetY = 0;
