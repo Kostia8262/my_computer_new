@@ -1069,3 +1069,60 @@ body.modal-open{overflow:hidden}
 @media(max-width:768px){
   .form-input,.form-select{font-size:16px}
 }
+
+/* ═══════════════════════════════════════════════════════
+   HERO STUDENT PHOTO  — desktop 1024px+ only
+   ═══════════════════════════════════════════════════════ */
+.hero__photo-wrap{
+  display:none;
+  position:relative;
+  width:470px;
+  height:470px;
+  flex-shrink:0;
+  align-self:center;
+}
+@media(min-width:1024px){
+  .hero__photo-wrap{display:block}
+  .hero__mockup{display:none}
+}
+.hero__photo-student{
+  display:block;
+  width:440px;
+  height:440px;
+  object-fit:cover;
+  /* centre the face when CSS-cropping */
+  object-position:center 8%;
+  border-radius:50%;
+  border:2px solid rgba(108,71,255,.3);
+  box-shadow:0 16px 56px rgba(108,71,255,.16),0 4px 16px rgba(0,0,0,.08);
+  margin:15px auto 0;
+}
+
+/* Parallax decorative elements */
+.h-deco{position:absolute;pointer-events:none;will-change:transform}
+
+/* Outer ghost ring — floats slightly behind photo */
+.h-deco--ring{
+  width:500px;height:500px;border-radius:50%;
+  border:1.5px solid rgba(108,71,255,.18);
+  top:50%;left:50%;
+  margin-top:-250px;margin-left:-250px;
+}
+/* Dot — top-right corner */
+.h-deco--dot-tr{
+  width:16px;height:16px;border-radius:50%;
+  background:#6C47FF;opacity:.75;
+  top:10px;right:10px;
+}
+/* </> code icon — left side */
+.h-deco--code{bottom:80px;left:-4px}
+/* Star sparkle — top area */
+.h-deco--star{top:36px;left:42px}
+/* Wave squiggle — top-right */
+.h-deco--wave{top:22px;right:0}
+/* Small dot — bottom left */
+.h-deco--dot-bl{
+  width:10px;height:10px;border-radius:50%;
+  background:#6C47FF;opacity:.4;
+  bottom:36px;left:42px;
+}
