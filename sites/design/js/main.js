@@ -440,7 +440,7 @@ async function loadCourses() {
     };
     el.innerHTML = active.map(c => {
       const hClass   = COLOR_CLASS[c.id] || '';
-      const hStyle   = hClass ? '' : `style="background:${esc(c.color || '#6C47FF')}"`;
+      const hStyle   = hClass ? '' : `style="background:${esc(c.color || '#E2604A')}"`;
       const ageGroup = esc(c.age_group || '');
       const popular  = c.popular ? ' course-card--popular' : '';
       const feats    = (c.features || []).map(f => {

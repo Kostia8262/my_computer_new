@@ -68,7 +68,7 @@ async function sendLeadNotification(lead) {
 <head><meta charset="UTF-8"/></head>
 <body style="font-family:Arial,sans-serif;background:#f5f5f5;padding:20px">
   <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.1)">
-    <div style="background:#6C47FF;padding:20px 28px">
+    <div style="background:#E2604A;padding:20px 28px">
       <h2 style="color:#fff;margin:0;font-size:18px">🎓 Нова заявка — My Computer Academy</h2>
     </div>
     <div style="padding:24px 28px">
@@ -76,8 +76,8 @@ async function sendLeadNotification(lead) {
         <tr><td style="padding:8px 0;color:#888;width:140px">Ім'я дитини</td><td style="padding:8px 0;font-weight:600">${lead.child_name}</td></tr>
         <tr><td style="padding:8px 0;color:#888">Вік</td><td style="padding:8px 0">${lead.age || '—'} років</td></tr>
         <tr><td style="padding:8px 0;color:#888">Курс</td><td style="padding:8px 0">${courseName}</td></tr>
-        <tr><td style="padding:8px 0;color:#888">Телефон</td><td style="padding:8px 0"><strong><a href="tel:${lead.phone}" style="color:#6C47FF;text-decoration:none">${lead.phone}</a></strong></td></tr>
-        <tr><td style="padding:8px 0;color:#888">Email</td><td style="padding:8px 0">${lead.email ? `<a href="mailto:${lead.email}" style="color:#6C47FF">${lead.email}</a>` : '—'}</td></tr>
+        <tr><td style="padding:8px 0;color:#888">Телефон</td><td style="padding:8px 0"><strong><a href="tel:${lead.phone}" style="color:#E2604A;text-decoration:none">${lead.phone}</a></strong></td></tr>
+        <tr><td style="padding:8px 0;color:#888">Email</td><td style="padding:8px 0">${lead.email ? `<a href="mailto:${lead.email}" style="color:#E2604A">${lead.email}</a>` : '—'}</td></tr>
         <tr><td style="padding:8px 0;color:#888">Заявка №</td><td style="padding:8px 0">#${lead.id}</td></tr>
         <tr><td style="padding:8px 0;color:#888">Час</td><td style="padding:8px 0">${time}</td></tr>
       </table>

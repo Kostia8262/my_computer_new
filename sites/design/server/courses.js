@@ -46,7 +46,7 @@ module.exports = {
       description:  data.description || '',
       features:     Array.isArray(data.features) ? data.features : [],
       popular:      !!data.popular,
-      color:        data.color       || '#6C47FF',
+      color:        data.color       || '#E2604A',
       active:       data.active !== false,
       curriculum:   Array.isArray(data.curriculum) && data.curriculum.length > 0
                       ? data.curriculum

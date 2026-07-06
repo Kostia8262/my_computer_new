@@ -76,11 +76,11 @@
     /* Info block — dark theme */
     .course-info{padding:72px 0;background:#07050f;position:relative;overflow:hidden}
     .course-info::before{content:'';position:absolute;inset:0;pointer-events:none;
-      background-image:linear-gradient(rgba(108,71,255,.05) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(108,71,255,.05) 1px,transparent 1px);
+      background-image:linear-gradient(rgba(226,96,74,.05) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(226,96,74,.05) 1px,transparent 1px);
       background-size:52px 52px}
     .course-info::after{content:'';position:absolute;width:480px;height:480px;border-radius:50%;
-      background:radial-gradient(circle,rgba(108,71,255,.12) 0%,transparent 70%);
+      background:radial-gradient(circle,rgba(226,96,74,.12) 0%,transparent 70%);
       top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
     .course-info__inner{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:stretch;position:relative;z-index:1}
     .course-info-box{
@@ -90,7 +90,7 @@
       box-shadow:0 24px 64px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.08);
       display:flex;flex-direction:column;position:relative;overflow:hidden}
     .course-info-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
-      background:linear-gradient(90deg,#6C47FF,#9B76FF);border-radius:3px 3px 0 0}
+      background:linear-gradient(90deg,#E2604A,#EF8064);border-radius:3px 3px 0 0}
     .course-info-box h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;
       color:rgba(255,255,255,.4);margin-bottom:22px;padding-top:6px}
     .course-info-row{display:flex;justify-content:space-between;align-items:center;
@@ -101,7 +101,7 @@
     .course-info-box__cta{margin-top:auto;padding-top:24px}
 
     /* CTA */
-    .course-cta{padding:72px 0;background:linear-gradient(135deg,#6C47FF 0%,#9B76FF 100%);text-align:center;color:#fff}
+    .course-cta{padding:72px 0;background:linear-gradient(135deg,#E2604A 0%,#EF8064 100%);text-align:center;color:#fff}
     .course-cta h2{font-size:clamp(24px,4vw,38px);font-weight:900;margin-bottom:14px}
     .course-cta p{font-size:17px;opacity:.85;margin-bottom:32px}
     .course-cta .btn--white{background:#fff;color:var(--color-primary);font-weight:700;font-size:16px;padding:14px 36px;border-radius:var(--r-full);display:inline-block;transition:transform .2s,box-shadow .2s}
@@ -109,7 +109,7 @@
 
     /* FAQ on course page */
     .course-faq{padding:64px 0}
-    .course-contact{padding:64px 0;background:#f8f7ff}
+    .course-contact{padding:64px 0;background:#FBF3EF}
 
     @media(max-width:768px){
       .course-hero{padding:72px 0 40px}
@@ -357,7 +357,7 @@ function apiToRender(c) {
   forCards.push({ title: 'Мала група',   desc: c.groupSize > 0
     ? `До ${c.groupSize} учнів — індивідуальна увага викладача.`
     : 'Індивідуальний підхід до кожного учня.' });
-  const col = c.color || '#6C47FF';
+  const col = c.color || '#E2604A';
   return {
     id:       c.id,
     emoji:    c.emoji || '📚',
