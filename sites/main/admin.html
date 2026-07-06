@@ -337,13 +337,33 @@ tr:hover td{background:#faf9ff}
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebarEl">
     <nav class="sidebar-nav">
-      <div class="sidebar-section">Навігація</div>
+      <div class="sidebar-section">Спільне</div>
       <button class="sidebar-item active" id="sideNav-leads" onclick="showTab('leads')">
         <span class="sidebar-icon">📋</span><span>Заявки</span>
       </button>
       <button class="sidebar-item" id="sideNav-clients" onclick="showTab('clients')">
         <span class="sidebar-icon">🗂</span><span>База клієнтів</span>
       </button>
+      <button class="sidebar-item management-visible" id="sideNav-dashboard" onclick="showTab('dashboard')" style="display:none">
+        <span class="sidebar-icon">📊</span><span>Дашборд</span>
+      </button>
+      <button class="sidebar-item superadmin-only" id="sideNav-admins" onclick="showTab('admins')" style="display:none">
+        <span class="sidebar-icon">👥</span><span>Співробітники</span>
+      </button>
+
+      <div class="sidebar-section" style="margin-top:16px">Сайт</div>
+      <div style="padding:0 16px 12px">
+        <select id="siteSelector" class="modal-input" style="width:100%;font-size:13px" onchange="onSiteChange()">
+          <option value="">mycomputer.education</option>
+          <option value="https://mycomputer.school">mycomputer.school</option>
+          <option value="https://webdesign.mycomputer.education">webdesign.mycomputer.education</option>
+          <option value="https://python.mycomputer.education">python.mycomputer.education</option>
+          <option value="https://minecraft.mycomputer.education">minecraft.mycomputer.education</option>
+          <option value="https://roblox.mycomputer.education">roblox.mycomputer.education</option>
+        </select>
+      </div>
+
+      <div class="sidebar-section">Контент сайту</div>
       <button class="sidebar-item" id="sideNav-courses" onclick="showTab('courses')">
         <span class="sidebar-icon">🎓</span><span>Курси</span>
       </button>
@@ -364,13 +384,6 @@ tr:hover td{background:#faf9ff}
       </button>
       <button class="sidebar-item" id="sideNav-seo" onclick="showTab('seo')">
         <span class="sidebar-icon">🔍</span><span>SEO тексти</span>
-      </button>
-      <div class="sidebar-section">Налаштування</div>
-      <button class="sidebar-item management-visible" id="sideNav-dashboard" onclick="showTab('dashboard')" style="display:none">
-        <span class="sidebar-icon">📊</span><span>Дашборд</span>
-      </button>
-      <button class="sidebar-item superadmin-only" id="sideNav-admins" onclick="showTab('admins')" style="display:none">
-        <span class="sidebar-icon">👥</span><span>Співробітники</span>
       </button>
     </nav>
   </div>
@@ -1194,6 +1207,14 @@ let token         = localStorage.getItem(STORAGE_KEY) || '';
 let currentRole   = '';
 let _teachersList = []; // [{id, name}] loaded on init
 
+// ── MULTI-SITE CONTENT SWITCHER ───────────────────────────────────────────────
+// '' = mycomputer.education (default/current site) — every apiUrl()/authHeaders()
+// call resolves to the exact same relative path + token as before this feature existed.
+const STORAGE_SITE_KEY = 'mca_admin_site';
+let apiBase = localStorage.getItem(STORAGE_SITE_KEY) || '';
+function apiUrl(path) { return apiBase + path; }
+function authHeaders(extra) { return Object.assign({ 'x-admin-token': token }, extra || {}); }
+
 const ROLE_LABELS = {
   superadmin:    '⭐ Суперадмін',
   administrator: '👔 Адміністратор',
@@ -1292,6 +1313,8 @@ function buildTeacherSelect(currentVal, extraStyle) {
 async function showApp() {
   document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('app').style.display       = 'flex';
+  const siteSel = document.getElementById('siteSelector');
+  if (siteSel) siteSel.value = apiBase;
   const ok = await loadMe();
   if (!ok) return; // token invalid — doLogout() already fired inside loadMe
   await loadTeachersList();
@@ -1363,6 +1386,20 @@ async function loadMe() {
 }
 
 let _currentTab = 'leads';
+
+// In-scope site-aware tabs whose data must be refetched when the site switches.
+const SITE_AWARE_TABS = ['courses', 'curriculum', 'content', 'modules', 'articles', 'reviews', 'seo'];
+
+function onSiteChange() {
+  const sel = document.getElementById('siteSelector');
+  apiBase = sel.value;
+  localStorage.setItem(STORAGE_SITE_KEY, apiBase);
+  // Clear memoized caches so the currently active (or next opened) tab re-fetches from the new site.
+  _cmsData = null;
+  _seoData = null;
+  _allCourses = null;
+  if (SITE_AWARE_TABS.includes(_currentTab)) showTab(_currentTab);
+}
 
 function showTab(tab) {
   _currentTab = tab;
@@ -2879,7 +2916,7 @@ function showCmsSection(section) {
 
 async function loadContentData() {
   try {
-    const res = await fetch('/api/content', { headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl('/api/content'), { headers: authHeaders() });
     _cmsData = await res.json();
     renderPricingEditor(_cmsData.pricing || []);
     renderFaqEditor(_cmsData.faq || []);
@@ -2946,9 +2983,9 @@ async function savePricing() {
     priceUnit: { ua: document.getElementById(`pUnitUa_${i}`)?.value||'', ru: document.getElementById(`pUnitRu_${i}`)?.value||'' },
   }));
   try {
-    const res = await fetch('/api/content/pricing', {
+    const res = await fetch(apiUrl('/api/content/pricing'), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(cards),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
@@ -3008,9 +3045,9 @@ function deleteFaqItem(idx) {
 async function saveFaq() {
   const items = collectFaqFromForm();
   try {
-    const res = await fetch('/api/content/faq', {
+    const res = await fetch(apiUrl('/api/content/faq'), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(items),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
@@ -3140,7 +3177,7 @@ let _editingCourse = null;
 
 async function loadCoursesTab() {
   try {
-    const res = await fetch('/api/courses?all=1', { headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl('/api/courses?all=1'), { headers: authHeaders() });
     const d = await res.json();
     _allCourses = d.courses || [];
     renderCoursesGrid();
@@ -3230,11 +3267,11 @@ async function saveCourse() {
     features:     (document.getElementById('crs_features')?.value || '').split('\n').map(s => s.trim()).filter(Boolean),
   };
   try {
-    const url    = _editingCourse ? `/api/courses/${_editingCourse}` : '/api/courses';
+    const url    = apiUrl(_editingCourse ? `/api/courses/${_editingCourse}` : '/api/courses');
     const method = _editingCourse ? 'PATCH' : 'POST';
     const res = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(data),
     });
     const json = await res.json();
@@ -3248,7 +3285,7 @@ async function saveCourse() {
 async function deleteCourse(id) {
   if (!confirm(`Видалити курс "${id}"?`)) return;
   try {
-    const res = await fetch(`/api/courses/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl(`/api/courses/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
     showToast('Курс видалено ✓', 'success');
     await loadCoursesTab();
@@ -3259,9 +3296,9 @@ async function hideCourse(id, currentlyActive) {
   const label = currentlyActive ? 'приховати' : 'показати';
   if (!confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} курс "${id}"?`)) return;
   try {
-    const res = await fetch(`/api/courses/${id}`, {
+    const res = await fetch(apiUrl(`/api/courses/${id}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ active: !currentlyActive }),
     });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -3294,7 +3331,7 @@ async function loadCurriculumTab() {
   // Ensure courses are loaded
   if (!_allCourses) {
     try {
-      const res = await fetch('/api/courses?all=1', { headers: { 'x-admin-token': token } });
+      const res = await fetch(apiUrl('/api/courses?all=1'), { headers: authHeaders() });
       const d = await res.json();
       _allCourses = d.courses || [];
     } catch { showToast('Помилка завантаження курсів', 'error'); return; }
@@ -3393,9 +3430,9 @@ async function saveModule() {
     curriculum.push({ num, title, desc });
   }
   try {
-    const res = await fetch(`/api/courses/${_curriculumCourseId}`, {
+    const res = await fetch(apiUrl(`/api/courses/${_curriculumCourseId}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ curriculum }),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
@@ -3413,9 +3450,9 @@ async function deleteModule(idx) {
   const curriculum = [...(course.curriculum || [])];
   curriculum.splice(idx, 1);
   try {
-    const res = await fetch(`/api/courses/${_curriculumCourseId}`, {
+    const res = await fetch(apiUrl(`/api/courses/${_curriculumCourseId}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ curriculum }),
     });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -3445,7 +3482,7 @@ let _modulesVisibility = null;
 
 async function loadModulesTab() {
   try {
-    const res  = await fetch('/api/content', { headers: { 'x-admin-token': token } });
+    const res  = await fetch(apiUrl('/api/content'), { headers: authHeaders() });
     const data = await res.json();
     _modulesVisibility = data.modules || {};
     renderModulesList();
@@ -3471,9 +3508,9 @@ async function saveModuleVisibility() {
     visibility[s.key] = cb ? cb.checked : true;
   });
   try {
-    const res = await fetch('/api/content/modules', {
+    const res = await fetch(apiUrl('/api/content/modules'), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(visibility),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
@@ -3488,7 +3525,7 @@ let _articleEditId = null;
 
 async function loadArticlesTab() {
   try {
-    const res = await fetch('/api/articles?all=1', { headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl('/api/articles?all=1'), { headers: authHeaders() });
     const data = await res.json();
     _articles = data.articles || [];
     renderArticlesTable();
@@ -3577,10 +3614,10 @@ async function saveArticle() {
   };
   try {
     const method = _articleEditId ? 'PATCH' : 'POST';
-    const url    = _articleEditId ? `/api/articles/${_articleEditId}` : '/api/articles';
+    const url    = apiUrl(_articleEditId ? `/api/articles/${_articleEditId}` : '/api/articles');
     const res    = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -3595,7 +3632,7 @@ async function deleteArticle(id) {
   const a = _articles.find(x => x.id === id);
   if (!a || !confirm(`Видалити статтю "${a.title}"?`)) return;
   try {
-    const res = await fetch(`/api/articles/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl(`/api/articles/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка видалення', 'error'); return; }
     showToast('Статтю видалено', 'success');
     loadArticlesTab();
@@ -3607,9 +3644,9 @@ async function hideArticle(id, currentlyActive) {
   const label = currentlyActive ? 'сховати' : 'показати';
   if (!a || !confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} статтю "${a.title}"?`)) return;
   try {
-    const res = await fetch(`/api/articles/${id}`, {
+    const res = await fetch(apiUrl(`/api/articles/${id}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ active: !currentlyActive }),
     });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -3624,7 +3661,7 @@ let _reviewEditId = null;
 
 async function loadReviewsTab() {
   try {
-    const res = await fetch('/api/reviews', { headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl('/api/reviews'), { headers: authHeaders() });
     const data = await res.json();
     _reviews = data.reviews || [];
     renderReviewsTable();
@@ -3705,9 +3742,9 @@ async function saveReview() {
   };
   try {
     const method = _reviewEditId ? 'PATCH' : 'POST';
-    const url    = _reviewEditId ? `/api/reviews/${_reviewEditId}` : '/api/reviews';
+    const url    = apiUrl(_reviewEditId ? `/api/reviews/${_reviewEditId}` : '/api/reviews');
     const res    = await fetch(url, {
-      method, headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      method, headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -3722,7 +3759,7 @@ async function deleteReview(id) {
   const r = _reviews.find(x => x.id === id);
   if (!r || !confirm(`Видалити відгук від "${r.name}"?`)) return;
   try {
-    const res = await fetch(`/api/reviews/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl(`/api/reviews/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
     showToast('Відгук видалено', 'success');
     loadReviewsTab();
@@ -3734,9 +3771,9 @@ async function hideReview(id, currentlyActive) {
   const label = currentlyActive ? 'сховати' : 'показати';
   if (!r || !confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} відгук від "${r.name}"?`)) return;
   try {
-    const res = await fetch(`/api/reviews/${id}`, {
+    const res = await fetch(apiUrl(`/api/reviews/${id}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ active: !currentlyActive }),
     });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -4726,7 +4763,7 @@ let _seoData = null;
 async function loadSeoTab() {
   if (_seoData) { renderSeoTab(); return; }
   try {
-    const r = await authFetch('/api/content');
+    const r = await fetch(apiUrl('/api/content'), { headers: authHeaders() });
     const d = await r.json();
     _seoData = d.seo || { pages: [] };
     renderSeoTab();
@@ -4765,14 +4802,14 @@ function toggleSeoPreview() {
 async function saveSeoTexts() {
   const heading = (document.getElementById('seo_main_heading')?.value || '').trim();
   const text    = (document.getElementById('seo_main_text')?.value    || '').trim();
-  const pages   = [{ id: 'main', label: 'Головна сторінка (mycomputer.education)', heading, text }];
+  const pages   = [{ id: 'main', label: `Головна сторінка (${apiBase ? apiBase.replace('https://','') : 'mycomputer.education'})`, heading, text }];
   _seoData = { pages };
   const okEl  = document.getElementById('seoSaveOk');
   const errEl = document.getElementById('seoSaveErr');
   try {
-    const r = await authFetch('/api/content/seo', {
+    const r = await fetch(apiUrl('/api/content/seo'), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ pages }),
     });
     if (!r.ok) throw new Error('HTTP ' + r.status);

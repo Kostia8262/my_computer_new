@@ -666,6 +666,7 @@ function corsOrigin(origin, callback) {
   if (
     ALLOWED_ORIGIN === '*' ||
     origin === 'https://mycomputer.education' ||
+    origin === 'https://mycomputer.school' ||
     /^https:\/\/[a-z0-9-]+\.mycomputer\.education$/.test(origin)
   ) return callback(null, true);
   const allowed = ALLOWED_ORIGIN.split(',').map(s => s.trim()).filter(Boolean);
@@ -782,6 +783,7 @@ function validateLead(data) {
 function getRole(token) {
   if (!token) return null;
   if (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) return 'superadmin';
+  if (process.env.MAIN_ADMIN_TOKEN && token === process.env.MAIN_ADMIN_TOKEN) return 'superadmin';
   if (adminsDb.findByToken(token)) return 'admin';
   return null;
 }
@@ -804,7 +806,9 @@ function requireAdmin(req, res, next) {
 
 function requireSuperAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
-  if (!SUPERADMIN_TOKEN || token !== SUPERADMIN_TOKEN) {
+  const ok = (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) ||
+             (process.env.MAIN_ADMIN_TOKEN && token === process.env.MAIN_ADMIN_TOKEN);
+  if (!ok) {
     return res.status(403).json({ error: 'Forbidden: superadmin only' });
   }
   req.role  = 'superadmin';
