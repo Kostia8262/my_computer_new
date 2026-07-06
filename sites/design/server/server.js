@@ -1818,7 +1818,7 @@ app.get('/articles/:slug', (req, res) => {
 
   const title    = article.title || 'Стаття';
   const excerpt  = (article.excerpt || '').slice(0, 160);
-  const siteUrl  = 'https://mycomputer.education';
+  const siteUrl  = 'https://mycomputer.school';
   const pageUrl  = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
 
@@ -1887,7 +1887,7 @@ app.get('/articles/:slug', (req, res) => {
   <meta property="og:description" content="${escHtml(excerpt)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="article"/>
-  <meta property="og:image" content="https://mycomputer.education/og-image.png"/>
+  <meta property="og:image" content="https://mycomputer.school/og-image.png"/>
   <meta property="og:locale" content="uk_UA"/>
   <script type="application/ld+json">${articleJsonLd}</script>`
     )
@@ -1961,7 +1961,7 @@ app.get('/courses/:slug', (req, res) => {
     : 'Детальна інформація про курс програмування для дітей у My Computer Academy';
   // Use hardcoded SEO desc (140-160 chars) when DB description is too short
   const desc = rawDesc.length >= 130 ? rawDesc.slice(0, 160) : (COURSE_SEO_DESCS[slug] || rawDesc.slice(0, 160));
-  const siteUrl = 'https://mycomputer.education';
+  const siteUrl = 'https://mycomputer.school';
   const pageUrl = `${siteUrl}/courses/${slug}`;
 
   const durationMonths = course && course.duration
@@ -2064,7 +2064,7 @@ app.get('/courses/:slug', (req, res) => {
   <meta property="og:description" content="${escHtml(desc)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="website"/>
-  <meta property="og:image" content="https://mycomputer.education/og-image.png"/>
+  <meta property="og:image" content="https://mycomputer.school/og-image.png"/>
   <meta property="og:locale" content="uk_UA"/>`
     )
     .replace(
