@@ -5,10 +5,10 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root {
-  --color-primary:      var(--color-primary);
-  --color-primary-dark: var(--color-primary-dark);
+  --color-primary:      #6C47FF;
+  --color-primary-dark: #5533EE;
   --color-primary-light:#EEE9FF;
-  --color-primary-mid:  var(--color-primary-mid);
+  --color-primary-mid:  #8B6FFF;
   --color-primary-rgb:  108,71,255;
   --color-primary-mid-rgb: 139,92,246;
   --color-success:      #22C55E;
