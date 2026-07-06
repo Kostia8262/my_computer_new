@@ -1467,7 +1467,7 @@ function renderTable() {
   } else {
     tbody.innerHTML = page.map(l => `
       <tr id="row-${l.id}">
-        <td style="color:#aaa;font-size:12px">#${l.id}${l.source ? `<br><span style="color:#6C47FF;font-size:10px;font-weight:600" title="${esc(l.source)}">${esc(l.source)}</span>` : ''}</td>
+        <td style="color:#aaa;font-size:12px">#${l.id}</td>
         <td style="font-weight:600"><input class="notes-input" style="font-weight:600" value="${esc(l.child_name)}" onblur="saveLeadFields(${l.id},{child_name:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td><input class="notes-input" style="width:42px;text-align:center" value="${esc(String(l.age||''))}" placeholder="вік" onblur="saveLeadFields(${l.id},{age:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td>

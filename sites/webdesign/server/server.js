@@ -411,6 +411,7 @@ app.post('/api/leads', leadsLimiter, (req, res) => {
       course:     sanitize(course) || null,
       phone:      sanitize(phone),
       email:      sanitize(email) || null,
+      source:     'webdesign.mycomputer.education',
     };
 
     const result = db.insertLead(sanitized);

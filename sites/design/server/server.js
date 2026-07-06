@@ -357,7 +357,7 @@ function saveContent(data) { fs.writeFileSync(CONTENT_FILE, JSON.stringify(data,
 
 const app            = express();
 app.set('trust proxy', 1); // behind nginx reverse proxy
-const PORT           = process.env.PORT || 3000;
+const PORT           = process.env.PORT || 3005;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
 // Support both SUPERADMIN_TOKEN (new) and ADMIN_TOKEN (legacy)
 const SUPERADMIN_TOKEN = process.env.SUPERADMIN_TOKEN || process.env.ADMIN_TOKEN;
@@ -767,11 +767,20 @@ app.post('/api/leads', leadsLimiter, (req, res) => {
       course:     sanitize(course) || null,
       phone:      sanitize(phone),
       email:      sanitize(email) || null,
-      source:     'mycomputer.education',
+      source:     'mycomputer.school',
     };
 
     const result = db.insertLead(sanitized);
     console.log(`[LEAD #${result.id}] ${sanitized.child_name} | ${sanitized.phone} | ${sanitized.course || '—'}`);
+
+    // Forward to main admin panel (non-blocking)
+    if (process.env.MAIN_ADMIN_TOKEN) {
+      fetch('https://mycomputer.education/api/leads/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': process.env.MAIN_ADMIN_TOKEN },
+        body: JSON.stringify({ ...sanitized, course: sanitized.course || 'Дизайн (mycomputer.school)', notes: 'Заявка з mycomputer.school' }),
+      }).catch(() => {});
+    }
 
     // Send email notification (non-blocking — lead is saved regardless)
     sendLeadNotification({ ...sanitized, id: result.id }).catch(() => {});
@@ -789,7 +798,7 @@ app.post('/api/leads', leadsLimiter, (req, res) => {
 
 // POST /api/leads/admin — admin-only lead creation (no public rate limit)
 app.post('/api/leads/admin', adminLimiter, requireAdmin, (req, res) => {
-  const { child_name, age, phone, course, email, teacher, notes, source } = req.body;
+  const { child_name, age, phone, course, email, teacher, notes } = req.body;
   if (!child_name || child_name.trim().length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я (мін. 2 символи)' });
   if (!phone || String(phone).replace(/\D/g,'').length < 10) return res.status(400).json({ error: 'Невірний формат телефону' });
   try {
@@ -799,7 +808,7 @@ app.post('/api/leads/admin', adminLimiter, requireAdmin, (req, res) => {
       course:     sanitize(course || '') || null,
       phone:      sanitize(phone),
       email:      sanitize(email || '') || null,
-      source:     sanitize(source || '') || 'mycomputer.education',
+      source:     'mycomputer.school',
     });
     const lead = db.getLeadById(result.id);
     if (teacher) db.updateFields(result.id, { teacher: sanitize(teacher) });
