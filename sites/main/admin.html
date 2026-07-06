@@ -1398,6 +1398,15 @@ function onSiteChange() {
   _cmsData = null;
   _seoData = null;
   _allCourses = null;
+  // Close any open edit modals and reset their IDs — a course/article/review/module id
+  // from the previous site is meaningless (and won't exist) on the newly selected one.
+  closeCourseModal();
+  closeModuleModal();
+  closeArticleModal();
+  closeReviewModal();
+  _editingCourse = null;
+  _curriculumCourseId = null;
+  _editingModuleIdx = null;
   if (SITE_AWARE_TABS.includes(_currentTab)) showTab(_currentTab);
 }
 
@@ -3244,7 +3253,7 @@ function openCourseModal(id) {
   document.getElementById('courseModal').style.display = 'flex';
 }
 
-function closeCourseModal() { document.getElementById('courseModal').style.display = 'none'; }
+function closeCourseModal() { document.getElementById('courseModal').style.display = 'none'; _editingCourse = null; }
 
 async function saveCourse() {
   const idVal = document.getElementById('crs_id')?.value.trim();
@@ -3414,7 +3423,7 @@ function openEditModuleModal(idx) {
   document.getElementById('moduleModal').style.display = 'flex';
 }
 
-function closeModuleModal() { document.getElementById('moduleModal').style.display = 'none'; }
+function closeModuleModal() { document.getElementById('moduleModal').style.display = 'none'; _editingModuleIdx = null; }
 
 async function saveModule() {
   const num   = document.getElementById('mod_num')?.value.trim();
