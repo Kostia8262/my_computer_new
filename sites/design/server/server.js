@@ -2155,7 +2155,6 @@ const server = app.listen(PORT, () => {
   console.log(`  ║  My Computer Academy              ║`);
   console.log(`  ║  http://localhost:${PORT}             ║`);
   console.log(`  ╚═══════════════════════════════════╝\n`);
-  console.log(`  Admin UI: http://localhost:${PORT}/admin`);
   console.log(`  Leads: POST /api/leads\n`);
 });
 
