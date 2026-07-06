@@ -432,11 +432,11 @@ async function loadCourses() {
     const el = document.getElementById('coursesGrid');
     if (!el) return;
     const COLOR_CLASS = {
-      scratch:  'course-card__header--scratch',  python:    'course-card__header--python',
-      roblox:   'course-card__header--roblox',   web:       'course-card__header--web',
-      construct:'course-card__header--construct', graphic:   'course-card__header--graphic',
-      pc:       'course-card__header--pc',        blog:      'course-card__header--blog',
-      minecraft:'course-card__header--minecraft',
+      pc:       'course-card__header--pc',        graphic:      'course-card__header--graphic',
+      blog:     'course-card__header--blog',      'ui-ux':      'course-card__header--ui-ux',
+      animation:'course-card__header--animation', '3d-interior':'course-card__header--3d-interior',
+      '3d-blender':'course-card__header--3d-blender', drawing:  'course-card__header--drawing',
+      branding: 'course-card__header--branding',  'ai-design':  'course-card__header--ai-design',
     };
     el.innerHTML = active.map(c => {
       const hClass   = COLOR_CLASS[c.id] || '';
