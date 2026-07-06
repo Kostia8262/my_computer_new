@@ -375,7 +375,7 @@ app.use(helmet({
       styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
       fontSrc:     ["'self'", "https://fonts.gstatic.com"],
       imgSrc:      ["'self'", "data:", "https:"],
-      connectSrc:  ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://stats.g.doubleclick.net"],
+      connectSrc:  ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://stats.g.doubleclick.net", "https://mycomputer.school", "https://webdesign.mycomputer.education", "https://python.mycomputer.education", "https://minecraft.mycomputer.education", "https://roblox.mycomputer.education"],
       frameSrc:       ["'none'"],
       objectSrc:      ["'none'"],
       scriptSrcAttr:  ["'unsafe-inline'"], // allow onclick/onchange in admin panel
