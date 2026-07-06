@@ -1093,7 +1093,7 @@ async function init() {
   const descEl = document.querySelector('meta[name="description"]');
   if (descEl) descEl.setAttribute('content', course.subtitle);
 
-  const canonUrl = `https://mycomputer.education/courses/${course.id}`;
+  const canonUrl = `https://mycomputer.school/courses/${course.id}`;
   let canon = document.querySelector('link[rel="canonical"]');
   if (!canon) { canon = document.createElement('link'); canon.rel = 'canonical'; document.head.appendChild(canon); }
   canon.href = canonUrl;
