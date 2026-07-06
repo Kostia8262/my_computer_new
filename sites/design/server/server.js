@@ -1672,7 +1672,8 @@ app.delete('/api/articles/:id', adminLimiter, requireSuperAdmin, (req, res) => {
 // ── REVIEWS API ───────────────────────────────────────────────────────────────
 app.get('/api/reviews', (req, res) => {
   const token = req.headers['x-admin-token'];
-  const isAdmin = (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) || !!adminsDb.findByToken(token);
+  const isAdmin = (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) ||
+    (process.env.MAIN_ADMIN_TOKEN && token === process.env.MAIN_ADMIN_TOKEN) || !!adminsDb.findByToken(token);
   const reviews = isAdmin ? reviewsDb.getAll() : reviewsDb.getActive();
   res.json({ success: true, reviews });
 });
