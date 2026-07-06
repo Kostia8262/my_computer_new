@@ -110,6 +110,53 @@ const CONTENT_SEED = {
       coursesDb.create({ id: 'python', name: 'Python: справжнє програмування', emoji: '🐍', age: '10–14 років', age_group: '10-14', duration: '4 місяці', lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.' });
       console.log('✅  Seeded python course');
     }
+    if (!coursesDb.getAll().some(c => c.id === 'python-7-10')) {
+      const shared = { duration: '4 місяці', groupSize: 5, price: 3600, color: '#3b82f6', active: true };
+      coursesDb.create({ id: 'python-7-10', name: 'Python Старт', emoji: '🐢', age: '7–10 років', age_group: '7-10', description: 'Перші кроки в програмуванні через ігри та малюнки', lessonsCount: 10, ...shared, curriculum: [
+        { num: '01', title: 'Знайомство з Python', desc: 'Встановлення, IDLE, print(), перша програма "Hello, World!"' },
+        { num: '02', title: 'Змінні та типи даних', desc: 'Числа, рядки, True/False. Математика в коді.' },
+        { num: '03', title: 'Умови if / else', desc: 'Вчимо Python "думати": порівняння та розгалуження логіки.' },
+        { num: '04', title: 'Цикли for та while', desc: 'Автоматизація повторень. Будуємо патерни та лічильники.' },
+        { num: '05', title: 'Функції', desc: 'Пишемо власні команди: def, return, параметри.' },
+        { num: '06', title: 'Списки', desc: 'Зберігання наборів даних, індекси, len(), sorted().' },
+        { num: '07', title: 'Turtle: малюємо кодом', desc: 'Графіка, фігури, кольори, спіралі та зірки.' },
+        { num: '08', title: 'Minecraft + Python (mcpi)', desc: 'Підключення до Minecraft Education Edition, будуємо споруди та лабіринти кодом.' },
+        { num: '09', title: 'Знайомство зі штучним інтелектом', desc: 'Що таке ШІ та машинне навчання — пояснення на прикладах, гра "навчи комп\'ютер розрізняти котів та собак".' },
+        { num: '🚀', title: 'Фінальний проект', desc: 'Власна малюнкова програма, вікторина або Minecraft-будівля, створена кодом.' },
+      ]});
+      coursesDb.create({ id: 'python-10-14', name: 'Python: Ігри та боти', emoji: '🎮', age: '10–14 років', age_group: '10-14', description: 'Від синтаксису до власної гри та Telegram-бота', lessonsCount: 13, ...shared, curriculum: [
+        { num: '01', title: 'Основи та VS Code', desc: 'Середовище розробника, синтаксис, типи, умови, цикли.' },
+        { num: '02', title: 'Структури даних', desc: 'Списки, словники, кортежи, set. Коли що використовувати.' },
+        { num: '03', title: 'Функції та модулі', desc: 'Scope, рекурсія, import, власні модулі.' },
+        { num: '04', title: 'Файли та обробка помилок', desc: 'Читання/запис файлів, try/except, власні виключення.' },
+        { num: '05', title: 'Робота з API', desc: 'requests, JSON, отримання даних з відкритих API (погода, курси валют).' },
+        { num: '06', title: 'Pygame: основи', desc: 'Вікно, події, малювання фігур, таймер, FPS-контроль.' },
+        { num: '07', title: 'Pygame: спрайти та анімація', desc: 'Завантаження зображень, спрайт-листи, плавний рух, ефекти.' },
+        { num: '08', title: 'Pygame: повноцінна гра', desc: 'Колізії, рахунок, рівні, звуки, меню старту та кінця гри.' },
+        { num: '09', title: 'Telegram-бот: основи', desc: 'aiogram, команди, клавіатури, відповіді на повідомлення.' },
+        { num: '10', title: 'Telegram-бот: стани та логіка', desc: 'FSM (машина станів), сценарії діалогу, зберігання даних користувача.' },
+        { num: '11', title: 'ШІ у повсякденних задачах', desc: 'Підключення до OpenAI API, генерація тексту та зображень із Python-скрипту.' },
+        { num: '12', title: 'Git та GitHub', desc: 'Контроль версій, commit, push, pull request — публікуємо перший репозиторій.' },
+        { num: '🚀', title: 'Фінальний проект', desc: 'Гра на Pygame, бот з ШІ або автоматизований скрипт — публікація на GitHub.' },
+      ]});
+      coursesDb.create({ id: 'python-14-18', name: 'Python Pro: до портфоліо', emoji: '💻', age: '14–18 років', age_group: '14-18', description: 'Глибокий Python, автоматизація та реальні продукти', lessonsCount: 14, ...shared, curriculum: [
+        { num: '01', title: 'Python Advanced: генератори та декоратори', desc: 'lambda, map/filter, генератори, декоратори — пишемо елегантний код.' },
+        { num: '02', title: 'ООП: класи та об\'єкти', desc: 'Класи, методи, наслідування, інкапсуляція, dunder-методи.' },
+        { num: '03', title: 'Бібліотеки та pip', desc: 'requests, json, datetime, virtual environment — робота з зовнішніми пакетами.' },
+        { num: '04', title: 'Парсинг даних', desc: 'BeautifulSoup, requests-html — автоматичний збір інформації з сайтів.' },
+        { num: '05', title: 'Бази даних: SQLite', desc: 'SQL: SELECT, INSERT, UPDATE, DELETE. Підключення через sqlite3 та SQLAlchemy.' },
+        { num: '06', title: 'Telegram-бот з БД', desc: 'aiogram + SQLite — реєстрація, профілі, адмін-панель, FSM-діалоги.' },
+        { num: '07', title: 'Веб-API на Flask', desc: 'Роутінг, GET/POST, шаблони Jinja2, JSON API, автентифікація.' },
+        { num: '08', title: 'Автоматизація та аналіз даних', desc: 'pandas, openpyxl — читання Excel, статистика, автогенерація звітів.' },
+        { num: '09', title: 'Основи Machine Learning', desc: 'scikit-learn, numpy, matplotlib — лінійна регресія, класифікатори, візуалізація.' },
+        { num: '10', title: 'Нейронні мережі на практиці', desc: 'TensorFlow/Keras — будуємо просту нейромережу, розпізнавання рукописних цифр (MNIST).' },
+        { num: '11', title: 'Робота з LLM та OpenAI API', desc: 'Підключення ChatGPT до власного додатку, prompt engineering, RAG-системи.' },
+        { num: '12', title: 'Git, GitHub та деплой', desc: 'Гілки, pull request, деплой Flask на Railway/Render, змінні оточення.' },
+        { num: '13', title: 'Тестування та якість коду', desc: 'pytest, unittest, mock, linting (flake8/black) — код як у реальному проекті.' },
+        { num: '🚀', title: 'Фінальний проект для портфоліо', desc: 'Повноцінний AI-продукт: бот, Flask-сервіс або ML-застосунок — деплой і GitHub.' },
+      ]});
+      console.log('✅  Seeded python age-group courses (7-10, 10-14, 14-18)');
+    }
     const _cnt = loadContent();
     if (!_cnt.pricing || !_cnt.pricing.length || !_cnt.faq || !_cnt.faq.length) {
       saveContent({ ..._cnt, ...CONTENT_SEED });
