@@ -1269,16 +1269,6 @@ app.delete('/api/leads/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   }
 });
 
-// Admin panel — no cache so updates apply immediately
-app.get('/admin', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(path.join(__dirname, '..', 'admin.html'));
-});
-app.get('/admin.html', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(path.join(__dirname, '..', 'admin.html'));
-});
-
 // Known single-page routes → index.html
 const SPA_ROUTES = ['/', '/index.html'];
 SPA_ROUTES.forEach(r => app.get(r, (req, res) => {
