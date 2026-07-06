@@ -442,12 +442,18 @@ tr:hover td{background:#faf9ff}
           <div class="modal-group"><label class="modal-label">Ім'я дитини *</label><input class="modal-input" id="nl_name" placeholder="Ім'я дитини"/></div>
           <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="nl_age" type="number" placeholder="7"/></div>
           <div class="modal-group"><label class="modal-label">Курс</label>
-            <select class="modal-input" id="nl_course">
+            <select class="modal-input course-dynamic-select" id="nl_course">
               <option value="">— Не вказано —</option>
-              <option value="scratch">Scratch</option>
-              <option value="python">Python</option>
-              <option value="roblox">Roblox</option>
-              <option value="web">Веб-розробка</option>
+              <option value="pc">Базовий ПК</option>
+              <option value="graphic">Графіка та ілюстрація</option>
+              <option value="blog">Блог та сайт</option>
+              <option value="ui-ux">UI/UX дизайн</option>
+              <option value="animation">Анімація</option>
+              <option value="3d-interior">3D-інтер'єри</option>
+              <option value="3d-blender">3D у Blender</option>
+              <option value="drawing">Цифровий рисунок</option>
+              <option value="branding">Брендинг</option>
+              <option value="ai-design">AI-дизайн</option>
               <option value="help">Допоможіть обрати</option>
             </select>
           </div>
@@ -881,10 +887,16 @@ tr:hover td{background:#faf9ff}
           </select>
           <select class="filter-select" id="clientCourseFilter" onchange="renderClients()">
             <option value="">Всі курси</option>
-            <option value="scratch">Scratch</option>
-            <option value="python">Python</option>
-            <option value="roblox">Roblox</option>
-            <option value="web">Веб</option>
+            <option value="pc">Базовий ПК</option>
+            <option value="graphic">Графіка та ілюстрація</option>
+            <option value="blog">Блог та сайт</option>
+            <option value="ui-ux">UI/UX дизайн</option>
+            <option value="animation">Анімація</option>
+            <option value="3d-interior">3D-інтер'єри</option>
+            <option value="3d-blender">3D у Blender</option>
+            <option value="drawing">Цифровий рисунок</option>
+            <option value="branding">Брендинг</option>
+            <option value="ai-design">AI-дизайн</option>
             <option value="other">Інше</option>
           </select>
           <button class="btn btn-primary btn-sm" onclick="openClientModal(null)">+ Додати клієнта</button>
@@ -1140,10 +1152,16 @@ tr:hover td{background:#faf9ff}
       </select>
       <select class="filter-select" id="courseFilter" onchange="renderTable()">
         <option value="">Всі курси</option>
-        <option value="scratch">Scratch</option>
-        <option value="python">Python</option>
-        <option value="roblox">Roblox</option>
-        <option value="web">Веб-розробка</option>
+        <option value="pc">Базовий ПК</option>
+        <option value="graphic">Графіка та ілюстрація</option>
+        <option value="blog">Блог та сайт</option>
+        <option value="ui-ux">UI/UX дизайн</option>
+        <option value="animation">Анімація</option>
+        <option value="3d-interior">3D-інтер'єри</option>
+        <option value="3d-blender">3D у Blender</option>
+        <option value="drawing">Цифровий рисунок</option>
+        <option value="branding">Брендинг</option>
+        <option value="ai-design">AI-дизайн</option>
         <option value="help">Допоможіть обрати</option>
       </select>
       <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">+ Нова заявка</button>
@@ -1221,11 +1239,17 @@ const STATUS_LABELS = {
   rejected:          '🔴 Відмова',
 };
 const COURSE_LABELS = {
-  scratch: 'Scratch',
-  python:  'Python',
-  roblox:  'Roblox',
-  web:     'Веб',
-  help:    'Допоможіть',
+  pc:          'Базовий ПК',
+  graphic:     'Графіка та ілюстрація',
+  blog:        'Блог та сайт',
+  'ui-ux':     'UI/UX дизайн',
+  animation:   'Анімація',
+  '3d-interior': "3D-інтер'єри",
+  '3d-blender':  '3D у Blender',
+  drawing:     'Цифровий рисунок',
+  branding:    'Брендинг',
+  'ai-design': 'AI-дизайн',
+  help:        'Допоможіть',
 };
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
@@ -1880,8 +1904,11 @@ function renderClients() {
     tbody.innerHTML = page.map(c => {
       // Option lists
       const courseOpts = [
-        ['','— курс —'],['scratch','Scratch'],['python','Python'],
-        ['roblox','Roblox'],['web','Веб'],['other','Інше'],
+        ['','— курс —'],['pc','Базовий ПК'],['graphic','Графіка та ілюстрація'],
+        ['blog','Блог та сайт'],['ui-ux','UI/UX дизайн'],['animation','Анімація'],
+        ['3d-interior',"3D-інтер'єри"],['3d-blender','3D у Blender'],
+        ['drawing','Цифровий рисунок'],['branding','Брендинг'],['ai-design','AI-дизайн'],
+        ['other','Інше'],
       ].map(([v,l]) => `<option value="${v}"${c.course===v?' selected':''}>${l}</option>`).join('');
 
       const statusOpts = Object.entries(CLIENT_STATUS_LABELS)

@@ -1997,7 +1997,7 @@ app.get('/courses/:slug', (req, res) => {
   const seoTitle  = COURSE_SEO_TITLES[slug] || `${name} — My Computer Academy`;
   const rawDesc = course && course.description
     ? course.description
-    : 'Детальна інформація про курс програмування для дітей у My Computer Academy';
+    : 'Детальна інформація про курс дизайну для дітей у My Computer Academy';
   // Use hardcoded SEO desc (140-160 chars) when DB description is too short
   const desc = rawDesc.length >= 130 ? rawDesc.slice(0, 160) : (COURSE_SEO_DESCS[slug] || rawDesc.slice(0, 160));
   const siteUrl = 'https://mycomputer.school';
