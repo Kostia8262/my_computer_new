@@ -132,7 +132,7 @@
       </nav>
     </div>
     <div class="listing-hero__badge">📚 Бібліотека статей</div>
-    <h1 class="listing-hero__title">Статті про програмування<br/>для дітей та батьків</h1>
+    <h1 class="listing-hero__title">Статті про дизайн<br/>для дітей та батьків</h1>
     <p class="listing-hero__sub" id="heroSub">Завантаження…</p>
     <div class="listing-search">
       <input type="search" id="searchInput" placeholder="Пошук за назвою або темою…" autocomplete="off" aria-label="Пошук статей"/>
@@ -174,7 +174,7 @@
           <img src="/android-chrome-192x192.png" alt="My Computer Academy" class="nav__logo-img" width="38" height="38" loading="lazy"/>
           <span>My Computer <strong>Academy</strong></span>
         </a>
-        <p class="footer__desc">Онлайн школа програмування для дітей від 6 до 18 років. Дніпро, Україна.</p>
+        <p class="footer__desc">Онлайн школа дизайну для дітей від 6 до 18 років. Дніпро, Україна.</p>
         <div class="footer__social">
           <a href="https://www.instagram.com/my_computer_academy_/" target="_blank" rel="noopener" class="social-link" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
           <a href="https://www.facebook.com/MyComputerAcademy.Dnipro" target="_blank" rel="noopener" class="social-link" aria-label="Facebook"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2h-3a5 5 0 0 0-5 5v3H6v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
@@ -317,26 +317,16 @@ burger.addEventListener('click', () => {
 
 // ── Label map ────────────────────────────────────────────────────────────────
 const LABEL_MAP = {
-  '🐍': {label:'Python',            cls:'cat-python',  cat:'Python'},
-  '🧩': {label:'Scratch',           cls:'cat-scratch', cat:'Scratch'},
-  '🎮': {label:'Roblox',            cls:'cat-roblox',  cat:'Roblox'},
-  '🌐': {label:'Веб-розробка',      cls:'cat-web',     cat:'Веб'},
-  '💡': {label:'Для батьків',       cls:'cat-parents', cat:'Батькам'},
-  '🧮': {label:'Математика і код',  cls:'cat-parents', cat:'Батькам'},
-  '🎯': {label:'Вибір курсу',       cls:'cat-tips',    cat:'Поради'},
-  '🔀': {label:'Scratch vs Python', cls:'cat-tips',    cat:'Поради'},
-  '💪': {label:'Мотивація',         cls:'cat-parents', cat:'Батькам'},
-  '🖥': {label:'Формат навчання',   cls:'cat-tips',    cat:'Поради'},
-  '💬': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '📁': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '💻': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '🧹': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '🔒': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '📖': {label:'Словник',           cls:'cat-dict',    cat:'Словник'},
-  '🎨': {label:'Дизайн',            cls:'cat-design',  cat:'Дизайн'},
-  '🎭': {label:'Дизайн',            cls:'cat-design',  cat:'Дизайн'},
-  '🧭': {label:'Дизайн',            cls:'cat-design',  cat:'Дизайн'},
-  '🤖': {label:'Дизайн',            cls:'cat-design',  cat:'Дизайн'},
+  '🤖': {label:'Тренди',              cls:'cat-trends', cat:'Тренди'},
+  '🖼️': {label:"Кар'єра та професії", cls:'cat-career', cat:"Кар'єра"},
+  '📱': {label:"Кар'єра та професії", cls:'cat-career', cat:"Кар'єра"},
+  '💼': {label:"Кар'єра та професії", cls:'cat-career', cat:"Кар'єра"},
+  '🌈': {label:'Розвиток дитини',     cls:'cat-guide',  cat:'Розвиток'},
+  '✏️': {label:'Розвиток дитини',     cls:'cat-guide',  cat:'Розвиток'},
+  '📁': {label:'Поради батькам',      cls:'cat-parents',cat:'Батькам'},
+  '🎨': {label:'Поради батькам',      cls:'cat-parents',cat:'Батькам'},
+  '🎬': {label:'Курси',               cls:'cat-dict',   cat:'Курси'},
+  '🖌️': {label:'Вибір курсу',         cls:'cat-tips',   cat:'Вибір курсу'},
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -455,7 +445,7 @@ async function init() {
 
     const active = ALL_ARTICLES.filter(a => a.active !== false);
     document.getElementById('heroSub').textContent =
-      pluralArticles(active.length) + ' — Python, Scratch, Roblox, веб-розробка та поради батькам';
+      pluralArticles(active.length) + ' — графіка, UI/UX, 3D, AI-дизайн та поради батькам';
 
     buildFilters(active);
     renderCards(active);

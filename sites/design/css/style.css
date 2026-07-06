@@ -1031,6 +1031,8 @@ body.modal-open{overflow:hidden}
 .article-card__cat.cat-guide  {background:rgba(20,184,166,.18);color:#2dd4bf}
 .article-card__cat.cat-dict   {background:rgba(168,85,247,.18);color:#c084fc}
 .article-card__cat.cat-design {background:rgba(236,72,153,.18);color:#f9a8d4}
+.article-card__cat.cat-trends {background:rgba(16,185,129,.18);color:#6ee7b7}
+.article-card__cat.cat-career {background:rgba(249,115,22,.18);color:#fdba74}
 .article-card__body{padding:16px 20px;flex:1}
 .article-card__title{font-size:16px;font-weight:700;line-height:1.4;margin-bottom:10px;color:#fff}
 .article-card__excerpt{font-size:13px;color:rgba(255,255,255,.5);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
