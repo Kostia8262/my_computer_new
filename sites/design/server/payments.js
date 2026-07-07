@@ -1,55 +1,69 @@
 'use strict';
 
-const db = require('./db');
+const fs   = require('fs');
+const path = require('path');
 
-const METHOD_VALUES = ['cash', 'card', 'wayforpay', 'googlepay', 'applepay', 'transfer', 'other'];
+const DATA_DIR  = path.join(__dirname, '..', 'data');
+const DATA_FILE = path.join(DATA_DIR, 'payments.json');
 
-function fromRow(row) {
-  if (!row) return null;
-  return {
-    id: row.id, clientId: row.client_id, amount: row.amount, date: row.date,
-    method: row.method, note: row.note, createdAt: row.created_at,
-  };
+if (!fs.existsSync(DATA_DIR))  fs.mkdirSync(DATA_DIR, { recursive: true });
+if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
+
+function load() {
+  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
+  catch { return []; }
 }
 
-const selAll        = db.prepare('SELECT * FROM payments ORDER BY id DESC');
-const selByClient    = db.prepare('SELECT * FROM payments WHERE client_id = ? ORDER BY id DESC');
-const selById        = db.prepare('SELECT * FROM payments WHERE id = ?');
-const sumByClient     = db.prepare('SELECT COALESCE(SUM(amount), 0) AS total FROM payments WHERE client_id = ?');
-const insPayment     = db.prepare(`INSERT INTO payments (client_id, amount, date, method, note, created_at)
-  VALUES (@client_id, @amount, @date, @method, @note, @created_at)`);
-const delPayment     = db.prepare('DELETE FROM payments WHERE id = ?');
+function save(data) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
+
+function nextId(arr) {
+  return arr.length > 0 ? Math.max(...arr.map(p => p.id || 0)) + 1 : 1;
+}
+
+const METHOD_VALUES = ['cash', 'card', 'wayforpay', 'googlepay', 'applepay', 'transfer', 'other'];
 
 module.exports = {
   METHOD_VALUES,
 
   getAll(clientId) {
-    const rows = clientId ? selByClient.all(parseInt(clientId)) : selAll.all();
-    return rows.map(fromRow);
+    const all = load();
+    return clientId ? all.filter(p => p.clientId === parseInt(clientId)) : all;
   },
 
   create(data) {
-    const info = insPayment.run({
-      client_id: parseInt(data.clientId),
-      amount:    parseFloat(data.amount) || 0,
-      date:      data.date || new Date().toISOString().slice(0, 10),
-      method:    METHOD_VALUES.includes(data.method) ? data.method : 'other',
-      note:      data.note || '',
-      created_at: new Date().toISOString(),
-    });
-    return fromRow(selById.get(info.lastInsertRowid));
+    const payments = load();
+    const payment = {
+      id:       nextId(payments),
+      clientId: parseInt(data.clientId),
+      amount:   parseFloat(data.amount) || 0,
+      date:     data.date || new Date().toISOString().slice(0, 10),
+      method:   METHOD_VALUES.includes(data.method) ? data.method : 'other',
+      note:     data.note || '',
+      createdAt: new Date().toISOString(),
+    };
+    payments.unshift(payment);
+    save(payments);
+    return payment;
   },
 
   delete(id) {
-    return delPayment.run(id).changes > 0;
+    const payments = load();
+    const idx = payments.findIndex(p => p.id === id);
+    if (idx === -1) return false;
+    payments.splice(idx, 1);
+    save(payments);
+    return true;
   },
 
   getTotalForClient(clientId) {
-    const cid = parseInt(clientId);
-    return Number.isNaN(cid) ? 0 : sumByClient.get(cid).total;
+    return load()
+      .filter(p => p.clientId === parseInt(clientId))
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
   },
 
   getById(id) {
-    return id != null ? fromRow(selById.get(id)) : null;
+    return load().find(p => p.id === id) || null;
   },
 };

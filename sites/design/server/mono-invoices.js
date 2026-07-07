@@ -1,50 +1,67 @@
 'use strict';
 
-const db = require('./db');
+const fs   = require('fs');
+const path = require('path');
 
-function fromRow(row) {
-  if (!row) return null;
-  return {
-    invoiceId: row.invoice_id, status: row.status, amount: row.amount,
-    finalAmount: row.final_amount, description: row.description, reference: row.reference,
-    createdAt: row.created_at, updatedAt: row.updated_at,
-  };
+const DATA_FILE = path.join(__dirname, '..', 'data', 'mono-invoices.json');
+
+if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
+
+function load() {
+  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
+  catch { return []; }
 }
-
-const selAll  = db.prepare('SELECT * FROM mono_invoices ORDER BY created_at DESC');
-const selById = db.prepare('SELECT * FROM mono_invoices WHERE invoice_id = ?');
-const insInv  = db.prepare(`INSERT INTO mono_invoices (invoice_id, status, amount, final_amount, description, reference, created_at, updated_at)
-  VALUES (@invoice_id, 'created', @amount, NULL, @description, '', @created_at, @updated_at)`);
+function save(data) { fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8'); }
 
 module.exports = {
   // Called when invoice is created
   create(data) {
-    if (selById.get(data.invoiceId)) return;
-    const now = new Date().toISOString();
-    insInv.run({
-      invoice_id: data.invoiceId,
-      amount: data.amount,
+    const records = load();
+    if (records.find(r => r.invoiceId === data.invoiceId)) return;
+    records.unshift({
+      invoiceId:   data.invoiceId,
+      status:      'created',
+      amount:      data.amount,
+      finalAmount: null,
       description: data.description || '',
-      created_at: now,
-      updated_at: now,
+      reference:   '',
+      createdAt:   new Date().toISOString(),
+      updatedAt:   new Date().toISOString(),
     });
+    save(records);
   },
 
   // Called on webhook — idempotent upsert
   upsert(data) {
-    const existing = selById.get(data.invoiceId);
-    const now = new Date().toISOString();
-    if (existing) {
-      db.prepare(`UPDATE mono_invoices SET status = ?, final_amount = COALESCE(?, final_amount), reference = COALESCE(NULLIF(?, ''), reference), updated_at = ? WHERE invoice_id = ?`)
-        .run(data.status, data.finalAmount ?? null, data.reference || '', now, data.invoiceId);
-      return fromRow(selById.get(data.invoiceId));
+    const records = load();
+    const idx     = records.findIndex(r => r.invoiceId === data.invoiceId);
+    const now     = new Date().toISOString();
+    if (idx >= 0) {
+      records[idx] = {
+        ...records[idx],
+        status:      data.status,
+        finalAmount: data.finalAmount ?? records[idx].finalAmount,
+        reference:   data.reference   || records[idx].reference,
+        updatedAt:   now,
+      };
+      save(records);
+      return records[idx];
     }
-    db.prepare(`INSERT INTO mono_invoices (invoice_id, status, amount, final_amount, description, reference, created_at, updated_at)
-      VALUES (?, ?, ?, ?, '', ?, ?, ?)`)
-      .run(data.invoiceId, data.status, data.amount, data.finalAmount ?? null, data.reference || '', now, now);
-    return fromRow(selById.get(data.invoiceId));
+    const record = {
+      invoiceId:   data.invoiceId,
+      status:      data.status,
+      amount:      data.amount,
+      finalAmount: data.finalAmount ?? null,
+      description: '',
+      reference:   data.reference || '',
+      createdAt:   now,
+      updatedAt:   now,
+    };
+    records.unshift(record);
+    save(records);
+    return record;
   },
 
-  getAll()         { return selAll.all().map(fromRow); },
-  getByInvoice(id) { return id ? fromRow(selById.get(id)) : null; },
+  getAll()         { return load(); },
+  getByInvoice(id) { return load().find(r => r.invoiceId === id) || null; },
 };
