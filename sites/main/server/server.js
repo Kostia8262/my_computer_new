@@ -360,6 +360,16 @@ ARTICLES_SEED.forEach(a => {
         articlesPatched++;
       }
     });
+    // ARTICLES_RU also covers live-only articles that were never added to ARTICLES_SEED
+    // (most were published directly via the admin API) — patch those by slug too.
+    Object.keys(ARTICLES_RU).forEach(slug => {
+      const existing = articlesDb.getBySlug(slug);
+      const ru = ARTICLES_RU[slug];
+      if (existing && ru.title && existing.title_ru !== ru.title) {
+        articlesDb.update(existing.id, { title_ru: ru.title, excerpt_ru: ru.excerpt, content_ru: ru.content });
+        articlesPatched++;
+      }
+    });
     if (articlesSeeded) console.log(`✅  Seeded ${articlesSeeded} articles`);
     if (articlesPatched) console.log(`✅  Patched ${articlesPatched} articles (RU translation)`);
 
