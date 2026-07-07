@@ -1,106 +1,92 @@
 'use strict';
 
 /**
- * MY COMPUTER ACADEMY — JSON file storage (no native deps, works on all platforms)
- * Data is stored in data/leads.json — created automatically on first run.
+ * MY COMPUTER ACADEMY — leads storage, backed by SQLite (data/design.db).
  */
 
-const fs   = require('fs');
-const path = require('path');
-
-const DATA_DIR  = path.join(__dirname, '..', 'data');
-const DATA_FILE = path.join(DATA_DIR, 'leads.json');
-
-if (!fs.existsSync(DATA_DIR))  fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
-
-function load() {
-  try {
-    return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-  } catch {
-    return [];
-  }
-}
-
-function save(leads) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(leads, null, 2), 'utf8');
-}
-
-function nextId(leads) {
-  return leads.length > 0 ? Math.max(...leads.map(l => l.id)) + 1 : 1;
-}
+const db = require('./db');
 
 function now() {
   return new Date().toLocaleString('uk-UA', { timeZone: 'Europe/Kiev' });
 }
 
+function fromRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id, child_name: row.child_name, age: row.age, course: row.course,
+    source: row.source, phone: row.phone, email: row.email, status: row.status,
+    notes: row.notes, teacher: row.teacher, schedule: row.schedule,
+    created_at: row.created_at, updated_at: row.updated_at,
+  };
+}
+
+const selAll   = db.prepare('SELECT * FROM leads ORDER BY id DESC');
+const selById  = db.prepare('SELECT * FROM leads WHERE id = ?');
+const selByPhone = db.prepare('SELECT * FROM leads WHERE phone = ?');
+const insLead  = db.prepare(`INSERT INTO leads (child_name, age, course, source, phone, email, status, notes, created_at, updated_at)
+  VALUES (@child_name, @age, @course, @source, @phone, @email, 'new', NULL, @created_at, @updated_at)`);
+const delLead  = db.prepare('DELETE FROM leads WHERE id = ?');
+
 module.exports = {
   insertLead(data) {
-    const leads = load();
-    const lead = {
-      id:         nextId(leads),
+    const t = now();
+    const info = insLead.run({
       child_name: data.child_name,
       age:        data.age   ?? null,
       course:     data.course ?? null,
       source:     data.source ?? null,
       phone:      data.phone,
       email:      data.email ?? null,
-      status:     'new',
-      notes:      null,
-      created_at: now(),
-      updated_at: now(),
-    };
-    leads.unshift(lead);
-    save(leads);
-    return { id: lead.id, changes: 1 };
+      created_at: t,
+      updated_at: t,
+    });
+    return { id: info.lastInsertRowid, changes: 1 };
   },
 
   getAllLeads() {
-    return load();
+    return selAll.all().map(fromRow);
   },
 
   getLeadById(id) {
-    return load().find(l => l.id === id) || null;
+    return id != null ? fromRow(selById.get(id)) : null;
   },
 
   updateStatus(id, status) {
-    const leads = load();
-    const lead  = leads.find(l => l.id === id);
-    if (lead) { lead.status = status; lead.updated_at = now(); save(leads); }
-    return { changes: lead ? 1 : 0 };
+    const info = db.prepare('UPDATE leads SET status = ?, updated_at = ? WHERE id = ?').run(status, now(), id);
+    return { changes: info.changes };
   },
 
   updateNotes(id, notes) {
-    const leads = load();
-    const lead  = leads.find(l => l.id === id);
-    if (lead) { lead.notes = notes; lead.updated_at = now(); save(leads); }
-    return { changes: lead ? 1 : 0 };
+    const info = db.prepare('UPDATE leads SET notes = ?, updated_at = ? WHERE id = ?').run(notes, now(), id);
+    return { changes: info.changes };
   },
 
   updateFields(id, fields) {
-    const leads = load();
-    const lead = leads.find(l => l.id === id);
-    if (!lead) return null;
+    const existing = selById.get(id);
+    if (!existing) return null;
     const allowed = ['child_name', 'phone', 'age', 'course', 'email', 'teacher', 'schedule'];
-    allowed.forEach(k => { if (k in fields && fields[k] !== undefined) lead[k] = fields[k]; });
-    lead.updated_at = now();
-    save(leads);
-    return lead;
+    const sets = ['updated_at = @updated_at'];
+    const params = { id, updated_at: now() };
+    allowed.forEach(k => {
+      if (!(k in fields) || fields[k] === undefined) return;
+      sets.push(`${k} = @${k}`);
+      params[k] = fields[k];
+    });
+    db.prepare(`UPDATE leads SET ${sets.join(', ')} WHERE id = @id`).run(params);
+    return fromRow(selById.get(id));
   },
 
   getByPhone(phone) {
-    return load().find(l => l.phone === phone) || null;
+    return phone ? fromRow(selByPhone.get(phone)) : null;
   },
 
   deleteLead(id) {
-    const leads = load();
-    const idx   = leads.findIndex(l => l.id === id);
-    if (idx >= 0) { leads.splice(idx, 1); save(leads); return { changes: 1 }; }
-    return { changes: 0 };
+    const info = delLead.run(id);
+    return { changes: info.changes };
   },
 
   getStats() {
-    const leads    = load();
+    const leads = selAll.all().map(fromRow);
     const statusMap = {};
     leads.forEach(l => { statusMap[l.status] = (statusMap[l.status] || 0) + 1; });
     return {
