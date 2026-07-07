@@ -401,11 +401,20 @@ document.addEventListener('click', e => {
   }
 });
 
-document.querySelectorAll('.lang-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === btn.dataset.lang));
+(function() {
+  const lang = getLang();
+  document.documentElement.lang = lang === 'ua' ? 'uk' : 'ru';
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.lang-btn');
+    if (!btn || btn.dataset.lang === lang) return;
+    localStorage.setItem('mca-lang', btn.dataset.lang);
+    const url = new URL(location.href);
+    if (btn.dataset.lang === 'ru') url.searchParams.set('lang', 'ru');
+    else url.searchParams.delete('lang');
+    location.href = url.toString();
   });
-});
+})();
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function esc(s) {
@@ -418,10 +427,16 @@ function formatDate(d) {
 }
 
 // ── Article loader ────────────────────────────────────────────────────────────
+function getLang() {
+  const urlLang = new URLSearchParams(location.search).get('lang') === 'ru' ? 'ru' : null;
+  return urlLang || localStorage.getItem('mca-lang') || 'ua';
+}
+
 async function init() {
   const pathMatch = window.location.pathname.match(/\/articles\/([^/?#]+)/);
   const slug = pathMatch ? pathMatch[1] : null;
   if (!slug) { showNotFound(); return; }
+  const lang = getLang();
 
   try {
     const res = await fetch('/api/articles');
@@ -429,13 +444,17 @@ async function init() {
     const { articles } = await res.json();
     const article = articles.find(a => a.slug === slug && a.active !== false);
     if (!article) { showNotFound(); return; }
-    renderArticle(article, articles.filter(a => a.active !== false && a.id !== article.id).slice(0, 4));
+    renderArticle(article, articles.filter(a => a.active !== false && a.id !== article.id).slice(0, 4), lang);
   } catch { showNotFound(); }
 }
 
-function renderArticle(a, related) {
-  document.title = a.title + ' — My Computer Academy';
-  document.getElementById('pageDesc')?.setAttribute('content', a.excerpt || a.title);
+function renderArticle(a, related, lang) {
+  const title   = (lang === 'ru' && a.title_ru)   || a.title;
+  const excerpt = (lang === 'ru' && a.excerpt_ru) || a.excerpt;
+  const content = (lang === 'ru' && a.content_ru) || a.content;
+
+  document.title = title + ' — My Computer Academy';
+  document.getElementById('pageDesc')?.setAttribute('content', excerpt || title);
 
   document.getElementById('pageContent').innerHTML = `
     <section class="article-hero">
@@ -447,7 +466,7 @@ function renderArticle(a, related) {
           <a href="/articles">Статті</a>
         </nav>
         <div class="article-hero__badge">${a.coverEmoji || '📄'} ${esc(a.category || 'навчання')}</div>
-        <h1 class="article-hero__title">${esc(a.title)}</h1>
+        <h1 class="article-hero__title">${esc(title)}</h1>
         <div class="article-hero__meta">
           <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${esc(a.author || 'My Computer Academy')}</span>
           <span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:.7"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${formatDate(a.publishedAt)}</span>
@@ -458,7 +477,7 @@ function renderArticle(a, related) {
     <section class="article-body">
       <div class="article-container">
         <main class="article-content">
-          ${a.content || '<p>' + esc(a.excerpt || '') + '</p>'}
+          ${content || '<p>' + esc(excerpt || '') + '</p>'}
         </main>
         <aside class="article-sidebar">
           <div class="sidebar-cta">
@@ -469,7 +488,7 @@ function renderArticle(a, related) {
           ${related.length ? `
           <div class="sidebar-card">
             <h3>Читайте також</h3>
-            ${related.map(r => `<a class="sidebar-link" href="/articles/${esc(r.slug)}">${r.coverEmoji || '📄'} ${esc(r.title)}</a>`).join('')}
+            ${related.map(r => `<a class="sidebar-link" href="/articles/${esc(r.slug)}">${r.coverEmoji || '📄'} ${esc((lang === 'ru' && r.title_ru) || r.title)}</a>`).join('')}
           </div>` : ''}
         </aside>
       </div>

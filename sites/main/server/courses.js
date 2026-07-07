@@ -36,6 +36,7 @@ module.exports = {
     const course = {
       id,
       name:         data.name        || '',
+      name_ru:      data.name_ru     || '',
       emoji:        data.emoji       || '📚',
       age:          data.age         || '',
       age_group:    data.age_group   || '',
@@ -44,6 +45,7 @@ module.exports = {
       groupSize:    parseInt(data.groupSize)    || 0,
       price:        parseFloat(data.price)      || 0,
       description:  data.description || '',
+      description_ru: data.description_ru || '',
       features:     Array.isArray(data.features) ? data.features : [],
       popular:      !!data.popular,
       color:        data.color       || '#6C47FF',
@@ -61,7 +63,7 @@ module.exports = {
     const courses = load();
     const idx = courses.findIndex(c => c.id === id);
     if (idx === -1) return null;
-    const allowed = ['name','emoji','age','age_group','duration','lessonsCount','groupSize','price','description','features','popular','color','active','curriculum'];
+    const allowed = ['name','name_ru','emoji','age','age_group','duration','lessonsCount','groupSize','price','description','description_ru','features','popular','color','active','curriculum'];
     const patch = {};
     allowed.forEach(k => { if (k in data) patch[k] = data[k]; });
     if ('lessonsCount' in patch) patch.lessonsCount = parseInt(patch.lessonsCount) || 0;

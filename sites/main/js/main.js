@@ -5,7 +5,8 @@
    • Украинский: текст внутри тега
    • Русский: атрибут data-ru="..." на том же элементе
    =================================================== */
-let currentLang = localStorage.getItem('mca-lang') || 'ua';
+const _urlLang = new URLSearchParams(location.search).get('lang') === 'ru' ? 'ru' : null;
+let currentLang = _urlLang || localStorage.getItem('mca-lang') || 'ua';
 
 function cacheUaTexts() {
   document.querySelectorAll('[data-ru]').forEach(el => {

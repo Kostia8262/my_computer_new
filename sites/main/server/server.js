@@ -32,6 +32,10 @@ const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
 const CURRICULA      = require('./curricula');
 const reviewsDb      = require('./reviews');
+const {
+  ARTICLES_RU, COURSES_RU, COURSE_SEO_TITLES_RU, COURSE_SEO_DESCS_RU,
+  COURSE_SEO_TEXTS_RU, CURRICULA_RU, DOCS_SEO_RU, ARTICLES_INDEX_RU,
+} = require('./content-ru');
 const { sendLeadNotification, sendPaymentNotification } = require('./mailer');
 const monoPay        = require('./mono-pay');
 const monoInvoicesDb = require('./mono-invoices');
@@ -130,6 +134,12 @@ const COURSE_SEED = [
     description: 'Від ідеї до власного онлайн-простору. Учні створюють блог або портфоліо з нуля — без фреймворків, лише HTML, CSS і натхнення.',
     features: [{ua:'✓ Структура та дизайн сторінки',    ru:'✓ Структура и дизайн страницы'},{ua:'✓ Контент, SEO-основи, домен',        ru:'✓ Контент, SEO-основы, домен'},{ua:'✓ Публікація власного сайту',        ru:'✓ Публикация собственного сайта'}] },
 ];
+
+// Merge RU name/description onto each seed entry (also used to patch existing live records)
+COURSE_SEED.forEach(c => {
+  const ru = COURSES_RU[c.id];
+  if (ru) { c.name_ru = ru.name; c.description_ru = ru.description; }
+});
 
 // ── ARTICLES SEED ─────────────────────────────────────────────────────────────
 const ARTICLES_SEED = [
@@ -289,6 +299,12 @@ mc.setBlocks(
   },
 ];
 
+// Merge RU title/excerpt/content onto each seed entry (also used to patch existing live records)
+ARTICLES_SEED.forEach(a => {
+  const ru = ARTICLES_RU[a.slug];
+  if (ru) { a.title_ru = ru.title; a.excerpt_ru = ru.excerpt; a.content_ru = ru.content; }
+});
+
 // ── STARTUP SEED (test teachers + demo clients) ───────────────────────────────
 (function seedTestData() {
   try {
@@ -318,6 +334,10 @@ mc.setBlocks(
           patch.features = seed.features;
           patch.popular  = seed.popular || false;
         }
+        if (seed && seed.name_ru && (c.name_ru !== seed.name_ru || c.description_ru !== seed.description_ru)) {
+          patch.name_ru        = seed.name_ru;
+          patch.description_ru = seed.description_ru;
+        }
         const hasPlaceholder = !c.curriculum || !c.curriculum.length ||
           c.curriculum.some(m => m.num === 'Фінал' || (m.num && m.num.startsWith('Модуль')));
         if (hasPlaceholder && CURRICULA[c.id]) {
@@ -331,10 +351,17 @@ mc.setBlocks(
       if (patched) console.log(`✅  Patched ${patched} courses (features/popular/curriculum)`);
     }
     let articlesSeeded = 0;
+    let articlesPatched = 0;
     ARTICLES_SEED.forEach(a => {
-      if (!articlesDb.getBySlug(a.slug)) { articlesDb.create(a); articlesSeeded++; }
+      const existing = articlesDb.getBySlug(a.slug);
+      if (!existing) { articlesDb.create(a); articlesSeeded++; }
+      else if (a.title_ru && existing.title_ru !== a.title_ru) {
+        articlesDb.update(existing.id, { title_ru: a.title_ru, excerpt_ru: a.excerpt_ru, content_ru: a.content_ru });
+        articlesPatched++;
+      }
     });
     if (articlesSeeded) console.log(`✅  Seeded ${articlesSeeded} articles`);
+    if (articlesPatched) console.log(`✅  Patched ${articlesPatched} articles (RU translation)`);
 
     if (!clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
       [
@@ -462,6 +489,70 @@ app.get(['/', '/index.html'], (req, res) => {
       .replace(/(<meta property="og:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
       .replace(/(<meta name="twitter:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
       .replace(/(<meta name="twitter:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
+  }
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+
+// ── ARTICLES LISTING LANGUAGE SSR ─────────────────────────────────────────────
+const ARTICLES_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
+app.get('/articles', (req, res) => {
+  const isRu = req.query.lang === 'ru';
+  const hasRu = !!ARTICLES_INDEX_RU.title;
+  const siteUrl = 'https://mycomputer.education';
+  let html = ARTICLES_INDEX_TPL;
+  if (hasRu) {
+    html = html.replace(
+      '<link rel="canonical" href="https://mycomputer.education/articles"/>',
+      `<link rel="canonical" href="${siteUrl}/articles${isRu ? '?lang=ru' : ''}"/>
+  <link rel="alternate" hreflang="uk" href="${siteUrl}/articles"/>
+  <link rel="alternate" hreflang="ru" href="${siteUrl}/articles?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${siteUrl}/articles"/>`
+    );
+  }
+  if (isRu && hasRu) {
+    const m = ARTICLES_INDEX_RU;
+    html = html
+      .replace('<html lang="uk">', '<html lang="ru">')
+      .replace(/<title>[^<]*<\/title>/, `<title>${escHtml(m.title)}</title>`)
+      .replace(/(<meta name="description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
+      .replace(/(<meta property="og:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
+      .replace(/(<meta property="og:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
+  }
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+
+// ── DOCS (legal pages) LANGUAGE SSR ────────────────────────────────────────────
+const DOCS_IDS = ['privacy-policy', 'terms', 'public-offer', 'refund-policy', 'cookie-policy'];
+const DOCS_TPLS = {};
+DOCS_IDS.forEach(id => {
+  DOCS_TPLS[id] = fs.readFileSync(path.join(__dirname, '..', 'docs', `${id}.html`), 'utf8');
+});
+app.get('/docs/:id.html', (req, res, next) => {
+  const id = req.params.id;
+  const tpl = DOCS_TPLS[id];
+  if (!tpl) return next();
+  const isRu = req.query.lang === 'ru';
+  const m = DOCS_SEO_RU[id];
+  const siteUrl = 'https://mycomputer.education';
+  const pageUrl = `${siteUrl}/docs/${id}.html`;
+  let html = tpl;
+  if (m) {
+    html = html.replace(
+      /<meta name="description" content="[^"]*"\/>/,
+      (match) => `${match}
+  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>`
+    );
+  }
+  if (isRu && m) {
+    html = html
+      .replace('<html lang="uk">', '<html lang="ru">')
+      .replace(/<title>[^<]*<\/title>/, `<title>${escHtml(m.title)}</title>`)
+      .replace(/(<meta name="description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
   }
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
@@ -1529,10 +1620,6 @@ app.post('/api/payment/wfp-webhook', (req, res) => {
 });
 
 // ── ARTICLE PAGES ─────────────────────────────────────────────────────────────
-app.get('/articles', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'articles', 'index.html'));
-});
-
 const ARTICLE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
 
 app.get('/articles/:slug', (req, res) => {
@@ -1542,8 +1629,10 @@ app.get('/articles/:slug', (req, res) => {
   const article  = articlesDb.getBySlug(slug);
   if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
 
-  const title    = article.title || 'Стаття';
-  const excerpt  = truncateAtWord(article.excerpt, 160);
+  const isRu     = req.query.lang === 'ru';
+  const ru       = ARTICLES_RU[slug];
+  const title    = (isRu && ru?.title) || article.title || 'Стаття';
+  const excerpt  = truncateAtWord((isRu && ru?.excerpt) || article.excerpt, 160);
   const siteUrl  = 'https://mycomputer.education';
   const pageUrl  = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
@@ -1560,7 +1649,7 @@ app.get('/articles/:slug', (req, res) => {
         url: pageUrl,
         name: fullTitle,
         description: excerpt,
-        inLanguage: 'uk',
+        inLanguage: isRu ? 'ru' : 'uk',
         isPartOf: { '@id': `${siteUrl}/#website` },
         breadcrumb: { '@id': `${pageUrl}#breadcrumb` },
       },
@@ -1579,7 +1668,7 @@ app.get('/articles/:slug', (req, res) => {
         headline: title,
         description: excerpt,
         url: pageUrl,
-        inLanguage: 'uk',
+        inLanguage: isRu ? 'ru' : 'uk',
         datePublished: publishedIso,
         dateModified: publishedIso,
         author: {
@@ -1600,7 +1689,12 @@ app.get('/articles/:slug', (req, res) => {
     ],
   });
 
-  const html = ARTICLE_HTML_TPL
+  const hreflangBlock = ru ? `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
+
+  let html = ARTICLE_HTML_TPL
     .replace(
       '<title id="pageTitle">Стаття — My Computer Academy</title>',
       `<title id="pageTitle">${escHtml(fullTitle)}</title>`
@@ -1608,19 +1702,21 @@ app.get('/articles/:slug', (req, res) => {
     .replace(
       '<meta name="description" id="pageDesc" content="Корисні статті про програмування для дітей від My Computer Academy"/>',
       `<meta name="description" id="pageDesc" content="${escHtml(excerpt) || 'Корисні статті про програмування для дітей від My Computer Academy'}"/>
-  <link rel="canonical" href="${pageUrl}"/>
+  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>${hreflangBlock}
   <meta property="og:title" content="${escHtml(fullTitle)}"/>
   <meta property="og:description" content="${escHtml(excerpt)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="article"/>
   <meta property="og:image" content="https://mycomputer.education/og-image.png"/>
-  <meta property="og:locale" content="uk_UA"/>
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
   <script type="application/ld+json">${articleJsonLd}</script>`
     )
     .replace(
       '>Стаття — My Computer Academy</h1>',
       `>${escHtml(title)}</h1>`
     );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
@@ -1680,15 +1776,23 @@ app.get('/courses/:slug', (req, res) => {
     return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
   }
 
-  const name      = course ? course.name : 'Курс';
-  const seoTitle  = COURSE_SEO_TITLES[slug] || `${name} — My Computer Academy`;
+  const isRu = req.query.lang === 'ru';
+  const name      = isRu
+    ? (course ? (course.name_ru || COURSES_RU[slug]?.name || course.name) : 'Курс')
+    : (course ? course.name : 'Курс');
+  const seoTitle  = isRu
+    ? (COURSE_SEO_TITLES_RU[slug] || `${name} — My Computer Academy`)
+    : (COURSE_SEO_TITLES[slug] || `${name} — My Computer Academy`);
   const rawDesc = course && course.description
-    ? course.description
-    : 'Детальна інформація про курс програмування для дітей у My Computer Academy';
+    ? (isRu ? (course.description_ru || COURSES_RU[slug]?.description || course.description) : course.description)
+    : (isRu ? 'Детальная информация о курсе программирования для детей в My Computer Academy' : 'Детальна інформація про курс програмування для дітей у My Computer Academy');
   // Use hardcoded SEO desc (140-160 chars) when DB description is too short
-  const desc = rawDesc.length >= 130 ? truncateAtWord(rawDesc, 160) : (COURSE_SEO_DESCS[slug] || truncateAtWord(rawDesc, 160));
+  const desc = rawDesc.length >= 130
+    ? truncateAtWord(rawDesc, 160)
+    : ((isRu ? COURSE_SEO_DESCS_RU[slug] : COURSE_SEO_DESCS[slug]) || truncateAtWord(rawDesc, 160));
   const siteUrl = 'https://mycomputer.education';
   const pageUrl = `${siteUrl}/courses/${slug}`;
+  const hasRuCourse = !!(COURSES_RU[slug] || CURRICULA_RU[slug]);
 
   const durationMonths = course && course.duration
     ? parseInt(course.duration) || null : null;
@@ -1702,7 +1806,7 @@ app.get('/courses/:slug', (req, res) => {
       url: pageUrl,
       name: seoTitle,
       description: desc,
-      inLanguage: 'uk',
+      inLanguage: isRu ? 'ru' : 'uk',
       isPartOf: { '@id': `${siteUrl}/#website` },
       breadcrumb: { '@id': `${pageUrl}/#breadcrumb` },
     },
@@ -1710,8 +1814,8 @@ app.get('/courses/:slug', (req, res) => {
       '@type': 'BreadcrumbList',
       '@id': `${pageUrl}/#breadcrumb`,
       itemListElement: [
-        { '@type': 'ListItem', position: 1, item: { '@id': siteUrl + '/', name: 'Головна' } },
-        { '@type': 'ListItem', position: 2, item: { '@id': siteUrl + '/#courses', name: 'Курси' } },
+        { '@type': 'ListItem', position: 1, item: { '@id': siteUrl + '/', name: isRu ? 'Главная' : 'Головна' } },
+        { '@type': 'ListItem', position: 2, item: { '@id': siteUrl + '/#courses', name: isRu ? 'Курсы' : 'Курси' } },
         { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
       ],
     },
@@ -1735,7 +1839,7 @@ app.get('/courses/:slug', (req, res) => {
       name,
       description: rawDesc,
       url: pageUrl,
-      inLanguage: 'uk',
+      inLanguage: isRu ? 'ru' : 'uk',
       educationalLevel: 'Beginner',
       ...(course && course.age ? { typicalAgeRange: course.age } : {}),
       provider: { '@id': `${siteUrl}/#organization` },
@@ -1744,7 +1848,7 @@ app.get('/courses/:slug', (req, res) => {
           '@type': 'CourseInstance',
           courseMode: 'online',
           duration: isoPeriod,
-          inLanguage: 'uk',
+          inLanguage: isRu ? 'ru' : 'uk',
         }
       } : {}),
       offers: {
@@ -1777,7 +1881,12 @@ app.get('/courses/:slug', (req, res) => {
 
   const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graphItems });
 
-  const html = COURSE_HTML_TPL
+  const hreflangBlock = hasRuCourse ? `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
+
+  let html = COURSE_HTML_TPL
     .replace(
       '<title>Курс — My Computer Academy</title>',
       `<title>${escHtml(seoTitle)}</title>`
@@ -1785,13 +1894,13 @@ app.get('/courses/:slug', (req, res) => {
     .replace(
       '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
       `<meta name="description" content="${escHtml(desc)}"/>
-  <link rel="canonical" href="${pageUrl}"/>
+  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>${hreflangBlock}
   <meta property="og:title" content="${escHtml(seoTitle)}"/>
   <meta property="og:description" content="${escHtml(desc)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="website"/>
   <meta property="og:image" content="https://mycomputer.education/og-image.png"/>
-  <meta property="og:locale" content="uk_UA"/>`
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>`
     )
     .replace(
       '>Курс програмування для дітей — My Computer Academy</h1>',
@@ -1800,10 +1909,17 @@ app.get('/courses/:slug', (req, res) => {
     .replace(
       '<!-- SEO_BLOCK_COURSE -->',
       (() => {
-        const seoText = COURSE_SEO_TEXTS[slug] ? `<p>${escHtml(COURSE_SEO_TEXTS[slug])}</p>` : '';
-        const items = CURRICULA[slug] || [];
-        const currHtml = items.length
-          ? `<ul>${items.map(m => `<li><strong>${escHtml(m.num)}: ${escHtml(m.title)}</strong> — ${escHtml(m.desc)}</li>`).join('')}</ul>`
+        const seoTextSrc = isRu ? COURSE_SEO_TEXTS_RU[slug] : COURSE_SEO_TEXTS[slug];
+        const seoText = seoTextSrc ? `<p>${escHtml(seoTextSrc)}</p>` : '';
+        const uaItems = CURRICULA[slug] || [];
+        const currHtml = uaItems.length
+          ? `<ul>${uaItems.map((m, i) => {
+              const ruItem = isRu ? CURRICULA_RU[slug]?.[i] : null;
+              const num   = isRu ? (m.num === 'Фінал' ? 'Финал' : m.num) : m.num;
+              const title = ruItem?.title || m.title;
+              const desc  = ruItem?.desc  || m.desc;
+              return `<li><strong>${escHtml(num)}: ${escHtml(title)}</strong> — ${escHtml(desc)}</li>`;
+            }).join('')}</ul>`
           : '';
         return (seoText || currHtml)
           ? `<div class="vh-seo" aria-hidden="true">${seoText}${currHtml}</div>`
@@ -1811,6 +1927,8 @@ app.get('/courses/:slug', (req, res) => {
       })()
     )
     .replace('</head>', `  <script type="application/ld+json">${jsonLd}</script>\n</head>`);
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
