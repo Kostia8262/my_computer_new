@@ -2038,7 +2038,7 @@ const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'
 const COURSE_SEO_TITLES = {
   pc:          'Базовий курс ПК для дітей — My Computer Academy',
   graphic:     'Курс графіки та ілюстрації — My Computer Academy',
-  blog:        'Курс Створення блогу та сайту — My Computer Academy',
+  blog:        'Курс створення блогу та сайту — My Computer Academy',
   'ui-ux':     'Курс UI/UX дизайну у Figma — My Computer Academy',
   animation:   'Курс анімації та моушн-дизайну — My Computer Academy',
   '3d-interior': 'Курс 3D-інтер\'єрів та ландшафтів (3ds Max) — My Computer Academy',
