@@ -106,7 +106,7 @@ const COURSE_SEED = [
     description: 'Перший крок у світ комп\'ютерів. Діти освоюють клавіатуру, мишу, файлову систему, текстові редактори та безпечний інтернет.',
     features: [{ua:'✓ Швидкий набір тексту (сліпий метод)', ru:'✓ Быстрый набор текста (слепой метод)'},{ua:'✓ Word, Paint, базові програми',         ru:'✓ Word, Paint, базовые программы'},{ua:'✓ Безпека в інтернеті',                  ru:'✓ Безопасность в интернете'}] },
   { id: 'graphic',     name: 'Графіка та ілюстрація',             emoji: '🎨', age: '6–12 років',  age_group: '6-10',  duration: '16 місяців', lessonsCount: 128, groupSize: 5, price: 3600, color: '#ec4899', popular: false,
-    description: 'Цифровий малюнок, кольорознавство та основи дизайну в Photoshop і Illustrator. Курс для тих, хто хоче поєднати творчість і технології.',
+    description: 'Цифровий малюнок, кольорознавство та основи дизайну в Photoshop і Illustrator для тих, хто хоче поєднати творчість і технології.',
     features: [{ua:'✓ Цифровий малюнок та кольорознавство', ru:'✓ Цифровой рисунок и цветоведение'},{ua:'✓ Photoshop та Illustrator',            ru:'✓ Photoshop и Illustrator'},{ua:'✓ Власна ілюстрація у фіналі курсу',   ru:'✓ Собственная иллюстрация в финале курса'}] },
   { id: 'blog',        name: 'Створення блогу та сайту',          emoji: '✍️', age: '12–17 років', age_group: '14-18', duration: '14 місяців', lessonsCount: 112, groupSize: 5, price: 3600, color: '#f97316', popular: false,
     description: 'Від ідеї до власного онлайн-простору. Учні створюють блог або портфоліо з нуля — без фреймворків, лише HTML, CSS і натхнення.',
@@ -824,6 +824,15 @@ const SAFE_ID_RE = /^[a-z0-9_-]{1,64}$/i;
 
 function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Truncate to maxLen without cutting a word in half (for meta descriptions)
+function truncateAtWord(str, maxLen) {
+  str = String(str || '');
+  if (str.length <= maxLen) return str;
+  const cut = str.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim() + '…';
 }
 
 function requireAdmin(req, res, next) {
@@ -1843,7 +1852,7 @@ app.get('/articles/:slug', (req, res) => {
   if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
 
   const title    = article.title || 'Стаття';
-  const excerpt  = (article.excerpt || '').slice(0, 160);
+  const excerpt  = truncateAtWord(article.excerpt, 160);
   const siteUrl  = 'https://mycomputer.school';
   const pageUrl  = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
@@ -1989,7 +1998,7 @@ app.get('/courses/:slug', (req, res) => {
     ? course.description
     : 'Детальна інформація про курс дизайну для дітей у My Computer Academy';
   // Use hardcoded SEO desc (140-160 chars) when DB description is too short
-  const desc = rawDesc.length >= 130 ? rawDesc.slice(0, 160) : (COURSE_SEO_DESCS[slug] || rawDesc.slice(0, 160));
+  const desc = rawDesc.length >= 130 ? truncateAtWord(rawDesc, 160) : (COURSE_SEO_DESCS[slug] || truncateAtWord(rawDesc, 160));
   const siteUrl = 'https://mycomputer.school';
   const pageUrl = `${siteUrl}/courses/${slug}`;
 

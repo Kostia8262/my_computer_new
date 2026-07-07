@@ -519,6 +519,15 @@ function escHtml(str) {
   return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+// Truncate to maxLen without cutting a word in half (for meta descriptions)
+function truncateAtWord(str, maxLen) {
+  str = String(str || '');
+  if (str.length <= maxLen) return str;
+  const cut = str.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(' ');
+  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trim() + '…';
+}
+
 function requireAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
   const role  = getRole(token);
@@ -1534,7 +1543,7 @@ app.get('/articles/:slug', (req, res) => {
   if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
 
   const title    = article.title || 'Стаття';
-  const excerpt  = (article.excerpt || '').slice(0, 160);
+  const excerpt  = truncateAtWord(article.excerpt, 160);
   const siteUrl  = 'https://mycomputer.education';
   const pageUrl  = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
@@ -1677,7 +1686,7 @@ app.get('/courses/:slug', (req, res) => {
     ? course.description
     : 'Детальна інформація про курс програмування для дітей у My Computer Academy';
   // Use hardcoded SEO desc (140-160 chars) when DB description is too short
-  const desc = rawDesc.length >= 130 ? rawDesc.slice(0, 160) : (COURSE_SEO_DESCS[slug] || rawDesc.slice(0, 160));
+  const desc = rawDesc.length >= 130 ? truncateAtWord(rawDesc, 160) : (COURSE_SEO_DESCS[slug] || truncateAtWord(rawDesc, 160));
   const siteUrl = 'https://mycomputer.education';
   const pageUrl = `${siteUrl}/courses/${slug}`;
 
