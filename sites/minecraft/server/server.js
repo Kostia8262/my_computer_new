@@ -1424,3 +1424,4 @@ server.on('error', (err) => {
 
 process.on('SIGINT',  () => { db.close(); process.exit(0); });
 process.on('SIGTERM', () => { db.close(); process.exit(0); });
+
