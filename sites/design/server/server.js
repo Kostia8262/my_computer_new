@@ -2006,8 +2006,8 @@ app.get('/articles/:slug', (req, res) => {
       `<title id="pageTitle">${escHtml(fullTitle)}</title>`
     )
     .replace(
-      '<meta name="description" id="pageDesc" content="Корисні статті про програмування для дітей від My Computer Academy"/>',
-      `<meta name="description" id="pageDesc" content="${escHtml(excerpt) || 'Корисні статті про програмування для дітей від My Computer Academy'}"/>
+      '<meta name="description" id="pageDesc" content="Корисні статті про дизайн для дітей від My Computer Academy"/>',
+      `<meta name="description" id="pageDesc" content="${escHtml(excerpt) || 'Корисні статті про дизайн для дітей від My Computer Academy'}"/>
   <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>
   <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
   <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
@@ -2198,7 +2198,7 @@ app.get('/courses/:slug', (req, res) => {
       `<title>${escHtml(seoTitle)}</title>`
     )
     .replace(
-      '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
+      '<meta name="description" content="Детальна інформація про курс дизайну для дітей у My Computer Academy"/>',
       `<meta name="description" content="${escHtml(desc)}"/>
   <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>
   <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
@@ -2212,7 +2212,7 @@ app.get('/courses/:slug', (req, res) => {
   <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>`
     )
     .replace(
-      '>Курс програмування для дітей — My Computer Academy</h1>',
+      '>Курс дизайну для дітей — My Computer Academy</h1>',
       `>${escHtml(name)}</h1>`
     )
     .replace(
