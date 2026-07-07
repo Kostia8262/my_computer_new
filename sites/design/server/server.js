@@ -571,8 +571,8 @@ const ARTICLES_SEED = [
 (function seedTestData() {
   try {
     if (!adminsDb.getAll().some(a => a.role === 'teacher')) {
-      adminsDb.create('Богдан Коваль',   'teacher', { hourlyRate: 150, lessonDuration: 60, phone: '+380501234567', notes: 'Веб-розробка, Python' });
-      adminsDb.create('Аліна Петренко',  'teacher', { hourlyRate: 130, lessonDuration: 60, phone: '+380671234568', notes: 'Scratch, Roblox' });
+      adminsDb.create('Богдан Коваль',   'teacher', { hourlyRate: 150, lessonDuration: 60, phone: '+380501234567', notes: 'UI/UX дизайн, брендинг' });
+      adminsDb.create('Аліна Петренко',  'teacher', { hourlyRate: 130, lessonDuration: 60, phone: '+380671234568', notes: 'Графіка, цифровий рисунок' });
       console.log('✅  Seeded 2 test teachers');
     }
     const _cnt = loadContent();
@@ -644,12 +644,12 @@ const ARTICLES_SEED = [
 
     if (!clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
       [
-        { name: 'Марко Тищенко',    age: 10, course: 'scratch', phone: '+380501001001', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'1',time:'15:00'},{day:'4',time:'15:00'}], schedule: 'Пн 15:00, Чт 15:00' },
-        { name: 'Діана Коваль',     age: 12, course: 'python',  phone: '+380502002002', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'group',      scheduleDays: [{day:'2',time:'16:00'},{day:'5',time:'16:00'}], schedule: 'Вт 16:00, Пт 16:00' },
-        { name: 'Артем Мороз',      age: 14, course: 'web',     phone: '+380503003003', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'individual', scheduleDays: [{day:'3',time:'17:00'}],                       schedule: 'Ср 17:00' },
-        { name: 'Соня Петрик',      age: 11, course: 'roblox',  phone: '+380504004004', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'3',time:'14:30'}],                       schedule: 'Ср 14:30' },
-        { name: 'Данило Романів',   age:  9, course: 'scratch', phone: '+380505005005', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'6',time:'10:00'}],                       schedule: 'Сб 10:00' },
-        { name: 'Вікторія Лисенко', age: 13, course: 'python',  phone: '+380506006006', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'group',      scheduleDays: [{day:'2',time:'18:00'}],                       schedule: 'Вт 18:00' },
+        { name: 'Марко Тищенко',    age: 10, course: 'drawing',    phone: '+380501001001', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'1',time:'15:00'},{day:'4',time:'15:00'}], schedule: 'Пн 15:00, Чт 15:00' },
+        { name: 'Діана Коваль',     age: 12, course: 'ui-ux',      phone: '+380502002002', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'group',      scheduleDays: [{day:'2',time:'16:00'},{day:'5',time:'16:00'}], schedule: 'Вт 16:00, Пт 16:00' },
+        { name: 'Артем Мороз',      age: 14, course: 'blog',       phone: '+380503003003', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'individual', scheduleDays: [{day:'3',time:'17:00'}],                       schedule: 'Ср 17:00' },
+        { name: 'Соня Петрик',      age: 11, course: '3d-blender', phone: '+380504004004', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'3',time:'14:30'}],                       schedule: 'Ср 14:30' },
+        { name: 'Данило Романів',   age:  9, course: 'drawing',    phone: '+380505005005', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'6',time:'10:00'}],                       schedule: 'Сб 10:00' },
+        { name: 'Вікторія Лисенко', age: 13, course: 'ui-ux',      phone: '+380506006006', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'group',      scheduleDays: [{day:'2',time:'18:00'}],                       schedule: 'Вт 18:00' },
       ].forEach(c => clientsDb.create(c));
       console.log('✅  Seeded 6 test clients with schedule data');
     }
@@ -745,8 +745,8 @@ const adminLimiter = rateLimit({
 // ── HOMEPAGE LANGUAGE SSR ─────────────────────────────────────────────────────
 const MAIN_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const MAIN_META_RU = {
-  title: 'Школа программирования и IT-курсов для детей — My Computer Academy | Minecraft, Scratch, Python, Roblox',
-  desc:  'Компьютерные курсы для детей от 6 до 18 лет по всей Украине. Scratch, Python, Roblox Studio, Веб-разработка. Малые группы до 5 человек. Первый урок бесплатно.',
+  title: 'IT-курсы дизайна для детей: Figma, Photoshop, AI | My Computer Academy',
+  desc:  'Курсы дизайна для детей и подростков 6–18 лет по всей Украине: графика, UI/UX, 3D-моделирование, анимация, AI-дизайн. Малые группы до 5 человек, первый урок бесплатно!',
 };
 app.get(['/', '/index.html'], (req, res) => {
   // Build SEO block from content.json
