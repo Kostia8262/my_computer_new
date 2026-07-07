@@ -350,6 +350,18 @@ ARTICLES_SEED.forEach(a => {
       });
       if (patched) console.log(`✅  Patched ${patched} courses (features/popular/curriculum)`);
     }
+
+    // Live courses.json predates some COURSE_SEED entries (e.g. construct/blog were
+    // added to the source later) — create any course that's in the seed but missing live.
+    let addedCourses = 0;
+    COURSE_SEED.forEach(c => {
+      if (!coursesDb.getAll().some(x => x.id === c.id)) {
+        coursesDb.create({ ...c, curriculum: CURRICULA[c.id] || [] });
+        addedCourses++;
+      }
+    });
+    if (addedCourses) console.log(`✅  Added ${addedCourses} missing courses from seed`);
+
     let articlesSeeded = 0;
     let articlesPatched = 0;
     ARTICLES_SEED.forEach(a => {
