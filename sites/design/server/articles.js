@@ -34,8 +34,11 @@ module.exports = {
       id,
       slug,
       title:       data.title       || '',
+      title_ru:    data.title_ru    || '',
       excerpt:     data.excerpt     || '',
+      excerpt_ru:  data.excerpt_ru  || '',
       content:     data.content     || '',
+      content_ru:  data.content_ru  || '',
       category:    data.category    || 'навчання',
       coverEmoji:  data.coverEmoji  || '📄',
       author:      data.author      || 'My Computer Academy',
@@ -51,7 +54,7 @@ module.exports = {
     const articles = load();
     const idx = articles.findIndex(a => a.id === id);
     if (idx === -1) return null;
-    const allowed = ['title','excerpt','content','category','coverEmoji','author','publishedAt','active','slug'];
+    const allowed = ['title','title_ru','excerpt','excerpt_ru','content','content_ru','category','coverEmoji','author','publishedAt','active','slug'];
     const patch = {};
     allowed.forEach(k => { if (k in data) patch[k] = data[k]; });
     articles[idx] = { ...articles[idx], ...patch };

@@ -349,7 +349,7 @@ function lightenHex(hex, amt) {
   const clamp = v => Math.min(255, Math.max(0, v + amt));
   return '#' + [clamp(r),clamp(g),clamp(b)].map(v=>v.toString(16).padStart(2,'0')).join('');
 }
-function apiToRender(c) {
+function apiToRender(c, lang) {
   const forCards = [];
   if (c.age)        forCards.push({ title: c.age, desc: 'Оптимальний вік для цього курсу.' });
   forCards.push({ title: 'Початківцям',  desc: 'Починаємо з нуля — попередній досвід не потрібен.' });
@@ -363,8 +363,8 @@ function apiToRender(c) {
     emoji:    c.emoji || '📚',
     color:    col,
     badge:    c.age || 'Дизайн',
-    title:    c.name,
-    subtitle: c.description || 'Практичний курс дизайну для дітей у My Computer Academy.',
+    title:    (lang === 'ru' && c.name_ru) || c.name,
+    subtitle: (lang === 'ru' && c.description_ru) || c.description || 'Практичний курс дизайну для дітей у My Computer Academy.',
     duration: c.duration || '-',
     format:   c.groupSize > 0 ? `Група до ${c.groupSize} дітей` : 'Мала група',
     lessons:  c.lessonsCount > 0 ? `${c.lessonsCount} занять` : '-',
@@ -775,16 +775,16 @@ const COURSES = {
 };
 
 /* ── RENDER ─────────────────────────────────────────────────────────────────── */
-function renderCourse(c) {
+function renderCourse(c, lang) {
   document.title = c.title + ' — My Computer Academy';
   document.querySelector('meta[name="description"]').content =
-    c.title + '. ' + c.subtitle + ' My Computer Academy, Дніпро.';
+    c.title + '. ' + c.subtitle + ' My Computer Academy.';
 
   const currHtml = c.curriculum.map(m => `
     <div class="curriculum-card">
-      <div class="curriculum-card__num">${esc(m.num)}</div>
-      <div class="curriculum-card__title">${esc(m.title)}</div>
-      <div class="curriculum-card__desc">${esc(m.desc)}</div>
+      <div class="curriculum-card__num">${esc(m.num === 'Фінал' && lang === 'ru' ? 'Финал' : m.num)}</div>
+      <div class="curriculum-card__title">${esc((lang === 'ru' && m.title_ru) || m.title)}</div>
+      <div class="curriculum-card__desc">${esc((lang === 'ru' && m.desc_ru) || m.desc)}</div>
     </div>`).join('');
 
   const forHtml = c.forCards.map(f => `
@@ -1040,6 +1040,7 @@ async function init() {
   const pathMatch = window.location.pathname.match(/\/courses\/([^/?#]+)/);
   const params = new URLSearchParams(window.location.search);
   const key = pathMatch ? pathMatch[1] : (params.get('c') || 'scratch');
+  const lang = params.get('lang') === 'ru' ? 'ru' : (localStorage.getItem('mca-lang') || 'ua');
 
   // Fetch live course list for nav/select updates and unknown-course fallback
   let apiCourses = [];
@@ -1067,7 +1068,7 @@ async function init() {
   // Fallback: build render data from API for custom/new courses
   if (!course) {
     const apiCourse = apiCourses.find(c => c.id === key);
-    if (apiCourse) course = apiToRender(apiCourse);
+    if (apiCourse) course = apiToRender(apiCourse, lang);
   }
 
   // Override with live DB data so admin edits reflect on the page
@@ -1080,8 +1081,8 @@ async function init() {
       if (apiCourse.lessonsCount > 0)  course.lessons  = `${apiCourse.lessonsCount} занять`;
       if (apiCourse.price > 0)         course.price    = `від ${apiCourse.price} ₴/міс.`;
       if (apiCourse.age)               { course.badge  = apiCourse.age; course.age = apiCourse.age; }
-      if (apiCourse.description)       course.subtitle = apiCourse.description;
-      if (apiCourse.name)              course.title    = apiCourse.name;
+      if (apiCourse.description)       course.subtitle = (lang === 'ru' && apiCourse.description_ru) || apiCourse.description;
+      if (apiCourse.name)              course.title    = (lang === 'ru' && apiCourse.name_ru) || apiCourse.name;
     }
   }
 
@@ -1090,7 +1091,7 @@ async function init() {
       '<div class="container" style="padding:80px 0;text-align:center"><h2>Курс не знайдено</h2><a href="/" class="btn btn--primary" style="margin-top:20px">На головну</a></div>';
     return;
   }
-  renderCourse(course);
+  renderCourse(course, lang);
 
   // Update <head> so each course URL gets its own title/description/canonical for SEO
   document.title = `${course.title} — My Computer Academy`;
@@ -1186,16 +1187,19 @@ document.addEventListener('click', e => {
 
 /* ── LANG SWITCHER ──────────────────────────────────────────────────────────── */
 (function() {
-  const lang = localStorage.getItem('mca-lang') || 'ua';
-  function applyLang(l) {
-    localStorage.setItem('mca-lang', l);
-    document.documentElement.lang = l === 'ua' ? 'uk' : 'ru';
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
-  }
-  applyLang(lang);
+  const urlLang = new URLSearchParams(location.search).get('lang') === 'ru' ? 'ru' : null;
+  const lang = urlLang || localStorage.getItem('mca-lang') || 'ua';
+  localStorage.setItem('mca-lang', lang);
+  document.documentElement.lang = lang === 'ua' ? 'uk' : 'ru';
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
   document.addEventListener('click', e => {
     const btn = e.target.closest('.lang-btn');
-    if (btn) applyLang(btn.dataset.lang);
+    if (!btn || btn.dataset.lang === lang) return;
+    localStorage.setItem('mca-lang', btn.dataset.lang);
+    const url = new URL(location.href);
+    if (btn.dataset.lang === 'ru') url.searchParams.set('lang', 'ru');
+    else url.searchParams.delete('lang');
+    location.href = url.toString();
   });
 })();
 

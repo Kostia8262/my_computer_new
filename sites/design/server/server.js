@@ -32,6 +32,10 @@ const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
 const CURRICULA      = require('./curricula');
 const reviewsDb      = require('./reviews');
+const {
+  ARTICLES_RU, COURSES_RU, COURSE_SEO_TITLES_RU, COURSE_SEO_DESCS_RU,
+  COURSE_SEO_TEXTS_RU, CURRICULA_RU, DOCS_SEO_RU, ARTICLES_INDEX_RU,
+} = require('./content-ru');
 const { sendLeadNotification, sendPaymentNotification } = require('./mailer');
 const monoPay        = require('./mono-pay');
 const monoInvoicesDb = require('./mono-invoices');
@@ -84,8 +88,8 @@ const CONTENT_SEED = {
       {
         id: 'main',
         label: 'Головна сторінка (mycomputer.school)',
-        heading: 'Школа дизайну для дітей та підлітків у Дніпрі — My Computer Academy',
-        text: 'My Computer Academy — це онлайн та офлайн школа дизайну для дітей та підлітків від 6 до 18 років у Дніпрі. Графіка та ілюстрація, UI/UX дизайн у Figma, 3D-моделювання (3ds Max, Blender), анімація, брендинг, AI-дизайн. Перший пробний урок безкоштовно.',
+        heading: 'Школа дизайну для дітей та підлітків по всій Україні — My Computer Academy',
+        text: 'My Computer Academy — це онлайн та офлайн школа дизайну для дітей та підлітків від 6 до 18 років по всій Україні. Графіка та ілюстрація, UI/UX дизайн у Figma, 3D-моделювання (3ds Max, Blender), анімація, брендинг, AI-дизайн. Перший пробний урок безкоштовно.',
       },
     ],
   },
@@ -133,6 +137,12 @@ const COURSE_SEED = [
     description: 'Створення зображень нейромережами: prompt engineering, Midjourney та інтеграція AI у дизайнерський процес.',
     features: [{ua:'✓ Prompt engineering для зображень', ru:'✓ Prompt engineering для изображений'},{ua:'✓ Midjourney та інші AI-інструменти', ru:'✓ Midjourney и другие AI-инструменты'},{ua:'✓ AI-арт проєкт у портфоліо', ru:'✓ AI-арт проект в портфолио'}] },
 ];
+
+// Merge RU name/description onto each seed entry (also used to patch existing live records)
+COURSE_SEED.forEach(c => {
+  const ru = COURSES_RU[c.id];
+  if (ru) { c.name_ru = ru.name; c.description_ru = ru.description; }
+});
 
 // ── ARTICLES SEED ─────────────────────────────────────────────────────────────
 const ARTICLES_SEED = [
@@ -567,6 +577,12 @@ const ARTICLES_SEED = [
   },
 ];
 
+// Merge RU title/excerpt/content onto each seed entry (also used to patch existing live records)
+ARTICLES_SEED.forEach(a => {
+  const ru = ARTICLES_RU[a.slug];
+  if (ru) { a.title_ru = ru.title; a.excerpt_ru = ru.excerpt; a.content_ru = ru.content; }
+});
+
 // ── STARTUP SEED (test teachers + demo clients) ───────────────────────────────
 (function seedTestData() {
   try {
@@ -586,7 +602,7 @@ const ARTICLES_SEED = [
     }
     if (!coursesDb.getAll().length) {
       COURSE_SEED.forEach(c => coursesDb.create({ ...c, curriculum: CURRICULA[c.id] || [] }));
-      console.log('✅  Seeded 9 courses');
+      console.log(`✅  Seeded ${COURSE_SEED.length} courses`);
     } else {
       let patched = 0;
       coursesDb.getAll().forEach(c => {
@@ -595,6 +611,10 @@ const ARTICLES_SEED = [
         if (seed && (!c.features || !c.features.length)) {
           patch.features = seed.features;
           patch.popular  = seed.popular || false;
+        }
+        if (seed && seed.name_ru && (c.name_ru !== seed.name_ru || c.description_ru !== seed.description_ru)) {
+          patch.name_ru        = seed.name_ru;
+          patch.description_ru = seed.description_ru;
         }
         const hasPlaceholder = !c.curriculum || !c.curriculum.length ||
           c.curriculum.some(m => m.num === 'Фінал' || (m.num && m.num.startsWith('Модуль')));
@@ -637,10 +657,17 @@ const ARTICLES_SEED = [
     }
 
     let articlesSeeded = 0;
+    let articlesPatched = 0;
     ARTICLES_SEED.forEach(a => {
-      if (!articlesDb.getBySlug(a.slug)) { articlesDb.create(a); articlesSeeded++; }
+      const existing = articlesDb.getBySlug(a.slug);
+      if (!existing) { articlesDb.create(a); articlesSeeded++; }
+      else if (a.title_ru && existing.title_ru !== a.title_ru) {
+        articlesDb.update(existing.id, { title_ru: a.title_ru, excerpt_ru: a.excerpt_ru, content_ru: a.content_ru });
+        articlesPatched++;
+      }
     });
     if (articlesSeeded) console.log(`✅  Seeded ${articlesSeeded} articles`);
+    if (articlesPatched) console.log(`✅  Patched ${articlesPatched} articles (RU translation)`);
 
     if (!clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
       [
@@ -768,6 +795,62 @@ app.get(['/', '/index.html'], (req, res) => {
       .replace(/(<meta property="og:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
       .replace(/(<meta name="twitter:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
       .replace(/(<meta name="twitter:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
+  }
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+
+// ── ARTICLES LISTING LANGUAGE SSR ─────────────────────────────────────────────
+const ARTICLES_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
+app.get('/articles', (req, res) => {
+  const isRu = req.query.lang === 'ru';
+  const siteUrl = 'https://mycomputer.school';
+  let html = ARTICLES_INDEX_TPL.replace(
+    '<link rel="canonical" href="https://mycomputer.school/articles"/>',
+    `<link rel="canonical" href="${siteUrl}/articles${isRu ? '?lang=ru' : ''}"/>
+  <link rel="alternate" hreflang="uk" href="${siteUrl}/articles"/>
+  <link rel="alternate" hreflang="ru" href="${siteUrl}/articles?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${siteUrl}/articles"/>`
+  );
+  if (isRu) {
+    const m = ARTICLES_INDEX_RU;
+    html = html
+      .replace('<html lang="uk">', '<html lang="ru">')
+      .replace(/<title>[^<]*<\/title>/, `<title>${escHtml(m.title)}</title>`)
+      .replace(/(<meta name="description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`)
+      .replace(/(<meta property="og:title" content=")[^"]*"/, `$1${escHtml(m.title)}"`)
+      .replace(/(<meta property="og:description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
+  }
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+
+// ── DOCS (legal pages) LANGUAGE SSR ────────────────────────────────────────────
+const DOCS_TPLS = {};
+Object.keys(DOCS_SEO_RU).forEach(id => {
+  DOCS_TPLS[id] = fs.readFileSync(path.join(__dirname, '..', 'docs', `${id}.html`), 'utf8');
+});
+app.get('/docs/:id.html', (req, res, next) => {
+  const id = req.params.id;
+  const tpl = DOCS_TPLS[id];
+  if (!tpl) return next();
+  const isRu = req.query.lang === 'ru';
+  const siteUrl = 'https://mycomputer.school';
+  const pageUrl = `${siteUrl}/docs/${id}.html`;
+  let html = tpl.replace(
+    /<meta name="description" content="[^"]*"\/>/,
+    (match) => `${match}
+  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>`
+  );
+  if (isRu) {
+    const m = DOCS_SEO_RU[id];
+    html = html
+      .replace('<html lang="uk">', '<html lang="ru">')
+      .replace(/<title>[^<]*<\/title>/, `<title>${escHtml(m.title)}</title>`)
+      .replace(/(<meta name="description" content=")[^"]*"/, `$1${escHtml(m.desc)}"`);
   }
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
@@ -1838,10 +1921,6 @@ app.post('/api/payment/wfp-webhook', (req, res) => {
 });
 
 // ── ARTICLE PAGES ─────────────────────────────────────────────────────────────
-app.get('/articles', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'articles', 'index.html'));
-});
-
 const ARTICLE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
 
 app.get('/articles/:slug', (req, res) => {
@@ -1851,8 +1930,10 @@ app.get('/articles/:slug', (req, res) => {
   const article  = articlesDb.getBySlug(slug);
   if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
 
-  const title    = article.title || 'Стаття';
-  const excerpt  = truncateAtWord(article.excerpt, 160);
+  const isRu     = req.query.lang === 'ru';
+  const ru       = ARTICLES_RU[slug];
+  const title    = (isRu && ru?.title) || article.title || 'Стаття';
+  const excerpt  = truncateAtWord((isRu && ru?.excerpt) || article.excerpt, 160);
   const siteUrl  = 'https://mycomputer.school';
   const pageUrl  = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
@@ -1869,7 +1950,7 @@ app.get('/articles/:slug', (req, res) => {
         url: pageUrl,
         name: fullTitle,
         description: excerpt,
-        inLanguage: 'uk',
+        inLanguage: isRu ? 'ru' : 'uk',
         isPartOf: { '@id': `${siteUrl}/#website` },
         breadcrumb: { '@id': `${pageUrl}#breadcrumb` },
       },
@@ -1888,7 +1969,7 @@ app.get('/articles/:slug', (req, res) => {
         headline: title,
         description: excerpt,
         url: pageUrl,
-        inLanguage: 'uk',
+        inLanguage: isRu ? 'ru' : 'uk',
         datePublished: publishedIso,
         dateModified: publishedIso,
         author: {
@@ -1909,7 +1990,7 @@ app.get('/articles/:slug', (req, res) => {
     ],
   });
 
-  const html = ARTICLE_HTML_TPL
+  let html = ARTICLE_HTML_TPL
     .replace(
       '<title id="pageTitle">Стаття — My Computer Academy</title>',
       `<title id="pageTitle">${escHtml(fullTitle)}</title>`
@@ -1917,19 +1998,24 @@ app.get('/articles/:slug', (req, res) => {
     .replace(
       '<meta name="description" id="pageDesc" content="Корисні статті про програмування для дітей від My Computer Academy"/>',
       `<meta name="description" id="pageDesc" content="${escHtml(excerpt) || 'Корисні статті про програмування для дітей від My Computer Academy'}"/>
-  <link rel="canonical" href="${pageUrl}"/>
+  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>
   <meta property="og:title" content="${escHtml(fullTitle)}"/>
   <meta property="og:description" content="${escHtml(excerpt)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="article"/>
   <meta property="og:image" content="https://mycomputer.school/og-image.png"/>
-  <meta property="og:locale" content="uk_UA"/>
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
   <script type="application/ld+json">${articleJsonLd}</script>`
     )
     .replace(
       '>Стаття — My Computer Academy</h1>',
       `>${escHtml(title)}</h1>`
     );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
@@ -1954,30 +2040,30 @@ const COURSE_SEO_TITLES = {
 
 // ── COURSE SEO DESCRIPTIONS (140-160 chars) ───────────────────────────────────
 const COURSE_SEO_DESCS = {
-  pc:          'Базовий курс комп\'ютерної грамотності для дітей 6–10 років у Дніпрі. Клавіатура, Word, безпека в інтернеті. Онлайн та офлайн у малих групах до 5 учнів.',
-  graphic:     'Курс графіки та ілюстрації для дітей 6–12 років у Дніпрі. Photoshop, Illustrator, цифровий малюнок, кольорознавство. Онлайн та офлайн у групах до 5 учнів.',
-  blog:        'Курс створення блогу та сайту для підлітків 12–17 років у Дніпрі. HTML, CSS, SEO, публікація з доменом. Онлайн та офлайн у малих групах до 5 учнів.',
-  'ui-ux':     'Курс UI/UX дизайну у Figma для підлітків 12–18 років у Дніпрі. Прототипи, дизайн застосунків і сайтів. Онлайн та офлайн у малих групах до 5 учнів.',
-  animation:   'Курс анімації та моушн-дизайну для дітей 8–14 років у Дніпрі. Анімація персонажів, банерів, соцмереж. Онлайн та офлайн у малих групах до 5 учнів.',
-  '3d-interior': 'Курс 3D-інтер\'єрів та ландшафтів у 3ds Max для підлітків 12–18 років у Дніпрі. Моделювання, візуалізація. Онлайн та офлайн у групах до 5 учнів.',
-  '3d-blender':  'Курс 3D-моделювання у Blender для дітей 10–16 років у Дніпрі. Моделювання, матеріали, рендер. Онлайн та офлайн у малих групах до 5 учнів.',
-  drawing:     'Курс цифрового рисунка для дітей 6–12 років у Дніпрі. Графічний планшет, композиція, колір. Онлайн та офлайн у малих групах до 5 учнів.',
-  branding:    'Курс брендингу та логотипів для підлітків 12–18 років у Дніпрі. Illustrator, фірмовий стиль, брендбук. Онлайн та офлайн у малих групах до 5 учнів.',
-  'ai-design': 'Курс AI-дизайну для підлітків 12–18 років у Дніпрі. Midjourney, prompt engineering, нейромережі в дизайні. Онлайн та офлайн у малих групах до 5 учнів.',
+  pc:          'Базовий курс комп\'ютерної грамотності для дітей 6–10 років по всій Україні. Клавіатура, Word, безпека в інтернеті. Онлайн та офлайн у малих групах до 5 учнів.',
+  graphic:     'Курс графіки та ілюстрації для дітей 6–12 років по всій Україні. Photoshop, Illustrator, цифровий малюнок, кольорознавство. Онлайн та офлайн у групах до 5 учнів.',
+  blog:        'Курс створення блогу та сайту для підлітків 12–17 років по всій Україні. HTML, CSS, SEO, публікація з доменом. Онлайн та офлайн у малих групах до 5 учнів.',
+  'ui-ux':     'Курс UI/UX дизайну у Figma для підлітків 12–18 років по всій Україні. Прототипи, дизайн застосунків і сайтів. Онлайн та офлайн у малих групах до 5 учнів.',
+  animation:   'Курс анімації та моушн-дизайну для дітей 8–14 років по всій Україні. Анімація персонажів, банерів, соцмереж. Онлайн та офлайн у малих групах до 5 учнів.',
+  '3d-interior': 'Курс 3D-інтер\'єрів та ландшафтів у 3ds Max для підлітків 12–18 років по всій Україні. Моделювання, візуалізація. Онлайн та офлайн у групах до 5 учнів.',
+  '3d-blender':  'Курс 3D-моделювання у Blender для дітей 10–16 років по всій Україні. Моделювання, матеріали, рендер. Онлайн та офлайн у малих групах до 5 учнів.',
+  drawing:     'Курс цифрового рисунка для дітей 6–12 років по всій Україні. Графічний планшет, композиція, колір. Онлайн та офлайн у малих групах до 5 учнів.',
+  branding:    'Курс брендингу та логотипів для підлітків 12–18 років по всій Україні. Illustrator, фірмовий стиль, брендбук. Онлайн та офлайн у малих групах до 5 учнів.',
+  'ai-design': 'Курс AI-дизайну для підлітків 12–18 років по всій Україні. Midjourney, prompt engineering, нейромережі в дизайні. Онлайн та офлайн у малих групах до 5 учнів.',
 };
 
 // ── COURSE SEO TEXT BLOCKS (visually-hidden, crawler-visible) ─────────────────
 const COURSE_SEO_TEXTS = {
-  pc:          'Базовий курс роботи з комп\'ютером для дітей у Дніпрі від школи дизайну My Computer Academy. Курс для дітей 6–10 років: клавіатура, миша, файлова система Windows, Word, Paint, безпека в інтернеті, захист від шкідливих сайтів. Швидкий набір тексту сліпим методом. Ідеальний старт у світ цифрових технологій та майбутнього дизайну. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 96 занять за 12 місяців. Перший урок безкоштовно.',
-  graphic:     'Курс графіки та ілюстрації для дітей у Дніпрі від школи дизайну My Computer Academy. Учні 6–12 років вивчають растрову та векторну графіку в Photoshop та Illustrator: цифровий малюнок, кольорознавство, робота з шарами та композицією. Курс для юних художників і майбутніх дизайнерів. Власна ілюстрація у фіналі. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 128 уроків за 16 місяців. Перший урок безкоштовно.',
-  blog:        'Курс створення блогу та особистого сайту для підлітків у Дніпрі від школи дизайну My Computer Academy. Учні 12–17 років навчаються HTML, CSS та основам SEO, щоб створити власний онлайн-простір: блог, портфоліо або творчу сторінку. Без складних фреймворків — чистий HTML і CSS, структура, дизайн, публікація з доменом. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 112 занять за 14 місяців. Перший урок безкоштовно.',
-  'ui-ux':     'Курс UI/UX дизайну у Figma для підлітків у Дніпрі від школи дизайну My Computer Academy. Учні 12–18 років проєктують інтерфейси сайтів і застосунків: фрейми, компоненти, Auto Layout, UX-дослідження та інтерактивні прототипи. Один із найбільш затребуваних напрямків в ІТ, не вимагає навичок програмування для старту. У фіналі — повний дизайн застосунку в портфоліо. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 96 занять за 12 місяців. Перший урок безкоштовно.',
-  animation:   'Курс анімації та моушн-дизайну для дітей у Дніпрі від школи дизайну My Computer Academy. Учні 8–14 років навчаються оживляти графіку: анімація персонажів кадр за кадром, моушн-дизайн для банерів та соцмереж. Затребувана навичка для контенту в Instagram, TikTok, реклами. У фіналі — власний анімований ролик. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 72 заняття за 9 місяців. Перший урок безкоштовно.',
-  '3d-interior': 'Курс 3D-ландшафтів та інтер\'єрів у 3ds Max для підлітків у Дніпрі від школи дизайну My Computer Academy. Учні 12–18 років моделюють меблі, простір та ландшафти, працюють з матеріалами, текстурами й освітленням через V-Ray/Corona. Професійний інструмент архітектурної візуалізації. У фіналі — візуалізація власного проєкту. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 144 заняття за 18 місяців. Перший урок безкоштовно.',
-  '3d-blender':  'Курс 3D-моделювання у Blender для дітей у Дніпрі від школи дизайну My Computer Academy. Учні 10–16 років вивчають безкоштовний і потужний Blender: моделювання від примітивів до персонажів, матеріали, освітлення сцени та рендер. У фіналі — готова 3D-модель для портфоліо. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 80 занять за 10 місяців. Перший урок безкоштовно.',
-  drawing:     'Курс цифрового рисунка для дітей у Дніпрі від школи дизайну My Computer Academy. Учні 6–12 років малюють на графічному планшеті: композиція, форма, перспектива, колір і світлотінь. База для будь-якого майбутнього напрямку дизайну. У фіналі — власна ілюстрація персонажа. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 72 заняття за 9 місяців. Перший урок безкоштовно.',
-  branding:    'Курс брендингу та логотипів для підлітків у Дніпрі від школи дизайну My Computer Academy. Учні 12–18 років розробляють фірмовий стиль в Illustrator: логотип від ескізу до вектора, кольори, шрифти, повний брендбук. Класичний напрямок графічного дизайну зі стабільним попитом. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 72 заняття за 9 місяців. Перший урок безкоштовно.',
-  'ai-design': 'Курс AI-дизайну для підлітків у Дніпрі від школи дизайну My Computer Academy. Учні 12–18 років навчаються створювати зображення нейромережами: prompt engineering, Midjourney та інші AI-інструменти, інтеграція штучного інтелекту в дизайнерський процес. Один з найактуальніших напрямків 2026 року. У фіналі — AI-арт проєкт у портфоліо. Онлайн та офлайн у Дніпрі, мала група до 5 учнів, 72 заняття за 9 місяців. Перший урок безкоштовно.',
+  pc:          'Базовий курс роботи з комп\'ютером для дітей по всій Україні від школи дизайну My Computer Academy. Курс для дітей 6–10 років: клавіатура, миша, файлова система Windows, Word, Paint, безпека в інтернеті, захист від шкідливих сайтів. Швидкий набір тексту сліпим методом. Ідеальний старт у світ цифрових технологій та майбутнього дизайну. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 96 занять за 12 місяців. Перший урок безкоштовно.',
+  graphic:     'Курс графіки та ілюстрації для дітей по всій Україні від школи дизайну My Computer Academy. Учні 6–12 років вивчають растрову та векторну графіку в Photoshop та Illustrator: цифровий малюнок, кольорознавство, робота з шарами та композицією. Курс для юних художників і майбутніх дизайнерів. Власна ілюстрація у фіналі. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 128 уроків за 16 місяців. Перший урок безкоштовно.',
+  blog:        'Курс створення блогу та особистого сайту для підлітків по всій Україні від школи дизайну My Computer Academy. Учні 12–17 років навчаються HTML, CSS та основам SEO, щоб створити власний онлайн-простір: блог, портфоліо або творчу сторінку. Без складних фреймворків — чистий HTML і CSS, структура, дизайн, публікація з доменом. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 112 занять за 14 місяців. Перший урок безкоштовно.',
+  'ui-ux':     'Курс UI/UX дизайну у Figma для підлітків по всій Україні від школи дизайну My Computer Academy. Учні 12–18 років проєктують інтерфейси сайтів і застосунків: фрейми, компоненти, Auto Layout, UX-дослідження та інтерактивні прототипи. Один із найбільш затребуваних напрямків в ІТ, не вимагає навичок програмування для старту. У фіналі — повний дизайн застосунку в портфоліо. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 96 занять за 12 місяців. Перший урок безкоштовно.',
+  animation:   'Курс анімації та моушн-дизайну для дітей по всій Україні від школи дизайну My Computer Academy. Учні 8–14 років навчаються оживляти графіку: анімація персонажів кадр за кадром, моушн-дизайн для банерів та соцмереж. Затребувана навичка для контенту в Instagram, TikTok, реклами. У фіналі — власний анімований ролик. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 72 заняття за 9 місяців. Перший урок безкоштовно.',
+  '3d-interior': 'Курс 3D-ландшафтів та інтер\'єрів у 3ds Max для підлітків по всій Україні від школи дизайну My Computer Academy. Учні 12–18 років моделюють меблі, простір та ландшафти, працюють з матеріалами, текстурами й освітленням через V-Ray/Corona. Професійний інструмент архітектурної візуалізації. У фіналі — візуалізація власного проєкту. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 144 заняття за 18 місяців. Перший урок безкоштовно.',
+  '3d-blender':  'Курс 3D-моделювання у Blender для дітей по всій Україні від школи дизайну My Computer Academy. Учні 10–16 років вивчають безкоштовний і потужний Blender: моделювання від примітивів до персонажів, матеріали, освітлення сцени та рендер. У фіналі — готова 3D-модель для портфоліо. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 80 занять за 10 місяців. Перший урок безкоштовно.',
+  drawing:     'Курс цифрового рисунка для дітей по всій Україні від школи дизайну My Computer Academy. Учні 6–12 років малюють на графічному планшеті: композиція, форма, перспектива, колір і світлотінь. База для будь-якого майбутнього напрямку дизайну. У фіналі — власна ілюстрація персонажа. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 72 заняття за 9 місяців. Перший урок безкоштовно.',
+  branding:    'Курс брендингу та логотипів для підлітків по всій Україні від школи дизайну My Computer Academy. Учні 12–18 років розробляють фірмовий стиль в Illustrator: логотип від ескізу до вектора, кольори, шрифти, повний брендбук. Класичний напрямок графічного дизайну зі стабільним попитом. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 72 заняття за 9 місяців. Перший урок безкоштовно.',
+  'ai-design': 'Курс AI-дизайну для підлітків по всій Україні від школи дизайну My Computer Academy. Учні 12–18 років навчаються створювати зображення нейромережами: prompt engineering, Midjourney та інші AI-інструменти, інтеграція штучного інтелекту в дизайнерський процес. Один з найактуальніших напрямків 2026 року. У фіналі — AI-арт проєкт у портфоліо. Онлайн та офлайн по всій Україні, мала група до 5 учнів, 72 заняття за 9 місяців. Перший урок безкоштовно.',
 };
 
 app.get('/courses/:slug', (req, res) => {
@@ -1992,13 +2078,20 @@ app.get('/courses/:slug', (req, res) => {
     return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
   }
 
-  const name      = course ? course.name : 'Курс';
-  const seoTitle  = COURSE_SEO_TITLES[slug] || `${name} — My Computer Academy`;
+  const isRu = req.query.lang === 'ru';
+  const name      = isRu
+    ? (course ? (course.name_ru || COURSES_RU[slug]?.name || course.name) : 'Курс')
+    : (course ? course.name : 'Курс');
+  const seoTitle  = isRu
+    ? (COURSE_SEO_TITLES_RU[slug] || `${name} — My Computer Academy`)
+    : (COURSE_SEO_TITLES[slug] || `${name} — My Computer Academy`);
   const rawDesc = course && course.description
-    ? course.description
-    : 'Детальна інформація про курс дизайну для дітей у My Computer Academy';
+    ? (isRu ? (course.description_ru || COURSES_RU[slug]?.description || course.description) : course.description)
+    : (isRu ? 'Детальная информация о курсе дизайна для детей в My Computer Academy' : 'Детальна інформація про курс дизайну для дітей у My Computer Academy');
   // Use hardcoded SEO desc (140-160 chars) when DB description is too short
-  const desc = rawDesc.length >= 130 ? truncateAtWord(rawDesc, 160) : (COURSE_SEO_DESCS[slug] || truncateAtWord(rawDesc, 160));
+  const desc = rawDesc.length >= 130
+    ? truncateAtWord(rawDesc, 160)
+    : ((isRu ? COURSE_SEO_DESCS_RU[slug] : COURSE_SEO_DESCS[slug]) || truncateAtWord(rawDesc, 160));
   const siteUrl = 'https://mycomputer.school';
   const pageUrl = `${siteUrl}/courses/${slug}`;
 
@@ -2014,7 +2107,7 @@ app.get('/courses/:slug', (req, res) => {
       url: pageUrl,
       name: seoTitle,
       description: desc,
-      inLanguage: 'uk',
+      inLanguage: isRu ? 'ru' : 'uk',
       isPartOf: { '@id': `${siteUrl}/#website` },
       breadcrumb: { '@id': `${pageUrl}/#breadcrumb` },
     },
@@ -2022,8 +2115,8 @@ app.get('/courses/:slug', (req, res) => {
       '@type': 'BreadcrumbList',
       '@id': `${pageUrl}/#breadcrumb`,
       itemListElement: [
-        { '@type': 'ListItem', position: 1, item: { '@id': siteUrl + '/', name: 'Головна' } },
-        { '@type': 'ListItem', position: 2, item: { '@id': siteUrl + '/#courses', name: 'Курси' } },
+        { '@type': 'ListItem', position: 1, item: { '@id': siteUrl + '/', name: isRu ? 'Главная' : 'Головна' } },
+        { '@type': 'ListItem', position: 2, item: { '@id': siteUrl + '/#courses', name: isRu ? 'Курсы' : 'Курси' } },
         { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
       ],
     },
@@ -2047,7 +2140,7 @@ app.get('/courses/:slug', (req, res) => {
       name,
       description: rawDesc,
       url: pageUrl,
-      inLanguage: 'uk',
+      inLanguage: isRu ? 'ru' : 'uk',
       educationalLevel: 'Beginner',
       ...(course && course.age ? { typicalAgeRange: course.age } : {}),
       provider: { '@id': `${siteUrl}/#organization` },
@@ -2056,7 +2149,7 @@ app.get('/courses/:slug', (req, res) => {
           '@type': 'CourseInstance',
           courseMode: 'online',
           duration: isoPeriod,
-          inLanguage: 'uk',
+          inLanguage: isRu ? 'ru' : 'uk',
         }
       } : {}),
       offers: {
@@ -2089,7 +2182,7 @@ app.get('/courses/:slug', (req, res) => {
 
   const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graphItems });
 
-  const html = COURSE_HTML_TPL
+  let html = COURSE_HTML_TPL
     .replace(
       '<title>Курс — My Computer Academy</title>',
       `<title>${escHtml(seoTitle)}</title>`
@@ -2097,13 +2190,16 @@ app.get('/courses/:slug', (req, res) => {
     .replace(
       '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
       `<meta name="description" content="${escHtml(desc)}"/>
-  <link rel="canonical" href="${pageUrl}"/>
+  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>
   <meta property="og:title" content="${escHtml(seoTitle)}"/>
   <meta property="og:description" content="${escHtml(desc)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="website"/>
   <meta property="og:image" content="https://mycomputer.school/og-image.png"/>
-  <meta property="og:locale" content="uk_UA"/>`
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>`
     )
     .replace(
       '>Курс програмування для дітей — My Computer Academy</h1>',
@@ -2112,10 +2208,17 @@ app.get('/courses/:slug', (req, res) => {
     .replace(
       '<!-- SEO_BLOCK_COURSE -->',
       (() => {
-        const seoText = COURSE_SEO_TEXTS[slug] ? `<p>${escHtml(COURSE_SEO_TEXTS[slug])}</p>` : '';
-        const items = CURRICULA[slug] || [];
-        const currHtml = items.length
-          ? `<ul>${items.map(m => `<li><strong>${escHtml(m.num)}: ${escHtml(m.title)}</strong> — ${escHtml(m.desc)}</li>`).join('')}</ul>`
+        const seoTextSrc = isRu ? COURSE_SEO_TEXTS_RU[slug] : COURSE_SEO_TEXTS[slug];
+        const seoText = seoTextSrc ? `<p>${escHtml(seoTextSrc)}</p>` : '';
+        const uaItems = CURRICULA[slug] || [];
+        const currHtml = uaItems.length
+          ? `<ul>${uaItems.map((m, i) => {
+              const ruItem = isRu ? CURRICULA_RU[slug]?.[i] : null;
+              const num   = isRu ? (m.num === 'Фінал' ? 'Финал' : m.num) : m.num;
+              const title = ruItem?.title || m.title;
+              const desc  = ruItem?.desc  || m.desc;
+              return `<li><strong>${escHtml(num)}: ${escHtml(title)}</strong> — ${escHtml(desc)}</li>`;
+            }).join('')}</ul>`
           : '';
         return (seoText || currHtml)
           ? `<div class="vh-seo" aria-hidden="true">${seoText}${currHtml}</div>`
@@ -2123,6 +2226,8 @@ app.get('/courses/:slug', (req, res) => {
       })()
     )
     .replace('</head>', `  <script type="application/ld+json">${jsonLd}</script>\n</head>`);
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);
