@@ -866,6 +866,20 @@ app.get('/docs/:id.html', (req, res, next) => {
   res.send(html);
 });
 
+// ── SECURITY: never serve source code or raw data files as static assets ──────
+const STATIC_DATA_ALLOWLIST = new Set(['articles.json', 'content.json']); // only files client JS fetches directly
+app.use((req, res, next) => {
+  const p = req.path;
+  if (/^\/server(\/|$)/i.test(p) || /^\/node_modules(\/|$)/i.test(p) || /^\/(package(-lock)?\.json|\.env|\.git)/i.test(p)) {
+    return res.status(404).end();
+  }
+  const dataMatch = p.match(/^\/data\/([^/]+)$/i);
+  if (dataMatch && !STATIC_DATA_ALLOWLIST.has(dataMatch[1])) {
+    return res.status(404).end();
+  }
+  next();
+});
+
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,
