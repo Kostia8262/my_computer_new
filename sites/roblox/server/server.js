@@ -234,7 +234,7 @@ app.use(helmet({
       styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
       fontSrc:     ["'self'", "https://fonts.gstatic.com"],
       imgSrc:      ["'self'", "data:", "https:"],
-      connectSrc:  ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://stats.g.doubleclick.net", "https://mycomputer.education"],
+      connectSrc:  ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://stats.g.doubleclick.net", "https://*.contentsquare.net", "https://mycomputer.education"],
       frameSrc:    ["https://www.googletagmanager.com"],
       objectSrc:      ["'none'"],
       scriptSrcAttr:  ["'unsafe-inline'"],
