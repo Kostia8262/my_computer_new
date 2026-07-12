@@ -574,10 +574,39 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 }
 
 /* Toast */
-.toast{position:fixed;bottom:24px;right:24px;padding:13px 18px;border-radius:var(--r-lg);font-size:var(--fs-13);font-weight:var(--fw-medium);box-shadow:var(--sh-xl);transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);z-index:var(--z-toast);max-width:300px}
+.toast{position:fixed;bottom:100px;right:24px;padding:13px 18px;border-radius:var(--r-lg);font-size:var(--fs-13);font-weight:var(--fw-medium);box-shadow:var(--sh-xl);transform:translateY(80px);opacity:0;transition:all .35s cubic-bezier(.34,1.56,.64,1);z-index:var(--z-toast);max-width:300px}
 .toast.show{transform:translateY(0);opacity:1}
 .toast--success{background:#064E3B;color:var(--color-white);border-left:4px solid var(--color-success)}
 .toast--error  {background:#7F1D1D;color:var(--color-white);border-left:4px solid #EF4444}
+
+/* Floating Telegram widget */
+.tg-widget{
+  position:fixed;bottom:24px;right:24px;width:60px;height:60px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--color-primary),var(--color-primary-mid));
+  color:var(--color-white);border-radius:var(--r-full);
+  box-shadow:0 10px 30px rgba(var(--color-primary-rgb),.4),var(--sh-lg);
+  z-index:var(--z-toast);transition:transform var(--t),box-shadow var(--t);
+}
+.tg-widget:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 14px 36px rgba(var(--color-primary-rgb),.5),var(--sh-xl)}
+.tg-widget:active{transform:translateY(-1px) scale(.98)}
+.tg-widget__ping{
+  position:absolute;inset:0;border-radius:var(--r-full);
+  background:var(--color-primary);opacity:.55;
+  animation:tg-ping 2.4s cubic-bezier(0,0,.2,1) infinite;
+}
+@keyframes tg-ping{
+  0%{transform:scale(1);opacity:.55}
+  75%,100%{transform:scale(1.6);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .tg-widget__ping{animation:none;display:none}
+}
+@media (max-width:640px){
+  .tg-widget{width:52px;height:52px;bottom:16px;right:16px}
+  .tg-widget svg{width:24px;height:24px}
+  .toast{bottom:88px}
+}
 
 /* Animations */
 .fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
