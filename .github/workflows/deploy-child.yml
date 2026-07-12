@@ -59,6 +59,9 @@ jobs:
           python manage.py migrate --noinput
           python manage.py collectstatic --noinput
           chown -R nobody:nogroup $VH/main/migrations $VH/static 2>/dev/null || true
+          chown nobody:nogroup $VH $VH/db.sqlite3* 2>/dev/null || true
+          chmod 755 $VH 2>/dev/null || true
+          chmod 664 $VH/db.sqlite3* 2>/dev/null || true
           echo "=== Restarting OLS ==="
           /usr/local/lsws/bin/lswsctrl restart
           echo "Deploy complete: $(date)"
