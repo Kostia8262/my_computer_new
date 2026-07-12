@@ -1736,6 +1736,7 @@ app.get('/articles/:slug', (req, res) => {
   const ru       = ARTICLES_RU[slug];
   const title    = (isRu && ru?.title) || article.title || 'Стаття';
   const excerpt  = truncateAtWord((isRu && ru?.excerpt) || article.excerpt, 160);
+  const content  = (isRu && ru?.content) || article.content || '';
   const siteUrl  = 'https://mycomputer.education';
   const pageUrl  = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
@@ -1797,6 +1798,56 @@ app.get('/articles/:slug', (req, res) => {
   <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
   <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
 
+  // Server-render the real article body too — previously only SEO meta was
+  // injected server-side while the actual content only appeared after a
+  // client-side fetch('/api/articles') populated #pageContent, so crawlers
+  // that don't execute JS (or whose render pass fails/times out) saw an
+  // empty "Завантаження..." placeholder instead of the article text.
+  const dateStr = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+  const related = articlesDb.getActive().filter(a => a.id !== article.id).slice(0, 4);
+  const relatedHtml = related.length ? `
+          <div class="sidebar-card">
+            <h3>Читайте також</h3>
+            ${related.map(r => `<a class="sidebar-link" href="/articles/${escHtml(r.slug)}">${r.coverEmoji || '📄'} ${escHtml((isRu && r.title_ru) || r.title)}</a>`).join('')}
+          </div>` : '';
+  const bodyHtml = content || `<p>${escHtml(excerpt || '')}</p>`;
+
+  const pageContentHtml = `<div id="pageContent">
+  <section class="article-hero">
+    <div class="container">
+      <a href="/articles" class="article-back-btn">← Назад до статей</a>
+      <nav class="article-breadcrumb" aria-label="Навігація">
+        <a href="/">Головна</a>
+        <span class="article-breadcrumb-sep">›</span>
+        <a href="/articles">Статті</a>
+      </nav>
+      <div class="article-hero__badge">${article.coverEmoji || '📄'} ${escHtml(article.category || 'навчання')}</div>
+      <h1 class="article-hero__title">${escHtml(title)}</h1>
+      <div class="article-hero__meta">
+        <span>${escHtml(article.author || 'My Computer Academy')}</span>
+        <span>${dateStr}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="article-body">
+    <div class="article-container">
+      <main class="article-content">
+        ${bodyHtml}
+      </main>
+      <aside class="article-sidebar">
+        <div class="sidebar-cta">
+          <h3>Запишіть дитину на курс</h3>
+          <p>Перший урок безкоштовно — спробуйте без зобов'язань!</p>
+          <a href="/#contact">Записатись зараз →</a>
+        </div>${relatedHtml}
+      </aside>
+    </div>
+  </section>
+</div>`;
+
   let html = ARTICLE_HTML_TPL
     .replace(
       '<title id="pageTitle">Стаття — My Computer Academy</title>',
@@ -1815,8 +1866,11 @@ app.get('/articles/:slug', (req, res) => {
   <script type="application/ld+json">${articleJsonLd}</script>`
     )
     .replace(
-      '>Стаття — My Computer Academy</h1>',
-      `>${escHtml(title)}</h1>`
+      `<div id="pageContent">
+  <h1 class="vh-seo">Стаття — My Computer Academy</h1>
+  <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>
+</div>`,
+      pageContentHtml
     );
 
   if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
