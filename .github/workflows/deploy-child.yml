@@ -32,7 +32,7 @@ jobs:
               -e "ssh $SSH_OPTS" \
               --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' \
               --exclude='db.sqlite3' --exclude='db.sqlite3-journal' \
-              --exclude='static/' --exclude='media/' \
+              --exclude='/static/' --exclude='media/' \
               --exclude='lib/' --exclude='lib64/' --exclude='bin/' --exclude='pyvenv.cfg' \
               --exclude='.env' --exclude='.env.example' --exclude='stderr.log' \
               --exclude='.well-known/' \
