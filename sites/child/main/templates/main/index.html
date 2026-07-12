@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+{% load static %}
+{% load i18n %}
+{% load tz %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% translate 'Document' %}</title>
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+/>
+    <link rel="stylesheet" href="{% static 'main/fonts/ComicHelvetic/comichelvetic.css' %}" />
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}" />
+
+  </head>
+
+  <body>
+    <nav>
+      <div class="container">
+        <div class="navbar">
+          <a href="#" class="logo">
+            <img src="{% static 'main/img/logo.png' %}" alt="Дошколярик" />
+          </a>
+    
+          <button class="nav_burger">
+            ☰
+          </button>
+    
+          <div class="nav_menu">
+            <ul class="nav_list">
+              <li class="nav_item"><a href="/" class="nav_link">{% translate 'Главная' %}</a></li>
+              <li class="nav_item"><a href="#way" class="nav_link">{% translate 'Направления' %}</a></li>
+              <li class="nav_item"><a href="#promotion" class="nav_link">{% translate 'Акции' %}</a></li>
+              <li class="nav_item"><a href="#faq" class="nav_link">{% translate 'Вопросы' %}</a></li>
+              <li class="nav_item"><a href="#contacts" class="nav_link">{% translate 'Контакты' %}</a></li>
+            </ul>
+            <a href="https://mycomputer.education" target="_blank" rel="noopener" class="nav_tech-pill">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+              {% translate 'Компьютерные курсы' %}
+            </a>
+          </div>
+
+            <div class="schedule">
+              <p>Пн-Пт: <br /><span>8:00 - 21:00</span></p>
+            </div>
+
+            <div class="phone">
+              <p>+38(068) - 252 - 28 - 77</p>
+              <p>+38(095) - 462 - 46 - 72</p>
+            </div>
+
+            <button class="call nav_btn">{% translate 'Заказать звонок' %}</button>
+
+            <div class="lang_switch">
+              {% get_current_language as current_language %}
+              <ul>
+                {% get_available_languages as available_languages %}
+                {% for lang_code, lang_name in available_languages %}
+                  <li>
+                    <a href="{% url 'main:select_lang' lang_code %}">
+                      {% if lang_code == current_language %}
+                        <strong>{{ lang_code }}</strong>
+                      {% else %}
+                        {{ lang_code }}
+                      {% endif %}
+                    </a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+      </div>
+    </nav>
+    <header>
+      <div class="container">
+        <div class="promo_block">
+          <div class="promo_text">
+            <h1 class="promo_title">{% translate 'Дошколярик - центр развития и рисования для детей' %}</h1>
+            <p class="promo_description">
+              {% translate 'У нас вы найдете обучение английскому языку, рисование, лепку, скетчинг, раннее развитие (счет, письмо, чтение), математику, а также компьютерные курсы для детей.' %}
+            </p>
+            <ul class="promo_list">
+              <li class="promo_item">
+                {% translate 'Малые группы' %}
+              </li>
+              <li class="promo_item">
+                {% translate '11 городов' %}
+              </li>
+              <li class="promo_item">
+                {% translate 'Опытные учителя' %}
+              </li>
+            </ul>
+            <button class="call promo_btn">{% translate 'Записаться' %}</button>
+          </div>
+          <div class="promo_img">
+            <div id="promoScene">
+              <div data-depth="0.4">
+                <img src="{% static '/main/img/blob1.png' %}" alt="" />
+              </div>
+              <div data-depth="0.6">
+                <img src="{% static '/main/img/blob2.png' %}" alt="" style="transform: translate(15px,15px);" />
+              </div>
+              <div data-depth="1">
+                <img src="{% static '/main/img/blob3.png' %}" alt="" style="transform: translate(100px,50px);" />
+              </div>
+              <div data-depth="0.4">
+                <img src="{% static '/main/img/camera.png' %}" alt="" style="transform: translate(120px,70px);" />
+              </div>
+              <div data-depth="0.6">
+                <img src="{% static '/main/img/knight.png' %}" alt="" style="transform: translate(100px,0px);" />
+              </div>
+              <div data-depth="0.8">
+                <img src="{% static '/main/img/queen.png' %}" alt="" style="transform: translate(100px,265px);" />
+              </div>
+              <div data-depth="0.4">
+                <img src="{% static '/main/img/book.png' %}" alt="" style="transform: translate(200px,300px);" />
+              </div>
+
+              <div data-depth="1.5">
+                <img src="{% static '/main/img/malchik.svg' %}" style="height: 300px; transform: translate(210px,0);" alt="" />
+              </div>
+              <div data-depth="2">
+                <img src="{% static '/main/img/devochka.svg' %}" style="height: 300px; transform: translate(-160px,60px);" alt="" />
+              </div>
+            </div>
+            <ul class="promo_socio">
+              <li class="promo_socio_item">
+                <a href="#" class="promo_socio_link"><img src="" alt="" class="promo_icon" /></a>
+              </li>
+              <li class="promo_socio_item">
+                <a href="#" class="promo_socio_link"><img src="" alt="" class="promo_icon" /></a>
+              </li>
+              <li class="promo_socio_item">
+                <a href="#" class="promo_socio_link"><img src="" alt="" class="promo_icon" /></a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <img src="{% static '/main/img/shape.png' %}" class="promo_shape" alt="/-\-/-\/" />
+    </header>
+    <section class="way" id="way">
+      <div class="container">
+        <div class="way_title">
+          <h2>{% translate 'Наши направления:' %}</h2>
+          <img src="#" alt="" />
+        </div>
+        <div class="way_cards">
+          <div class="way_card">
+            <h3 class="way_card_title">
+              <span class="way_card_age" style="background-color:var(--orange)">{% translate '2,5 - 18 лет' %}</span>
+              <span class="way_card_tag">{% translate 'Рисование' %}</span>
+            </h3>
+            <ul class="way_card_list">
+              <li class="way_card_item">
+                {% translate 'Акварель и карандаши' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Гуашь, пастель, акрил' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Лепка, масло, дерево' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Скетчинг' %}
+              </li>
+            </ul>
+          </div>
+
+          <div class="way_card">
+            <h3 class="way_card_title">
+              <span class="way_card_age" style="background-color:var(--violet)">{% translate '3,5 - 18 лет' %}</span>
+              <span class="way_card_tag">{% translate 'Дошколярик и школа' %}</span>
+            </h3>
+            <ul class="way_card_list">
+              <li class="way_card_item">
+                {% translate 'Письмо, моторика' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Чтение, логика, развитие памяти' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Счет, арифметика, математика' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Изучение языков' %}
+              </li>
+            </ul>
+          </div>
+
+          <div class="way_card">
+            <h3 class="way_card_title">
+              <span class="way_card_age" style="background-color:var(--green)">{% translate '3,5 - 18 лет' %}</span>
+              <span class="way_card_tag">{% translate 'Языки и Математика' %}</span>
+            </h3>
+            <ul class="way_card_list">
+              <li class="way_card_item">
+                {% translate 'Английский язык' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Русский язык' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Украинский язык' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Математика' %}
+              </li>
+            </ul>
+          </div>
+
+          <div class="way_card">
+            <h3 class="way_card_title">
+              <span class="way_card_age" style="background-color:var(--yellow)">{% translate '7 - 18 лет' %}</span>
+              <span class="way_card_tag">{% translate 'Компьютерные курсы' %}</span>
+            </h3>
+            <ul class="way_card_list">
+              <li class="way_card_item">
+                {% translate 'Графика и дизайн' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Программирование' %}
+              </li>
+              <li class="way_card_item">
+                {% translate '3д Моделирование' %}
+              </li>
+              <li class="way_card_item">
+                {% translate 'Робототехника' %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <img src="{% static 'main/img/bush.svg' %}" alt="" class="way_bush" />
+      <img src="{% static 'main/img/tree.svg' %}" alt="" class="way_tree" />
+    </section>
+    <section class="description">
+      <div class="container">
+        <div class="description__slider swiper">
+          <div class="swiper-wrapper" style="padding-top: 100px;">
+          <div class="description__slide swiper-slide">
+            <div class="description__image">
+              <img src="{% static 'main/img/descript1.svg' %}" alt="Slide 1" class="description__img" />
+            </div>
+            <div class="description__content">
+              <h2 class="description__title">{% translate 'Дошкольная подготовка и школа (чтение, письмо, счет и т.д)' %}</h2>
+              <p class="description__text">
+                {% translate 'Подготовка ребенка к школе и его дальнейшая успеваемость, - важная задача, которая требует комплексного и своевременного подхода. Мы принимаем детей от 3,5 лет на различные виды дошкольной подготовки, включающей: чтение, письмо, счет, логику и рисование. Также вы можете учиться с нами до 11 класса, включительно, мы поможем в выполнении домашних заданий и подтянем ребенка в школьных предметах.' %}
+              </p>
+              <a href="#contacts"><button class="description__button">{% translate 'Подробнее' %}</button></a>
+            </div>
+          </div>
+          <div class="description__slide swiper-slide">
+            <div class="description__image">
+              <img src="{% static 'main/img/descript2.svg' %}" alt="Slide 1" class="description__img" />
+            </div>
+            <div class="description__content">
+              <h2 class="description__title">{% translate 'Рисование, лепка, работа с деревом' %}</h2>
+              <p class="description__text">
+                {% translate 'Одно из самых популярных наших направлений, - рисование для детей. Мы работаем с разнообразными материалами и техниками рисования. Акварель, пастель,акрил, масло, скетчинг, гуашь, цветные и ч.б карандаши,мел, - стоят на вооружении наших маленьких художников.' %}
+              </p>
+              <p class="description__text">
+                {% translate 'Также востребованы лепка, работа с древом, роспись, керамика и другие прикладные направления.начина рисовать и лепить можно с самого младшего возраста, начиная от обычной моторики рук и заканчивая настоящими шедеврами, которыми мы любим делиться у нас в инстаграме.' %}
+              </p>
+              <a href="#contacts"><button class="description__button">{% translate 'Подробнее' %}</button></a>
+            </div>
+          </div>
+          <div class="description__slide swiper-slide">
+            <div class="description__image">
+              <img src="{% static 'main/img/descript3.svg' %}" alt="Slide 1" class="description__img" />
+            </div>
+            <div class="description__content">
+              <h2 class="description__title">{% translate 'Компьютерные курсы' %}</h2>
+              <p class="description__text">
+                {% translate 'Приглашаем детей и взрослых на компьютерные курсы по различным направлениям:' %}
+              </p>
+              <p class="description__text">
+                {% translate '- Графика и анимация' %}<br />
+                {% translate '- Веб дизайн, Ui ux, сайты, игры, приложения' %}<br />
+                {% translate '- Frontend and Backend' %}<br />
+                {% translate '- Python- JavaScript' %}<br />
+                {% translate '- Java, Android- Php' %}<br />
+                {% translate '- 3д Моделирование 3dsMax + Corona + Vray' %}<br />
+                {% translate '- AutoCAD- SEO and SMM' %}<br />
+                {% translate '- Маркетинг и менеджмент' %}
+              </p>
+              <p class="description__text">
+                {% translate 'У нас есть возможность заниматься в мини-группах, а также индивидуально. Группы занимаются всю неделю, поэтому можно подобрать удобный график. Все материалы предоставляем, от вас только ответственно учиться.' %}
+              </p>
+              <a href="#contacts"><button class="description__button">{% translate 'Подробнее' %}</button></a>
+            </div>
+          </div>
+          <div class="description__slide swiper-slide">
+            <div class="description__image">
+              <img src="{% static 'main/img/descript4.svg' %}" alt="Slide 1" class="description__img" />
+            </div>
+            <div class="description__content">
+              <h2 class="description__title">{% translate 'Языки и математика' %}</h2>
+              <p class="description__text">
+                {% translate 'Обучение детей английскому, русскому и украинскому языкам, а также математике, всегда пользуется популярностью у наших учеников, поскольку является фундаментальным во всех сферах жизни.' %}
+              </p>
+              <p class="description__text">
+                {% translate 'Мы подберем преподавателя под ваш возраст и уровень, поможем разобраться как со школьной программой, так и с любыми международными тестами и олимпиадными задачами.' %}
+              </p>
+              <a href="#contacts"><button class="description__button">{% translate 'Подробнее' %}</button></a>
+            </div>
+          </div>
+        </div>
+        <div class="swiper-pagination"></div>
+      </div>
+    </div>
+    </section>
+    <section class="promo">
+      <div class="container">
+        <div class="description__slide">
+          <div class="description__image">
+            <img src="{% static 'main/img/descript5.svg' %}" alt="Slide 1" class="description__img" />
+          </div>
+          <div class="description__content">
+            <h2 class="description__title">{% translate 'Попробуйте онлайн занятия!' %}</h2>
+            <p class="description__text">
+              {% translate 'Если ваш ребенок заболел или вы уехали, но не хотите пропускать любимые занятия, не беда. Все наши преподаватели могут связаться со своими учениками онлайн через любую удобную вам программу.' %}
+            </p>
+            <a href="#contacts"><button class="description__button">{% translate 'Подробнее' %}</button></a>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="promotion" id="promotion">
+      <div class="container">
+        <div class="promotion__title">
+          <h2>{% translate 'Наши акции:' %}</h2>
+        </div>
+        <div class="promotion__cards">
+          <div class="promotion__card">
+            <div class="promotion__card_content">
+              <div class="promotion__card_head">
+                <svg class="promotion__card_bg mobile" width="157" height="140" viewBox="0 0 157 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M135.901 82.6463C113.065 106.3 134.246 130.738 147.691 140H0L0 0H157C135.653 17.9542 136.108 31.7048 139.004 36.3359C155.387 54.5751 143.761 74.8092 135.901 82.6463Z" fill="#F20070"/>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="200" height="126" viewBox="0 0 200 126" fill="none">
+                  <path d="M81.9338 109.067C48.1425 90.7398 13.2316 107.739 0 118.529V0H200V126C174.351 108.868 154.707 109.233 148.092 111.557C122.036 124.705 93.1298 115.375 81.9338 109.067Z" fill="#F20070" />
+                </svg>
+                <h3>{% translate 'Второй ребенок*' %}</h3>
+              </div>
+              <div class="promotion__card_body">
+                <p class="promotion__card_value" style='color:#F20070'>10%</p>
+                <p class="promotion__card_description">
+                  {% translate 'Скидка' %}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="promotion__card">
+            <div class="promotion__card_content">
+              <div class="promotion__card_head">
+                <svg class="promotion__card_bg mobile" width="157" height="140" viewBox="0 0 157 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M135.901 82.6463C113.065 106.3 134.246 130.738 147.691 140H0L0 0H157C135.653 17.9542 136.108 31.7048 139.004 36.3359C155.387 54.5751 143.761 74.8092 135.901 82.6463Z" fill="#FF7A3D"/>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="200" height="126" viewBox="0 0 200 126" fill="none">
+                  <path d="M81.9338 109.067C48.1425 90.7398 13.2316 107.739 0 118.529V0H200V126C174.351 108.868 154.707 109.233 148.092 111.557C122.036 124.705 93.1298 115.375 81.9338 109.067Z" fill="#FF7A3D" />
+                </svg>
+                <h3 >{% translate 'Приведи друга*' %}</h3>
+              </div>
+              <div class="promotion__card_body">
+                <p class="promotion__card_value" style='color:#FF7A3D'>25%</p>
+                <p class="promotion__card_description">
+                  {% translate 'Скидка' %}
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="promotion__card">
+            <div class="promotion__card_content">
+              <div class="promotion__card_head">
+                <svg class="promotion__card_bg mobile" width="157" height="140" viewBox="0 0 157 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M135.901 82.6463C113.065 106.3 134.246 130.738 147.691 140H0L0 0H157C135.653 17.9542 136.108 31.7048 139.004 36.3359C155.387 54.5751 143.761 74.8092 135.901 82.6463Z" fill="#FFC331"/>
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="200" height="126" viewBox="0 0 200 126" fill="none">
+                  <path d="M81.9338 109.067C48.1425 90.7398 13.2316 107.739 0 118.529V0H200V126C174.351 108.868 154.707 109.233 148.092 111.557C122.036 124.705 93.1298 115.375 81.9338 109.067Z" fill="#FFC331" />
+                </svg>
+                <h3>{% translate 'День рождения*' %}</h3>
+              </div>
+              <div class="promotion__card_body">
+                <p class="promotion__card_value"  style='color:#FFC331'>5%</p>
+                <p class="promotion__card_description">
+                  {% translate 'Скидка' %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="promotion__description">
+          <p>
+            {% translate '*Подробнее о наличии и условиях акций вы можете узнать связавшись с нами по телефону.' %}
+          </p>
+        </div>
+      </div>
+    </section>
+    <section class="faq" id="faq">
+      <div class="container">
+        <div class="faq__title">
+          <h2>{% translate 'Популярные вопросы:' %}</h2>
+        </div>
+        <div class="faq__cards">
+          <div class="faq__card">
+            <div class="faq__card_head">
+              <div class="faq__card_label">
+                {% translate 'Вопрос' %} 1
+              </div>
+              <div class="faq__card_title">
+                {% translate '- Какие у вас есть формы обучения?' %}
+              </div>
+              <button class="faq__card_btn">+</button>
+            </div>
+            <div class="faq__card_body">
+              <p>
+                {% translate 'Мы можем предложить вам обучение в мини-группах, а также индивидуальный формат. Мини-группа предполагает от 2 до 5 учеников. Вы можете поменять вид обучения, предварительно согласовав это с преподавателем.' %}
+              </p>
+            </div>
+          </div>
+          <div class="faq__card">
+            <div class="faq__card_head">
+              <div class="faq__card_label">
+                {% translate 'Вопрос' %} 2
+              </div>
+              <div class="faq__card_title">
+                {% translate '- Где вы находитесь?' %}
+              </div>
+              <button class="faq__card_btn">+</button>
+            </div>
+            <div class="faq__card_body">
+              <p>
+                {% translate 'У нас есть несколько очных отделений, в городе Днепр. Созвонитесь с нами, пожалуйста, чтобы подобрать ближайшее к вам отделение и удобный график.' %}
+              </p>
+            </div>
+          </div>
+          <div class="faq__card">
+            <div class="faq__card_head">
+              <div class="faq__card_label">
+                {% translate 'Вопрос' %} 3
+              </div>
+              <div class="faq__card_title">
+                {% translate '-Как узнать стоимость по каждому курсу?' %}
+              </div>
+              <button class="faq__card_btn">+</button>
+            </div>
+            <div class="faq__card_body">
+              <p>
+                {% translate 'Стоимость обучения может отличаться в разных отделениях и городах, поэтому самую актуальную информацию можно получить по телефону. Классический вариант посещения предполагает абонемент на 12 часов занятий, два раза в неделю по полтора часа, либо три раза в неделю по часу.По согласованию с преподавателем, можно составить свой график.' %}
+              </p>
+            </div>
+          </div>
+          <div class="faq__card">
+            <div class="faq__card_head">
+              <div class="faq__card_label">
+                {% translate 'Вопрос' %} 4
+              </div>
+              <div class="faq__card_title">
+                {% translate '- Для какого возраста ваши курсы?' %}
+              </div>
+              <button class="faq__card_btn">+</button>
+            </div>
+            <div class="faq__card_body">
+              <p>
+                {% translate 'Мы принимаем детей от 3,5 лет на различные направления. Также у нас есть программы для дошкольников, школьников и студентов. Можем предложить большой выбор языков, компьютерных курсов, а также математику и рисование.' %}
+              </p>
+            </div>
+          </div>
+          <div class="faq__card">
+            <div class="faq__card_head">
+              <div class="faq__card_label">
+                {% translate 'Вопрос' %} 5
+              </div>
+              <div class="faq__card_title">
+                {% translate '- Какой график занятий?' %}
+              </div>
+              <button class="faq__card_btn">+</button>
+            </div>
+            <div class="faq__card_body">
+              <p>
+                {% translate 'У нас большое количество групп во все дни недели. Не стесняйтесь созвониться с нами, чтобы подобрать ближайшее отделение и удобный график!' %}
+              </p>
+            </div>
+          </div>
+          <div class="faq__card">
+            <div class="faq__card_head">
+              <div class="faq__card_label">
+                {% translate 'Вопрос' %} 6
+              </div>
+              <div class="faq__card_title">
+                {% translate '- Сколько длятся занятия?' %}
+              </div>
+              <button class="faq__card_btn">+</button>
+            </div>
+            <div class="faq__card_body">
+              <p>
+                {% translate 'В зависимости от возраста детей, занятия длятся либо один полноценный час, либо полтора полноценных часа с переменой между первой и второй половиной урока. Классический вариант посещения предполагает абонемент на 12 часов занятий, два раза в неделю по полтора часа, либо три раза в неделю по часу.' %}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="contacts" id="contacts">
+      <div class="container">
+        <div class="contacts__title">
+          <h2>{% translate 'Контакты:' %}</h2>
+        </div>
+        <div class="contacts__wrapper">
+          <form class="form__wrap contacts__form">
+            <label for="">{% translate 'Оставьте ваше имя' %}</label>
+            <input type="text" name="clientName" id="" placeholder="Ім'я..." value="" />
+            <label for="">{% translate 'Номер телефона' %}</label>
+            <input type="text" name="clientPhone" required placeholder="+380..." />
+            <label for="">{% translate 'Напишите нам' %}</label>
+            {% csrf_token %}
+            <div class="contacts__comment">
+              <textarea placeholder="Введіть текст..." name="clientMessage"></textarea>
+              <button class="form__trigger"><img src="{% static 'main/img/send.svg' %}" alt="" /></button>
+            </div>
+            <div class="contacts__copyright">
+              <input type="checkbox" required id="clientConsent"/>
+              <label for="clientConsent">{% translate 'Я даю согласие на обработку своих персональных данных согласно' %} <a href="https://mycomputer.education/docs/privacy-policy.html" target="_blank" rel="noopener">{% translate 'политике конфиденциальности' %}</a> {% translate 'и' %} <a href="https://mycomputer.education/docs/public-offer.html" target="_blank" rel="noopener">{% translate 'публичной оферте' %}</a>.</label>
+            </div>
+          </form>
+          <div class="contacts__info">
+            <div class="section__heading">
+              <div class="heading__icon">
+                <img src="/static/media/phone_sm.130bf6eec48b7438ec35fafb6a90c6b9.svg" alt="" />
+              </div>
+              <h3>{% translate 'Свяжитесь с нами удобным способом:' %}</h3>
+            </div>
+            <div class="contacts__phones_wrapper">
+              <h3>{% translate 'Телефоны:' %}</h3>
+              <ul class="contacts__phones">
+                <li class="contacts__phone"> <span>+38 (095) - 462 - 46 - 72</span> <a href="viber://add?number=380954624672">Viber</a> <a href="https://api.whatsapp.com/send?phone=380954624672">Whatsapp</a><a href="https://t.me/380954624672">Telegram</a></li>
+                <li class="contacts__phone">  <span>+38 (068) - 252 - 28 - 77</span> <a href="https://api.whatsapp.com/send?phone=380682522877">Whatsapp</a></li>
+              </ul>
+            </div>
+            <h3>{% translate 'Почта:' %}</h3>
+            <ul class="contacts__mails">
+              <li class="contacts__mail">
+                my.computer.academy25@gmail.com
+              </li>
+            </ul>
+            <h3>{% translate 'Следите за нами в сосетях:' %}</h3>
+            <ul class="contacts__links">
+              <li class="contacts__link">
+                <a href="https://www.instagram.com/my_computer_academy_/">
+                  <img src="{% static 'main/img/inst.svg' %}" alt="" /></a>
+              </li>
+              <li class="contacts__link">
+                <a href="https://www.facebook.com/MyComputerAcademy.Dnipro/">
+                  <img src="{% static 'main/img/fb.svg' %}" alt="" /></a>
+              </li>
+            </ul>
+            <button class="call nav_btn">{% translate 'Заказать звонок' %}</button>
+            <ul class="contacts__docs">
+              <li><a href="https://mycomputer.education/docs/public-offer.html" target="_blank" rel="noopener">{% translate 'Публичная оферта' %}</a></li>
+              <li><a href="https://mycomputer.education/docs/privacy-policy.html" target="_blank" rel="noopener">{% translate 'Политика конфиденциальности' %}</a></li>
+              <li><a href="https://mycomputer.education/docs/refund-policy.html" target="_blank" rel="noopener">{% translate 'Правила возврата' %}</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <img src="{% static 'main/img/malchik.svg' %}" alt="" class="footer__boy" />
+    </section>
+    <footer>
+      <div class="container">
+        <div class="footer__top">
+          <div class="footer__brand">
+            <a href="/" class="footer__logo">
+              <img src="{% static 'main/img/logo.png' %}" alt="Дошколярик" />
+            </a>
+            <p class="footer__desc">{% translate 'Центр развития и творчества для детей: английский язык, рисование, лепка, скетчинг, раннее развитие и компьютерные курсы.' %}</p>
+            <div class="footer__social">
+              <a href="https://www.instagram.com/my_computer_academy_/" target="_blank" rel="noopener" aria-label="Instagram"><img src="{% static 'main/img/inst.svg' %}" alt="" /></a>
+              <a href="https://www.facebook.com/MyComputerAcademy.Dnipro/" target="_blank" rel="noopener" aria-label="Facebook"><img src="{% static 'main/img/fb.svg' %}" alt="" /></a>
+            </div>
+          </div>
+          <div class="footer__links">
+            <div class="footer__col">
+              <h4>{% translate 'Направления' %}</h4>
+              <ul>
+                <li><a href="#way">{% translate 'Наши направления' %}</a></li>
+                <li><a href="#promotion">{% translate 'Акции' %}</a></li>
+                <li><a href="#faq">{% translate 'Вопросы' %}</a></li>
+                <li><a href="#contacts">{% translate 'Контакты' %}</a></li>
+              </ul>
+            </div>
+            <div class="footer__col">
+              <h4>{% translate 'Компьютерные курсы' %}</h4>
+              <ul>
+                <li><a href="https://mycomputer.education" target="_blank" rel="noopener">My Computer Academy</a></li>
+                <li><a href="https://python.mycomputer.education" target="_blank" rel="noopener">Python</a></li>
+                <li><a href="https://roblox.mycomputer.education" target="_blank" rel="noopener">Roblox</a></li>
+                <li><a href="https://minecraft.mycomputer.education" target="_blank" rel="noopener">Minecraft</a></li>
+                <li><a href="https://mycomputer.school" target="_blank" rel="noopener">{% translate 'Дизайн и графика' %}</a></li>
+                <li><a href="https://webdesign.mycomputer.education" target="_blank" rel="noopener">{% translate 'Веб-дизайн' %}</a></li>
+              </ul>
+            </div>
+            <div class="footer__col">
+              <h4>{% translate 'Контакты' %}</h4>
+              <ul>
+                <li><a href="tel:+380682522877">+38 (068) 252-28-77</a></li>
+                <li><a href="tel:+380954624672">+38 (095) 462-46-72</a></li>
+                <li><a href="mailto:my.computer.academy25@gmail.com">my.computer.academy25@gmail.com</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer__pay">
+          <span class="footer__pay-label">{% translate 'Способы оплаты:' %}</span>
+          <div class="footer__pay-logos">
+            <img src="https://mycomputer.education/img/pay/visa.svg" alt="Visa" height="16" loading="lazy" />
+            <img src="https://mycomputer.education/img/pay/mc.svg" alt="Mastercard" height="16" loading="lazy" />
+            <img src="https://mycomputer.education/img/pay/apple-pay.svg" alt="Apple Pay" height="16" loading="lazy" />
+            <img src="https://mycomputer.education/img/pay/google-pay.svg" alt="Google Pay" height="16" loading="lazy" />
+          </div>
+          <a class="footer__pay-btn" href="https://mycomputer.education/#contacts" target="_blank" rel="noopener">
+            <img src="https://mycomputer.education/img/pay/plata.svg" alt="plata by mono" height="16" loading="lazy" />
+            {% translate 'Оплатить онлайн' %}
+          </a>
+        </div>
+
+        <div class="footer__legal">
+          <a href="https://mycomputer.education/docs/privacy-policy.html" target="_blank" rel="noopener">{% translate 'Политика конфиденциальности' %}</a>
+          <a href="https://mycomputer.education/docs/public-offer.html" target="_blank" rel="noopener">{% translate 'Публичная оферта' %}</a>
+          <a href="https://mycomputer.education/docs/terms.html" target="_blank" rel="noopener">{% translate 'Правила и условия' %}</a>
+          <a href="https://mycomputer.education/docs/refund-policy.html" target="_blank" rel="noopener">{% translate 'Правила возврата' %}</a>
+          <a href="https://mycomputer.education/docs/cookie-policy.html" target="_blank" rel="noopener">{% translate 'Политика cookie' %}</a>
+        </div>
+
+        <div class="footer__bottom">
+          <p>{% translate 'Дошколярик' %} © 1999–{% now "Y" %}. {% translate 'Все права защищены.' %}</p>
+          <p class="footer__fop">ФОП Піменов К.Ю., ІПН 3498404577, м. Дніпро, пр. О. Поля 28а</p>
+        </div>
+      </div>
+      <img src="{% static 'main/img/footer_blob.svg' %}" alt="" class="footer__blob" />
+    </footer>
+    {% include 'main/forms/enroll.html' %}
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
+    <script src="{% static 'main/js/script.js' %}"></script>
+  </body>
+</html>

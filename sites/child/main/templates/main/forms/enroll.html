@@ -1,0 +1,33 @@
+{% load static %}
+{% load i18n %}
+<div class="form__wrapper">
+  <form class="form__wrap form__content">
+    <div class="form__head">
+      <h3>{% translate 'Заказать звонок' %}</h3>
+      <button class="form__close" type="button">x</button>
+    </div>
+    <div class="form__body">
+      <input type="text" name="clientName" placeholder="{% translate 'Ваше имя' %}" />
+      <input type="text" name="clientPhone" placeholder="{% translate 'Телефон для связи' %}" />
+      <input type="text" name="clientMessage" placeholder="{% translate 'Страна, город' %}" />
+      {% csrf_token %}
+      <ul class="form__social_items">
+        <li class="form__social_item">
+          <a class="form__social_link" href="https://www.instagram.com/my_computer_academy_/">
+            <img src="{% static 'main/img/inst.svg' %}" alt="" /></a>
+        </li>
+        <li class="form__social_item">
+          <a class="form__social_link" href="https://www.facebook.com/MyComputerAcademy.Dnipro/">
+            <img src="{% static 'main/img/fb.svg' %}" alt="" /></a>
+        </li>
+      </ul>
+      <button class="form__trigger">{% translate 'Заказать звонок' %}</button>
+      <p>
+        {% translate 'Нажимая на кнопку, я соглашаюсь на обработку персональных данных согласно' %}
+        <a href="https://mycomputer.education/docs/privacy-policy.html" target="_blank" rel="noopener">{% translate 'политике конфиденциальности' %}</a>
+        {% translate 'и' %}
+        <a href="https://mycomputer.education/docs/public-offer.html" target="_blank" rel="noopener">{% translate 'публичной оферте' %}</a>.
+      </p>
+    </div>
+  </form>
+</div>

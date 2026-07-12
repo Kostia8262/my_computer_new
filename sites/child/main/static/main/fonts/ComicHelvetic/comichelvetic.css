@@ -1,0 +1,18 @@
+@font-face {
+    font-family: 'Comic Helvetic';
+    src: local('Comic Helvetic Medium'), local('ComicHelvetic-Medium'), url('Comichelveticmedium.woff2') format('woff2'), url('Comichelveticmedium.woff') format('woff'), url('Comichelveticmedium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Comic Helvetic';
+    src: local('Comic Helvetic Light'), local('ComicHelvetic-Light'), url('Comichelveticlight.woff2') format('woff2'), url('Comichelveticlight.woff') format('woff'), url('Comichelveticlight.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Comic Helvetic';
+    src: local('Comic Helvetic Heavy'), local('ComicHelvetic-Heavy'), url('Comichelveticheavy.woff2') format('woff2'), url('Comichelveticheavy.woff') format('woff'), url('Comichelveticheavy.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}

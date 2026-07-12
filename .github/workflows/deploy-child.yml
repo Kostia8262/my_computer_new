@@ -1,0 +1,75 @@
+name: Deploy Child Site (child.mycomputer.education)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'sites/child/**'
+
+concurrency:
+  group: deploy-child
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s' "${{ secrets.VPS_SSH_KEY }}" | base64 -d > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts || true
+
+      - name: Sync Django project to VPS
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
+          for attempt in 1 2 3; do
+            rsync -avz --delete \
+              -e "ssh $SSH_OPTS" \
+              --exclude='.git' --exclude='__pycache__' --exclude='*.pyc' \
+              --exclude='db.sqlite3' --exclude='db.sqlite3-journal' \
+              --exclude='static/' --exclude='media/' \
+              --exclude='lib/' --exclude='lib64/' --exclude='bin/' --exclude='pyvenv.cfg' \
+              --exclude='.env' --exclude='.env.example' --exclude='stderr.log' \
+              --exclude='.well-known/' \
+              sites/child/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/child.mycomputer.education/html/ \
+              && break
+            echo "Attempt $attempt failed, retrying in 20s..."
+            sleep 20
+          done
+
+      - name: Post-deploy on VPS
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
+          for attempt in 1 2 3; do
+            ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH' && break
+          set -e
+          VH=/usr/local/lsws/child.mycomputer.education/html
+          if [ ! -f "$VH/.env" ]; then
+            echo "ERROR: $VH/.env is missing on the server — refusing to deploy without it (SECRET_KEY etc. must already exist there)."
+            exit 1
+          fi
+          source $VH/bin/activate
+          cd $VH
+          pip install -r requirements.txt --quiet
+          python manage.py migrate --noinput
+          python manage.py collectstatic --noinput
+          chown -R nobody:nogroup $VH/main/migrations $VH/static 2>/dev/null || true
+          echo "=== Restarting OLS ==="
+          /usr/local/lsws/bin/lswsctrl restart
+          echo "Deploy complete: $(date)"
+          ENDSSH
+            echo "Attempt $attempt failed, retrying in 20s..."
+            sleep 20
+          done
+
+      - name: Health check
+        run: |
+          sleep 15
+          curl -f --retry 3 --retry-delay 5 https://child.mycomputer.education/ \
+            && echo "Health check passed" \
+            || (echo "Health check FAILED — site is down after deploy" && exit 1)
