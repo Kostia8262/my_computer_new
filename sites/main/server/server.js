@@ -518,11 +518,87 @@ app.get(['/', '/index.html'], (req, res) => {
 
 // ── ARTICLES LISTING LANGUAGE SSR ─────────────────────────────────────────────
 const ARTICLES_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
+// Mirrors articles/index.html's client-side LABEL_MAP so server-rendered
+// cards match what the JS re-renders on top of them.
+const ARTICLE_LABEL_MAP = {
+  '🐍': { label: 'Python',            cls: 'cat-python'  },
+  '🧩': { label: 'Scratch',           cls: 'cat-scratch' },
+  '🎮': { label: 'Roblox',            cls: 'cat-roblox'  },
+  '🌐': { label: 'Веб-розробка',      cls: 'cat-web'     },
+  '💡': { label: 'Для батьків',       cls: 'cat-parents' },
+  '🧮': { label: 'Математика і код',  cls: 'cat-parents' },
+  '🎯': { label: 'Вибір курсу',       cls: 'cat-tips'    },
+  '🔀': { label: 'Scratch vs Python', cls: 'cat-tips'    },
+  '💪': { label: 'Мотивація',         cls: 'cat-parents' },
+  '🖥': { label: 'Формат навчання',   cls: 'cat-tips'    },
+  '💬': { label: 'Гайди',             cls: 'cat-guide'   },
+  '📁': { label: 'Гайди',             cls: 'cat-guide'   },
+  '💻': { label: 'Гайди',             cls: 'cat-guide'   },
+  '🧹': { label: 'Гайди',             cls: 'cat-guide'   },
+  '🔒': { label: 'Гайди',             cls: 'cat-guide'   },
+  '📖': { label: 'Словник',           cls: 'cat-dict'    },
+  '🎨': { label: 'Дизайн',            cls: 'cat-design'  },
+  '🎭': { label: 'Дизайн',            cls: 'cat-design'  },
+  '🧭': { label: 'Дизайн',            cls: 'cat-design'  },
+  '🤖': { label: 'Дизайн',            cls: 'cat-design'  },
+};
+function pluralArticlesRu(n) {
+  if (n === 0) return 'статей не знайдено';
+  const m = n % 10, m100 = n % 100;
+  if (m === 1 && m100 !== 11) return n + ' стаття';
+  if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статті';
+  return n + ' статей';
+}
+
 app.get('/articles', (req, res) => {
   const isRu = req.query.lang === 'ru';
   const hasRu = !!ARTICLES_INDEX_RU.title;
   const siteUrl = 'https://mycomputer.education';
   let html = ARTICLES_INDEX_TPL;
+
+  // Server-render the actual article cards — previously the grid shipped
+  // empty and only filled in after a client-side fetch('/api/articles'),
+  // so this hub page carried zero real <a href="/articles/..."> links for
+  // crawlers, weakening internal linking to every post (same underlying
+  // gap as the individual article pages, fixed separately).
+  const activeArticles = articlesDb.getActive();
+  const cardsHtml = activeArticles.map(a => {
+    const title = (isRu && a.title_ru) || a.title;
+    const excerpt = (isRu && a.excerpt_ru) || a.excerpt;
+    const lbl = ARTICLE_LABEL_MAP[a.coverEmoji] || { label: escHtml(a.category || 'стаття'), cls: '' };
+    const dateStr = a.publishedAt
+      ? new Date(a.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+    return `
+    <a class="article-card" href="/articles/${escHtml(a.slug)}${isRu ? '?lang=ru' : ''}" aria-label="${escHtml(title)}">
+      <div class="article-card__top">
+        <span class="article-card__emoji">${a.coverEmoji || '📄'}</span>
+        <span class="article-card__cat ${lbl.cls}">${lbl.label}</span>
+      </div>
+      <div class="article-card__body">
+        <h2 class="article-card__title">${escHtml(title)}</h2>
+        <p class="article-card__excerpt">${escHtml(excerpt || '')}</p>
+      </div>
+      <div class="article-card__footer">
+        <span class="article-card__date">${dateStr}</span>
+        <span class="article-card__read">Читати →</span>
+      </div>
+    </a>`;
+  }).join('');
+  html = html
+    .replace(
+      '<p class="listing-hero__sub" id="heroSub">Завантаження…</p>',
+      `<p class="listing-hero__sub" id="heroSub">${pluralArticlesRu(activeArticles.length)} — Python, Scratch, Roblox, веб-розробка та поради батькам</p>`
+    )
+    .replace(
+      '<span class="listing-count" id="listingCount"></span>',
+      `<span class="listing-count" id="listingCount">${pluralArticlesRu(activeArticles.length)}</span>`
+    )
+    .replace(
+      '<div class="listing-grid" id="listingGrid"></div>',
+      `<div class="listing-grid" id="listingGrid">${cardsHtml}</div>`
+    );
+
   if (hasRu) {
     html = html.replace(
       '<link rel="canonical" href="https://mycomputer.education/articles"/>',
@@ -1934,6 +2010,11 @@ app.get('/courses/:slug', (req, res) => {
   }
 
   const isRu = req.query.lang === 'ru';
+  const activeReviews = reviewsDb.getActive();
+  const reviewCount   = activeReviews.length;
+  const ratingValue   = reviewCount
+    ? (activeReviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviewCount).toFixed(1)
+    : null;
   const name      = isRu
     ? (course ? (course.name_ru || COURSES_RU[slug]?.name || course.name) : 'Курс')
     : (course ? course.name : 'Курс');
@@ -2014,13 +2095,15 @@ app.get('/courses/:slug', (req, res) => {
         availability: 'https://schema.org/InStock',
         url: `${siteUrl}/#contact`,
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.9',
-        bestRating: '5',
-        worstRating: '1',
-        reviewCount: '127',
-      },
+      ...(ratingValue ? {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue,
+          bestRating: '5',
+          worstRating: '1',
+          reviewCount: String(reviewCount),
+        },
+      } : {}),
     },
   ];
 
