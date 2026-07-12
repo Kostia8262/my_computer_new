@@ -580,6 +580,73 @@ app.get('/docs/:id.html', (req, res, next) => {
   res.send(html);
 });
 
+// ── DYNAMIC SITEMAP ───────────────────────────────────────────────────────────
+app.get('/sitemap.xml', (req, res) => {
+  const base  = 'https://mycomputer.education';
+  const today = new Date().toISOString().slice(0, 10);
+  const courseUrls = coursesDb.getActive().map(c => {
+    return `  <url>\n    <loc>${base}/courses/${c.id}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.9</priority>\n  </url>`;
+  }).join('\n');
+  const artUrls = articlesDb.getActive().map(a => {
+    const lm = (a.publishedAt || today).slice(0, 10);
+    return `  <url>\n    <loc>${base}/articles/${a.slug}</loc>\n    <lastmod>${lm}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.7</priority>\n  </url>`;
+  }).join('\n');
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <url>
+    <loc>${base}/</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="uk" href="${base}/"/>
+    <xhtml:link rel="alternate" hreflang="ru" href="${base}/?lang=ru"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="${base}/"/>
+  </url>
+${courseUrls ? '\n' + courseUrls + '\n' : ''}
+  <url>
+    <loc>${base}/articles</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+${artUrls ? '\n' + artUrls + '\n' : ''}
+  <url>
+    <loc>${base}/docs/privacy-policy.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${base}/docs/public-offer.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${base}/docs/terms.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${base}/docs/refund-policy.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>${base}/docs/cookie-policy.html</loc>
+    <lastmod>2026-06-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+</urlset>`;
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8');
+  res.send(xml);
+});
+
 // ── SECURITY: never serve source code or raw data files as static assets ──────
 const STATIC_DATA_ALLOWLIST = new Set(['articles.json', 'content.json']); // only files client JS fetches directly
 app.use((req, res, next) => {
