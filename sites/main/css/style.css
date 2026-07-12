@@ -274,9 +274,9 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .courses__grid::-webkit-scrollbar{display:none}
 .courses__grid.is-grabbing{cursor:grabbing;scroll-behavior:auto}
 /* Gradient overlays — separate divs to avoid mask-image WebKit clipping bug */
-.courses__fade{position:absolute;top:20px;bottom:8px;width:80px;pointer-events:none;z-index:var(--z-lift)}
-.courses__fade--r{right:-2px;width:52px;background:linear-gradient(to right,transparent 0%,#0D0C1A 70%,#0D0C1A 100%)}
-.courses__fade--l{left:-2px;width:52px;background:linear-gradient(to left,transparent 0%,#0D0C1A 70%,#0D0C1A 100%);opacity:0;transition:opacity .25s}
+.courses__fade{position:absolute;top:0;bottom:0;width:100px;pointer-events:none;z-index:var(--z-lift)}
+.courses__fade--r{right:-1px;background:linear-gradient(to right,transparent 0%,rgba(13,12,26,.35) 35%,rgba(13,12,26,.8) 65%,#0D0C1A 100%)}
+.courses__fade--l{left:-1px;background:linear-gradient(to left,transparent 0%,rgba(13,12,26,.35) 35%,rgba(13,12,26,.8) 65%,#0D0C1A 100%);opacity:0;transition:opacity .25s}
 .courses__slider-wrap.is-scrolled .courses__fade--l{opacity:1}
 
 /* ── COMPACT CARD ── */
@@ -714,6 +714,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 
   /* Courses — tablet: 2–3 cards, equal height */
   .course-card{flex:0 0 230px}
+  .courses__fade{width:56px}
 
   /* Steps */
   .steps{flex-direction:column;align-items:flex-start;gap:0}

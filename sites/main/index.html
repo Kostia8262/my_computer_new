@@ -1587,7 +1587,7 @@
     var sliderWrap = g.closest('.courses__slider-wrap');
     function onScroll() {
       activeDot();
-      if (sliderWrap) sliderWrap.classList.toggle('is-scrolled', g.scrollLeft > 10);
+      if (sliderWrap) sliderWrap.classList.toggle('is-scrolled', g.scrollLeft > 4);
     }
     g.addEventListener('scroll', onScroll, { passive: true });
 
