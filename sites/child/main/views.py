@@ -3,8 +3,33 @@ from .models import Order
 from .decorators import set_language
 from .telegramm import send_message
 from django.utils.translation import activate, check_for_language, get_language
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse as DjangoHttpResponse
 # Create your views here.
+
+
+def robots_txt(request):
+    lines = [
+        "User-agent: *",
+        "Allow: /",
+        "Disallow: /admin/",
+        "",
+        "Sitemap: https://child.mycomputer.education/sitemap.xml",
+    ]
+    return DjangoHttpResponse("\n".join(lines), content_type="text/plain")
+
+
+def sitemap_xml(request):
+    xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        '  <url>\n'
+        '    <loc>https://child.mycomputer.education/</loc>\n'
+        '    <changefreq>weekly</changefreq>\n'
+        '    <priority>1.0</priority>\n'
+        '  </url>\n'
+        '</urlset>\n'
+    )
+    return DjangoHttpResponse(xml, content_type="application/xml")
 
 
 @set_language

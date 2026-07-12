@@ -71,6 +71,7 @@
     --shadow-md: 0 4px 14px rgba(98, 85, 165, 0.3);
     --shadow-pink: 0 4px 14px rgba(221, 37, 99, 0.35);
     --shadow-nav: 0 2px 24px rgba(98, 85, 165, 0.08);
+    --shadow-lg: 0 20px 48px rgba(36, 32, 33, 0.18);
 
     /* Spacing scale — available for reuse; not yet retrofitted across every
        pre-existing rule (see memory note re: pending Figma reference) */
@@ -179,7 +180,8 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    gap: 14px;
+    flex-wrap: nowrap;
 }
 
 .nav_burger {
@@ -235,7 +237,8 @@ nav {
     text-decoration: none;
     text-transform: capitalize;
     font-weight: 500;
-    padding: 15px 20px;
+    white-space: nowrap;
+    padding: 15px 14px;
     transition: color 0.3s;
 }
 
@@ -243,27 +246,31 @@ nav {
     color: var(--main-color);
 }
 
-.schedule {
+.nav_phone {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 8px;
+    color: var(--main-text);
+    text-decoration: none;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    flex-shrink: 0;
+    transition: color 0.3s;
 }
 
-.schedule p {
-    margin-right: 15px;
-    color: var(--second-text)
+.nav_phone svg {
+    flex-shrink: 0;
+    color: var(--main-color);
 }
 
-.schedule span {
-    color: var(--main-color)
-}
-
-.phone {
-    color: var(--main-color)
+.nav_phone:hover {
+    color: var(--main-color);
 }
 
 .nav_btn {
     width: 150px;
+    flex-shrink: 0;
     background: linear-gradient(135deg, var(--second-color), var(--main-color));
     font-size: var(--fs-base);
     padding: 10px 0;
@@ -1257,23 +1264,57 @@ footer {
 .cookie_banner {
     display: none;
     align-items: center;
-    justify-content: space-between;
-    gap: 20px;
+    gap: 16px;
     position: fixed;
     left: 20px;
     right: 20px;
     bottom: 20px;
-    max-width: 640px;
+    max-width: 620px;
     margin: 0 auto;
-    background: var(--white);
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: var(--radius-3xl);
-    padding: 18px 22px;
-    box-shadow: var(--shadow-md);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-lg), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
     z-index: 500;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.cookie_banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, var(--second-color), var(--main-color));
+    opacity: 0.35;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
 }
 
 .cookie_banner.active {
     display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cookie_banner__icon {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, var(--second-color), var(--main-color));
+    color: var(--white);
+    box-shadow: var(--shadow-glow-pink);
 }
 
 .cookie_banner__text {
@@ -1284,6 +1325,7 @@ footer {
 
 .cookie_banner__text a {
     color: var(--main-color);
+    font-weight: 600;
     text-decoration: underline;
     text-underline-offset: 2px;
 }
@@ -1291,19 +1333,64 @@ footer {
 .cookie_banner__accept {
     flex-shrink: 0;
     width: auto;
-    padding: 10px 22px;
+    padding: 11px 24px;
     background: linear-gradient(135deg, var(--second-color), var(--main-color));
     font-size: var(--fs-sm);
+    font-weight: 600;
     border-radius: var(--radius-pill);
+    transition: box-shadow 0.3s, transform 0.3s;
 }
 
 .cookie_banner__accept:hover {
     box-shadow: var(--shadow-glow-pink);
+    transform: translateY(-1px);
 }
 
 @media screen and (max-width:1200px) {
     .container {
         width: 960px;
+    }
+
+    .navbar .logo img {
+        width: 120px;
+    }
+
+    .nav_menu {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 65px;
+        width: 100%;
+        background-color: var(--white);
+        z-index: 1;
+        height: auto;
+    }
+
+    .nav_menu.active {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav_menu.active .nav_list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .lang_switch {
+        align-self: center;
+        margin: 16px 0 20px;
+    }
+
+    .nav_phone span {
+        display: none;
+    }
+
+    .nav_btn {
+        display: none;
+    }
+
+    .nav_burger {
+        display: block;
     }
 
     .footer__boy {
@@ -1322,43 +1409,6 @@ footer {
 @media screen and (max-width:992px) {
     .container {
         width: 750px;
-    }
-    .navbar .logo img {
-        width: 120px;
-    }
-    .nav_menu {
-        display: none;
-        position: absolute;
-        left: 0;
-        top: 65px;
-        width: 100%;
-        background-color: var(--white);
-        z-index: 1;
-        height: auto;
-    }
-    .nav_menu.active {
-        display: flex;
-        flex-direction: column;
-    }
-    .nav_menu.active .nav_list{
-        display: flex;
-        flex-direction: column;
-    }
-    .navbar .schedule {
-        display: none;
-    }
-    .nav_btn {
-        display: none;
-    }
-    .navbar .phone p{
-        font-size: var(--fs-xs);
-    }
-    .lang_switch {
-        align-self: center;
-        margin: 16px 0 20px;
-    }
-    .nav_burger {
-        display: block;
     }
 
     .description__slide {
@@ -1445,7 +1495,12 @@ footer {
         left: 12px;
         right: 12px;
         bottom: 12px;
-        padding: 18px;
+        padding: 20px 18px;
+        gap: 12px;
+    }
+
+    .cookie_banner__icon {
+        margin: 0 auto;
     }
 
     .cookie_banner__accept {
