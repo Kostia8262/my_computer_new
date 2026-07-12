@@ -90,3 +90,15 @@ window.addEventListener('resize', () => {
   clearTimeout(window._resizeTimeout);
   window._resizeTimeout = setTimeout(initMobileSwiper, 200);
 });
+
+const cookieBanner = document.getElementById('cookieBanner');
+const cookieAccept = document.getElementById('cookieAccept');
+if (cookieBanner && !localStorage.getItem('cookieConsent')) {
+  cookieBanner.classList.add('active');
+}
+if (cookieAccept) {
+  cookieAccept.addEventListener('click', function () {
+    localStorage.setItem('cookieConsent', '1');
+    cookieBanner.classList.remove('active');
+  });
+}

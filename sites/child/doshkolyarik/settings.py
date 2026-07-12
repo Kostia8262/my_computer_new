@@ -130,7 +130,7 @@ LANGUAGE_CODE = 'ru'
 LANGUAGES = [
     ('ru',_('Русский')),
     # ('en', _('English')),
-    ('ua', _('Українська')),
+    ('uk', _('Українська')),
 ]
 
 LANGUAGE_COOKIE_NAME = 'django_language'

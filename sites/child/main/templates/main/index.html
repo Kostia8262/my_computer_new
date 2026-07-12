@@ -37,10 +37,14 @@
               <li class="nav_item"><a href="#faq" class="nav_link">{% translate 'Вопросы' %}</a></li>
               <li class="nav_item"><a href="#contacts" class="nav_link">{% translate 'Контакты' %}</a></li>
             </ul>
-            <a href="https://mycomputer.education" target="_blank" rel="noopener" class="nav_tech-pill">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-              {% translate 'Компьютерные курсы' %}
-            </a>
+
+            {% get_current_language as current_language %}
+            {% get_available_languages as available_languages %}
+            <div class="lang_switch">
+              {% for lang_code, lang_name in available_languages %}
+                <a href="{% url 'main:select_lang' lang_code %}" class="lang_switch__item{% if lang_code == current_language %} lang_switch__item--active{% endif %}" aria-label="{{ lang_name }}">{{ lang_code|upper }}</a>
+              {% endfor %}
+            </div>
           </div>
 
             <div class="schedule">
@@ -53,24 +57,6 @@
             </div>
 
             <button class="call nav_btn">{% translate 'Заказать звонок' %}</button>
-
-            <div class="lang_switch">
-              {% get_current_language as current_language %}
-              <ul>
-                {% get_available_languages as available_languages %}
-                {% for lang_code, lang_name in available_languages %}
-                  <li>
-                    <a href="{% url 'main:select_lang' lang_code %}">
-                      {% if lang_code == current_language %}
-                        <strong>{{ lang_code }}</strong>
-                      {% else %}
-                        {{ lang_code }}
-                      {% endif %}
-                    </a>
-                  </li>
-                {% endfor %}
-              </ul>
-            </div>
           </div>
       </div>
     </nav>
@@ -508,19 +494,26 @@
     <section class="contacts" id="contacts">
       <div class="container">
         <div class="contacts__title">
-          <h2>{% translate 'Контакты:' %}</h2>
+          <h2>{% translate 'Контакты' %}</h2>
+          <p class="contacts__subtitle">{% translate 'Оставьте заявку или свяжитесь с нами напрямую' %}</p>
         </div>
         <div class="contacts__wrapper">
           <form class="form__wrap contacts__form">
-            <label for="">{% translate 'Оставьте ваше имя' %}</label>
-            <input type="text" name="clientName" id="" placeholder="Ім'я..." value="" />
-            <label for="">{% translate 'Номер телефона' %}</label>
-            <input type="text" name="clientPhone" required placeholder="+380..." />
-            <label for="">{% translate 'Напишите нам' %}</label>
-            {% csrf_token %}
-            <div class="contacts__comment">
-              <textarea placeholder="Введіть текст..." name="clientMessage"></textarea>
-              <button class="form__trigger"><img src="{% static 'main/img/send.svg' %}" alt="" /></button>
+            <div class="contacts__field">
+              <label for="contactsName">{% translate 'Ваше имя' %}</label>
+              <input type="text" name="clientName" id="contactsName" placeholder="Ім'я..." />
+            </div>
+            <div class="contacts__field">
+              <label for="contactsPhone">{% translate 'Номер телефона' %}</label>
+              <input type="text" name="clientPhone" id="contactsPhone" required placeholder="+380..." />
+            </div>
+            <div class="contacts__field">
+              <label for="contactsMessage">{% translate 'Напишите нам' %}</label>
+              {% csrf_token %}
+              <div class="contacts__comment">
+                <textarea placeholder="Введіть текст..." name="clientMessage" id="contactsMessage"></textarea>
+                <button class="form__trigger" type="button" aria-label="{% translate 'Отправить' %}"><img src="{% static 'main/img/send.svg' %}" alt="" /></button>
+              </div>
             </div>
             <div class="contacts__copyright">
               <input type="checkbox" required id="clientConsent"/>
@@ -528,42 +521,30 @@
             </div>
           </form>
           <div class="contacts__info">
-            <div class="section__heading">
-              <div class="heading__icon">
-                <img src="/static/media/phone_sm.130bf6eec48b7438ec35fafb6a90c6b9.svg" alt="" />
-              </div>
-              <h3>{% translate 'Свяжитесь с нами удобным способом:' %}</h3>
-            </div>
-            <div class="contacts__phones_wrapper">
-              <h3>{% translate 'Телефоны:' %}</h3>
+            <div class="contacts__card">
+              <span class="contacts__card-label">{% translate 'Телефоны' %}</span>
               <ul class="contacts__phones">
-                <li class="contacts__phone"> <span>+38 (095) - 462 - 46 - 72</span> <a href="viber://add?number=380954624672">Viber</a> <a href="https://api.whatsapp.com/send?phone=380954624672">Whatsapp</a><a href="https://t.me/380954624672">Telegram</a></li>
-                <li class="contacts__phone">  <span>+38 (068) - 252 - 28 - 77</span> <a href="https://api.whatsapp.com/send?phone=380682522877">Whatsapp</a></li>
+                <li class="contacts__phone">
+                  <a href="tel:+380954624672">+38 (095) 462-46-72</a>
+                  <span class="contacts__phone-links"><a href="viber://add?number=380954624672">Viber</a><a href="https://api.whatsapp.com/send?phone=380954624672">WhatsApp</a><a href="https://t.me/380954624672">Telegram</a></span>
+                </li>
+                <li class="contacts__phone">
+                  <a href="tel:+380682522877">+38 (068) 252-28-77</a>
+                  <span class="contacts__phone-links"><a href="https://api.whatsapp.com/send?phone=380682522877">WhatsApp</a></span>
+                </li>
               </ul>
             </div>
-            <h3>{% translate 'Почта:' %}</h3>
-            <ul class="contacts__mails">
-              <li class="contacts__mail">
-                my.computer.academy25@gmail.com
-              </li>
-            </ul>
-            <h3>{% translate 'Следите за нами в сосетях:' %}</h3>
-            <ul class="contacts__links">
-              <li class="contacts__link">
-                <a href="https://www.instagram.com/my_computer_academy_/">
-                  <img src="{% static 'main/img/inst.svg' %}" alt="" /></a>
-              </li>
-              <li class="contacts__link">
-                <a href="https://www.facebook.com/MyComputerAcademy.Dnipro/">
-                  <img src="{% static 'main/img/fb.svg' %}" alt="" /></a>
-              </li>
-            </ul>
-            <button class="call nav_btn">{% translate 'Заказать звонок' %}</button>
-            <ul class="contacts__docs">
-              <li><a href="https://mycomputer.education/docs/public-offer.html" target="_blank" rel="noopener">{% translate 'Публичная оферта' %}</a></li>
-              <li><a href="https://mycomputer.education/docs/privacy-policy.html" target="_blank" rel="noopener">{% translate 'Политика конфиденциальности' %}</a></li>
-              <li><a href="https://mycomputer.education/docs/refund-policy.html" target="_blank" rel="noopener">{% translate 'Правила возврата' %}</a></li>
-            </ul>
+            <div class="contacts__card">
+              <span class="contacts__card-label">{% translate 'Почта' %}</span>
+              <a class="contacts__mail" href="mailto:my.computer.academy25@gmail.com">my.computer.academy25@gmail.com</a>
+            </div>
+            <div class="contacts__row">
+              <div class="contacts__social">
+                <a href="https://www.instagram.com/my_computer_academy_/" target="_blank" rel="noopener" aria-label="Instagram"><img src="{% static 'main/img/inst.svg' %}" alt="" /></a>
+                <a href="https://www.facebook.com/MyComputerAcademy.Dnipro/" target="_blank" rel="noopener" aria-label="Facebook"><img src="{% static 'main/img/fb.svg' %}" alt="" /></a>
+              </div>
+              <button class="call contacts__cta">{% translate 'Заказать звонок' %}</button>
+            </div>
           </div>
         </div>
       </div>
@@ -617,13 +598,13 @@
         <div class="footer__pay">
           <span class="footer__pay-label">{% translate 'Способы оплаты:' %}</span>
           <div class="footer__pay-logos">
-            <img src="https://mycomputer.education/img/pay/visa.svg" alt="Visa" height="16" loading="lazy" />
-            <img src="https://mycomputer.education/img/pay/mc.svg" alt="Mastercard" height="16" loading="lazy" />
-            <img src="https://mycomputer.education/img/pay/apple-pay.svg" alt="Apple Pay" height="16" loading="lazy" />
-            <img src="https://mycomputer.education/img/pay/google-pay.svg" alt="Google Pay" height="16" loading="lazy" />
+            <img src="{% static 'main/img/pay/visa.svg' %}" alt="Visa" height="16" loading="lazy" />
+            <img src="{% static 'main/img/pay/mc.svg' %}" alt="Mastercard" height="16" loading="lazy" />
+            <img src="{% static 'main/img/pay/apple-pay.svg' %}" alt="Apple Pay" height="16" loading="lazy" />
+            <img src="{% static 'main/img/pay/google-pay.svg' %}" alt="Google Pay" height="16" loading="lazy" />
           </div>
           <a class="footer__pay-btn" href="https://mycomputer.education/#contacts" target="_blank" rel="noopener">
-            <img src="https://mycomputer.education/img/pay/plata.svg" alt="plata by mono" height="16" loading="lazy" />
+            <img src="{% static 'main/img/pay/plata.svg' %}" alt="plata by mono" height="16" loading="lazy" />
             {% translate 'Оплатить онлайн' %}
           </a>
         </div>
@@ -644,6 +625,14 @@
       <img src="{% static 'main/img/footer_blob.svg' %}" alt="" class="footer__blob" />
     </footer>
     {% include 'main/forms/enroll.html' %}
+
+    <div class="cookie_banner" id="cookieBanner">
+      <p class="cookie_banner__text">
+        {% translate 'Мы используем файлы cookie, чтобы сайт работал быстрее и удобнее для вас.' %}
+        <a href="https://mycomputer.education/docs/cookie-policy.html" target="_blank" rel="noopener">{% translate 'Подробнее' %}</a>
+      </p>
+      <button class="cookie_banner__accept" id="cookieAccept" type="button">{% translate 'Понятно' %}</button>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/parallax/3.1.0/parallax.min.js"></script>
