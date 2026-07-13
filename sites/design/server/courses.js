@@ -1,6 +1,7 @@
 'use strict';
 
 const db = require('./db');
+const { CURRICULA_RU } = require('./content-ru');
 
 const DEFAULT_CURRICULUM = [
   { num: 'Модуль 1', title: 'Вступ та основи',      desc: 'Знайомство з інструментами та середовищем. Перші практичні кроки та базові концепції курсу.' },
@@ -9,6 +10,20 @@ const DEFAULT_CURRICULUM = [
   { num: 'Модуль 4', title: 'Просунутий рівень',    desc: 'Ускладнені теми та нові інструменти. Творчі завдання з елементами самостійного дослідження.' },
   { num: 'Фінал',    title: 'Підсумковий проект',   desc: 'Учень самостійно розробляє та презентує фінальний проект. Сертифікат про завершення курсу.' },
 ];
+
+// Curriculum modules are stored UA-only in the DB. RU translations live
+// separately in content-ru.js's CURRICULA_RU, index-aligned per course id
+// (confirmed 1:1 with the live DB curriculum before wiring this up — see
+// commit message). Merged in here so every consumer of courses.js (the
+// public API, course.html's client render) gets title_ru/desc_ru for free,
+// instead of only the previous SSR-only hidden SEO block having them.
+function withCurriculumRu(id, curriculum) {
+  const ruItems = CURRICULA_RU[id];
+  if (!Array.isArray(ruItems)) return curriculum;
+  return curriculum.map((m, i) => ruItems[i]
+    ? { ...m, title_ru: ruItems[i].title, desc_ru: ruItems[i].desc }
+    : m);
+}
 
 function fromRow(row) {
   if (!row) return null;
@@ -29,7 +44,7 @@ function fromRow(row) {
     popular: !!row.popular,
     color: row.color,
     active: !!row.active,
-    curriculum: JSON.parse(row.curriculum || '[]'),
+    curriculum: withCurriculumRu(row.id, JSON.parse(row.curriculum || '[]')),
   };
 }
 
