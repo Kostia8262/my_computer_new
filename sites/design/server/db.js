@@ -2,21 +2,41 @@
 
 const fs   = require('fs');
 const path = require('path');
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const DB_FILE  = path.join(DATA_DIR, 'design.db');
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const db = new Database(DB_FILE);
+const db = new DatabaseSync(DB_FILE);
 
 // WAL mode: writes go to a separate log first, so a crash mid-write can never
 // leave the main database file truncated/corrupted — SQLite replays or
 // discards the incomplete entry automatically on next open.
-db.pragma('journal_mode = WAL');
-db.pragma('synchronous = NORMAL');
-db.pragma('foreign_keys = ON');
+// node:sqlite has no .pragma() convenience method (unlike better-sqlite3) —
+// PRAGMA statements go through plain .exec() instead.
+db.exec('PRAGMA journal_mode = WAL');
+db.exec('PRAGMA synchronous = NORMAL');
+db.exec('PRAGMA foreign_keys = ON');
+
+// node:sqlite has no .transaction() helper (unlike better-sqlite3) — this
+// shim restores the same API (`db.transaction(fn)` returns a callable that
+// runs fn wrapped in BEGIN/COMMIT/ROLLBACK) so migrate-json-to-sqlite.js,
+// monthly-payments.js and reviews.js don't need to change at all.
+db.transaction = function (fn) {
+  return function (...args) {
+    db.exec('BEGIN');
+    try {
+      const result = fn(...args);
+      db.exec('COMMIT');
+      return result;
+    } catch (err) {
+      db.exec('ROLLBACK');
+      throw err;
+    }
+  };
+};
 
 db.exec(`
 CREATE TABLE IF NOT EXISTS admins (
