@@ -43,8 +43,6 @@ const monoPay        = require('./mono-pay');
 const monoInvoicesDb = require('./mono-invoices');
 const wfp            = require('./wayforpay');
 
-const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
-
 // ── CONTENT SEED DATA ─────────────────────────────────────────────────────────
 const CONTENT_SEED = {
   pricing: [
@@ -402,9 +400,14 @@ ARTICLES_SEED.forEach(a => {
 })();
 
 function loadContent() {
-  try { return JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8')); } catch { return {}; }
+  const row = sqliteDb.prepare('SELECT data FROM content_kv WHERE id = 1').get();
+  if (!row) return {};
+  try { return JSON.parse(row.data); } catch { return {}; }
 }
-function saveContent(data) { fs.writeFileSync(CONTENT_FILE, JSON.stringify(data, null, 2), 'utf8'); }
+function saveContent(data) {
+  sqliteDb.prepare(`INSERT INTO content_kv (id, data) VALUES (1, ?)
+    ON CONFLICT(id) DO UPDATE SET data = excluded.data`).run(JSON.stringify(data));
+}
 
 const app            = express();
 app.set('trust proxy', 1); // behind nginx reverse proxy
