@@ -1,86 +1,88 @@
 'use strict';
 
-const fs   = require('fs');
-const path = require('path');
 const crypto = require('crypto');
+const db = require('./db');
 
-const DATA_DIR  = path.join(__dirname, '..', 'data');
-const FILE      = path.join(DATA_DIR, 'admins.json');
-
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(FILE))     fs.writeFileSync(FILE, '[]', 'utf8');
-
-function load() {
-  try { return JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch { return []; }
-}
-function save(list) { fs.writeFileSync(FILE, JSON.stringify(list, null, 2), 'utf8'); }
 function now()      { return new Date().toLocaleString('uk-UA', { timeZone: 'Europe/Kiev' }); }
 function genToken() { return crypto.randomBytes(24).toString('hex'); }
-function nextId(list) { return list.length > 0 ? Math.max(...list.map(a => a.id)) + 1 : 1; }
 
 const ALLOWED_ROLES = ['administrator', 'manager', 'teacher'];
 
+function fromRow(row) {
+  if (!row) return null;
+  const a = {
+    id: row.id, name: row.name, role: row.role, token: row.token,
+    active: !!row.active, createdAt: row.created_at,
+  };
+  if (row.hourly_rate     !== null) a.hourlyRate     = row.hourly_rate;
+  if (row.lesson_duration !== null) a.lessonDuration = row.lesson_duration;
+  if (row.notes           !== null) a.notes          = row.notes;
+  if (row.phone           !== null) a.phone          = row.phone;
+  if (row.payment_type    !== null) a.paymentType    = row.payment_type;
+  if (row.monthly_rate    !== null) a.monthlyRate    = row.monthly_rate;
+  if (row.updated_at      !== null) a.updatedAt      = row.updated_at;
+  return a;
+}
+
+const selAll   = db.prepare('SELECT * FROM admins ORDER BY id ASC');
+const selById  = db.prepare('SELECT * FROM admins WHERE id = ?');
+const selByToken = db.prepare('SELECT * FROM admins WHERE token = ? AND active = 1');
+const insAdmin = db.prepare(`INSERT INTO admins (name, role, token, active, hourly_rate, lesson_duration, notes, phone, created_at)
+  VALUES (@name, @role, @token, 1, @hourly_rate, @lesson_duration, @notes, @phone, @created_at)`);
+const delAdmin = db.prepare('DELETE FROM admins WHERE id = ?');
+
 module.exports = {
   ALLOWED_ROLES,
-  getAll()        { return load(); },
-  getById(id)     { return load().find(a => a.id === id) || null; },
-  findByToken(t)  { return load().find(a => a.token === t && a.active) || null; },
+  getAll()        { return selAll.all().map(fromRow); },
+  getById(id)     { return id != null ? fromRow(selById.get(id)) : null; },
+  findByToken(t)  { return t ? fromRow(selByToken.get(t)) : null; },
 
   create(name, role, extra = {}) {
     const r = ALLOWED_ROLES.includes(role) ? role : 'administrator';
-    const list  = load();
-    const admin = { id: nextId(list), name: String(name).trim(), role: r, token: genToken(), active: true, createdAt: now() };
-    if (extra.hourlyRate     !== undefined) admin.hourlyRate     = parseFloat(extra.hourlyRate)    || 0;
-    if (extra.lessonDuration !== undefined) admin.lessonDuration = parseInt(extra.lessonDuration)  || 60;
-    if (extra.notes !== undefined) admin.notes = String(extra.notes).slice(0, 500);
-    if (extra.phone !== undefined) admin.phone = String(extra.phone).slice(0, 30);
-    list.push(admin);
-    save(list);
-    return admin;
+    const info = insAdmin.run({
+      name: String(name).trim(), role: r, token: genToken(), created_at: now(),
+      hourly_rate: extra.hourlyRate !== undefined ? (parseFloat(extra.hourlyRate) || 0) : null,
+      lesson_duration: extra.lessonDuration !== undefined ? (parseInt(extra.lessonDuration) || 60) : null,
+      notes: extra.notes !== undefined ? String(extra.notes).slice(0, 500) : null,
+      phone: extra.phone !== undefined ? String(extra.phone).slice(0, 30) : null,
+    });
+    return fromRow(selById.get(info.lastInsertRowid));
   },
 
   update(id, patch) {
-    const list = load();
-    const idx  = list.findIndex(a => a.id === id);
-    if (idx === -1) return null;
+    const existing = selById.get(id);
+    if (!existing) return null;
+    const sets = ['updated_at = @updated_at'];
+    const params = { id, updated_at: now() };
     ['name', 'hourlyRate', 'lessonDuration', 'notes', 'phone', 'paymentType', 'monthlyRate'].forEach(k => {
       if (!(k in patch)) return;
-      if (k === 'hourlyRate' || k === 'monthlyRate') list[idx][k] = parseFloat(patch[k]) || 0;
-      else if (k === 'lessonDuration') list[idx][k] = parseInt(patch[k]) || 60;
-      else if (k === 'paymentType')    list[idx][k] = String(patch[k]).slice(0, 20);
-      else                             list[idx][k] = String(patch[k]).slice(0, 500);
+      if (k === 'hourlyRate')       { sets.push('hourly_rate = @hourly_rate'); params.hourly_rate = parseFloat(patch[k]) || 0; }
+      else if (k === 'monthlyRate') { sets.push('monthly_rate = @monthly_rate'); params.monthly_rate = parseFloat(patch[k]) || 0; }
+      else if (k === 'lessonDuration') { sets.push('lesson_duration = @lesson_duration'); params.lesson_duration = parseInt(patch[k]) || 60; }
+      else if (k === 'paymentType') { sets.push('payment_type = @payment_type'); params.payment_type = String(patch[k]).slice(0, 20); }
+      else if (k === 'name')        { sets.push('name = @name'); params.name = String(patch[k]).slice(0, 500); }
+      else if (k === 'notes')       { sets.push('notes = @notes'); params.notes = String(patch[k]).slice(0, 500); }
+      else if (k === 'phone')       { sets.push('phone = @phone'); params.phone = String(patch[k]).slice(0, 500); }
     });
-    list[idx].updatedAt = now();
-    save(list);
-    return list[idx];
+    db.prepare(`UPDATE admins SET ${sets.join(', ')} WHERE id = @id`).run(params);
+    return fromRow(selById.get(id));
   },
 
   regenerateToken(id) {
-    const list  = load();
-    const admin = list.find(a => a.id === id);
-    if (!admin) return null;
-    admin.token    = genToken();
-    admin.active   = true;
-    admin.updatedAt = now();
-    save(list);
-    return admin;
+    const existing = selById.get(id);
+    if (!existing) return null;
+    db.prepare('UPDATE admins SET token = ?, active = 1, updated_at = ? WHERE id = ?').run(genToken(), now(), id);
+    return fromRow(selById.get(id));
   },
 
   revoke(id) {
-    const list  = load();
-    const admin = list.find(a => a.id === id);
-    if (!admin) return null;
-    admin.active = false;
-    save(list);
-    return admin;
+    const existing = selById.get(id);
+    if (!existing) return null;
+    db.prepare('UPDATE admins SET active = 0 WHERE id = ?').run(id);
+    return fromRow(selById.get(id));
   },
 
   delete(id) {
-    const list = load();
-    const idx  = list.findIndex(a => a.id === id);
-    if (idx < 0) return false;
-    list.splice(idx, 1);
-    save(list);
-    return true;
+    return delAdmin.run(id).changes > 0;
   },
 };
