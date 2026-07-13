@@ -22,6 +22,8 @@ const helmet       = require('helmet');
 const rateLimit    = require('express-rate-limit');
 const path         = require('path');
 const fs           = require('fs');
+const sqliteDb       = require('./db');
+require('./migrate-json-to-sqlite').run(); // one-time JSON→SQLite import, no-op after first boot
 const db             = require('./database');
 const adminsDb       = require('./admins');
 const clientsDb      = require('./clients');

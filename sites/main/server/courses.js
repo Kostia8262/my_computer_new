@@ -1,7 +1,6 @@
 'use strict';
 
-const fs   = require('fs');
-const path = require('path');
+const db = require('./db');
 
 const DEFAULT_CURRICULUM = [
   { num: 'Модуль 1', title: 'Вступ та основи',      desc: 'Знайомство з інструментами та середовищем. Перші практичні кроки та базові концепції курсу.' },
@@ -11,78 +10,100 @@ const DEFAULT_CURRICULUM = [
   { num: 'Фінал',    title: 'Підсумковий проект',   desc: 'Учень самостійно розробляє та презентує фінальний проект. Сертифікат про завершення курсу.' },
 ];
 
-const DATA_DIR  = path.join(__dirname, '..', 'data');
-const DATA_FILE = path.join(DATA_DIR, 'courses.json');
-
-if (!fs.existsSync(DATA_DIR))  fs.mkdirSync(DATA_DIR, { recursive: true });
-if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]', 'utf8');
-
-function load() {
-  try { return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); }
-  catch { return []; }
+function fromRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    name: row.name,
+    name_ru: row.name_ru,
+    emoji: row.emoji,
+    age: row.age,
+    age_group: row.age_group,
+    duration: row.duration,
+    lessonsCount: row.lessons_count,
+    groupSize: row.group_size,
+    price: row.price,
+    description: row.description,
+    description_ru: row.description_ru,
+    features: JSON.parse(row.features || '[]'),
+    popular: !!row.popular,
+    color: row.color,
+    active: !!row.active,
+    curriculum: JSON.parse(row.curriculum || '[]'),
+  };
 }
-function save(data) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf8');
-}
+
+const selAll   = db.prepare('SELECT * FROM courses ORDER BY sort_order ASC, rowid ASC');
+const selById  = db.prepare('SELECT * FROM courses WHERE id = ?');
+const selMaxSort = db.prepare('SELECT MAX(sort_order) AS m FROM courses');
+const insCourse = db.prepare(`INSERT INTO courses
+  (id, name, name_ru, emoji, age, age_group, duration, lessons_count, group_size, price, description, description_ru, features, popular, color, active, curriculum, sort_order)
+  VALUES (@id, @name, @name_ru, @emoji, @age, @age_group, @duration, @lessons_count, @group_size, @price, @description, @description_ru, @features, @popular, @color, @active, @curriculum, @sort_order)`);
+const delCourse = db.prepare('DELETE FROM courses WHERE id = ?');
 
 module.exports = {
-  getAll()  { return load(); },
-  getActive() { return load().filter(c => c.active !== false); },
+  getAll()    { return selAll.all().map(fromRow); },
+  getActive() { return selAll.all().map(fromRow).filter(c => c.active !== false); },
 
   create(data) {
-    const courses = load();
     const id = data.id || ('course_' + Date.now());
-    if (courses.find(c => c.id === id)) return null; // duplicate
-    const course = {
+    if (selById.get(id)) return null; // duplicate
+    const maxSort = selMaxSort.get().m;
+    insCourse.run({
       id,
-      name:         data.name        || '',
-      name_ru:      data.name_ru     || '',
-      emoji:        data.emoji       || '📚',
-      age:          data.age         || '',
-      age_group:    data.age_group   || '',
-      duration:     data.duration    || '',
-      lessonsCount: parseInt(data.lessonsCount) || 0,
-      groupSize:    parseInt(data.groupSize)    || 0,
-      price:        parseFloat(data.price)      || 0,
-      description:  data.description || '',
-      description_ru: data.description_ru || '',
-      features:     Array.isArray(data.features) ? data.features : [],
-      popular:      !!data.popular,
-      color:        data.color       || '#6C47FF',
-      active:       data.active !== false,
-      curriculum:   Array.isArray(data.curriculum) && data.curriculum.length > 0
-                      ? data.curriculum
-                      : DEFAULT_CURRICULUM,
-    };
-    courses.push(course);
-    save(courses);
-    return course;
+      name:            data.name        || '',
+      name_ru:         data.name_ru     || '',
+      emoji:           data.emoji       || '📚',
+      age:             data.age         || '',
+      age_group:       data.age_group   || '',
+      duration:        data.duration    || '',
+      lessons_count:   parseInt(data.lessonsCount) || 0,
+      group_size:      parseInt(data.groupSize)    || 0,
+      price:           parseFloat(data.price)      || 0,
+      description:     data.description || '',
+      description_ru:  data.description_ru || '',
+      features:        JSON.stringify(Array.isArray(data.features) ? data.features : []),
+      popular:         data.popular ? 1 : 0,
+      color:           data.color       || '#6C47FF',
+      active:          data.active !== false ? 1 : 0,
+      curriculum:      JSON.stringify(
+        Array.isArray(data.curriculum) && data.curriculum.length > 0 ? data.curriculum : DEFAULT_CURRICULUM
+      ),
+      sort_order: (maxSort ?? -1) + 1,
+    });
+    return fromRow(selById.get(id));
   },
 
   update(id, data) {
-    const courses = load();
-    const idx = courses.findIndex(c => c.id === id);
-    if (idx === -1) return null;
-    const allowed = ['name','name_ru','emoji','age','age_group','duration','lessonsCount','groupSize','price','description','description_ru','features','popular','color','active','curriculum'];
-    const patch = {};
-    allowed.forEach(k => { if (k in data) patch[k] = data[k]; });
-    if ('lessonsCount' in patch) patch.lessonsCount = parseInt(patch.lessonsCount) || 0;
-    if ('groupSize'    in patch) patch.groupSize    = parseInt(patch.groupSize) || 0;
-    if ('price'        in patch) patch.price        = parseFloat(patch.price) || 0;
-    if ('features'     in patch) patch.features     = Array.isArray(patch.features) ? patch.features : [];
-    if ('popular'      in patch) patch.popular      = !!patch.popular;
-    if ('curriculum'   in patch) patch.curriculum   = Array.isArray(patch.curriculum) ? patch.curriculum : [];
-    courses[idx] = { ...courses[idx], ...patch };
-    save(courses);
-    return courses[idx];
+    const existing = selById.get(id);
+    if (!existing) return null;
+    const colMap = {
+      name: 'name', name_ru: 'name_ru', emoji: 'emoji', age: 'age', age_group: 'age_group',
+      duration: 'duration', lessonsCount: 'lessons_count', groupSize: 'group_size', price: 'price',
+      description: 'description', description_ru: 'description_ru', features: 'features',
+      popular: 'popular', color: 'color', active: 'active', curriculum: 'curriculum',
+    };
+    const sets = [];
+    const params = { id };
+    Object.keys(colMap).forEach(k => {
+      if (!(k in data)) return;
+      const col = colMap[k];
+      let val = data[k];
+      if (k === 'lessonsCount' || k === 'groupSize') val = parseInt(val) || 0;
+      else if (k === 'price') val = parseFloat(val) || 0;
+      else if (k === 'features') val = JSON.stringify(Array.isArray(val) ? val : []);
+      else if (k === 'curriculum') val = JSON.stringify(Array.isArray(val) ? val : []);
+      else if (k === 'popular') val = val ? 1 : 0;
+      else if (k === 'active') val = val !== false ? 1 : 0;
+      sets.push(`${col} = @${col}`);
+      params[col] = val;
+    });
+    if (sets.length === 0) return fromRow(existing);
+    db.prepare(`UPDATE courses SET ${sets.join(', ')} WHERE id = @id`).run(params);
+    return fromRow(selById.get(id));
   },
 
   delete(id) {
-    const courses = load();
-    const before = courses.length;
-    const next   = courses.filter(c => c.id !== id);
-    if (next.length === before) return false;
-    save(next);
-    return true;
+    return delCourse.run(id).changes > 0;
   },
 };
