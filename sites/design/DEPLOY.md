@@ -8,7 +8,7 @@ my-computer-academy/
 ├── js/main.js          — фронтенд JS
 ├── server/
 │   ├── server.js       — Express сервер
-│   └── database.js     — SQLite через better-sqlite3
+│   └── db.js           — SQLite через встроенный node:sqlite (Node 26+)
 ├── data/               — создаётся автоматически (leads.db)
 ├── package.json
 ├── .env                — переменные окружения (создай из .env.example)
