@@ -22,6 +22,7 @@ const helmet       = require('helmet');
 const rateLimit    = require('express-rate-limit');
 const path         = require('path');
 const fs           = require('fs');
+const crypto       = require('crypto');
 const sqliteDb       = require('./db');
 require('./migrate-json-to-sqlite').run(); // one-time JSON→SQLite import, no-op after first boot
 const db             = require('./database');
@@ -427,11 +428,21 @@ function validateLead(data) {
   return errors;
 }
 
+// Constant-time token comparison — avoids leaking token length/prefix via
+// response-time differences on a plain === string compare.
+function safeCompare(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
 // Returns 'superadmin' | 'admin' | null
 function getRole(token) {
   if (!token) return null;
-  if (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) return 'superadmin';
-  if (process.env.MAIN_ADMIN_TOKEN && token === process.env.MAIN_ADMIN_TOKEN) return 'superadmin';
+  if (SUPERADMIN_TOKEN && safeCompare(token, SUPERADMIN_TOKEN)) return 'superadmin';
+  if (process.env.MAIN_ADMIN_TOKEN && safeCompare(token, process.env.MAIN_ADMIN_TOKEN)) return 'superadmin';
   if (adminsDb.findByToken(token)) return 'admin';
   return null;
 }
@@ -454,8 +465,8 @@ function requireAdmin(req, res, next) {
 
 function requireSuperAdmin(req, res, next) {
   const token = req.headers['x-admin-token'];
-  const ok = (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) ||
-             (process.env.MAIN_ADMIN_TOKEN && token === process.env.MAIN_ADMIN_TOKEN);
+  const ok = (SUPERADMIN_TOKEN && safeCompare(token, SUPERADMIN_TOKEN)) ||
+             (process.env.MAIN_ADMIN_TOKEN && safeCompare(token, process.env.MAIN_ADMIN_TOKEN));
   if (!ok) {
     return res.status(403).json({ error: 'Forbidden: superadmin only' });
   }
@@ -466,7 +477,7 @@ function requireSuperAdmin(req, res, next) {
 
 function requireNotTeacher(req, res, next) {
   const token = req.headers['x-admin-token'];
-  if (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) return next();
+  if (SUPERADMIN_TOKEN && safeCompare(token, SUPERADMIN_TOKEN)) return next();
   const admin = adminsDb.findByToken(token);
   if (admin && admin.role === 'teacher') {
     return res.status(403).json({ error: 'Forbidden: teacher access restricted' });
@@ -479,7 +490,7 @@ function requireNotTeacher(req, res, next) {
 const TEACHER_ALLOWED = ['/me', '/health', '/attendance', '/clients', '/alerts', '/teachers'];
 app.use('/api', (req, res, next) => {
   const token = req.headers['x-admin-token'];
-  if (!token || (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN)) return next();
+  if (!token || (SUPERADMIN_TOKEN && safeCompare(token, SUPERADMIN_TOKEN))) return next();
   const admin = adminsDb.findByToken(token);
   if (!admin || admin.role !== 'teacher') return next();
   const allowed = TEACHER_ALLOWED.some(p => req.path === p || req.path.startsWith(p + '/') || req.path.startsWith(p + '?'));
@@ -1319,8 +1330,8 @@ app.delete('/api/articles/:id', adminLimiter, requireSuperAdmin, (req, res) => {
 // ── REVIEWS API ───────────────────────────────────────────────────────────────
 app.get('/api/reviews', (req, res) => {
   const token = req.headers['x-admin-token'];
-  const isAdmin = (SUPERADMIN_TOKEN && token === SUPERADMIN_TOKEN) ||
-    (process.env.MAIN_ADMIN_TOKEN && token === process.env.MAIN_ADMIN_TOKEN) || !!adminsDb.findByToken(token);
+  const isAdmin = (SUPERADMIN_TOKEN && safeCompare(token, SUPERADMIN_TOKEN)) ||
+    (process.env.MAIN_ADMIN_TOKEN && safeCompare(token, process.env.MAIN_ADMIN_TOKEN)) || !!adminsDb.findByToken(token);
   const reviews = isAdmin ? reviewsDb.getAll() : reviewsDb.getActive();
   res.json({ success: true, reviews });
 });
