@@ -22,6 +22,8 @@ const helmet       = require('helmet');
 const rateLimit    = require('express-rate-limit');
 const path         = require('path');
 const fs           = require('fs');
+const sqliteDb       = require('./db');
+require('./migrate-json-to-sqlite').run(); // one-time JSON→SQLite import, no-op after first boot
 const db             = require('./database');
 const adminsDb       = require('./admins');
 const clientsDb      = require('./clients');
@@ -35,7 +37,18 @@ const { sendLeadNotification } = require('./mailer');
 const monoPay = require('./mono-pay');
 const wfp     = require('./wayforpay');
 
-const CONTENT_FILE = path.join(__dirname, '..', 'data', 'content.json');
+// Defined here (not further down where they used to live as plain fs
+// functions) because the startup seed IIFE below calls loadContent()/
+// saveContent() before that later point in the file would have run —
+// a const in the temporal dead zone throws if referenced first.
+const selContent = sqliteDb.prepare('SELECT data FROM content_kv WHERE id = 1');
+const upsertContent = sqliteDb.prepare(`INSERT INTO content_kv (id, data) VALUES (1, ?)
+  ON CONFLICT(id) DO UPDATE SET data = excluded.data`);
+function loadContent() {
+  const row = selContent.get();
+  try { return row ? JSON.parse(row.data) : {}; } catch { return {}; }
+}
+function saveContent(data) { upsertContent.run(JSON.stringify(data)); }
 
 // ── CONTENT SEED DATA (matches what's already live in index.html) ────────────
 const CONTENT_SEED = {
@@ -189,11 +202,6 @@ const CONTENT_SEED = {
     }
   } catch(e) { console.warn('Seed warning:', e.message); }
 })();
-
-function loadContent() {
-  try { return JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8')); } catch { return {}; }
-}
-function saveContent(data) { fs.writeFileSync(CONTENT_FILE, JSON.stringify(data, null, 2), 'utf8'); }
 
 const app            = express();
 app.set('trust proxy', 1);
@@ -360,6 +368,16 @@ app.use((req, res, next) => {
     return res.status(404).end();
   }
   next();
+});
+
+// The frontend (js/main.js, article.html, articles/index.html) fetches
+// /data/articles.json directly rather than through an API endpoint — now that
+// articles live in SQLite, that path has to be generated dynamically instead
+// of served as a static file, or it would go stale the moment SQLite took
+// over as the source of truth. Registered before express.static() so it
+// takes precedence over the (now-frozen) file on disk.
+app.get('/data/articles.json', (req, res) => {
+  res.json(articlesDb.getAll());
 });
 
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
