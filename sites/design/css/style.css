@@ -352,7 +352,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .stats__card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r-xl) var(--r-xl) 0 0;opacity:0;transition:opacity .3s}
 .stats__card:nth-child(1)::before{background:linear-gradient(90deg,var(--color-primary),var(--color-primary-mid))}
 .stats__card:nth-child(2)::before{background:linear-gradient(90deg,#3B82F6,#60A5FA)}
-.stats__card:nth-child(3)::before{background:linear-gradient(90deg,#22C55E,#4ADE80)}
+.stats__card:nth-child(3)::before{background:linear-gradient(90deg,var(--color-success),#4ADE80)}
 .stats__card:nth-child(4)::before{background:linear-gradient(90deg,#F59E0B,#FCD34D)}
 .stats__card:hover{background:rgba(var(--color-white-rgb),.07);border-color:rgba(var(--color-white-rgb),.16);transform:translateY(-4px);box-shadow:0 20px 60px rgba(var(--color-black-rgb),.4)}
 .stats__card:hover::before{opacity:1}
@@ -370,7 +370,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .stats__card-desc{font-size:var(--fs-12);color:rgba(var(--color-white-rgb),.4);line-height:var(--lh-relaxed)}
 .stats__card-bar{height:4px;background:rgba(var(--color-white-rgb),.08);border-radius:var(--r-full);overflow:hidden;margin-top:auto}
 .stats__card-bar-fill{height:100%;border-radius:var(--r-full);background:linear-gradient(90deg,var(--color-primary),var(--color-primary-mid))}
-.stats__card-bar-fill--green{background:linear-gradient(90deg,#22C55E,#4ADE80)}
+.stats__card-bar-fill--green{background:linear-gradient(90deg,var(--color-success),#4ADE80)}
 .stats__card-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto}
 .stats__card-tags span{font-size:var(--fs-10);font-weight:var(--fw-semibold);background:rgba(var(--color-primary-rgb),.2);color:var(--color-primary-mid);border:1px solid rgba(var(--color-primary-rgb),.25);padding:3px 9px;border-radius:var(--r-full)}
 .stats__card-stars{display:flex;gap:3px;margin-top:auto}
@@ -959,7 +959,7 @@ body.modal-open{overflow:hidden}
 .pricing-card:hover{transform:translateY(-3px);box-shadow:var(--sh-md)}
 .pricing-card--featured{border-color:var(--color-primary);box-shadow:0 0 0 1px var(--color-primary),var(--sh-md)}
 .pricing-card--featured:hover{box-shadow:0 0 0 1px var(--color-primary),var(--sh-lg)}
-.pricing-card__badge{position:absolute;top:-1px;right:20px;background:#22C55E;color:var(--color-white);font-size:var(--fs-10);font-weight:var(--fw-extrabold);padding:4px 12px;border-radius:0 0 var(--r-sm) var(--r-sm);text-transform:uppercase;letter-spacing:.6px}
+.pricing-card__badge{position:absolute;top:-1px;right:20px;background:var(--color-success);color:var(--color-white);font-size:var(--fs-10);font-weight:var(--fw-extrabold);padding:4px 12px;border-radius:0 0 var(--r-sm) var(--r-sm);text-transform:uppercase;letter-spacing:.6px}
 .pricing-card--featured .pricing-card__badge{background:var(--color-primary)}
 .pricing-card__title{font-size:var(--fs-18);font-weight:var(--fw-extrabold);color:var(--color-text);margin:12px 0 16px;line-height:var(--lh-snug)}
 .pricing-card__features{list-style:none;margin-bottom:20px;flex:1}
@@ -1179,4 +1179,32 @@ body.modal-open{overflow:hidden}
 .h-deco--score-card{
   top:58px;left:12px;
   filter:drop-shadow(0 4px 12px rgba(var(--color-primary-rgb),.08));
+}
+
+/* Floating Telegram widget */
+.tg-widget{
+  position:fixed;bottom:24px;right:24px;width:60px;height:60px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--color-primary),var(--color-primary-mid));
+  color:var(--color-white);border-radius:var(--r-full);
+  box-shadow:0 10px 30px rgba(var(--color-primary-rgb),.4),var(--sh-lg);
+  z-index:var(--z-toast);transition:transform var(--t),box-shadow var(--t);
+}
+.tg-widget:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 14px 36px rgba(var(--color-primary-rgb),.5),var(--sh-xl)}
+.tg-widget:active{transform:translateY(-1px) scale(.98)}
+.tg-widget__ping{
+  position:absolute;inset:0;border-radius:var(--r-full);
+  background:var(--color-primary);opacity:.55;
+  animation:tg-ping 2.4s cubic-bezier(0,0,.2,1) infinite;
+}
+@keyframes tg-ping{
+  0%{transform:scale(1);opacity:.55}
+  75%,100%{transform:scale(1.6);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .tg-widget__ping{animation:none;display:none}
+}
+@media (max-width:640px){
+  .tg-widget{width:52px;height:52px;bottom:16px;right:16px}
+  .tg-widget svg{width:24px;height:24px}
 }

@@ -1265,3 +1265,31 @@ body.modal-open{overflow:hidden}
 .reviews{overflow:visible}
 .faq{content-visibility:auto;contain-intrinsic-size:0 640px}
 .contact{content-visibility:auto;contain-intrinsic-size:0 680px}
+
+/* Floating Telegram widget */
+.tg-widget{
+  position:fixed;bottom:24px;right:24px;width:60px;height:60px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--color-primary),var(--color-primary-mid));
+  color:var(--color-white);border-radius:var(--r-full);
+  box-shadow:0 10px 30px rgba(var(--color-primary-rgb),.4),var(--sh-lg);
+  z-index:var(--z-toast);transition:transform var(--t),box-shadow var(--t);
+}
+.tg-widget:hover{transform:translateY(-3px) scale(1.05);box-shadow:0 14px 36px rgba(var(--color-primary-rgb),.5),var(--sh-xl)}
+.tg-widget:active{transform:translateY(-1px) scale(.98)}
+.tg-widget__ping{
+  position:absolute;inset:0;border-radius:var(--r-full);
+  background:var(--color-primary);opacity:.55;
+  animation:tg-ping 2.4s cubic-bezier(0,0,.2,1) infinite;
+}
+@keyframes tg-ping{
+  0%{transform:scale(1);opacity:.55}
+  75%,100%{transform:scale(1.6);opacity:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .tg-widget__ping{animation:none;display:none}
+}
+@media (max-width:640px){
+  .tg-widget{width:52px;height:52px;bottom:16px;right:16px}
+  .tg-widget svg{width:24px;height:24px}
+}
