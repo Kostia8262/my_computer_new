@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'sites/minecraft/**'
+      - '.github/workflows/deploy-minecraft.yml'
 
 concurrency:
   group: deploy-minecraft

@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'sites/roblox/**'
+      - '.github/workflows/deploy-roblox.yml'
 
 concurrency:
   group: deploy-roblox

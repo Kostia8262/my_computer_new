@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'sites/python/**'
+      - '.github/workflows/deploy-python.yml'
 
 concurrency:
   group: deploy-python

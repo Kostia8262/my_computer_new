@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'sites/webdesign/**'
+      - '.github/workflows/deploy-webdesign.yml'
 
 concurrency:
   group: deploy-webdesign

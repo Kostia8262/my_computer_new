@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'sites/child/**'
+      - '.github/workflows/deploy-child.yml'
 
 concurrency:
   group: deploy-child
