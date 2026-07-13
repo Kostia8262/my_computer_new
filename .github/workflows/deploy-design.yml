@@ -24,7 +24,7 @@ jobs:
       - name: Deploy
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            "cd /var/www/mycomputer-new && git fetch origin master && git reset --hard origin/master && cd sites/design && npm install --production --silent && pm2 restart mycomputer-design && echo Deploy complete"
+            "cd /var/www/mycomputer-new && git fetch origin master && git reset --hard origin/master && cd sites/design && npm install --production --silent && test -f node_modules/better-sqlite3/build/Release/better_sqlite3.node && echo better-sqlite3-binding-OK && pm2 restart mycomputer-design && echo Deploy complete"
 
       - name: Health check
         run: |
