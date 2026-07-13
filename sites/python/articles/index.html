@@ -88,14 +88,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span>My Computer <strong>Academy</strong></span>
     </a>
     <ul class="nav__menu" id="navMenu">
-      <li><a href="/#courses" class="nav__link">Курси</a></li>
-      <li><a href="/#how-it-works" class="nav__link">Як це працює</a></li>
-      <li><a href="/#reviews" class="nav__link">Відгуки</a></li>
-      <li><a href="/#faq" class="nav__link">FAQ</a></li>
+      <li><a href="/#courses" class="nav__link" data-ru="Курсы">Курси</a></li>
+      <li><a href="/#how-it-works" class="nav__link" data-ru="Как это работает">Як це працює</a></li>
+      <li><a href="/#reviews" class="nav__link" data-ru="Отзывы">Відгуки</a></li>
+      <li><a href="/#faq" class="nav__link" data-ru="FAQ">FAQ</a></li>
+      <li class="nav__lang-mobile">
+        <span class="nav__lang-label" data-ru="Язык">Мова</span>
+        <div class="lang-switcher lang-switcher--burger">
+          <button class="lang-btn" data-lang="ua">UA</button>
+          <span class="lang-divider"></span>
+          <button class="lang-btn" data-lang="ru">RU</button>
+        </div>
+      </li>
     </ul>
     <div class="nav__actions">
       <a href="tel:+380954624672" class="nav__phone">+38 (095) 462-46-72</a>
-      <button type="button" class="btn btn--primary btn--sm nav__cta" onclick="openModal()">Записатись</button>
+      <div class="lang-switcher" id="langSwitcher">
+        <button class="lang-btn active" data-lang="ua">UA</button>
+        <span class="lang-divider"></span>
+        <button class="lang-btn" data-lang="ru">RU</button>
+      </div>
+      <button type="button" class="btn btn--primary btn--sm nav__cta" onclick="openModal()" data-ru="Записаться">Записатись</button>
     </div>
     <button class="nav__burger" id="navBurger" aria-label="Меню" aria-expanded="false">
       <span></span><span></span><span></span>
@@ -281,6 +294,42 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script>
 'use strict';
 
+// ── Language (mirrors js/main.js's mechanism, same localStorage key) ──────────
+function detectInitialLang() {
+  const saved = localStorage.getItem('mca-lang');
+  if (saved) return saved;
+  const nav = (navigator.languages?.[0] || navigator.language || 'uk').toLowerCase();
+  return nav.startsWith('ru') ? 'ru' : 'ua';
+}
+let currentLang = detectInitialLang();
+
+function tr(a, field) {
+  if (currentLang === 'ru' && a[field + '_ru']) return a[field + '_ru'];
+  return a[field] || '';
+}
+function cacheUaTexts() {
+  document.querySelectorAll('[data-ru]').forEach(el => {
+    if (!('ua' in el.dataset)) el.dataset.ua = el.textContent.trim();
+  });
+}
+function applyLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('mca-lang', lang);
+  document.documentElement.lang = lang === 'ua' ? 'uk' : 'ru';
+  document.querySelectorAll('[data-ru]').forEach(el => {
+    el.textContent = lang === 'ru' ? el.dataset.ru : el.dataset.ua;
+  });
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+  if (ALL_ARTICLES.length) applyFilters();
+}
+cacheUaTexts();
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.lang-btn');
+  if (btn) applyLang(btn.dataset.lang);
+});
+
 // ── Header scroll ─────────────────────────────────────────────────────────────
 const header = document.getElementById('header');
 window.addEventListener('scroll', () => {
@@ -335,8 +384,14 @@ function countLabel(str) {
   return str === '1 стаття' ? str : (str === '' ? '' : str);
 }
 function pluralArticles(n) {
-  if (n === 0) return 'статей не знайдено';
   const m = n % 10, m100 = n % 100;
+  if (currentLang === 'ru') {
+    if (n === 0) return 'статей не найдено';
+    if (m === 1 && m100 !== 11) return n + ' статья';
+    if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статьи';
+    return n + ' статей';
+  }
+  if (n === 0) return 'статей не знайдено';
   if (m === 1 && m100 !== 11) return n + ' стаття';
   if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статті';
   return n + ' статей';
@@ -360,18 +415,18 @@ function renderCards(list) {
   grid.innerHTML = list.map(a => {
     const lbl = LABEL_MAP[a.coverEmoji] || {label: esc(a.category||'стаття'), cls:''};
     return `
-    <a class="article-card" href="/articles/${esc(a.slug)}" aria-label="${esc(a.title)}">
+    <a class="article-card" href="/articles/${esc(a.slug)}" aria-label="${esc(tr(a,'title'))}">
       <div class="article-card__top">
         <span class="article-card__emoji">${esc(a.coverEmoji||'📄')}</span>
         <span class="article-card__cat ${lbl.cls}">${lbl.label}</span>
       </div>
       <div class="article-card__body">
-        <h2 class="article-card__title">${esc(a.title)}</h2>
-        <p class="article-card__excerpt">${esc(a.excerpt||'')}</p>
+        <h2 class="article-card__title">${esc(tr(a,'title'))}</h2>
+        <p class="article-card__excerpt">${esc(tr(a,'excerpt'))}</p>
       </div>
       <div class="article-card__footer">
         <span class="article-card__date">${formatDate(a.publishedAt)}</span>
-        <span class="article-card__read">Читати →</span>
+        <span class="article-card__read">${currentLang === 'ru' ? 'Читать →' : 'Читати →'}</span>
       </div>
     </a>`;
   }).join('');
@@ -457,6 +512,7 @@ document.getElementById('searchInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') { clearTimeout(searchTimer); applyFilters(); }
 });
 
+applyLang(currentLang);
 init();
 
 // ── Modal ─────────────────────────────────────────────────────────────────────

@@ -56,8 +56,6 @@ CREATE TABLE IF NOT EXISTS admins (
 );
 CREATE INDEX IF NOT EXISTS idx_admins_token ON admins(token);
 
--- No title_ru/excerpt_ru/content_ru here — this landing site is single-language
--- (unlike main/design), matching its current articles.js exactly.
 CREATE TABLE IF NOT EXISTS articles (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,
   slug         TEXT UNIQUE NOT NULL,
@@ -191,5 +189,17 @@ CREATE TABLE IF NOT EXISTS migration_meta (
   value TEXT
 );
 `);
+
+// Adds RU translation columns to an already-existing articles table (this
+// site was single-language at first migration time). SQLite has no
+// "ADD COLUMN IF NOT EXISTS", so each ALTER is wrapped and duplicate-column
+// errors are swallowed — safe to run on every boot.
+for (const col of ['title_ru', 'excerpt_ru', 'content_ru']) {
+  try {
+    db.exec(`ALTER TABLE articles ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`);
+  } catch (e) {
+    if (!/duplicate column/i.test(e.message)) throw e;
+  }
+}
 
 module.exports = db;

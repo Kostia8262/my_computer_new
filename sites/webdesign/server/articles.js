@@ -22,8 +22,11 @@ function fromRow(row) {
     id: row.id,
     slug: row.slug,
     title: row.title,
+    title_ru: row.title_ru,
     excerpt: row.excerpt,
+    excerpt_ru: row.excerpt_ru,
     content: row.content,
+    content_ru: row.content_ru,
     category: row.category,
     coverEmoji: row.cover_emoji,
     author: row.author,
@@ -38,8 +41,8 @@ const selBySlug  = db.prepare('SELECT * FROM articles WHERE slug = ?');
 const selBySlugExcl = db.prepare('SELECT * FROM articles WHERE slug = ? AND id != ?');
 const selMaxSort = db.prepare('SELECT MIN(sort_order) AS m FROM articles');
 const insArticle = db.prepare(`INSERT INTO articles
-  (slug, title, excerpt, content, category, cover_emoji, author, published_at, active, sort_order)
-  VALUES (@slug, @title, @excerpt, @content, @category, @cover_emoji, @author, @published_at, @active, @sort_order)`);
+  (slug, title, title_ru, excerpt, excerpt_ru, content, content_ru, category, cover_emoji, author, published_at, active, sort_order)
+  VALUES (@slug, @title, @title_ru, @excerpt, @excerpt_ru, @content, @content_ru, @category, @cover_emoji, @author, @published_at, @active, @sort_order)`);
 const delArticle = db.prepare('DELETE FROM articles WHERE id = ?');
 
 module.exports = {
@@ -57,8 +60,11 @@ module.exports = {
     const info = insArticle.run({
       slug,
       title:       data.title       || '',
+      title_ru:    data.title_ru    || '',
       excerpt:     data.excerpt     || '',
+      excerpt_ru:  data.excerpt_ru  || '',
       content:     data.content     || '',
+      content_ru:  data.content_ru  || '',
       category:    data.category    || 'навчання',
       cover_emoji: data.coverEmoji  || '📄',
       author:      data.author      || 'My Computer Academy',
@@ -72,9 +78,10 @@ module.exports = {
   update(id, data) {
     const existing = db.prepare('SELECT * FROM articles WHERE id = ?').get(id);
     if (!existing) return null;
-    const allowed = ['title','excerpt','content','category','coverEmoji','author','publishedAt','active','slug'];
+    const allowed = ['title','title_ru','excerpt','excerpt_ru','content','content_ru','category','coverEmoji','author','publishedAt','active','slug'];
     const colMap = {
-      title: 'title', excerpt: 'excerpt', content: 'content', category: 'category', coverEmoji: 'cover_emoji',
+      title: 'title', title_ru: 'title_ru', excerpt: 'excerpt', excerpt_ru: 'excerpt_ru',
+      content: 'content', content_ru: 'content_ru', category: 'category', coverEmoji: 'cover_emoji',
       author: 'author', publishedAt: 'published_at', active: 'active', slug: 'slug',
     };
     const sets = [];
