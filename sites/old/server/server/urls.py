@@ -38,6 +38,7 @@ urlpatterns = [
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     path('health/', health_check),
     path('admin/', admin.site.urls),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     path('', include('main.urls')),
     path('order/', include('orders.urls')),
     path('discounts/', include('discounts.urls')),

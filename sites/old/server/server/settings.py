@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'nested_admin',
     'import_export',
-    'ckeditor',
+    'django_ckeditor_5',
     'recurrence',
 
     'django.contrib.sitemaps',

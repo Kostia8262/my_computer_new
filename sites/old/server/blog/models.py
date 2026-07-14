@@ -1,5 +1,5 @@
 from django.db import models
-from ckeditor.fields import RichTextField
+from django_ckeditor_5.fields import CKEditor5Field
 from main.models import Course
 
 
@@ -15,7 +15,8 @@ class Post(models.Model):
         verbose_name="Описание",
         help_text="Введите краткое описание статьи."
     )
-    rich_content = RichTextField(
+    rich_content = CKEditor5Field(
+        config_name='default',
         verbose_name="Текст статьи",
         help_text="Форматируемый текст статьи."
     )
