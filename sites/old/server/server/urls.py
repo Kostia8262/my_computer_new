@@ -31,10 +31,6 @@ sitemaps = {
 
 def health_check(request):
     connection.cursor().execute("SELECT 1")
-    import sys
-    import django
-    venv_in_path = any('old.mycomputer.education/html/lib' in p for p in sys.path)
-    print(f"[DIAG] django={django.get_version()} django_file={django.__file__} python={sys.executable} venv_in_sys_path={venv_in_path} sys_path={sys.path}", file=sys.stderr)
     return JsonResponse({"status": "ok"})
 
 

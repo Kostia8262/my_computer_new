@@ -102,20 +102,32 @@ jobs:
             ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'ENDSSH' && break
           set -e
           VH=/usr/local/lsws/old.mycomputer.education/html
+          # rsync (run as the deploy user) leaves $VH/server owned by that
+          # user, not nobody:nogroup (who lswsgi actually runs as). Fix this
+          # FIRST, before anything else that could abort the script under
+          # `set -e` and skip it — SQLite's WAL mode needs write access to
+          # this directory itself, not just db.sqlite3, or every view that
+          # touches the DB 500s while health/admin-GET keep working and mask it.
+          chown nobody:nogroup $VH/server
+          chmod 755 $VH/server
+          chown nobody:nogroup $VH/server/db.sqlite3* 2>/dev/null || true
+          chmod 664 $VH/server/db.sqlite3* 2>/dev/null || true
           source $VH/bin/activate
           cd $VH/server
           $VH/bin/python -m pip install -r requirements.txt --quiet
           python manage.py migrate --noinput
           python manage.py collectstatic --noinput
           python manage.py create_sample_posts || true
-          chown nobody:nogroup $VH/server/db.sqlite3* 2>/dev/null || true
-          chmod 664 $VH/server/db.sqlite3* 2>/dev/null || true
-          chown nobody:nogroup $VH/server 2>/dev/null || true
-          chmod 755 $VH/server 2>/dev/null || true
           rm -f /tmp/django_errors.log 2>/dev/null || true
           echo "=== Verifying React build on VPS ==="
           ls -la $VH/client/index.html
           echo "=== Restarting OLS ==="
+          # lswsctrl restart alone can leave old LSAPI worker processes
+          # running alongside the new ones (LSWS round-robins between them),
+          # silently serving stale code until they idle-timeout on their own.
+          # Kill old's workers explicitly first so every request after this
+          # deploy hits freshly-spawned processes running the new code.
+          pkill -9 -f 'lswsgi.*old.mycomputer' || true
           /usr/local/lsws/bin/lswsctrl restart
           echo "Deploy complete: $(date)"
           ENDSSH
