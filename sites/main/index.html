@@ -1539,7 +1539,8 @@
 
   function applyFilter() {
     cards().forEach(function(c) {
-      var show = currentAge === 'all' || c.dataset.age === currentAge || c.dataset.age === 'all';
+      var ages = (c.dataset.age || '').split(',').map(function(a) { return a.trim(); });
+      var show = currentAge === 'all' || ages.indexOf(currentAge) !== -1 || ages.indexOf('all') !== -1;
       c.classList.toggle('course-card--hidden', !show);
     });
     var g = grid();

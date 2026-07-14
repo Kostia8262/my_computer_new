@@ -575,14 +575,12 @@ tr:hover td{background:#faf9ff}
           <div class="modal-group"><label class="modal-label">Emoji</label><input class="modal-input" id="crs_emoji" placeholder="🧩" style="font-size:20px"/></div>
           <div class="modal-group full"><label class="modal-label">Назва курсу *</label><input class="modal-input" id="crs_name" placeholder="Scratch: візуальне програмування"/></div>
           <div class="modal-group"><label class="modal-label">Вік (текст)</label><input class="modal-input" id="crs_age" placeholder="6–10 років"/></div>
-          <div class="modal-group"><label class="modal-label">Вікова група (фільтр)</label>
-            <select class="modal-input" id="crs_age_group">
-              <option value="">— не вказано —</option>
-              <option value="6-10">6–10 років</option>
-              <option value="10-14">10–14 років</option>
-              <option value="14-18">14–18 років</option>
-              <option value="all">6–18 років (всі вікові групи)</option>
-            </select>
+          <div class="modal-group full"><label class="modal-label">Вікові групи (фільтр) <span style="font-weight:400;opacity:.6">(можна обрати декілька — курс з'явиться на кожній обраній вкладці)</span></label>
+            <div id="crs_age_group_boxes" style="display:flex;gap:16px;flex-wrap:wrap;padding:8px 0">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400"><input type="checkbox" class="crs-age-box" value="6-10" style="width:16px;height:16px;accent-color:#6C47FF;cursor:pointer"/> 6–10 років</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400"><input type="checkbox" class="crs-age-box" value="10-14" style="width:16px;height:16px;accent-color:#6C47FF;cursor:pointer"/> 10–14 років</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400"><input type="checkbox" class="crs-age-box" value="14-18" style="width:16px;height:16px;accent-color:#6C47FF;cursor:pointer"/> 14–18 років</label>
+            </div>
           </div>
           <div class="modal-group"><label class="modal-label">Тривалість</label><input class="modal-input" id="crs_duration" placeholder="3 місяці"/></div>
           <div class="modal-group"><label class="modal-label">К-сть занять</label><input class="modal-input" type="number" id="crs_lessonsCount" placeholder="24"/></div>
@@ -3234,7 +3232,7 @@ function openCourseModal(id) {
   fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el) el.value = ''; });
   document.getElementById('crs_color').value    = '#6C47FF';
   document.getElementById('crs_active').value   = 'true';
-  document.getElementById('crs_age_group').value = '';
+  document.querySelectorAll('.crs-age-box').forEach(b => b.checked = false);
   document.getElementById('crs_features').value  = '';
   document.getElementById('courseModalTitle').textContent = id ? 'Редагувати курс' : 'Новий курс';
   document.getElementById('crs_id').disabled = !!id;
@@ -3244,7 +3242,8 @@ function openCourseModal(id) {
       fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el && c[f] != null) el.value = c[f]; });
       document.getElementById('crs_color').value     = c.color     || '#6C47FF';
       document.getElementById('crs_active').value    = String(c.active !== false);
-      document.getElementById('crs_age_group').value = c.age_group || '';
+      const selectedAges = (c.age_group || '').split(',').map(s => s.trim()).filter(Boolean);
+      document.querySelectorAll('.crs-age-box').forEach(b => b.checked = selectedAges.includes(b.value));
       if (Array.isArray(c.features)) {
         document.getElementById('crs_features').value = c.features.map(f => typeof f === 'string' ? f : (f.ua || '')).join('\n');
       }
@@ -3265,7 +3264,7 @@ async function saveCourse() {
     name,
     emoji:        document.getElementById('crs_emoji')?.value.trim()        || '📚',
     age:          document.getElementById('crs_age')?.value.trim()          || '',
-    age_group:    document.getElementById('crs_age_group')?.value           || '',
+    age_group:    Array.from(document.querySelectorAll('.crs-age-box:checked')).map(b => b.value).join(','),
     duration:     document.getElementById('crs_duration')?.value.trim()     || '',
     lessonsCount: document.getElementById('crs_lessonsCount')?.value        || 0,
     groupSize:    document.getElementById('crs_groupSize')?.value           || 0,

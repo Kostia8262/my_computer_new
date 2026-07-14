@@ -426,9 +426,10 @@ async function loadCourses() {
     if (!res.ok) return;
     const { courses } = await res.json();
     const AGE_ORDER = { '6-10': 0, '10-14': 1, '14-18': 2 };
+    const firstAge  = g => (g || '').split(',')[0].trim();
     const active = (courses || [])
       .filter(c => c.active !== false)
-      .sort((a, b) => (AGE_ORDER[a.age_group] ?? 99) - (AGE_ORDER[b.age_group] ?? 99));
+      .sort((a, b) => (AGE_ORDER[firstAge(a.age_group)] ?? 99) - (AGE_ORDER[firstAge(b.age_group)] ?? 99));
     if (!active.length) return;
     const el = document.getElementById('coursesGrid');
     if (!el) return;
