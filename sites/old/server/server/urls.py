@@ -31,6 +31,9 @@ sitemaps = {
 
 def health_check(request):
     connection.cursor().execute("SELECT 1")
+    import sys
+    import django
+    print(f"[DIAG] django={django.get_version()} django_file={django.__file__} python={sys.executable}", file=sys.stderr)
     return JsonResponse({"status": "ok"})
 
 
