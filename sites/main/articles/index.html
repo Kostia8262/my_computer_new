@@ -314,28 +314,19 @@ burger.addEventListener('click', () => {
 });
 
 // ── Label map ────────────────────────────────────────────────────────────────
-const LABEL_MAP = {
-  '🐍': {label:'Python',            cls:'cat-python',  cat:'Python'},
-  '🧩': {label:'Scratch',           cls:'cat-scratch', cat:'Scratch'},
-  '🎮': {label:'Roblox',            cls:'cat-roblox',  cat:'Roblox'},
-  '🌐': {label:'Веб-розробка',      cls:'cat-web',     cat:'Веб'},
-  '💡': {label:'Для батьків',       cls:'cat-parents', cat:'Батькам'},
-  '🧮': {label:'Математика і код',  cls:'cat-parents', cat:'Батькам'},
-  '🎯': {label:'Вибір курсу',       cls:'cat-tips',    cat:'Поради'},
-  '🔀': {label:'Scratch vs Python', cls:'cat-tips',    cat:'Поради'},
-  '💪': {label:'Мотивація',         cls:'cat-parents', cat:'Батькам'},
-  '🖥': {label:'Формат навчання',   cls:'cat-tips',    cat:'Поради'},
-  '💬': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '📁': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '💻': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '🧹': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '🔒': {label:'Гайди',             cls:'cat-guide',   cat:'Гайди'},
-  '📖': {label:'Словник',           cls:'cat-dict',    cat:'Словник'},
-  '🎨': {label:'Дизайн',            cls:'cat-design',  cat:'Дизайн'},
-  '🎭': {label:'Дизайн',            cls:'cat-design',  cat:'Дизайн'},
-  '🧭': {label:'Дизайн',            cls:'cat-design',  cat:'Дизайн'},
-  '🤖': {label:'Дизайн',            cls:'cat-design',  cat:'Дизайн'},
+// Keyed by the article's own `category` field (not coverEmoji — several
+// categories now share the same emoji, e.g. 🎯/🎮/💻 each appear on two
+// different categories, which made emoji-keyed lookup mislabel articles).
+const CATEGORY_MAP = {
+  'для батьків':    {label:'Для батьків',    cls:'cat-parents', cat:'Для батьків'},
+  'поради батькам': {label:'Поради батькам', cls:'cat-parents', cat:'Поради батькам'},
+  'курси':          {label:'Курси',          cls:'cat-tips',    cat:'Курси'},
+  'вибір курсу':    {label:'Вибір курсу',    cls:'cat-tips',    cat:'Вибір курсу'},
+  'гайди':          {label:'Гайди',          cls:'cat-guide',   cat:'Гайди'},
+  'словник':        {label:'Словник',        cls:'cat-dict',    cat:'Словник'},
+  'дизайн':         {label:'Дизайн',         cls:'cat-design',  cat:'Дизайн'},
 };
+function categoryLabel(a) { return CATEGORY_MAP[(a.category||'').trim().toLowerCase()]; }
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let ALL_ARTICLES = [];
@@ -373,7 +364,7 @@ function renderCards(list) {
   empty.style.display = 'none';
 
   grid.innerHTML = list.map(a => {
-    const lbl = LABEL_MAP[a.coverEmoji] || {label: esc(a.category||'стаття'), cls:''};
+    const lbl = categoryLabel(a) || {label: esc(a.category||'стаття'), cls:''};
     return `
     <a class="article-card" href="/articles/${esc(a.slug)}" aria-label="${esc(a.title)}">
       <div class="article-card__top">
@@ -399,7 +390,7 @@ function applyFilters() {
 
   if (activeFilter) {
     list = list.filter(a => {
-      const lbl = LABEL_MAP[a.coverEmoji];
+      const lbl = categoryLabel(a);
       return lbl && lbl.cat === activeFilter;
     });
   }
@@ -425,7 +416,7 @@ function buildFilters(articles) {
   const seen = new Set();
   const cats = [];
   articles.forEach(a => {
-    const lbl = LABEL_MAP[a.coverEmoji];
+    const lbl = categoryLabel(a);
     if (lbl && lbl.cat && !seen.has(lbl.cat)) {
       seen.add(lbl.cat);
       cats.push({cat: lbl.cat, emoji: a.coverEmoji});

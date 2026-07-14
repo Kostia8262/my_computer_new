@@ -613,9 +613,9 @@ async function loadArticles() {
     const active = (articles || []).filter(a => a.active !== false).slice(0, 6);
     if (!active.length) { document.getElementById('articles')?.style.setProperty('display','none'); return; }
 
-    const LABEL_MAP = {'💡':{label:'Для батьків',cls:'cat-parents'},'🎮':{label:'Для дітей',cls:'cat-kids'},'🚀':{label:'Навчання',cls:'cat-learning'},'💻':{label:'Технології',cls:'cat-tech'},'🏆':{label:'Проєкти',cls:'cat-projects'},'🌐':{label:'Веб',cls:'cat-web'}};
+    const CATEGORY_MAP = {'для батьків':{label:'Для батьків',cls:'cat-parents'},'поради батькам':{label:'Поради батькам',cls:'cat-parents'},'курси':{label:'Курси',cls:'cat-tips'},'вибір курсу':{label:'Вибір курсу',cls:'cat-tips'},'гайди':{label:'Гайди',cls:'cat-guide'},'словник':{label:'Словник',cls:'cat-dict'},'дизайн':{label:'Дизайн',cls:'cat-design'}};
     slider.innerHTML = active.map(a => {
-      const lbl = LABEL_MAP[a.coverEmoji] || {label: esc(a.category||''), cls:''};
+      const lbl = CATEGORY_MAP[(a.category||'').trim().toLowerCase()] || {label: esc(a.category||''), cls:''};
       return `
       <a class="article-card" href="/articles/${a.slug}" aria-label="${esc(a.title)}">
         <div class="article-card__top">

@@ -524,29 +524,18 @@ app.get(['/', '/index.html'], (req, res) => {
 
 // ── ARTICLES LISTING LANGUAGE SSR ─────────────────────────────────────────────
 const ARTICLES_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
-// Mirrors articles/index.html's client-side LABEL_MAP so server-rendered
-// cards match what the JS re-renders on top of them.
-const ARTICLE_LABEL_MAP = {
-  '🐍': { label: 'Python',            cls: 'cat-python'  },
-  '🧩': { label: 'Scratch',           cls: 'cat-scratch' },
-  '🎮': { label: 'Roblox',            cls: 'cat-roblox'  },
-  '🌐': { label: 'Веб-розробка',      cls: 'cat-web'     },
-  '💡': { label: 'Для батьків',       cls: 'cat-parents' },
-  '🧮': { label: 'Математика і код',  cls: 'cat-parents' },
-  '🎯': { label: 'Вибір курсу',       cls: 'cat-tips'    },
-  '🔀': { label: 'Scratch vs Python', cls: 'cat-tips'    },
-  '💪': { label: 'Мотивація',         cls: 'cat-parents' },
-  '🖥': { label: 'Формат навчання',   cls: 'cat-tips'    },
-  '💬': { label: 'Гайди',             cls: 'cat-guide'   },
-  '📁': { label: 'Гайди',             cls: 'cat-guide'   },
-  '💻': { label: 'Гайди',             cls: 'cat-guide'   },
-  '🧹': { label: 'Гайди',             cls: 'cat-guide'   },
-  '🔒': { label: 'Гайди',             cls: 'cat-guide'   },
-  '📖': { label: 'Словник',           cls: 'cat-dict'    },
-  '🎨': { label: 'Дизайн',            cls: 'cat-design'  },
-  '🎭': { label: 'Дизайн',            cls: 'cat-design'  },
-  '🧭': { label: 'Дизайн',            cls: 'cat-design'  },
-  '🤖': { label: 'Дизайн',            cls: 'cat-design'  },
+// Mirrors articles/index.html's client-side CATEGORY_MAP so server-rendered
+// cards match what the JS re-renders on top of them. Keyed by the article's
+// own `category` field (not coverEmoji — several categories now share the
+// same emoji, which made emoji-keyed lookup mislabel articles).
+const ARTICLE_CATEGORY_MAP = {
+  'для батьків':    { label: 'Для батьків',    cls: 'cat-parents' },
+  'поради батькам': { label: 'Поради батькам', cls: 'cat-parents' },
+  'курси':          { label: 'Курси',          cls: 'cat-tips'    },
+  'вибір курсу':    { label: 'Вибір курсу',    cls: 'cat-tips'    },
+  'гайди':          { label: 'Гайди',          cls: 'cat-guide'   },
+  'словник':        { label: 'Словник',        cls: 'cat-dict'    },
+  'дизайн':         { label: 'Дизайн',         cls: 'cat-design'  },
 };
 function pluralArticlesRu(n) {
   if (n === 0) return 'статей не знайдено';
@@ -571,7 +560,7 @@ app.get('/articles', (req, res) => {
   const cardsHtml = activeArticles.map(a => {
     const title = (isRu && a.title_ru) || a.title;
     const excerpt = (isRu && a.excerpt_ru) || a.excerpt;
-    const lbl = ARTICLE_LABEL_MAP[a.coverEmoji] || { label: escHtml(a.category || 'стаття'), cls: '' };
+    const lbl = ARTICLE_CATEGORY_MAP[(a.category || '').trim().toLowerCase()] || { label: escHtml(a.category || 'стаття'), cls: '' };
     const dateStr = a.publishedAt
       ? new Date(a.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
       : '';
