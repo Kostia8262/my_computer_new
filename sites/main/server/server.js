@@ -743,6 +743,16 @@ app.use((req, res, next) => {
   next();
 });
 
+// The frontend (js/main.js, article.html, articles/index.html) fetches
+// /data/articles.json directly rather than through an API endpoint — now that
+// articles live in SQLite, that path has to be generated dynamically instead
+// of served as a static file, or it would go stale the moment SQLite took
+// over as the source of truth. Registered before express.static() so it
+// takes precedence over the (now-frozen) file on disk.
+app.get('/data/articles.json', (req, res) => {
+  res.json(articlesDb.getAll());
+});
+
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,
