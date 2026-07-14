@@ -104,7 +104,7 @@ jobs:
           VH=/usr/local/lsws/old.mycomputer.education/html
           source $VH/bin/activate
           cd $VH/server
-          pip install -r requirements.txt --quiet
+          $VH/bin/python -m pip install -r requirements.txt --quiet
           python manage.py migrate --noinput
           python manage.py collectstatic --noinput
           python manage.py create_sample_posts || true
