@@ -437,7 +437,7 @@ async function loadCourses() {
       roblox:   'course-card__header--roblox',   web:       'course-card__header--web',
       construct:'course-card__header--construct', graphic:   'course-card__header--graphic',
       pc:       'course-card__header--pc',        blog:      'course-card__header--blog',
-      minecraft:'course-card__header--minecraft',
+      minecraft:'course-card__header--minecraft', 'ui-ux':   'course-card__header--ui-ux',
     };
     el.innerHTML = active.map(c => {
       const hClass   = COLOR_CLASS[c.id] || '';

@@ -39,6 +39,7 @@ const COURSE_NAMES = {
   python:  'Python (10–14 років)',
   roblox:  'Roblox (9–14 років)',
   web:     'Веб-розробка (12–16 років)',
+  'ui-ux': 'UI/UX дизайн у Figma (12–18 років)',
   help:    'Допоможіть обрати',
 };
 
