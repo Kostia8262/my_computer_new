@@ -47,6 +47,7 @@ a{color:#6C47FF;text-decoration:none}
 .search:focus{border-color:#6C47FF}
 .filter-select{padding:9px 12px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:13px;outline:none;background:#fff;cursor:pointer}
 .filter-select:focus{border-color:#6C47FF}
+select.filter-select,select.modal-input{padding-right:30px}
 
 /* TABLE */
 .table-wrap{background:#fff;border-radius:12px;border:1px solid #e8e4ff;overflow:auto}
@@ -194,14 +195,14 @@ tr:hover td{background:#faf9ff}
 .att-drop-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 /* Schedule pickers in client modal */
 .sched-row{display:flex;gap:8px;margin-bottom:6px}
-.sched-row select{flex:1;padding:7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff}
+.sched-row select{flex:1;padding:7px 28px 7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff}
 .sched-row select:focus{outline:none;border-color:#6C47FF}
 /* Schedule quick-edit popup */
 .sched-popup{position:fixed;z-index:9999;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(108,71,255,.18);border:1px solid #e8e4ff;padding:16px;min-width:260px}
 .sched-popup h5{font-size:13px;font-weight:700;margin-bottom:10px;color:#333}
 .sched-popup-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
 .sched-popup-row label{font-size:11px;color:#888;min-width:40px}
-.sched-popup-row select{flex:1;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px}
+.sched-popup-row select{flex:1;padding:5px 24px 5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px}
 .sched-popup-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;border-top:1px solid #f0eeff;padding-top:10px}
 
 /* PAYMENTS SUB-TAB */
@@ -397,25 +398,9 @@ tr:hover td{background:#faf9ff}
   <div class="main">
     <!-- ADMINS TAB (superadmin only) -->
     <div id="adminsTab" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
         <h2 style="font-size:18px;font-weight:800">👥 Співробітники</h2>
         <button class="btn btn-primary btn-sm" onclick="showCreateAdminForm()">+ Додати співробітника</button>
-      </div>
-      <div id="adminsStats" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"></div>
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
-        <input id="adminsSearch" class="search" placeholder="🔍 Пошук за ім'ям..." style="flex:1;min-width:180px;margin:0" oninput="filterAdminsTable()"/>
-        <select id="adminsRoleFilter" class="filter-select" onchange="filterAdminsTable()">
-          <option value="">Всі ролі</option>
-          <option value="superadmin">⭐ Суперадмін</option>
-          <option value="administrator">👔 Адміністратор</option>
-          <option value="manager">📋 Менеджер</option>
-          <option value="teacher">📚 Викладач</option>
-        </select>
-        <select id="adminsStatusFilter" class="filter-select" onchange="filterAdminsTable()">
-          <option value="">Всі статуси</option>
-          <option value="active">Активні</option>
-          <option value="revoked">Відкликані</option>
-        </select>
       </div>
       <div id="createAdminForm" style="display:none;background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:20px;margin-bottom:20px">
         <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
@@ -446,10 +431,10 @@ tr:hover td{background:#faf9ff}
         <table style="width:100%;border-collapse:collapse;font-size:14px">
           <thead><tr>
             <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Ім'я</th>
-            <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff;cursor:pointer;user-select:none" onclick="toggleAdminsSort('role')">Роль <span id="adminsSortRole"></span></th>
+            <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Роль</th>
             <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Токен</th>
             <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Статус</th>
-            <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff;cursor:pointer;user-select:none" onclick="toggleAdminsSort('createdAt')">Створено <span id="adminsSortCreatedAt"></span></th>
+            <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Створено</th>
             <th style="padding:12px 14px;border-bottom:1px solid #f0eeff"></th>
           </tr></thead>
           <tbody id="adminsBody"></tbody>
@@ -1806,109 +1791,45 @@ async function createAdmin() {
   } catch { showToast('Помилка сервера', 'error'); }
 }
 
-let _allAdmins    = null;
-let _teachingToday = {};
-let _adminsSort   = { field: null, dir: 'asc' };
-
 async function renderAdmins() {
   try {
-    const [adminsRes, todayRes] = await Promise.all([
-      fetch('/api/admins', { headers: { 'x-admin-token': token } }),
-      currentRole === 'superadmin' ? fetch('/api/admins/teaching-today', { headers: { 'x-admin-token': token } }) : Promise.resolve(null),
-    ]);
-    if (!adminsRes.ok) { showToast('Помилка завантаження', 'error'); return; }
-    const data = await adminsRes.json();
-    _allAdmins = data.admins || [];
-    _teachingToday = todayRes && todayRes.ok ? (await todayRes.json()).byTeacher || {} : {};
-    filterAdminsTable();
+    const res  = await fetch('/api/admins', { headers: { 'x-admin-token': token } });
+    if (!res.ok) { showToast('Помилка завантаження', 'error'); return; }
+    const data = await res.json();
+    const list = data.admins || [];
+    const tbody = document.getElementById('adminsBody');
+    if (!list.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:40px 20px">Адмінів поки немає. Натисніть «+ Додати адміна».</div></td></tr>`;
+      return;
+    }
+    tbody.innerHTML = list.map(a => {
+      const roleLbl = ROLE_LABELS[a.role] || a.role || '—';
+      const roleBg  = ROLE_COLORS[a.role]      || '#f0eeff';
+      const roleClr = ROLE_TEXT_COLORS[a.role] || '#6C47FF';
+      const nameCell = currentRole === 'superadmin'
+        ? `<button style="background:none;border:none;cursor:pointer;font-weight:600;color:#6C47FF;font-size:14px;text-decoration:underline;padding:0" onclick="openStaffProfile(${a.id})" title="Особова справа">${esc(a.name)}</button>`
+        : `<span style="font-weight:600">${esc(a.name)}</span>`;
+      const tokenDisplay = a.active
+        ? `<code style="font-size:11px;background:#f0eeff;padding:2px 8px;border-radius:4px;word-break:break-all;user-select:all">${esc(a.token)}</code>
+           <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="copyToken('${esc(a.token)}')">📋</button>`
+        : `<span style="color:#aaa;font-size:12px">—</span>`;
+      return `<tr>
+        <td>${nameCell}</td>
+        <td><span style="display:inline-block;background:${roleBg};color:${roleClr};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${roleLbl}</span></td>
+        <td>${tokenDisplay}</td>
+        <td>${a.active
+          ? '<span class="badge badge-enrolled">Активний</span>'
+          : '<span class="badge badge-rejected">Відкликано</span>'}</td>
+        <td style="color:#aaa;font-size:12px;white-space:nowrap">${esc(a.createdAt)}</td>
+        <td>
+          <div style="display:flex;gap:6px;white-space:nowrap;flex-wrap:wrap">
+            ${a.active ? `<button class="btn btn-ghost btn-sm" onclick="revokeAdmin(${a.id})">🔒 Відкликати</button>` : `<button class="btn btn-primary btn-sm" onclick="regenerateAdminToken(${a.id})">🔄 Відновити токен</button>`}
+            <button class="btn btn-danger btn-sm" onclick="deleteAdminUser(${a.id})">✕ Видалити</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
   } catch { showToast('Помилка завантаження адмінів', 'error'); }
-}
-
-function toggleAdminsSort(field) {
-  if (_adminsSort.field === field) {
-    _adminsSort.dir = _adminsSort.dir === 'asc' ? 'desc' : 'asc';
-  } else {
-    _adminsSort = { field, dir: 'asc' };
-  }
-  filterAdminsTable();
-}
-
-function renderAdminsStats(list) {
-  const total   = list.length;
-  const teachers = list.filter(a => a.role === 'teacher' && a.active).length;
-  const probation = list.filter(a => a.employmentType === 'probation').length;
-  const pill = (label, value, color) => `<div style="background:#fff;border:1px solid #e8e4ff;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">
-    <span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${label}: <strong style="color:#333">${value}</strong>
-  </div>`;
-  document.getElementById('adminsStats').innerHTML =
-    pill('Всього', total, '#6C47FF') +
-    pill('Активних викладачів', teachers, '#22c55e') +
-    (probation ? pill('На випробувальному', probation, '#f59e0b') : '');
-}
-
-function filterAdminsTable() {
-  if (!_allAdmins) return;
-  const q      = (document.getElementById('adminsSearch')?.value  || '').trim().toLowerCase();
-  const roleF  = document.getElementById('adminsRoleFilter')?.value   || '';
-  const statusF = document.getElementById('adminsStatusFilter')?.value || '';
-
-  renderAdminsStats(_allAdmins);
-
-  let list = _allAdmins.filter(a => {
-    if (q && !a.name.toLowerCase().includes(q)) return false;
-    if (roleF && a.role !== roleF) return false;
-    if (statusF === 'active'  && !a.active) return false;
-    if (statusF === 'revoked' && a.active)  return false;
-    return true;
-  });
-
-  if (_adminsSort.field) {
-    const { field, dir } = _adminsSort;
-    list = list.slice().sort((a, b) => {
-      const av = (a[field] || ''), bv = (b[field] || '');
-      const cmp = String(av).localeCompare(String(bv));
-      return dir === 'asc' ? cmp : -cmp;
-    });
-  }
-  document.getElementById('adminsSortRole').textContent      = _adminsSort.field === 'role'      ? (_adminsSort.dir === 'asc' ? '▲' : '▼') : '';
-  document.getElementById('adminsSortCreatedAt').textContent = _adminsSort.field === 'createdAt' ? (_adminsSort.dir === 'asc' ? '▲' : '▼') : '';
-
-  const tbody = document.getElementById('adminsBody');
-  if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:40px 20px">${_allAdmins.length ? 'Нічого не знайдено.' : 'Адмінів поки немає. Натисніть «+ Додати адміна».'}</div></td></tr>`;
-    return;
-  }
-  tbody.innerHTML = list.map(a => {
-    const roleLbl = ROLE_LABELS[a.role] || a.role || '—';
-    const roleBg  = ROLE_COLORS[a.role]      || '#f0eeff';
-    const roleClr = ROLE_TEXT_COLORS[a.role] || '#6C47FF';
-    const todayLessons = _teachingToday[a.name] || [];
-    const todayBadge = todayLessons.length
-      ? ` <span title="${todayLessons.map(l => l.time + ' ' + esc(l.clientName)).join(', ')}" style="display:inline-block;background:#e8fff2;color:#15803d;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;white-space:nowrap">📅 ${todayLessons.length} сьогодні</span>`
-      : '';
-    const nameCell = currentRole === 'superadmin'
-      ? `<button style="background:none;border:none;cursor:pointer;font-weight:600;color:#6C47FF;font-size:14px;text-decoration:underline;padding:0" onclick="openStaffProfile(${a.id})" title="Особова справа">${esc(a.name)}</button>${todayBadge}`
-      : `<span style="font-weight:600">${esc(a.name)}</span>${todayBadge}`;
-    const tokenDisplay = a.active
-      ? `<code style="font-size:11px;background:#f0eeff;padding:2px 8px;border-radius:4px;word-break:break-all;user-select:all">${esc(a.token)}</code>
-         <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="copyToken('${esc(a.token)}')">📋</button>`
-      : `<span style="color:#aaa;font-size:12px">—</span>`;
-    return `<tr>
-      <td>${nameCell}</td>
-      <td><span style="display:inline-block;background:${roleBg};color:${roleClr};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${roleLbl}</span></td>
-      <td>${tokenDisplay}</td>
-      <td>${a.active
-        ? '<span class="badge badge-enrolled">Активний</span>'
-        : '<span class="badge badge-rejected">Відкликано</span>'}</td>
-      <td style="color:#aaa;font-size:12px;white-space:nowrap">${esc(a.createdAt)}</td>
-      <td>
-        <div style="display:flex;gap:6px;white-space:nowrap;flex-wrap:wrap">
-          ${a.active ? `<button class="btn btn-ghost btn-sm" onclick="revokeAdmin(${a.id})">🔒 Відкликати</button>` : `<button class="btn btn-primary btn-sm" onclick="regenerateAdminToken(${a.id})">🔄 Відновити токен</button>`}
-          <button class="btn btn-danger btn-sm" onclick="deleteAdminUser(${a.id})">✕ Видалити</button>
-        </div>
-      </td>
-    </tr>`;
-  }).join('');
 }
 
 async function revokeAdmin(id) {
