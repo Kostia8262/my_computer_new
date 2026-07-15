@@ -726,8 +726,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
         <h2 style="font-size:18px;font-weight:800">🔲 Модулі сайту</h2>
         <button class="btn btn-primary btn-sm" onclick="saveModuleVisibility()">💾 Зберегти</button>
       </div>
-      <div style="background:#fff;border-radius:14px;border:1px solid #e8e4ff;padding:24px;max-width:560px">
-        <p style="font-size:13px;color:#888;margin-bottom:20px">Вимкнені блоки не будуть відображатися на головній сторінці.</p>
+      <div style="background:var(--c-surface);border-radius:var(--r-xl);border:1px solid var(--c-border);padding:24px;max-width:560px">
+        <p style="font-size:13px;color:var(--c-gray-500);margin-bottom:20px">Вимкнені блоки не будуть відображатися на головній сторінці.</p>
         <div id="moduleVisibilityList"></div>
       </div>
     </div>
@@ -3716,20 +3716,20 @@ function renderCurriculumContent(courseId) {
   }
   el.innerHTML = `
     <div class="table-wrap">
-      <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <table>
         <thead><tr>
-          <th style="padding:10px 14px;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff;width:120px">Номер</th>
-          <th style="padding:10px 14px;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Назва</th>
-          <th style="padding:10px 14px;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Опис</th>
-          <th style="padding:10px 14px;border-bottom:1px solid #f0eeff;width:100px"></th>
+          <th style="width:120px">Номер</th>
+          <th>Назва</th>
+          <th>Опис</th>
+          <th style="width:100px"></th>
         </tr></thead>
         <tbody>
           ${modules.map((m, i) => `
             <tr>
-              <td style="padding:10px 14px;font-weight:700;color:#6C47FF;font-size:12px;vertical-align:top">${esc(m.num || '')}</td>
-              <td style="padding:10px 14px;font-weight:600;vertical-align:top">${esc(m.title || '')}</td>
-              <td style="padding:10px 14px;font-size:13px;color:#666;vertical-align:top;line-height:1.5">${esc(m.desc || '')}</td>
-              <td style="padding:10px 14px;vertical-align:top">
+              <td style="font-weight:700;color:var(--c-brand-500);font-size:12px;vertical-align:top">${esc(m.num || '')}</td>
+              <td style="font-weight:600;vertical-align:top">${esc(m.title || '')}</td>
+              <td style="font-size:13px;color:var(--c-ink-soft);vertical-align:top;line-height:1.5">${esc(m.desc || '')}</td>
+              <td style="vertical-align:top">
                 <div style="display:flex;gap:6px">
                   <button class="btn btn-ghost btn-sm" onclick="openEditModuleModal(${i})">✏️</button>
                   <button class="btn btn-danger btn-sm" onclick="deleteModule(${i})">✕</button>
@@ -3844,8 +3844,8 @@ function renderModulesList() {
   if (!el) return;
   el.innerHTML = SITE_SECTIONS.map(s => {
     const checked = _modulesVisibility[s.key] !== false;
-    return `<label style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0eeff;cursor:pointer;font-size:14px;font-weight:600">
-      <input type="checkbox" id="modvis_${s.key}" ${checked ? 'checked' : ''} style="width:18px;height:18px;accent-color:#6C47FF;cursor:pointer"/>
+    return `<label style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--c-border-soft);cursor:pointer;font-size:14px;font-weight:600">
+      <input type="checkbox" id="modvis_${s.key}" ${checked ? 'checked' : ''} style="width:18px;height:18px;accent-color:var(--c-brand-500);cursor:pointer"/>
       <span>${s.label}</span>
     </label>`;
   }).join('');
@@ -3891,13 +3891,13 @@ function renderArticlesTable() {
   }
   tbody.innerHTML = _articles.map((a, i) => `
     <tr>
-      <td style="color:#888;font-size:12px">${i+1}</td>
+      <td style="color:var(--c-gray-500);font-size:12px">${i+1}</td>
       <td>
         <div style="font-weight:600;font-size:13px">${a.coverEmoji || ''} ${esc(a.title)}</div>
-        <div style="font-size:11px;color:#aaa">/articles/${esc(a.slug)}</div>
+        <div style="font-size:11px;color:var(--c-gray-400)">/articles/${esc(a.slug)}</div>
       </td>
       <td><span class="chip">${esc(a.category || '')}</span></td>
-      <td style="font-size:12px;color:#888">${a.publishedAt || ''}</td>
+      <td style="font-size:12px;color:var(--c-gray-500)">${a.publishedAt || ''}</td>
       <td>
         <span class="badge ${a.active !== false ? 'badge-enrolled' : 'badge-rejected'}">
           ${a.active !== false ? 'Активна' : 'Архів'}
