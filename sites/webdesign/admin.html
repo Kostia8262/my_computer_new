@@ -109,12 +109,12 @@ tr:hover td{background:var(--c-row-hover)}
 .phone-link:hover{color:var(--c-brand-500)}
 
 /* STATUS BADGE */
-.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
-.badge-new{background:#e8f4ff;color:#2563eb}
-.badge-contacted{background:#fef9e7;color:#b45309}
-.badge-trial{background:#f0e8ff;color:#7c3aed}
-.badge-enrolled{background:#e8f5e9;color:#15803d}
-.badge-rejected{background:#fff0f0;color:#dc2626}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--r-pill);font-size:var(--fs-sm);font-weight:var(--fw-medium);white-space:nowrap}
+.badge-new{background:var(--c-info-bg);color:var(--c-info-text)}
+.badge-contacted{background:var(--c-warning-bg);color:var(--c-warning-text)}
+.badge-trial{background:var(--c-trial-bg);color:var(--c-trial-text)}
+.badge-enrolled{background:var(--c-success-bg);color:var(--c-success-text)}
+.badge-rejected{background:var(--c-danger-bg);color:var(--c-danger-text)}
 
 /* COURSE CHIP */
 .chip{display:inline-flex;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:#f0eeff;color:#6C47FF}
@@ -191,13 +191,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .alert-item__btn{font-size:11px;padding:4px 10px;white-space:nowrap}
 
 /* CLIENTS TAB */
-.client-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
-.cs-new{background:#e8f4ff;color:#2563eb}
-.cs-trial{background:#f0e8ff;color:#7c3aed}
-.cs-active{background:#e8f5e9;color:#15803d}
-.cs-paused{background:#fef9e7;color:#b45309}
-.cs-completed{background:#f0fdf4;color:#166534}
-.cs-churned{background:#fff0f0;color:#dc2626}
+.client-status{display:inline-flex;align-items:center;padding:3px 10px;border-radius:var(--r-pill);font-size:var(--fs-xs);font-weight:var(--fw-bold);white-space:nowrap}
+.cs-new{background:var(--c-info-bg);color:var(--c-info-text)}
+.cs-trial{background:var(--c-trial-bg);color:var(--c-trial-text)}
+.cs-active{background:var(--c-success-bg);color:var(--c-success-text)}
+.cs-paused{background:var(--c-warning-bg);color:var(--c-warning-text)}
+.cs-completed{background:var(--c-done-bg);color:var(--c-done-text)}
+.cs-churned{background:var(--c-danger-bg);color:var(--c-danger-text)}
 
 /* CLIENT MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
@@ -311,11 +311,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .pay-alert-names{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .pay-alert-badge{background:#fecaca;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600;color:#991b1b;white-space:nowrap}
 .mp-status-sel{padding:3px 7px;border-radius:6px;font-size:12px;font-weight:700;border:1.5px solid transparent;cursor:pointer;outline:none;min-width:120px}
-.mp-status-pending{background:#fff0f0;color:#dc2626;border-color:#fecaca}
-.mp-status-paid{background:#e8f5e9;color:#15803d;border-color:#a7f3d0}
-.mp-status-partial{background:#fef9e7;color:#b45309;border-color:#fde68a}
-.mp-status-waived{background:#e8f4ff;color:#2563eb;border-color:#bfdbfe}
-.mp-status-completed{background:#f5f5f5;color:#888;border-color:#e0e0e0}
+.mp-status-pending{background:var(--c-danger-bg);color:var(--c-danger-text);border-color:var(--c-danger-border)}
+.mp-status-paid{background:var(--c-success-bg);color:var(--c-success-text);border-color:var(--c-success-border)}
+.mp-status-partial{background:var(--c-warning-bg);color:var(--c-warning-text);border-color:var(--c-warning-border)}
+.mp-status-waived{background:var(--c-info-bg);color:var(--c-info-text);border-color:var(--c-info-border)}
+.mp-status-completed{background:var(--c-neutral-bg);color:var(--c-neutral-text);border-color:var(--c-neutral-border)}
 .mp-inline{padding:4px 7px;border:1.5px solid #e0d9ff;border-radius:6px;font-size:12px;outline:none;background:#fff;width:100%;min-width:60px}
 .mp-inline:focus{border-color:#6C47FF}
 .mp-no-month{text-align:center;padding:40px 20px;color:#888}
@@ -2174,8 +2174,8 @@ const CLIENT_STATUS_LABELS = {
   paused: '🟡 Пауза', completed: '✅ Завершив', churned: '🔴 Відмовився',
 };
 const STATUS_DOT_COLORS = {
-  new: '#3b82f6', trial: '#a855f7', active: '#22c55e',
-  paused: '#eab308', completed: '#16a34a', churned: '#ef4444',
+  new: 'var(--c-info-solid)', trial: 'var(--c-trial-solid)', active: 'var(--c-success-solid)',
+  paused: 'var(--c-warning-solid)', completed: 'var(--c-done-solid)', churned: 'var(--c-danger-solid)',
 };
 const SOURCE_LABELS = {
   website: '🌐 Сайт', referral: '👥 Рекомендація', social: '📱 Соцмережі',
