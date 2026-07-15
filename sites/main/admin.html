@@ -48,25 +48,6 @@ a{color:#6C47FF;text-decoration:none}
 .filter-select{padding:9px 12px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:13px;outline:none;background:#fff;cursor:pointer}
 .filter-select:focus{border-color:#6C47FF}
 
-/* CUSTOM SELECT — wraps .filter-select/.modal-input <select> so the open
-   dropdown list is styled (native <option> lists can't be themed via CSS
-   across browsers), while the underlying <select> stays the source of truth
-   (value/onchange/name all keep working unchanged). */
-.csel{position:relative;display:inline-block}
-.csel--block{display:block;width:100%}
-.csel__native{position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;overflow:hidden}
-.csel__trigger{display:flex;align-items:center;justify-content:space-between;gap:8px;cursor:pointer;user-select:none;background:#fff;transition:border-color .15s}
-.csel__trigger-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.csel__arrow{flex-shrink:0;color:#8b7ff0;transition:transform .15s}
-.csel.open .csel__trigger{border-color:#6C47FF}
-.csel.open .csel__arrow{transform:rotate(180deg)}
-.csel__panel{position:absolute;top:calc(100% + 6px);left:0;min-width:100%;max-height:280px;overflow-y:auto;background:#fff;border:1.5px solid #e0d9ff;border-radius:10px;box-shadow:0 14px 34px rgba(76,45,199,.16),0 2px 8px rgba(0,0,0,.06);padding:6px;z-index:2000;display:none}
-.csel.open .csel__panel{display:block}
-.csel__opt{padding:8px 10px;border-radius:7px;font-size:13px;cursor:pointer;white-space:nowrap;color:#2b2540}
-.csel__opt:hover{background:#f4f1ff}
-.csel__opt.selected{background:#6C47FF;color:#fff;font-weight:600}
-.csel__opt.selected:hover{background:#5a38e0}
-
 /* TABLE */
 .table-wrap{background:#fff;border-radius:12px;border:1px solid #e8e4ff;overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:14px}
@@ -3207,87 +3188,6 @@ async function hideCourse(id, currentlyActive) {
     await loadCoursesTab();
   } catch { showToast('Помилка', 'error'); }
 }
-
-// ── CUSTOM SELECT ─────────────────────────────────────────────────────────────
-// Wraps every `select.filter-select`/`select.modal-input` with a styled
-// trigger+panel so the OPEN dropdown list matches the design system (native
-// <option> lists ignore almost all CSS). The real <select> stays untouched as
-// the source of truth: value/selectedIndex/onchange/name keep working exactly
-// as before, so no call site elsewhere in this file needs to change.
-function enhanceSelects(root) {
-  (root || document).querySelectorAll('select.filter-select, select.modal-input').forEach(sel => {
-    if (sel.dataset.cselDone) return;
-    sel.dataset.cselDone = '1';
-
-    const wrap = document.createElement('div');
-    wrap.className = 'csel' + (sel.classList.contains('modal-input') ? ' csel--block' : '');
-    sel.parentNode.insertBefore(wrap, sel);
-
-    const trigger = document.createElement('div');
-    trigger.className = sel.className + ' csel__trigger';
-    if (sel.getAttribute('style')) trigger.setAttribute('style', sel.getAttribute('style'));
-    trigger.innerHTML = '<span class="csel__trigger-text"></span>' +
-      '<svg class="csel__arrow" width="11" height="7" viewBox="0 0 11 7" fill="none" aria-hidden="true">' +
-      '<path d="M1 1l4.5 4.5L10 1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-
-    const panel = document.createElement('div');
-    panel.className = 'csel__panel';
-
-    wrap.appendChild(trigger);
-    wrap.appendChild(panel);
-    wrap.appendChild(sel);
-    sel.classList.add('csel__native');
-
-    trigger.addEventListener('click', e => {
-      e.stopPropagation();
-      const isOpen = wrap.classList.contains('open');
-      document.querySelectorAll('.csel.open').forEach(o => o.classList.remove('open'));
-      if (sel.disabled) return;
-      if (!isOpen) { _renderCselPanel(sel, panel, wrap); wrap.classList.add('open'); }
-    });
-    sel.addEventListener('change', () => _renderCselTrigger(sel));
-
-    // Any `.value =`/`.selectedIndex =` assignment elsewhere in this file
-    // (there are dozens, e.g. when a modal opens pre-filled for editing)
-    // should refresh the visible trigger too — intercept both setters once,
-    // on the instance, instead of touching every call site.
-    ['value', 'selectedIndex'].forEach(prop => {
-      const desc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, prop);
-      Object.defineProperty(sel, prop, {
-        get() { return desc.get.call(this); },
-        set(v) { desc.set.call(this, v); _renderCselTrigger(this); },
-      });
-    });
-    // Options list can also be rebuilt wholesale (e.g. _populateCourseDropdowns
-    // does `sel.innerHTML = ...`) — catch that too.
-    new MutationObserver(() => _renderCselTrigger(sel)).observe(sel, { childList: true });
-
-    _renderCselTrigger(sel);
-  });
-}
-function _renderCselTrigger(sel) {
-  const wrap = sel.closest('.csel');
-  if (!wrap) return;
-  const txt = wrap.querySelector('.csel__trigger-text');
-  const opt = sel.options[sel.selectedIndex];
-  txt.textContent = opt ? opt.textContent : '';
-}
-function _renderCselPanel(sel, panel, wrap) {
-  panel.innerHTML = Array.from(sel.options).map((o, i) =>
-    `<div class="csel__opt${i === sel.selectedIndex ? ' selected' : ''}" data-i="${i}">${esc(o.textContent)}</div>`
-  ).join('');
-  panel.querySelectorAll('.csel__opt').forEach(el => {
-    el.addEventListener('click', () => {
-      sel.selectedIndex = parseInt(el.dataset.i, 10);
-      sel.dispatchEvent(new Event('change', { bubbles: true }));
-      wrap.classList.remove('open');
-    });
-  });
-}
-document.addEventListener('click', () => document.querySelectorAll('.csel.open').forEach(o => o.classList.remove('open')));
-document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.csel.open').forEach(o => o.classList.remove('open')); });
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => enhanceSelects());
-else enhanceSelects();
 
 function _populateCourseDropdowns() {
   if (!_allCourses) return;
