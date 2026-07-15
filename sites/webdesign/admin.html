@@ -4223,12 +4223,34 @@ async function loadDashboardTab() {
     const convRate       = totalLeads > 0 ? Math.round(enrolledLeads / totalLeads * 100) : 0;
     const unprocessed    = leads.filter(l => l.status === 'new').length;
 
+    // Average child age — across all clients with a valid recorded age.
+    const validAges = clients.map(c => parseFloat(c.age)).filter(a => !isNaN(a) && a > 0);
+    const avgAge = validAges.length ? validAges.reduce((s, a) => s + a, 0) / validAges.length : 0;
+
+    // Average student lifetime — for churned/completed clients this is their
+    // actual enrolledDate→updatedAt span; for everyone still with us it's
+    // "how long so far" (enrolledDate→now). Blending both gives one honest
+    // "average time a student stays" number even before enough students have
+    // actually left to compute a clean churned-only cohort average.
+    const withEnroll = clients.filter(c => c.enrolledDate && !isNaN(new Date(c.enrolledDate)));
+    const MS_PER_MONTH = 1000 * 60 * 60 * 24 * 30.44;
+    const avgLifetimeMonths = withEnroll.length
+      ? withEnroll.reduce((sum, c) => {
+          const start = new Date(c.enrolledDate);
+          const end   = (['churned', 'completed'].includes(c.status) && c.updatedAt && !isNaN(new Date(c.updatedAt)))
+            ? new Date(c.updatedAt) : new Date();
+          return sum + Math.max(0, (end - start) / MS_PER_MONTH);
+        }, 0) / withEnroll.length
+      : 0;
+
     studentsEl.innerHTML = [
       dashKpi('🎓', activeClients.length, 'Активних учнів', '#6C47FF', `+${trialClients.length} на пробному`),
       dashKpi('⏸️', pausedClients.length, 'На паузі', pausedClients.length > 3 ? '#b45309' : '#888', 'ризик відтоку'),
       dashKpi('🔴', churnedMonth.length, 'Відмовились (міс.)', churnedMonth.length > 0 ? '#dc2626' : '#15803d', 'відтік цього місяця'),
       dashKpi('📥', unprocessed, 'Необроблені заявки', unprocessed > 0 ? '#dc2626' : '#15803d', `${newLeadsWeek} за тиждень`),
       dashKpi('📈', `${convRate}%`, 'Конверсія в учні', convRate >= 30 ? '#15803d' : convRate >= 15 ? '#b45309' : '#dc2626', `${enrolledLeads} з ${totalLeads} заявок`),
+      dashKpi('🎂', validAges.length ? avgAge.toFixed(1) : '—', 'Середній вік дитини', '#0891b2', validAges.length ? `за ${validAges.length} учнями` : 'немає даних про вік'),
+      dashKpi('⏳', withEnroll.length ? avgLifetimeMonths.toFixed(1) + ' міс.' : '—', 'Лайфтайм учня', '#7c3aed', withEnroll.length ? `за ${withEnroll.length} учнями` : 'немає дати запису'),
     ].join('');
 
     // ── ④ CHARTS ─────────────────────────────────────────────────────────────
