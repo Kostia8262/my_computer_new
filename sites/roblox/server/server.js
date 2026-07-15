@@ -892,7 +892,7 @@ app.get('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
 // PATCH /api/leads/:id
 app.patch('/api/leads/:id', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const id = parseInt(req.params.id);
-  const { status, notes, child_name, phone, age, course, email, teacher, schedule } = req.body;
+  const { status, notes, child_name, phone, age, course, email, teacher, schedule, scheduleDays, lessonType } = req.body;
   const valid = ['new', 'contacted', 'trial_scheduled', 'enrolled', 'rejected'];
   try {
     // Update editable fields
@@ -904,6 +904,8 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, requireNotTeacher, (req,
     if (email      !== undefined) fieldPatch.email      = sanitize(email) || null;
     if (teacher    !== undefined) fieldPatch.teacher    = sanitize(teacher) || null;
     if (schedule   !== undefined) fieldPatch.schedule   = sanitize(schedule) || null;
+    if (scheduleDays !== undefined) fieldPatch.schedule_days = JSON.stringify(Array.isArray(scheduleDays) ? scheduleDays : []);
+    if (lessonType   !== undefined) fieldPatch.lesson_type   = sanitize(lessonType) || null;
     if (Object.keys(fieldPatch).length) db.updateFields(id, fieldPatch);
 
     if (status) {

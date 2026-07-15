@@ -182,6 +182,15 @@ CREATE TABLE IF NOT EXISTS leads (
   updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_leads_phone ON leads(phone);
+`);
+
+// Same structured-schedule support the clients table already has (the "same
+// mechanic" schedule popup on the leads page reads/writes these).
+['schedule_days', 'lesson_type'].forEach(col => {
+  try { db.exec(`ALTER TABLE leads ADD COLUMN ${col} TEXT`); } catch { /* already exists */ }
+});
+
+db.exec(`
 
 CREATE TABLE IF NOT EXISTS payments (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,

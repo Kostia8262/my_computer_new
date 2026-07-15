@@ -16,6 +16,7 @@ function fromRow(row) {
     id: row.id, child_name: row.child_name, age: row.age, course: row.course,
     source: row.source, phone: row.phone, email: row.email, status: row.status,
     notes: row.notes, teacher: row.teacher, schedule: row.schedule,
+    scheduleDays: JSON.parse(row.schedule_days || '[]'), lessonType: row.lesson_type,
     created_at: row.created_at, updated_at: row.updated_at,
   };
 }
@@ -64,7 +65,7 @@ module.exports = {
   updateFields(id, fields) {
     const existing = selById.get(id);
     if (!existing) return null;
-    const allowed = ['child_name', 'phone', 'age', 'course', 'email', 'teacher', 'schedule'];
+    const allowed = ['child_name', 'phone', 'age', 'course', 'email', 'teacher', 'schedule', 'schedule_days', 'lesson_type'];
     const sets = ['updated_at = @updated_at'];
     const params = { id, updated_at: now() };
     allowed.forEach(k => {

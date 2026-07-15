@@ -57,6 +57,10 @@ select.filter-select,select.modal-input{
 
 /* TABLE */
 .table-wrap{background:#fff;border-radius:12px;border:1px solid #e8e4ff;overflow:auto}
+/* Shadow horizontal scrollbar, fixed to the viewport bottom, shown only while
+   the real table's bottom edge (and thus its own scrollbar) is off-screen. */
+.sticky-hscroll{position:fixed;bottom:0;height:14px;overflow-x:scroll;overflow-y:hidden;z-index:200;display:none;background:#fff;border-top:1px solid #e8e4ff}
+.sticky-hscroll div{height:1px}
 table{width:100%;border-collapse:collapse;font-size:14px}
 th{padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f0eeff;white-space:nowrap}
 td{padding:12px 14px;border-bottom:1px solid #f8f7ff;vertical-align:middle}
@@ -471,7 +475,6 @@ tr:hover td{background:#faf9ff}
             </select>
           </div>
           <div class="modal-group"><label class="modal-label">Телефон *</label><input class="modal-input" id="nl_phone" placeholder="+380671234567"/></div>
-          <div class="modal-group"><label class="modal-label">Email</label><input class="modal-input" id="nl_email" type="email" placeholder="email@example.com"/></div>
           <div class="modal-group"><label class="modal-label">Викладач</label>
             <select class="modal-input" id="nl_teacher">
               <option value="">— Не призначено —</option>
@@ -1252,19 +1255,18 @@ tr:hover td{background:#faf9ff}
     </div>
 
     <!-- TABLE -->
-    <div class="table-wrap">
+    <div class="table-wrap" id="leadsTableWrap">
       <table id="leadsTable">
         <thead>
           <tr>
             <th>#</th>
-            <th>Дитина</th>
-            <th>Вік</th>
-            <th>Курс</th>
+            <th>Ім'я дитини</th>
+            <th>Статус</th>
+            <th class="td-tight" style="width:34px">Вік</th>
+            <th style="width:130px">Курс</th>
             <th>Телефон</th>
-            <th>Email</th>
             <th>Викладач</th>
             <th>Розклад</th>
-            <th>Статус</th>
             <th>Нотатки</th>
             <th>Дата</th>
             <th></th>
@@ -1274,6 +1276,10 @@ tr:hover td{background:#faf9ff}
       </table>
       <div class="pager" id="pager"></div>
     </div>
+    <!-- Sticky horizontal scrollbar for the leads table — mirrors leadsTableWrap's
+         scroll position so the user doesn't need to scroll the page down first to
+         reach the real scrollbar at the bottom of a tall table. -->
+    <div id="leadsHScrollBar" class="sticky-hscroll"><div id="leadsHScrollInner"></div></div>
     </div><!-- /leadsTab -->
   </div><!-- /main -->
   </div><!-- /app-body -->
@@ -1536,6 +1542,7 @@ function showTab(tab) {
   if (tab === 'reviews')    loadReviewsTab();
   if (tab === 'seo')        loadSeoTab();
   if (tab === 'dashboard')  loadDashboardTab();
+  setTimeout(_syncLeadsHScroll, 0);
 }
 
 function reloadCurrentTab() {
@@ -1591,7 +1598,7 @@ function renderTable() {
     if (status && l.status !== status) return false;
     if (course && l.course !== course) return false;
     if (q) {
-      const hay = [l.child_name, l.phone, l.email, l.course, l.notes].join(' ').toLowerCase();
+      const hay = [l.child_name, l.phone, l.course, l.notes].join(' ').toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -1603,15 +1610,22 @@ function renderTable() {
 
   const tbody = document.getElementById('leadsBody');
   if (!page.length) {
-    tbody.innerHTML = `<tr><td colspan="12"><div class="empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6M9 16h6M7 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1h-3M9 4a2 2 0 002 2h2a2 2 0 002-2M9 4a2 2 0 012-2h2a2 2 0 012 2"/></svg><div>Заявок не знайдено</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6M9 16h6M7 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1h-3M9 4a2 2 0 002 2h2a2 2 0 002-2M9 4a2 2 0 012-2h2a2 2 0 012 2"/></svg><div>Заявок не знайдено</div></div></td></tr>`;
   } else {
     tbody.innerHTML = page.map(l => `
       <tr id="row-${l.id}">
         <td style="color:#aaa;font-size:12px">#${l.id}${l.source ? `<br><span style="color:#6C47FF;font-size:10px;font-weight:600" title="${esc(l.source)}">${esc(l.source)}</span>` : ''}</td>
         <td style="font-weight:600"><input class="notes-input" style="font-weight:600" value="${esc(l.child_name)}" onblur="saveLeadFields(${l.id},{child_name:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-        <td><input class="notes-input" style="width:42px;text-align:center" value="${esc(String(l.age||''))}" placeholder="вік" onblur="saveLeadFields(${l.id},{age:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td>
-          <select class="status-sel" style="min-width:90px" onchange="saveLeadFields(${l.id},{course:this.value})">
+          <select class="status-sel" onchange="changeStatus(${l.id}, this.value)">
+            ${Object.entries(STATUS_LABELS).map(([v,lbl]) =>
+              `<option value="${v}" ${l.status===v?'selected':''}>${lbl}</option>`
+            ).join('')}
+          </select>
+        </td>
+        <td class="td-tight"><input class="notes-input" style="width:26px;padding:4px;text-align:center;min-width:0;appearance:textfield;-webkit-appearance:textfield;-moz-appearance:textfield" type="number" value="${esc(String(l.age||''))}" placeholder="вік" onblur="saveLeadFields(${l.id},{age:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td>
+          <select class="status-sel" style="width:130px;text-overflow:ellipsis" title="${esc(COURSE_LABELS[l.course]||l.course||'')}" onchange="saveLeadFields(${l.id},{course:this.value})">
             <option value="">—</option>
             ${Object.entries(COURSE_LABELS).map(([v,lbl]) =>
               `<option value="${v}" ${l.course===v?'selected':''}>${lbl}</option>`
@@ -1619,15 +1633,11 @@ function renderTable() {
           </select>
         </td>
         <td><input class="notes-input" value="${esc(l.phone)}" onblur="saveLeadFields(${l.id},{phone:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-        <td><input class="notes-input" value="${esc(l.email||'')}" placeholder="email" onblur="saveLeadFields(${l.id},{email:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td><select class="status-sel" style="min-width:100px" onchange="saveLeadFields(${l.id},{teacher:this.value})">${[`<option value="">— —</option>`,..._teachersList.map(t=>`<option value="${esc(t.name)}"${l.teacher===t.name?' selected':''}>${esc(t.name)}</option>`)].join('')}</select></td>
-        <td><input class="notes-input" style="min-width:100px" value="${esc(l.schedule||'')}" placeholder="Пн 15:00…" onblur="saveLeadFields(${l.id},{schedule:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
-        <td>
-          <select class="status-sel" onchange="changeStatus(${l.id}, this.value)">
-            ${Object.entries(STATUS_LABELS).map(([v,lbl]) =>
-              `<option value="${v}" ${l.status===v?'selected':''}>${lbl}</option>`
-            ).join('')}
-          </select>
+        <td style="white-space:nowrap">
+          <span style="font-size:12px;max-width:110px;display:inline-block;overflow:hidden;text-overflow:ellipsis;vertical-align:middle">${esc(l.schedule||'')}</span>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;vertical-align:middle"
+            onclick="openSchedPopup(event,${l.id},'lead')" title="Редагувати розклад">🕐</button>
         </td>
         <td>
           <input class="notes-input" value="${esc(l.notes||'')}" placeholder="Нотатки..."
@@ -1648,9 +1658,50 @@ function renderTable() {
       <button class="btn btn-ghost btn-sm" onclick="gotoPage(${currentPage+1})" ${currentPage>=totalPages?'disabled':''}>Далі ›</button>
     </div>
   `;
+  setTimeout(_syncLeadsHScroll, 0);
 }
 
 function gotoPage(p) { currentPage = p; renderTable(); }
+
+// ── STICKY HORIZONTAL SCROLLBAR (leads table) ─────────────────────────────────
+let _hscrollSyncing = false;
+
+function _syncLeadsHScroll() {
+  const wrap  = document.getElementById('leadsTableWrap');
+  const bar   = document.getElementById('leadsHScrollBar');
+  const inner = document.getElementById('leadsHScrollInner');
+  if (!wrap || !bar || !inner) return;
+  if (_currentTab !== 'leads') { bar.style.display = 'none'; return; }
+  const needsScroll = wrap.scrollWidth > wrap.clientWidth + 2;
+  const rect = wrap.getBoundingClientRect();
+  const tableBottomOffscreen = rect.bottom > window.innerHeight;
+  if (needsScroll && tableBottomOffscreen) {
+    bar.style.display = 'block';
+    bar.style.left    = rect.left  + 'px';
+    bar.style.width   = rect.width + 'px';
+    inner.style.width = wrap.scrollWidth + 'px';
+    if (!_hscrollSyncing) { _hscrollSyncing = true; bar.scrollLeft = wrap.scrollLeft; _hscrollSyncing = false; }
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+document.getElementById('leadsHScrollBar')?.addEventListener('scroll', () => {
+  if (_hscrollSyncing) return;
+  _hscrollSyncing = true;
+  const wrap = document.getElementById('leadsTableWrap');
+  if (wrap) wrap.scrollLeft = document.getElementById('leadsHScrollBar').scrollLeft;
+  _hscrollSyncing = false;
+});
+document.getElementById('leadsTableWrap')?.addEventListener('scroll', () => {
+  if (_hscrollSyncing) return;
+  _hscrollSyncing = true;
+  const bar = document.getElementById('leadsHScrollBar');
+  if (bar) bar.scrollLeft = document.getElementById('leadsTableWrap').scrollLeft;
+  _hscrollSyncing = false;
+});
+window.addEventListener('scroll', _syncLeadsHScroll);
+window.addEventListener('resize', _syncLeadsHScroll);
 
 // ── ACTIONS ───────────────────────────────────────────────────────────────────
 async function changeStatus(id, status) {
@@ -1682,7 +1733,7 @@ async function changeStatus(id, status) {
 }
 
 function openNewLeadModal() {
-  ['nl_name','nl_age','nl_phone','nl_email','nl_notes'].forEach(id => {
+  ['nl_name','nl_age','nl_phone','nl_notes'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
   });
   const csel = document.getElementById('nl_course'); if (csel) csel.value = '';
@@ -1707,7 +1758,6 @@ async function saveNewLead() {
     age:     parseInt(document.getElementById('nl_age')?.value) || null,
     course:  document.getElementById('nl_course')?.value || null,
     phone,
-    email:   document.getElementById('nl_email')?.value.trim() || null,
     teacher: document.getElementById('nl_teacher')?.value || null,
     notes:   document.getElementById('nl_notes')?.value.trim() || null,
   };
@@ -2758,8 +2808,11 @@ function renderAttCalendar() {
   cal.innerHTML = html;
 }
 
-// ── SCHEDULE QUICK-EDIT POPUP ────────────────────────────────────────────────
+// ── SCHEDULE QUICK-EDIT POPUP (shared by the clients table and the leads
+// table — same popup markup/mechanics, source array + save endpoint branch
+// on _schedPopupType) ─────────────────────────────────────────────────────
 let _schedPopupClientId = null;
+let _schedPopupType     = 'client';
 
 function onSpLessonTypeChange(val) {
   const isFree = val === 'individual' || val === 'adult';
@@ -2768,19 +2821,20 @@ function onSpLessonTypeChange(val) {
   document.getElementById('sp_slot2Row').style.display   = val === 'group2' ? '' : 'none';
 }
 
-function openSchedPopup(event, clientId) {
+function openSchedPopup(event, id, type = 'client') {
   event.stopPropagation();
-  _schedPopupClientId = clientId;
-  const client = _allClients?.find(c => c.id === clientId);
-  const days = client?.scheduleDays || [];
+  _schedPopupClientId = id;
+  _schedPopupType      = type;
+  const rec = type === 'lead' ? allLeads?.find(l => l.id === id) : _allClients?.find(c => c.id === id);
+  const days = rec?.scheduleDays || [];
   const d0 = days[0], d1 = days[1];
-  const lt = client?.lessonType || 'group';
+  const lt = rec?.lessonType || 'group';
   document.getElementById('sp_lessonType').value = lt;
   document.getElementById('sp_day1').value  = d0?.day  || '';
   document.getElementById('sp_time1').value = d0?.time || '';
   document.getElementById('sp_day2').value  = d1?.day  || '';
   document.getElementById('sp_time2').value = d1?.time || '';
-  document.getElementById('sp_manualNote').value = (lt === 'individual' || lt === 'adult') ? (client?.schedule || '') : '';
+  document.getElementById('sp_manualNote').value = (lt === 'individual' || lt === 'adult') ? (rec?.schedule || '') : '';
   onSpLessonTypeChange(lt);
   const pop = document.getElementById('schedPopup');
   pop.style.display = 'block';
@@ -2797,8 +2851,9 @@ function closeSchedPopup() {
 }
 
 async function saveSchedPopup() {
-  const clientId = _schedPopupClientId;
-  if (!clientId) return;
+  const id   = _schedPopupClientId;
+  const type = _schedPopupType;
+  if (!id) return;
   const lt = document.getElementById('sp_lessonType').value;
   const isFree = lt === 'individual' || lt === 'adult';
   let scheduleDays = [], schedule = '';
@@ -2814,14 +2869,29 @@ async function saveSchedPopup() {
     schedule = buildScheduleText(scheduleDays, '');
   }
   closeSchedPopup();
+  if (type === 'lead') {
+    try {
+      const res = await fetch(`/api/leads/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ lessonType: lt, scheduleDays, schedule }),
+      });
+      if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
+      const lead = allLeads?.find(l => l.id === id);
+      if (lead) { lead.lessonType = lt; lead.scheduleDays = scheduleDays; lead.schedule = schedule; }
+      renderTable();
+      showToast('Розклад збережено ✓', 'success');
+    } catch { showToast('Помилка', 'error'); }
+    return;
+  }
   try {
-    const res = await fetch(`/api/clients/${clientId}`, {
+    const res = await fetch(`/api/clients/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
       body: JSON.stringify({ lessonType: lt, scheduleDays, schedule }),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
-    const client = _allClients?.find(c => c.id === clientId);
+    const client = _allClients?.find(c => c.id === id);
     if (client) { client.lessonType = lt; client.scheduleDays = scheduleDays; client.schedule = schedule; }
     renderClients();
     // If schedule tab is visible, refresh it too
