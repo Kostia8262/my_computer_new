@@ -1181,7 +1181,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;max-width:1080px">
         <!-- LEFT: main form -->
         <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
-          <div style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:20px">
+          <div class="card" style="padding:20px">
             <div class="modal-grid">
               <div class="modal-group"><label class="modal-label">Ім'я</label><input class="modal-input" id="tp_name" placeholder="Ім'я"/></div>
               <div class="modal-group"><label class="modal-label">Повне ім'я (ПІБ)</label><input class="modal-input" id="tp_fullName" placeholder="Прізвище Ім'я По батькові"/></div>
@@ -1223,7 +1223,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
             </div>
             <!-- Teacher-only fields -->
             <div id="tp_teacherSection">
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin:14px 0 8px">📚 Оплата праці</div>
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c-gray-500);margin:14px 0 8px">📚 Оплата праці</div>
               <div class="modal-grid">
                 <div class="modal-group"><label class="modal-label">Тип оплати</label>
                   <select class="modal-input" id="tp_paymentType" onchange="onPaymentTypeChange(this.value)">
@@ -1237,56 +1237,56 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
                 <div class="modal-group full"><label class="modal-label">Реквізити для виплат (IBAN / картка)</label><input class="modal-input" id="tp_bankDetails" placeholder="UA0000000000000000000000000 або номер картки"/></div>
               </div>
               <!-- Salary calculation section -->
-              <div style="margin-top:12px;padding:14px;background:#f9f7ff;border-radius:10px;border:1px solid #e0d9ff">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">💰 Розрахунок зарплати</div>
+              <div style="margin-top:12px;padding:14px;background:#f9f7ff;border-radius:10px;border:1px solid var(--c-brand-100)">
+                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c-gray-500);margin-bottom:10px">💰 Розрахунок зарплати</div>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                   <select class="filter-select" id="tp_salaryMonth" style="min-width:160px">
                     <option value="">— Оберіть місяць —</option>
                   </select>
                   <button class="btn btn-primary btn-sm" onclick="loadTeacherSalary()" style="white-space:nowrap">📊 Розрахувати</button>
-                  <div id="tp_salaryResult" style="font-size:14px;color:#6C47FF;font-weight:700;margin-top:6px;width:100%"></div>
+                  <div id="tp_salaryResult" style="font-size:14px;color:var(--c-brand-500);font-weight:700;margin-top:6px;width:100%"></div>
                 </div>
                 <div id="tp_salaryBreakdown" style="margin-top:10px"></div>
                 <div id="tp_attendanceCalendar" style="margin-top:10px"></div>
               </div>
               <!-- Rate change history -->
               <div class="no-print" style="margin-top:12px;padding:14px;background:#fafafa;border-radius:10px;border:1px solid #eee">
-                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:8px">🕒 Історія змін ставки</div>
-                <div id="tp_rateHistory" style="font-size:12px;color:#aaa">Немає змін</div>
+                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c-gray-500);margin-bottom:8px">🕒 Історія змін ставки</div>
+                <div id="tp_rateHistory" style="font-size:12px;color:var(--c-gray-400)">Немає змін</div>
               </div>
             </div>
             <!-- Documents section -->
             <div style="margin-top:16px;padding:14px;background:#f7f9ff;border-radius:10px;border:1px solid #dde8ff">
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c-gray-500);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
                 📎 Документи
                 <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
                   + Завантажити
                   <input type="file" style="display:none" id="tp_docInput" onchange="uploadStaffDoc()" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"/>
                 </label>
               </div>
-              <div id="tp_docsList" style="font-size:13px;color:#aaa">Немає документів</div>
+              <div id="tp_docsList" style="font-size:13px;color:var(--c-gray-400)">Немає документів</div>
             </div>
           </div>
         </div>
         <!-- RIGHT: access + tenure/birthday sidebar -->
         <div style="display:flex;flex-direction:column;gap:16px">
-          <div style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:16px">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">🔑 Доступ</div>
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c-gray-500);margin-bottom:10px">🔑 Доступ</div>
             <div id="tp_accessBlock"></div>
           </div>
-          <div style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:16px">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">📅 Стаж та дата народження</div>
+          <div class="card">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c-gray-500);margin-bottom:10px">📅 Стаж та дата народження</div>
             <div class="modal-group" style="margin-bottom:10px"><label class="modal-label">Дата працевлаштування</label><input class="modal-input" type="date" id="tp_hireDate" oninput="updateTenureDisplay()"/></div>
-            <div id="tp_tenureDisplay" style="font-size:13px;color:#6C47FF;font-weight:600;margin-bottom:14px"></div>
+            <div id="tp_tenureDisplay" style="font-size:13px;color:var(--c-brand-500);font-weight:600;margin-bottom:14px"></div>
             <div class="modal-group" style="margin-bottom:10px"><label class="modal-label">Дата народження</label><input class="modal-input" type="date" id="tp_birthday" oninput="updateBirthdayDisplay()"/></div>
-            <div id="tp_birthdayDisplay" style="font-size:13px;color:#6C47FF;font-weight:600"></div>
+            <div id="tp_birthdayDisplay" style="font-size:13px;color:var(--c-brand-500);font-weight:600"></div>
           </div>
-          <div class="no-print" style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:16px">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+          <div class="no-print card">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--c-gray-500);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
               🌴 Відпустки / лікарняні
-              <span id="tp_leaveDaysTotal" style="color:#6C47FF;font-weight:700;font-size:11px"></span>
+              <span id="tp_leaveDaysTotal" style="color:var(--c-brand-500);font-weight:700;font-size:11px"></span>
             </div>
-            <div id="tp_leaveList" style="font-size:12px;color:#aaa;margin-bottom:10px">Немає записів</div>
+            <div id="tp_leaveList" style="font-size:12px;color:var(--c-gray-400);margin-bottom:10px">Немає записів</div>
             <div style="display:flex;flex-direction:column;gap:6px">
               <div style="display:flex;gap:6px">
                 <select class="filter-select" id="tp_leaveType" style="flex:1;font-size:12px">
@@ -4955,14 +4955,14 @@ async function loadRateHistory(adminId) {
 
 function renderRateHistory(list) {
   const el = document.getElementById('tp_rateHistory');
-  if (!list.length) { el.innerHTML = '<span style="color:#aaa">Немає змін</span>'; return; }
+  if (!list.length) { el.innerHTML = '<span style="color:var(--c-gray-400)">Немає змін</span>'; return; }
   el.innerHTML = list.map(h => {
     const label = RATE_HISTORY_LABELS[h.field] || h.field;
     const oldV  = h.oldValue == null || h.oldValue === '' ? '—' : esc(h.oldValue);
     const newV  = h.newValue == null || h.newValue === '' ? '—' : esc(h.newValue);
     return `<div style="padding:5px 0;border-bottom:1px solid #eee;display:flex;justify-content:space-between;gap:8px">
       <span>${label}: ${oldV} → <strong>${newV}</strong></span>
-      <span style="color:#aaa;white-space:nowrap">${esc(h.changedAt)}</span>
+      <span style="color:var(--c-gray-400);white-space:nowrap">${esc(h.changedAt)}</span>
     </div>`;
   }).join('');
 }
@@ -4982,7 +4982,7 @@ function renderStaffLeave(list) {
   const listEl  = document.getElementById('tp_leaveList');
   const totalEl = document.getElementById('tp_leaveDaysTotal');
   if (!list.length) {
-    listEl.innerHTML = '<span style="color:#aaa">Немає записів</span>';
+    listEl.innerHTML = '<span style="color:var(--c-gray-400)">Немає записів</span>';
     totalEl.textContent = '';
     return;
   }
@@ -5171,18 +5171,18 @@ function renderStaffProfileAccess(admin) {
   const el = document.getElementById('tp_accessBlock');
   if (!el) return;
   const roleLbl  = ROLE_LABELS[admin.role]      || admin.role || '—';
-  const roleBg   = ROLE_COLORS[admin.role]      || '#f0eeff';
-  const roleClr  = ROLE_TEXT_COLORS[admin.role] || '#6C47FF';
+  const roleBg   = ROLE_COLORS[admin.role]      || 'var(--c-brand-50)';
+  const roleClr  = ROLE_TEXT_COLORS[admin.role] || 'var(--c-brand-500)';
   const statusHtml = admin.active
     ? '<span class="badge badge-enrolled">Активний</span>'
     : '<span class="badge badge-rejected">Відкликано</span>';
   const actionHtml = admin.active
-    ? `<code style="font-size:11px;background:#f0eeff;padding:6px 8px;border-radius:4px;word-break:break-all;user-select:all;display:block;margin:10px 0">${esc(admin.token)}</code>
+    ? `<code style="font-size:11px;background:var(--c-brand-50);padding:6px 8px;border-radius:4px;word-break:break-all;user-select:all;display:block;margin:10px 0">${esc(admin.token)}</code>
        <div style="display:flex;gap:8px;flex-wrap:wrap">
          <button class="btn btn-ghost btn-sm" onclick="copyToken('${esc(admin.token)}')">📋 Копіювати</button>
          <button class="btn btn-danger btn-sm" onclick="revokeStaffTokenFromProfile()">🔒 Відкликати</button>
        </div>`
-    : `<div style="color:#aaa;font-size:12px;margin:10px 0">Токен відкликано — вхід недоступний</div>
+    : `<div style="color:var(--c-gray-400);font-size:12px;margin:10px 0">Токен відкликано — вхід недоступний</div>
        <button class="btn btn-primary btn-sm" onclick="regenerateStaffTokenFromProfile()">🔄 Відновити токен</button>`;
   el.innerHTML = `
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
@@ -5299,14 +5299,14 @@ async function loadStaffDocs(adminId) {
     const data = await res.json();
     const docs = data.docs || [];
     if (!docs.length) {
-      listEl.innerHTML = '<span style="color:#aaa">Немає документів</span>';
+      listEl.innerHTML = '<span style="color:var(--c-gray-400)">Немає документів</span>';
       return;
     }
     listEl.innerHTML = docs.map(d => {
       const kb = Math.round(d.size / 1024);
       const safeName = d.name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
       return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #eee">
-        <span style="color:#444;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📄 ${esc(d.name)} <span style="color:#aaa;font-size:11px">(${kb} KB)</span></span>
+        <span style="color:#444;font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📄 ${esc(d.name)} <span style="color:var(--c-gray-400);font-size:11px">(${kb} KB)</span></span>
         <div style="display:flex;gap:4px;flex-shrink:0;margin-left:8px">
           <button class="btn btn-ghost btn-sm" onclick="downloadStaffDoc(${adminId},'${safeName}')" title="Завантажити">⬇</button>
           <button class="btn btn-danger btn-sm" onclick="deleteStaffDoc(${adminId},'${safeName}')" title="Видалити">✕</button>
