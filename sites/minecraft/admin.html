@@ -5,9 +5,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Admin — My Computer Academy</title>
 <style>
+:root{
+  /* Brand */
+  --c-brand-50:#f0eeff; --c-brand-100:#e0d9ff; --c-brand-200:#e8e4ff;
+  --c-brand-500:#6C47FF; --c-brand-600:#5533EE; --c-brand-700:#7c3aed;
+  /* Neutral */
+  --c-ink:#1a1a2e; --c-ink-soft:#333;
+  --c-gray-500:#888; --c-gray-400:#aaa; --c-gray-300:#bbb;
+  --c-border:#e8e4ff; --c-border-soft:#f0eeff; --c-border-faint:#f8f7ff;
+  --c-surface:#fff; --c-canvas:#f0eeff; --c-row-hover:#faf9ff;
+  /* Semantic (bg/border/text/solid per status family) */
+  --c-info-bg:#e8f4ff; --c-info-border:#bfdbfe; --c-info-text:#2563eb; --c-info-solid:#3b82f6;
+  --c-success-bg:#e8f5e9; --c-success-border:#a7f3d0; --c-success-text:#15803d; --c-success-solid:#22c55e;
+  --c-warning-bg:#fef9e7; --c-warning-border:#fde68a; --c-warning-text:#b45309; --c-warning-solid:#eab308;
+  --c-danger-bg:#fff0f0; --c-danger-border:#fecaca; --c-danger-text:#dc2626; --c-danger-solid:#ef4444;
+  --c-trial-bg:#f0e8ff; --c-trial-border:#c4b5fd; --c-trial-text:#7c3aed; --c-trial-solid:#a855f7;
+  --c-done-bg:#f0fdf4; --c-done-border:#bbf7d0; --c-done-text:#166534; --c-done-solid:#16a34a;
+  --c-neutral-bg:#f5f5f5; --c-neutral-border:#e0e0e0; --c-neutral-text:#888; --c-neutral-solid:#9ca3af;
+  /* Typography */
+  --fs-xs:11px; --fs-sm:12px; --fs-base:13px; --fs-md:14px;
+  --fs-lg:15px; --fs-xl:16px; --fs-2xl:18px; --fs-3xl:20px; --fs-4xl:28px;
+  --fw-regular:400; --fw-medium:600; --fw-bold:700; --fw-black:800;
+  /* Spacing */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
+  /* Radius */
+  --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:14px; --r-pill:20px; --r-round:99px;
+  /* Shadow */
+  --shadow-sm:0 4px 24px rgba(108,71,255,.12);
+  --shadow-md:0 8px 30px rgba(0,0,0,.18);
+  --shadow-lg:0 20px 60px rgba(0,0,0,.25);
+  --shadow-brand:0 6px 20px rgba(20,14,40,.28);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Inter,Arial,sans-serif;background:#f0eeff;color:#1a1a2e;min-height:100vh;overflow-x:hidden}
-a{color:#6C47FF;text-decoration:none}
+body{font-family:Inter,Arial,sans-serif;background:var(--c-canvas);color:var(--c-ink);min-height:100vh;overflow-x:hidden}
+a{color:var(--c-brand-500);text-decoration:none}
 
 /* LOGIN */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
@@ -24,12 +55,12 @@ a{color:#6C47FF;text-decoration:none}
 
 /* LAYOUT */
 .app{display:none;flex-direction:column;min-height:100vh;overflow:hidden}
-.topbar{background:#fff;border-bottom:1px solid #e8e4ff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:10}
+.topbar{background:var(--c-surface);border-bottom:1px solid var(--c-border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:10}
 .topbar-left{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
 .topbar-right{display:flex;align-items:center;gap:12px}
 .btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.btn-primary{background:#6C47FF;color:#fff}.btn-primary:hover{background:#5533EE}
-.btn-ghost{background:#f0eeff;color:#6C47FF;border:1.5px solid #e0d9ff}.btn-ghost:hover{background:#e0d9ff}
+.btn-primary{background:var(--c-brand-500);color:#fff}.btn-primary:hover{background:var(--c-brand-600)}
+.btn-ghost{background:var(--c-brand-50);color:var(--c-brand-500);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
 .btn-danger{background:#fff0f0;color:#e53e3e;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
 .btn-sm{padding:5px 10px;font-size:12px}
 
@@ -37,9 +68,9 @@ a{color:#6C47FF;text-decoration:none}
 
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
-.stat{background:#fff;border-radius:12px;padding:18px;border:1px solid #e8e4ff}
-.stat-num{font-size:28px;font-weight:800;color:#6C47FF}
-.stat-label{font-size:13px;color:#888;margin-top:2px}
+.stat{background:var(--c-surface);border-radius:var(--r-lg);padding:18px;border:1px solid var(--c-border)}
+.stat-num{font-size:var(--fs-4xl);font-weight:var(--fw-black);color:var(--c-brand-500)}
+.stat-label{font-size:var(--fs-base);color:var(--c-gray-500);margin-top:2px}
 
 /* TOOLBAR */
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -56,7 +87,7 @@ select.filter-select,select.modal-input{
 }
 
 /* TABLE */
-.table-wrap{background:#fff;border-radius:12px;border:1px solid #e8e4ff;overflow:auto}
+.table-wrap{background:var(--c-surface);border-radius:var(--r-lg);border:1px solid var(--c-border);overflow:auto}
 /* Wide tables (leads/clients) hide their own native horizontal scrollbar —
    the fixed .sticky-hscroll bar below is the single visible/usable one, always
    reachable regardless of vertical scroll position, so there's never a second
@@ -66,16 +97,16 @@ select.filter-select,select.modal-input{
 .hscroll-native-hidden::-webkit-scrollbar{display:none}
 /* Shadow horizontal scrollbar, fixed to the viewport bottom, shown whenever
    its table needs horizontal scrolling at all. */
-.sticky-hscroll{position:fixed;bottom:0;height:14px;overflow-x:scroll;overflow-y:hidden;z-index:200;display:none;background:#fff;border-top:1px solid #e8e4ff}
+.sticky-hscroll{position:fixed;bottom:0;height:14px;overflow-x:scroll;overflow-y:hidden;z-index:200;display:none;background:var(--c-surface);border-top:1px solid var(--c-border)}
 .sticky-hscroll div{height:1px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #f0eeff;white-space:nowrap}
-td{padding:12px 14px;border-bottom:1px solid #f8f7ff;vertical-align:middle}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-md)}
+th{padding:12px 14px;text-align:left;font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--c-gray-500);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--c-border-soft);white-space:nowrap}
+td{padding:12px 14px;border-bottom:1px solid var(--c-border-faint);vertical-align:middle}
 td.td-tight,th.td-tight{padding:8px 4px}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:#faf9ff}
-.phone-link{color:#1a1a2e;font-weight:600}
-.phone-link:hover{color:#6C47FF}
+tr:hover td{background:var(--c-row-hover)}
+.phone-link{color:var(--c-ink);font-weight:600}
+.phone-link:hover{color:var(--c-brand-500)}
 
 /* STATUS BADGE */
 .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
@@ -184,7 +215,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* SIDEBAR LAYOUT */
 .app-body{display:flex;flex:1;min-height:0;overflow:hidden}
-.sidebar{width:218px;background:#fff;border-right:1px solid #e8e4ff;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar{width:218px;background:var(--c-surface);border-right:1px solid var(--c-border);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
 .sidebar-nav{padding:14px 10px;flex:1}
 .sidebar-section{font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.8px;padding:16px 10px 6px}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-size:13.5px;font-weight:600;color:#555;cursor:pointer;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
