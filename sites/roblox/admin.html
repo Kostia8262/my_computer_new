@@ -285,6 +285,13 @@ tr:hover td{background:#faf9ff}
 .sched-tbl td{border:1px solid #f0eeff;padding:3px;vertical-align:top;min-width:80px}
 .sched-time{font-size:11px;color:#aaa;font-weight:700;text-align:right;padding:8px;white-space:nowrap;background:#faf9ff;width:52px}
 .sched-card{border-radius:6px;padding:3px 7px;margin:2px 0;font-size:11px;font-weight:600;line-height:1.4;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* STAFF PROFILE — PDF export via browser print: hide chrome, show only the profile card */
+@media print{
+  body *{visibility:hidden}
+  #staffProfileTab, #staffProfileTab *{visibility:visible}
+  #staffProfileTab{position:absolute;top:0;left:0;width:100%}
+  .no-print{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -390,9 +397,25 @@ tr:hover td{background:#faf9ff}
   <div class="main">
     <!-- ADMINS TAB (superadmin only) -->
     <div id="adminsTab" style="display:none">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
         <h2 style="font-size:18px;font-weight:800">👥 Співробітники</h2>
         <button class="btn btn-primary btn-sm" onclick="showCreateAdminForm()">+ Додати співробітника</button>
+      </div>
+      <div id="adminsStats" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px"></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+        <input id="adminsSearch" class="search" placeholder="🔍 Пошук за ім'ям..." style="flex:1;min-width:180px;margin:0" oninput="filterAdminsTable()"/>
+        <select id="adminsRoleFilter" class="filter-select" onchange="filterAdminsTable()">
+          <option value="">Всі ролі</option>
+          <option value="superadmin">⭐ Суперадмін</option>
+          <option value="administrator">👔 Адміністратор</option>
+          <option value="manager">📋 Менеджер</option>
+          <option value="teacher">📚 Викладач</option>
+        </select>
+        <select id="adminsStatusFilter" class="filter-select" onchange="filterAdminsTable()">
+          <option value="">Всі статуси</option>
+          <option value="active">Активні</option>
+          <option value="revoked">Відкликані</option>
+        </select>
       </div>
       <div id="createAdminForm" style="display:none;background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:20px;margin-bottom:20px">
         <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
@@ -423,10 +446,10 @@ tr:hover td{background:#faf9ff}
         <table style="width:100%;border-collapse:collapse;font-size:14px">
           <thead><tr>
             <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Ім'я</th>
-            <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Роль</th>
+            <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff;cursor:pointer;user-select:none" onclick="toggleAdminsSort('role')">Роль <span id="adminsSortRole"></span></th>
             <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Токен</th>
             <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Статус</th>
-            <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff">Створено</th>
+            <th style="padding:12px 14px;text-align:left;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;border-bottom:1px solid #f0eeff;cursor:pointer;user-select:none" onclick="toggleAdminsSort('createdAt')">Створено <span id="adminsSortCreatedAt"></span></th>
             <th style="padding:12px 14px;border-bottom:1px solid #f0eeff"></th>
           </tr></thead>
           <tbody id="adminsBody"></tbody>
@@ -1032,7 +1055,10 @@ tr:hover td{background:#faf9ff}
           <button class="btn btn-ghost btn-sm" onclick="closeTeacherProfile()">← Назад</button>
           <h2 style="font-size:18px;font-weight:800" id="teacherProfileTitle">Особова справа</h2>
         </div>
-        <button class="btn btn-primary" onclick="saveTeacherProfile()">💾 Зберегти</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost no-print" onclick="window.print()">🖨️ Експорт у PDF</button>
+          <button class="btn btn-primary" onclick="saveTeacherProfile()">💾 Зберегти</button>
+        </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;max-width:1080px">
         <!-- LEFT: main form -->
@@ -1063,6 +1089,18 @@ tr:hover td{background:#faf9ff}
                 </select>
                 <input class="modal-input" id="tp_jobTitleOther" placeholder="Вкажіть посаду" style="display:none;margin-top:8px"/>
               </div>
+              <div class="modal-group"><label class="modal-label">Тип зайнятості</label>
+                <select class="modal-input" id="tp_employmentType" onchange="onEmploymentTypeChange(this.value)">
+                  <option value="full_time">Штатний</option>
+                  <option value="part_time">Підробіток</option>
+                  <option value="probation">На випробувальному</option>
+                </select>
+              </div>
+              <div class="modal-group" id="tp_probationWrap" style="display:none"><label class="modal-label">Випробувальний до</label><input class="modal-input" type="date" id="tp_probationUntil"/></div>
+              <div class="modal-group full" id="tp_qualificationsWrap">
+                <label class="modal-label">Кваліфікації (які курси може вести)</label>
+                <div id="tp_qualifications" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+              </div>
               <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="tp_notes" rows="2" placeholder="Спеціалізація, примітки..."></textarea></div>
             </div>
             <!-- Teacher-only fields -->
@@ -1078,6 +1116,7 @@ tr:hover td{background:#faf9ff}
                 <div class="modal-group" id="tp_hourlyWrap"><label class="modal-label">Ставка (₴/год)</label><input class="modal-input" type="number" id="tp_hourlyRate" placeholder="150" min="0"/></div>
                 <div class="modal-group" id="tp_lessonDurationWrap"><label class="modal-label">Тривалість уроку (хв)</label><input class="modal-input" type="number" id="tp_lessonDuration" placeholder="60" min="1"/></div>
                 <div class="modal-group" id="tp_monthlyWrap" style="display:none"><label class="modal-label">Місячна ставка (₴)</label><input class="modal-input" type="number" id="tp_monthlyRate" placeholder="12000" min="0"/></div>
+                <div class="modal-group full"><label class="modal-label">Реквізити для виплат (IBAN / картка)</label><input class="modal-input" id="tp_bankDetails" placeholder="UA0000000000000000000000000 або номер картки"/></div>
               </div>
               <!-- Salary calculation section -->
               <div style="margin-top:12px;padding:14px;background:#f9f7ff;border-radius:10px;border:1px solid #e0d9ff">
@@ -1090,6 +1129,12 @@ tr:hover td{background:#faf9ff}
                   <div id="tp_salaryResult" style="font-size:14px;color:#6C47FF;font-weight:700;margin-top:6px;width:100%"></div>
                 </div>
                 <div id="tp_salaryBreakdown" style="margin-top:10px"></div>
+                <div id="tp_attendanceCalendar" style="margin-top:10px"></div>
+              </div>
+              <!-- Rate change history -->
+              <div class="no-print" style="margin-top:12px;padding:14px;background:#fafafa;border-radius:10px;border:1px solid #eee">
+                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:8px">🕒 Історія змін ставки</div>
+                <div id="tp_rateHistory" style="font-size:12px;color:#aaa">Немає змін</div>
               </div>
             </div>
             <!-- Documents section -->
@@ -1117,6 +1162,26 @@ tr:hover td{background:#faf9ff}
             <div id="tp_tenureDisplay" style="font-size:13px;color:#6C47FF;font-weight:600;margin-bottom:14px"></div>
             <div class="modal-group" style="margin-bottom:10px"><label class="modal-label">Дата народження</label><input class="modal-input" type="date" id="tp_birthday" oninput="updateBirthdayDisplay()"/></div>
             <div id="tp_birthdayDisplay" style="font-size:13px;color:#6C47FF;font-weight:600"></div>
+          </div>
+          <div class="no-print" style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:16px">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+              🌴 Відпустки / лікарняні
+              <span id="tp_leaveDaysTotal" style="color:#6C47FF;font-weight:700;font-size:11px"></span>
+            </div>
+            <div id="tp_leaveList" style="font-size:12px;color:#aaa;margin-bottom:10px">Немає записів</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="display:flex;gap:6px">
+                <select class="filter-select" id="tp_leaveType" style="flex:1;font-size:12px">
+                  <option value="vacation">Відпустка</option>
+                  <option value="sick">Лікарняний</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:6px">
+                <input class="modal-input" type="date" id="tp_leaveStart" style="flex:1;font-size:12px"/>
+                <input class="modal-input" type="date" id="tp_leaveEnd" style="flex:1;font-size:12px"/>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="addStaffLeave()">+ Додати</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1741,45 +1806,109 @@ async function createAdmin() {
   } catch { showToast('Помилка сервера', 'error'); }
 }
 
+let _allAdmins    = null;
+let _teachingToday = {};
+let _adminsSort   = { field: null, dir: 'asc' };
+
 async function renderAdmins() {
   try {
-    const res  = await fetch('/api/admins', { headers: { 'x-admin-token': token } });
-    if (!res.ok) { showToast('Помилка завантаження', 'error'); return; }
-    const data = await res.json();
-    const list = data.admins || [];
-    const tbody = document.getElementById('adminsBody');
-    if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:40px 20px">Адмінів поки немає. Натисніть «+ Додати адміна».</div></td></tr>`;
-      return;
-    }
-    tbody.innerHTML = list.map(a => {
-      const roleLbl = ROLE_LABELS[a.role] || a.role || '—';
-      const roleBg  = ROLE_COLORS[a.role]      || '#f0eeff';
-      const roleClr = ROLE_TEXT_COLORS[a.role] || '#6C47FF';
-      const nameCell = currentRole === 'superadmin'
-        ? `<button style="background:none;border:none;cursor:pointer;font-weight:600;color:#6C47FF;font-size:14px;text-decoration:underline;padding:0" onclick="openStaffProfile(${a.id})" title="Особова справа">${esc(a.name)}</button>`
-        : `<span style="font-weight:600">${esc(a.name)}</span>`;
-      const tokenDisplay = a.active
-        ? `<code style="font-size:11px;background:#f0eeff;padding:2px 8px;border-radius:4px;word-break:break-all;user-select:all">${esc(a.token)}</code>
-           <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="copyToken('${esc(a.token)}')">📋</button>`
-        : `<span style="color:#aaa;font-size:12px">—</span>`;
-      return `<tr>
-        <td>${nameCell}</td>
-        <td><span style="display:inline-block;background:${roleBg};color:${roleClr};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${roleLbl}</span></td>
-        <td>${tokenDisplay}</td>
-        <td>${a.active
-          ? '<span class="badge badge-enrolled">Активний</span>'
-          : '<span class="badge badge-rejected">Відкликано</span>'}</td>
-        <td style="color:#aaa;font-size:12px;white-space:nowrap">${esc(a.createdAt)}</td>
-        <td>
-          <div style="display:flex;gap:6px;white-space:nowrap;flex-wrap:wrap">
-            ${a.active ? `<button class="btn btn-ghost btn-sm" onclick="revokeAdmin(${a.id})">🔒 Відкликати</button>` : `<button class="btn btn-primary btn-sm" onclick="regenerateAdminToken(${a.id})">🔄 Відновити токен</button>`}
-            <button class="btn btn-danger btn-sm" onclick="deleteAdminUser(${a.id})">✕ Видалити</button>
-          </div>
-        </td>
-      </tr>`;
-    }).join('');
+    const [adminsRes, todayRes] = await Promise.all([
+      fetch('/api/admins', { headers: { 'x-admin-token': token } }),
+      currentRole === 'superadmin' ? fetch('/api/admins/teaching-today', { headers: { 'x-admin-token': token } }) : Promise.resolve(null),
+    ]);
+    if (!adminsRes.ok) { showToast('Помилка завантаження', 'error'); return; }
+    const data = await adminsRes.json();
+    _allAdmins = data.admins || [];
+    _teachingToday = todayRes && todayRes.ok ? (await todayRes.json()).byTeacher || {} : {};
+    filterAdminsTable();
   } catch { showToast('Помилка завантаження адмінів', 'error'); }
+}
+
+function toggleAdminsSort(field) {
+  if (_adminsSort.field === field) {
+    _adminsSort.dir = _adminsSort.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    _adminsSort = { field, dir: 'asc' };
+  }
+  filterAdminsTable();
+}
+
+function renderAdminsStats(list) {
+  const total   = list.length;
+  const teachers = list.filter(a => a.role === 'teacher' && a.active).length;
+  const probation = list.filter(a => a.employmentType === 'probation').length;
+  const pill = (label, value, color) => `<div style="background:#fff;border:1px solid #e8e4ff;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:600;color:#555;display:flex;align-items:center;gap:6px">
+    <span style="width:8px;height:8px;border-radius:50%;background:${color}"></span>${label}: <strong style="color:#333">${value}</strong>
+  </div>`;
+  document.getElementById('adminsStats').innerHTML =
+    pill('Всього', total, '#6C47FF') +
+    pill('Активних викладачів', teachers, '#22c55e') +
+    (probation ? pill('На випробувальному', probation, '#f59e0b') : '');
+}
+
+function filterAdminsTable() {
+  if (!_allAdmins) return;
+  const q      = (document.getElementById('adminsSearch')?.value  || '').trim().toLowerCase();
+  const roleF  = document.getElementById('adminsRoleFilter')?.value   || '';
+  const statusF = document.getElementById('adminsStatusFilter')?.value || '';
+
+  renderAdminsStats(_allAdmins);
+
+  let list = _allAdmins.filter(a => {
+    if (q && !a.name.toLowerCase().includes(q)) return false;
+    if (roleF && a.role !== roleF) return false;
+    if (statusF === 'active'  && !a.active) return false;
+    if (statusF === 'revoked' && a.active)  return false;
+    return true;
+  });
+
+  if (_adminsSort.field) {
+    const { field, dir } = _adminsSort;
+    list = list.slice().sort((a, b) => {
+      const av = (a[field] || ''), bv = (b[field] || '');
+      const cmp = String(av).localeCompare(String(bv));
+      return dir === 'asc' ? cmp : -cmp;
+    });
+  }
+  document.getElementById('adminsSortRole').textContent      = _adminsSort.field === 'role'      ? (_adminsSort.dir === 'asc' ? '▲' : '▼') : '';
+  document.getElementById('adminsSortCreatedAt').textContent = _adminsSort.field === 'createdAt' ? (_adminsSort.dir === 'asc' ? '▲' : '▼') : '';
+
+  const tbody = document.getElementById('adminsBody');
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:40px 20px">${_allAdmins.length ? 'Нічого не знайдено.' : 'Адмінів поки немає. Натисніть «+ Додати адміна».'}</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(a => {
+    const roleLbl = ROLE_LABELS[a.role] || a.role || '—';
+    const roleBg  = ROLE_COLORS[a.role]      || '#f0eeff';
+    const roleClr = ROLE_TEXT_COLORS[a.role] || '#6C47FF';
+    const todayLessons = _teachingToday[a.name] || [];
+    const todayBadge = todayLessons.length
+      ? ` <span title="${todayLessons.map(l => l.time + ' ' + esc(l.clientName)).join(', ')}" style="display:inline-block;background:#e8fff2;color:#15803d;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;white-space:nowrap">📅 ${todayLessons.length} сьогодні</span>`
+      : '';
+    const nameCell = currentRole === 'superadmin'
+      ? `<button style="background:none;border:none;cursor:pointer;font-weight:600;color:#6C47FF;font-size:14px;text-decoration:underline;padding:0" onclick="openStaffProfile(${a.id})" title="Особова справа">${esc(a.name)}</button>${todayBadge}`
+      : `<span style="font-weight:600">${esc(a.name)}</span>${todayBadge}`;
+    const tokenDisplay = a.active
+      ? `<code style="font-size:11px;background:#f0eeff;padding:2px 8px;border-radius:4px;word-break:break-all;user-select:all">${esc(a.token)}</code>
+         <button class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="copyToken('${esc(a.token)}')">📋</button>`
+      : `<span style="color:#aaa;font-size:12px">—</span>`;
+    return `<tr>
+      <td>${nameCell}</td>
+      <td><span style="display:inline-block;background:${roleBg};color:${roleClr};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${roleLbl}</span></td>
+      <td>${tokenDisplay}</td>
+      <td>${a.active
+        ? '<span class="badge badge-enrolled">Активний</span>'
+        : '<span class="badge badge-rejected">Відкликано</span>'}</td>
+      <td style="color:#aaa;font-size:12px;white-space:nowrap">${esc(a.createdAt)}</td>
+      <td>
+        <div style="display:flex;gap:6px;white-space:nowrap;flex-wrap:wrap">
+          ${a.active ? `<button class="btn btn-ghost btn-sm" onclick="revokeAdmin(${a.id})">🔒 Відкликати</button>` : `<button class="btn btn-primary btn-sm" onclick="regenerateAdminToken(${a.id})">🔄 Відновити токен</button>`}
+          <button class="btn btn-danger btn-sm" onclick="deleteAdminUser(${a.id})">✕ Видалити</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
 }
 
 async function revokeAdmin(id) {
@@ -4444,6 +4573,116 @@ function onJobTitleChange(val) {
   document.getElementById('tp_jobTitleOther').style.display = val === 'custom' ? '' : 'none';
 }
 
+function onEmploymentTypeChange(val) {
+  document.getElementById('tp_probationWrap').style.display = val === 'probation' ? '' : 'none';
+}
+
+// ── STAFF PROFILE: qualifications (courses this teacher can lead) ────────────
+function renderQualifications(selected) {
+  const el = document.getElementById('tp_qualifications');
+  const courses = _allCourses || [];
+  if (!courses.length) { el.innerHTML = '<span style="font-size:12px;color:#aaa">Курси ще завантажуються...</span>'; return; }
+  el.innerHTML = courses.map(c => {
+    const checked = selected.includes(c.id) ? 'checked' : '';
+    return `<label style="display:flex;align-items:center;gap:5px;background:#f9f7ff;border:1px solid #e8e4ff;border-radius:20px;padding:4px 10px;font-size:12px;cursor:pointer">
+      <input type="checkbox" value="${esc(c.id)}" ${checked} style="margin:0"/>${esc(c.emoji || '📚')} ${esc(c.name)}
+    </label>`;
+  }).join('');
+}
+
+function collectQualifications() {
+  return Array.from(document.querySelectorAll('#tp_qualifications input[type=checkbox]:checked')).map(i => i.value);
+}
+
+// ── STAFF PROFILE: rate/pay-mode change history (read-only) ──────────────────
+const RATE_HISTORY_LABELS = { paymentType: 'Тип оплати', hourlyRate: 'Ставка/год', monthlyRate: 'Місячна ставка' };
+
+async function loadRateHistory(adminId) {
+  try {
+    const res = await fetch(`/api/admins/${adminId}/history`, { headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    renderRateHistory(data.history || []);
+  } catch { /* keep whatever was shown before */ }
+}
+
+function renderRateHistory(list) {
+  const el = document.getElementById('tp_rateHistory');
+  if (!list.length) { el.innerHTML = '<span style="color:#aaa">Немає змін</span>'; return; }
+  el.innerHTML = list.map(h => {
+    const label = RATE_HISTORY_LABELS[h.field] || h.field;
+    const oldV  = h.oldValue == null || h.oldValue === '' ? '—' : esc(h.oldValue);
+    const newV  = h.newValue == null || h.newValue === '' ? '—' : esc(h.newValue);
+    return `<div style="padding:5px 0;border-bottom:1px solid #eee;display:flex;justify-content:space-between;gap:8px">
+      <span>${label}: ${oldV} → <strong>${newV}</strong></span>
+      <span style="color:#aaa;white-space:nowrap">${esc(h.changedAt)}</span>
+    </div>`;
+  }).join('');
+}
+
+// ── STAFF PROFILE: vacation / sick-leave tracker ──────────────────────────────
+const LEAVE_TYPE_LABELS = { vacation: '🌴 Відпустка', sick: '🤒 Лікарняний' };
+
+async function loadStaffLeave(adminId) {
+  try {
+    const res = await fetch(`/api/admins/${adminId}/leave`, { headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    renderStaffLeave(data.leave || []);
+  } catch { /* keep whatever was shown before */ }
+}
+
+function renderStaffLeave(list) {
+  const listEl  = document.getElementById('tp_leaveList');
+  const totalEl = document.getElementById('tp_leaveDaysTotal');
+  if (!list.length) {
+    listEl.innerHTML = '<span style="color:#aaa">Немає записів</span>';
+    totalEl.textContent = '';
+    return;
+  }
+  let totalDays = 0;
+  listEl.innerHTML = list.map(l => {
+    const days = Math.round((new Date(l.endDate + 'T00:00:00') - new Date(l.startDate + 'T00:00:00')) / 86400000) + 1;
+    totalDays += days;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 0;border-bottom:1px solid #eee">
+      <span>${LEAVE_TYPE_LABELS[l.type] || l.type} · ${esc(l.startDate)} — ${esc(l.endDate)} (${days} дн.)</span>
+      <button class="btn btn-ghost btn-sm no-print" style="padding:2px 6px" onclick="deleteStaffLeave(${l.id})">✕</button>
+    </div>`;
+  }).join('');
+  totalEl.textContent = `${totalDays} дн. всього`;
+}
+
+async function addStaffLeave() {
+  if (!_currentTeacherId) return;
+  const type  = document.getElementById('tp_leaveType').value;
+  const start = document.getElementById('tp_leaveStart').value;
+  const end   = document.getElementById('tp_leaveEnd').value;
+  if (!start || !end) { showToast('Вкажіть обидві дати', 'error'); return; }
+  if (end < start) { showToast('Кінцева дата раніше початкової', 'error'); return; }
+  try {
+    const res = await fetch(`/api/admins/${_currentTeacherId}/leave`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ type, startDate: start, endDate: end }),
+    });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    document.getElementById('tp_leaveStart').value = '';
+    document.getElementById('tp_leaveEnd').value   = '';
+    showToast('Додано ✓', 'success');
+    await loadStaffLeave(_currentTeacherId);
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+async function deleteStaffLeave(leaveId) {
+  if (!_currentTeacherId) return;
+  if (!confirm('Видалити цей запис?')) return;
+  try {
+    const res = await fetch(`/api/admins/${_currentTeacherId}/leave/${leaveId}`, {
+      method: 'DELETE', headers: { 'x-admin-token': token },
+    });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    await loadStaffLeave(_currentTeacherId);
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
 async function openStaffProfile(adminId) {
   if (currentRole !== 'superadmin') return;
   _currentTeacherId = adminId;
@@ -4473,9 +4712,18 @@ async function openStaffProfile(adminId) {
     document.getElementById('tp_notes').value    = admin.notes    || '';
     document.getElementById('tp_hireDate').value = admin.hireDate || '';
     document.getElementById('tp_birthday').value = admin.birthday || '';
+    document.getElementById('tp_bankDetails').value = admin.bankDetails || '';
+    const empType = admin.employmentType || 'full_time';
+    document.getElementById('tp_employmentType').value = empType;
+    document.getElementById('tp_probationUntil').value = admin.probationUntil || '';
+    onEmploymentTypeChange(empType);
+    renderQualifications(admin.qualifications || []);
     updateTenureDisplay();
     updateBirthdayDisplay();
     renderStaffProfileAccess(admin);
+    document.getElementById('tp_attendanceCalendar').innerHTML = '';
+    loadRateHistory(adminId);
+    loadStaffLeave(adminId);
 
     // Show/hide payment section — every paid role except superadmin (the owner)
     const showPayment = admin.role !== 'superadmin';
@@ -4540,12 +4788,16 @@ async function saveTeacherProfile() {
     notes:    document.getElementById('tp_notes').value.trim(),
     hireDate: document.getElementById('tp_hireDate').value,
     birthday: document.getElementById('tp_birthday').value,
+    employmentType: document.getElementById('tp_employmentType').value,
+    probationUntil: document.getElementById('tp_probationUntil').value,
+    qualifications: collectQualifications(),
   };
   if (!patch.name || patch.name.length < 2) { showToast('Вкажіть ім\'я', 'error'); return; }
   if (_currentStaffRole !== 'superadmin') {
     const pt = document.getElementById('tp_paymentType').value;
     patch.paymentType    = pt;
     patch.lessonDuration = parseInt(document.getElementById('tp_lessonDuration').value) || 60;
+    patch.bankDetails    = document.getElementById('tp_bankDetails').value.trim();
     if (pt === 'monthly') {
       patch.monthlyRate = parseFloat(document.getElementById('tp_monthlyRate').value) || 0;
     } else {
@@ -4562,6 +4814,7 @@ async function saveTeacherProfile() {
     showToast('Збережено ✓', 'success');
     document.getElementById('teacherProfileTitle').textContent = `👤 ${patch.name}`;
     renderAdmins(); // keep the background staff list fresh for when the user goes back
+    loadRateHistory(_currentTeacherId); // rate/pay-mode may have just changed
   } catch { showToast('Помилка сервера', 'error'); }
 }
 
@@ -4820,7 +5073,55 @@ async function loadTeacherSalary() {
     } else {
       breakdownEl.innerHTML = '<div style="color:#aaa;font-size:12px;margin-top:6px">Учнів у цього викладача не знайдено</div>';
     }
+    loadAttendanceCalendar(ym);
   } catch { resultEl.textContent = '⚠️ Помилка'; }
+}
+
+// ── STAFF PROFILE: compact attendance calendar (replaces a single monthly number
+// with a day-by-day view) ──────────────────────────────────────────────────────
+async function loadAttendanceCalendar(ym) {
+  const el = document.getElementById('tp_attendanceCalendar');
+  if (!el || !_currentTeacherId) return;
+  try {
+    const res = await fetch(`/api/admins/${_currentTeacherId}/attendance-calendar?ym=${ym}`, { headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    if (!res.ok) return;
+    renderAttendanceCalendar(ym, data.days || {});
+  } catch { /* keep the salary numbers visible even if the calendar fails */ }
+}
+
+function renderAttendanceCalendar(ym, days) {
+  const el = document.getElementById('tp_attendanceCalendar');
+  const [year, month] = ym.split('-').map(Number);
+  const daysInMonth = new Date(year, month, 0).getDate();
+  let firstDow = new Date(year, month - 1, 1).getDay(); // 0=Sun..6=Sat
+  firstDow = firstDow === 0 ? 6 : firstDow - 1; // → 0=Mon..6=Sun, for grid padding
+
+  const dotColor = (d) => {
+    if (!d) return 'transparent';
+    if (d.present || d.makeup) return '#22c55e';
+    if (d.absent) return '#dc2626';
+    if (d.cancelled) return '#f59e0b';
+    return 'transparent';
+  };
+  const cells = [];
+  for (let i = 0; i < firstDow; i++) cells.push('<div></div>');
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${ym}-${String(day).padStart(2, '0')}`;
+    const d = days[dateStr];
+    const color = dotColor(d);
+    const title = d ? `${day}: ✓${d.present||0} ✕${d.absent||0} ↻${d.makeup||0} ⊘${d.cancelled||0}` : String(day);
+    cells.push(`<div title="${esc(title)}" style="text-align:center;font-size:10px;color:#888;padding:2px 0">
+      <div>${day}</div>
+      <div style="width:6px;height:6px;border-radius:50%;background:${color};margin:2px auto 0"></div>
+    </div>`);
+  }
+  el.innerHTML = `
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin:10px 0 6px">📆 Календар відвідувань</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">${cells.join('')}</div>
+    <div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#888">
+      <span>🟢 проведено</span><span>🔴 пропуск</span><span>🟠 скасовано</span>
+    </div>`;
 }
 
 // ── SEO TEXTS ────────────────────────────────────────────────────────────────

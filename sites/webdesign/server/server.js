@@ -27,6 +27,8 @@ const sqliteDb       = require('./db');
 require('./migrate-json-to-sqlite').run(); // one-time JSON→SQLite import, no-op after first boot
 const db             = require('./database');
 const adminsDb       = require('./admins');
+const adminHistoryDb = require('./admin-history');
+const adminLeaveDb   = require('./admin-leave');
 const clientsDb      = require('./clients');
 const paymentsDb     = require('./payments');
 const attendanceDb   = require('./attendance');
@@ -536,8 +538,14 @@ app.delete('/api/admins/:id', adminLimiter, requireSuperAdmin, (req, res) => {
 app.patch('/api/admins/:id/profile', adminLimiter, requireSuperAdmin, (req, res) => {
   const id = parseInt(req.params.id);
   if (!id) return res.status(400).json({ error: 'Invalid ID' });
+  const before = adminsDb.getById(id);
+  if (!before) return res.status(404).json({ error: 'Не знайдено' });
   const patch = {};
-  const { name, hourlyRate, lessonDuration, notes, phone, paymentType, monthlyRate, fullName, city, jobTitle, hireDate, birthday } = req.body;
+  const {
+    name, hourlyRate, lessonDuration, notes, phone, paymentType, monthlyRate,
+    fullName, city, jobTitle, hireDate, birthday,
+    employmentType, probationUntil, qualifications, bankDetails,
+  } = req.body;
   if (name           !== undefined) patch.name           = sanitize(name);
   if (hourlyRate     !== undefined) patch.hourlyRate     = parseFloat(hourlyRate)    || 0;
   if (lessonDuration !== undefined) patch.lessonDuration = parseInt(lessonDuration)  || 60;
@@ -550,9 +558,89 @@ app.patch('/api/admins/:id/profile', adminLimiter, requireSuperAdmin, (req, res)
   if (jobTitle       !== undefined) patch.jobTitle       = sanitize(jobTitle);
   if (hireDate       !== undefined) patch.hireDate       = sanitize(hireDate);
   if (birthday       !== undefined) patch.birthday       = sanitize(birthday);
+  if (employmentType !== undefined) patch.employmentType = sanitize(employmentType);
+  if (probationUntil !== undefined) patch.probationUntil = sanitize(probationUntil);
+  if (qualifications !== undefined) patch.qualifications = Array.isArray(qualifications) ? qualifications.map(String).slice(0, 50) : [];
+  if (bankDetails    !== undefined) patch.bankDetails    = sanitize(bankDetails);
   const admin = adminsDb.update(id, patch);
   if (!admin) return res.status(404).json({ error: 'Не знайдено' });
+  // Retroactive-payroll audit trail — only log when a rate/pay-mode field actually changed.
+  adminHistoryDb.logChange(id, 'paymentType', before.paymentType, admin.paymentType);
+  adminHistoryDb.logChange(id, 'hourlyRate',  before.hourlyRate,  admin.hourlyRate);
+  adminHistoryDb.logChange(id, 'monthlyRate', before.monthlyRate, admin.monthlyRate);
   res.json({ success: true, admin });
+});
+
+// Rate/pay-mode change history (superadmin only)
+app.get('/api/admins/:id/history', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid ID' });
+  res.json({ success: true, history: adminHistoryDb.getForAdmin(id) });
+});
+
+// Vacation/sick-leave tracker (superadmin only)
+app.get('/api/admins/:id/leave', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid ID' });
+  res.json({ success: true, leave: adminLeaveDb.getForAdmin(id) });
+});
+
+app.post('/api/admins/:id/leave', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  if (!id) return res.status(400).json({ error: 'Invalid ID' });
+  if (!adminsDb.getById(id)) return res.status(404).json({ error: 'Не знайдено' });
+  const { type, startDate, endDate, notes } = req.body;
+  if (!startDate || !endDate) return res.status(400).json({ error: 'Вкажіть дати' });
+  const entry = adminLeaveDb.create({ adminId: id, type, startDate: sanitize(startDate), endDate: sanitize(endDate), notes: sanitize(notes) });
+  res.status(201).json({ success: true, entry });
+});
+
+app.delete('/api/admins/:id/leave/:leaveId', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id      = parseInt(req.params.id);
+  const leaveId = parseInt(req.params.leaveId);
+  const ok = adminLeaveDb.delete(leaveId, id);
+  if (!ok) return res.status(404).json({ error: 'Не знайдено' });
+  res.json({ success: true });
+});
+
+// Per-day attendance summary for a teacher's compact calendar view (superadmin only)
+app.get('/api/admins/:id/attendance-calendar', adminLimiter, requireSuperAdmin, (req, res) => {
+  const id = parseInt(req.params.id);
+  const admin = adminsDb.getById(id);
+  if (!admin) return res.status(404).json({ error: 'Не знайдено' });
+  const ym = req.query.ym || new Date().toISOString().slice(0, 7);
+  const [year, month] = ym.split('-').map(Number);
+  const teacherClients = clientsDb.getAll().filter(c => (c.teacher || '').trim() === (admin.name || '').trim());
+  const attData = attendanceDb.getMonth(year, month);
+  const days = {};
+  teacherClients.forEach(c => {
+    const clientAtt = attData[String(c.id)] || {};
+    Object.entries(clientAtt).forEach(([date, status]) => {
+      if (!days[date]) days[date] = { present: 0, absent: 0, makeup: 0, cancelled: 0 };
+      if (days[date][status] !== undefined) days[date][status]++;
+    });
+  });
+  res.json({ success: true, ym, days });
+});
+
+// "Who's teaching today" — compact list for the staff table (superadmin only)
+app.get('/api/admins/teaching-today', adminLimiter, requireSuperAdmin, (req, res) => {
+  const today = new Date();
+  let dow = today.getDay();
+  if (dow === 0) dow = 7; // 1=Mon..7=Sun, matching scheduleDays
+  const allClients = clientsDb.getAll();
+  const byTeacher = {};
+  allClients.forEach(c => {
+    if (!c.teacher || c.status !== 'active') return;
+    (c.scheduleDays || []).forEach(slot => {
+      if (parseInt(slot.day) !== dow) return;
+      const key = c.teacher.trim();
+      if (!byTeacher[key]) byTeacher[key] = [];
+      byTeacher[key].push({ time: slot.time || '', clientName: c.name });
+    });
+  });
+  Object.values(byTeacher).forEach(list => list.sort((a, b) => a.time.localeCompare(b.time)));
+  res.json({ success: true, byTeacher });
 });
 
 // Regenerate token for revoked admin (superadmin only)

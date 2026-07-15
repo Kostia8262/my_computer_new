@@ -25,6 +25,12 @@ function fromRow(row) {
   if (row.job_title       !== null) a.jobTitle       = row.job_title;
   if (row.hire_date       !== null) a.hireDate       = row.hire_date;
   if (row.birthday        !== null) a.birthday       = row.birthday;
+  if (row.employment_type !== null) a.employmentType = row.employment_type;
+  if (row.probation_until !== null) a.probationUntil = row.probation_until;
+  if (row.qualifications  !== null) {
+    try { a.qualifications = JSON.parse(row.qualifications); } catch { a.qualifications = []; }
+  }
+  if (row.bank_details    !== null) a.bankDetails    = row.bank_details;
   if (row.updated_at      !== null) a.updatedAt      = row.updated_at;
   return a;
 }
@@ -59,7 +65,7 @@ module.exports = {
     if (!existing) return null;
     const sets = ['updated_at = @updated_at'];
     const params = { id, updated_at: now() };
-    ['name', 'hourlyRate', 'lessonDuration', 'notes', 'phone', 'paymentType', 'monthlyRate', 'fullName', 'city', 'jobTitle', 'hireDate', 'birthday'].forEach(k => {
+    ['name', 'hourlyRate', 'lessonDuration', 'notes', 'phone', 'paymentType', 'monthlyRate', 'fullName', 'city', 'jobTitle', 'hireDate', 'birthday', 'employmentType', 'probationUntil', 'qualifications', 'bankDetails'].forEach(k => {
       if (!(k in patch)) return;
       if (k === 'hourlyRate')       { sets.push('hourly_rate = @hourly_rate'); params.hourly_rate = parseFloat(patch[k]) || 0; }
       else if (k === 'monthlyRate') { sets.push('monthly_rate = @monthly_rate'); params.monthly_rate = parseFloat(patch[k]) || 0; }
@@ -73,6 +79,10 @@ module.exports = {
       else if (k === 'jobTitle')    { sets.push('job_title = @job_title'); params.job_title = String(patch[k]).slice(0, 200); }
       else if (k === 'hireDate')    { sets.push('hire_date = @hire_date'); params.hire_date = String(patch[k]).slice(0, 20); }
       else if (k === 'birthday')    { sets.push('birthday = @birthday'); params.birthday = String(patch[k]).slice(0, 20); }
+      else if (k === 'employmentType') { sets.push('employment_type = @employment_type'); params.employment_type = String(patch[k]).slice(0, 20); }
+      else if (k === 'probationUntil') { sets.push('probation_until = @probation_until'); params.probation_until = String(patch[k]).slice(0, 20); }
+      else if (k === 'qualifications') { sets.push('qualifications = @qualifications'); params.qualifications = JSON.stringify(Array.isArray(patch[k]) ? patch[k] : []); }
+      else if (k === 'bankDetails')    { sets.push('bank_details = @bank_details'); params.bank_details = String(patch[k]).slice(0, 300); }
     });
     db.prepare(`UPDATE admins SET ${sets.join(', ')} WHERE id = @id`).run(params);
     return fromRow(selById.get(id));

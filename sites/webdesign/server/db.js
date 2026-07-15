@@ -64,6 +64,35 @@ CREATE INDEX IF NOT EXISTS idx_admins_token ON admins(token);
   try { db.exec(`ALTER TABLE admins ADD COLUMN ${col} TEXT`); } catch { /* already exists */ }
 });
 
+// Same pattern for employment type/probation, qualifications (JSON array of
+// course ids the teacher can lead) and bank details (payout requisites).
+['employment_type', 'probation_until', 'qualifications', 'bank_details'].forEach(col => {
+  try { db.exec(`ALTER TABLE admins ADD COLUMN ${col} TEXT`); } catch { /* already exists */ }
+});
+
+db.exec(`
+CREATE TABLE IF NOT EXISTS admin_rate_history (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  admin_id   INTEGER NOT NULL,
+  field      TEXT NOT NULL,
+  old_value  TEXT,
+  new_value  TEXT,
+  changed_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_admin_rate_history_admin ON admin_rate_history(admin_id);
+
+CREATE TABLE IF NOT EXISTS admin_leave (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  admin_id   INTEGER NOT NULL,
+  type       TEXT NOT NULL DEFAULT 'vacation',
+  start_date TEXT NOT NULL,
+  end_date   TEXT NOT NULL,
+  notes      TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_admin_leave_admin ON admin_leave(admin_id);
+`);
+
 db.exec(`
 
 CREATE TABLE IF NOT EXISTS articles (
