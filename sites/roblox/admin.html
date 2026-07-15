@@ -201,10 +201,26 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 }
 
 /* CLIENT SUB-TABS */
-.client-subtabs{display:flex;gap:4px;margin-bottom:20px;background:#f0eeff;padding:4px;border-radius:10px}
-.csub-btn{flex:1;padding:8px 10px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:transparent;color:#6C47FF;transition:all .15s;text-align:center}
-.csub-btn.active{background:#fff;color:#6C47FF;box-shadow:0 1px 6px rgba(108,71,255,.15)}
-.csub-btn:hover:not(.active){background:rgba(255,255,255,.55)}
+.client-subtabs{
+  display:flex;gap:4px;margin-bottom:20px;
+  background:linear-gradient(155deg,#211c33,#181527);
+  padding:5px;border-radius:13px;
+  box-shadow:0 6px 20px rgba(20,14,40,.28),inset 0 1px 0 rgba(255,255,255,.05);
+}
+.csub-btn{
+  flex:1;padding:10px 12px;border-radius:9px;font-size:13px;font-weight:600;
+  cursor:pointer;border:none;background:transparent;color:#9089b3;
+  transition:color .18s ease,background .18s ease,transform .1s ease,box-shadow .18s ease;
+  text-align:center;
+}
+.csub-btn:hover:not(.active){background:rgba(255,255,255,.07);color:#e3dffc}
+.csub-btn:active{transform:scale(.97)}
+.csub-btn:focus-visible{outline:2px solid #b7a4ff;outline-offset:2px}
+.csub-btn.active{
+  background:linear-gradient(135deg,#8465ff,#6C47FF);
+  color:#fff;
+  box-shadow:0 4px 12px rgba(108,71,255,.5),inset 0 1px 0 rgba(255,255,255,.18);
+}
 
 /* ATTENDANCE CALENDAR */
 .att-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
