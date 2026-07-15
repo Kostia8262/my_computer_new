@@ -917,7 +917,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
         <div>
           <h2 style="font-size:18px;font-weight:800;margin-bottom:2px">📊 Дашборд школи</h2>
-          <div style="font-size:12px;color:#aaa" id="dashLastUpdated">—</div>
+          <div style="font-size:12px;color:var(--c-gray-400)" id="dashLastUpdated">—</div>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="loadDashboardTab()">🔄 Оновити</button>
       </div>
@@ -929,34 +929,34 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       <div id="dashLatePayments" style="margin-bottom:20px"></div>
 
       <!-- ② FINANCIAL KPIs -->
-      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;margin-bottom:10px">💰 Фінанси</div>
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--c-gray-500);margin-bottom:10px">💰 Фінанси</div>
       <div class="stats" id="dashFinancials" style="margin-bottom:24px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
 
       <!-- ③ STUDENTS & LEADS KPIs -->
-      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#888;margin-bottom:10px">🎓 Учні та заявки</div>
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--c-gray-500);margin-bottom:10px">🎓 Учні та заявки</div>
       <div class="stats" id="dashStudents" style="margin-bottom:24px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
 
       <!-- ④ CHARTS ROW -->
       <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-bottom:24px">
-        <div style="background:#fff;border-radius:14px;border:1px solid #e8e4ff;padding:20px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#1a1a2e">📈 Виручка за останні 6 місяців</div>
+        <div class="card" style="padding:20px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--c-ink)">📈 Виручка за останні 6 місяців</div>
           <div id="dashRevenueChart" style="min-height:160px"></div>
         </div>
-        <div style="background:#fff;border-radius:14px;border:1px solid #e8e4ff;padding:20px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#1a1a2e">🎓 Учні по курсах</div>
+        <div class="card" style="padding:20px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--c-ink)">🎓 Учні по курсах</div>
           <div id="dashCourseChart"></div>
         </div>
-        <div style="background:#fff;border-radius:14px;border:1px solid #e8e4ff;padding:20px">
-          <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:#1a1a2e">📋 Воронка заявок</div>
+        <div class="card" style="padding:20px">
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--c-ink)">📋 Воронка заявок</div>
           <div id="dashLeadsChart"></div>
         </div>
       </div>
 
       <!-- ⑤ UNPAID STUDENTS TABLE -->
-      <div style="background:#fff;border-radius:14px;border:1px solid #e8e4ff;padding:20px;margin-bottom:16px">
+      <div class="card" style="padding:20px;margin-bottom:16px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="font-size:13px;font-weight:700;color:#1a1a2e">⚠️ Несплачені учні — <span id="dashCurMonth">—</span></div>
-          <div style="font-size:12px;color:#888" id="dashUnpaidSummary"></div>
+          <div style="font-size:13px;font-weight:700;color:var(--c-ink)">⚠️ Несплачені учні — <span id="dashCurMonth">—</span></div>
+          <div style="font-size:12px;color:var(--c-gray-500)" id="dashUnpaidSummary"></div>
         </div>
         <div id="dashUnpaidTable"></div>
       </div>
@@ -4158,7 +4158,7 @@ function dashKpi(icon, value, label, color, sub) {
     <div style="font-size:20px;margin-bottom:3px">${icon}</div>
     <div class="stat-num" style="color:${color};font-size:22px">${value}</div>
     <div class="stat-label" style="font-size:12px">${label}</div>
-    ${sub ? `<div style="font-size:11px;color:#aaa;margin-top:3px">${sub}</div>` : ''}
+    ${sub ? `<div style="font-size:11px;color:var(--c-gray-400);margin-top:3px">${sub}</div>` : ''}
   </div>`;
 }
 
@@ -4166,8 +4166,8 @@ function dashBar(label, val, maxVal, color) {
   const pct = maxVal > 0 ? Math.round(val / maxVal * 100) : 0;
   return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
     <div style="min-width:90px;font-size:12px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</div>
-    <div style="flex:1;background:#f0eeff;border-radius:4px;height:18px">
-      <div style="background:${color||'#6C47FF'};border-radius:4px;height:100%;width:${pct}%;min-width:${val>0?4:0}px;transition:width .5s"></div>
+    <div style="flex:1;background:var(--c-brand-50);border-radius:4px;height:18px">
+      <div style="background:${color||'var(--c-brand-500)'};border-radius:4px;height:100%;width:${pct}%;min-width:${val>0?4:0}px;transition:width .5s"></div>
     </div>
     <div style="min-width:24px;font-size:12px;font-weight:700;text-align:right">${val}</div>
   </div>`;
@@ -4195,7 +4195,7 @@ async function loadDashboardTab() {
   const updatedEl    = document.getElementById('dashLastUpdated');
   if (!financialsEl) return;
 
-  financialsEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#aaa;padding:14px;font-size:13px">⏳ Завантаження...</div>';
+  financialsEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--c-gray-400);padding:14px;font-size:13px">⏳ Завантаження...</div>';
 
   const ym = new Date().toISOString().slice(0,7);
   const ymLabel = `${MONTH_NAMES[parseInt(ym.slice(5))]} ${ym.slice(0,4)}`;
@@ -4226,18 +4226,18 @@ async function loadDashboardTab() {
         alertsEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px;margin-bottom:4px">` +
           all.map(a => {
             const isHigh = a.severity === 'high';
-            return `<div style="background:${isHigh?'#fff5f5':'#fffbeb'};border:2px solid ${isHigh?'#fca5a5':'#fde68a'};border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
+            return `<div style="background:${isHigh?'#fff5f5':'#fffbeb'};border:2px solid ${isHigh?'#fca5a5':'var(--c-warning-border)'};border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
               <span style="font-size:20px;flex-shrink:0">${isHigh?'🚨':'⚠️'}</span>
               <div style="flex:1;min-width:0">
-                <div style="font-weight:700;font-size:13px;color:${isHigh?'#dc2626':'#92400e'};margin-bottom:3px">${esc(a.message)}</div>
+                <div style="font-weight:700;font-size:13px;color:${isHigh?'var(--c-danger-text)':'#92400e'};margin-bottom:3px">${esc(a.message)}</div>
                 <div style="font-size:11px;color:#666;line-height:1.4">${esc(a.hint)}</div>
-                ${a.count ? `<div style="font-size:11px;font-weight:700;color:${isHigh?'#dc2626':'#b45309'};margin-top:4px">${a.count} ${a.type.includes('lead')?'заявок':'клієнтів'}</div>` : ''}
+                ${a.count ? `<div style="font-size:11px;font-weight:700;color:${isHigh?'var(--c-danger-text)':'var(--c-warning-text)'};margin-top:4px">${a.count} ${a.type.includes('lead')?'заявок':'клієнтів'}</div>` : ''}
               </div>
               <button class="btn btn-ghost btn-sm" onclick="showTab('${a.tab}')" style="flex-shrink:0;white-space:nowrap">→</button>
             </div>`;
           }).join('') + '</div>';
       } else {
-        alertsEl.innerHTML = `<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:12px 16px;font-size:13px;font-weight:600;color:#15803d;margin-bottom:4px">✅ Критичних проблем немає — всі заявки оброблено, прострочень не виявлено</div>`;
+        alertsEl.innerHTML = `<div style="background:var(--c-done-bg);border:1.5px solid #86efac;border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:var(--c-success-text);margin-bottom:4px">✅ Критичних проблем немає — всі заявки оброблено, прострочень не виявлено</div>`;
       }
     }
 
@@ -4256,33 +4256,33 @@ async function loadDashboardTab() {
         });
         if (overdue.length) {
           lateEl.innerHTML = `
-            <div style="background:#fff5f5;border:2px solid #fca5a5;border-radius:14px;padding:20px">
+            <div style="background:#fff5f5;border:2px solid #fca5a5;border-radius:var(--r-xl);padding:20px">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
                 <span style="font-size:22px">🚨</span>
                 <div>
-                  <div style="font-size:14px;font-weight:800;color:#dc2626">Прострочені оплати — сьогодні ${dayOfMonth} число</div>
+                  <div style="font-size:14px;font-weight:800;color:var(--c-danger-text)">Прострочені оплати — сьогодні ${dayOfMonth} число</div>
                   <div style="font-size:12px;color:#b91c1c;margin-top:2px">${overdue.length} учнів не сплатили після 10-го числа</div>
                 </div>
               </div>
               <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px">
                 ${overdue.map(r => {
                   const cl = clientMap2[r.clientId] || {};
-                  return `<div style="background:#fff;border:1px solid #fecaca;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px">
+                  return `<div style="background:var(--c-surface);border:1px solid var(--c-danger-border);border-radius:var(--r-md);padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px">
                     <div>
-                      <div style="font-weight:700;font-size:13px;color:#1a1a2e">${esc(r.clientName || cl.name || '—')}</div>
-                      <div style="font-size:11px;color:#dc2626;font-weight:600;margin-top:2px">${(parseFloat(r.expectedAmount)||0).toLocaleString('uk-UA')} ₴ · ${r.status === 'partial' ? 'часткова' : 'не сплатив'}</div>
+                      <div style="font-weight:700;font-size:13px;color:var(--c-ink)">${esc(r.clientName || cl.name || '—')}</div>
+                      <div style="font-size:11px;color:var(--c-danger-text);font-weight:600;margin-top:2px">${(parseFloat(r.expectedAmount)||0).toLocaleString('uk-UA')} ₴ · ${r.status === 'partial' ? 'часткова' : 'не сплатив'}</div>
                     </div>
-                    <a href="tel:${esc(cl.phone||'')}" style="font-size:12px;color:#6C47FF;font-weight:600;white-space:nowrap;text-decoration:none">${esc(cl.phone||'—')}</a>
+                    <a href="tel:${esc(cl.phone||'')}" style="font-size:12px;color:var(--c-brand-500);font-weight:600;white-space:nowrap;text-decoration:none">${esc(cl.phone||'—')}</a>
                   </div>`;
                 }).join('')}
               </div>
-              <div style="margin-top:12px;font-size:12px;color:#888">Загальна сума боргу: <strong style="color:#dc2626">${overdue.reduce((s,r)=>s+Math.max(0,(parseFloat(r.expectedAmount)||0)-(parseFloat(r.paidAmount)||0)),0).toLocaleString('uk-UA')} ₴</strong></div>
+              <div style="margin-top:12px;font-size:12px;color:var(--c-gray-500)">Загальна сума боргу: <strong style="color:var(--c-danger-text)">${overdue.reduce((s,r)=>s+Math.max(0,(parseFloat(r.expectedAmount)||0)-(parseFloat(r.paidAmount)||0)),0).toLocaleString('uk-UA')} ₴</strong></div>
             </div>`;
         } else {
-          lateEl.innerHTML = `<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;padding:12px 16px;font-size:13px;font-weight:600;color:#15803d;margin-bottom:4px">✅ Після 10-го числа — всі учні сплатили цей місяць</div>`;
+          lateEl.innerHTML = `<div style="background:var(--c-done-bg);border:1.5px solid #86efac;border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:var(--c-success-text);margin-bottom:4px">✅ Після 10-го числа — всі учні сплатили цей місяць</div>`;
         }
       } else {
-        lateEl.innerHTML = `<div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:12px;padding:12px 16px;font-size:13px;font-weight:600;color:#92400e">⏳ Термін оплати до 10-го числа. Сьогодні ${dayOfMonth}-е — ще ${10 - dayOfMonth} дн. до дедлайну</div>`;
+        lateEl.innerHTML = `<div style="background:#fffbeb;border:1.5px solid var(--c-warning-border);border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:#92400e">⏳ Термін оплати до 10-го числа. Сьогодні ${dayOfMonth}-е — ще ${10 - dayOfMonth} дн. до дедлайну</div>`;
       }
     }
 
@@ -4315,13 +4315,13 @@ async function loadDashboardTab() {
     } catch {}
     const momDelta = prevRevenue > 0 ? Math.round((collected - prevRevenue) / prevRevenue * 100) : null;
     const momSign  = momDelta !== null ? (momDelta >= 0 ? `+${momDelta}%` : `${momDelta}%`) : '—';
-    const momColor = momDelta !== null ? (momDelta >= 0 ? '#15803d' : '#dc2626') : '#888';
+    const momColor = momDelta !== null ? (momDelta >= 0 ? 'var(--c-success-text)' : 'var(--c-danger-text)') : 'var(--c-gray-500)';
 
     financialsEl.innerHTML = [
-      dashKpi('💰', `${collected.toLocaleString('uk-UA')} ₴`, `Зібрано ${ymLabel}`, '#15803d', `Відносно попереднього місяця: <span style="color:${momColor};font-weight:700">${momSign}</span>`),
-      dashKpi('📊', `${collectRate}%`, 'Відсоток збору', collectRate >= 80 ? '#15803d' : collectRate >= 50 ? '#b45309' : '#dc2626', `очік. ${expected.toLocaleString('uk-UA')} ₴`),
-      dashKpi('⚠️', `${pendingCount} учн.`, 'Не сплатили', pendingCount > 0 ? '#dc2626' : '#15803d', `борг: ${pendingAmt.toLocaleString('uk-UA')} ₴`),
-      dashKpi('💳', `${avgRevenue.toLocaleString('uk-UA')} ₴`, 'Середній чек', '#6C47FF', `${payingCount} платників`),
+      dashKpi('💰', `${collected.toLocaleString('uk-UA')} ₴`, `Зібрано ${ymLabel}`, 'var(--c-success-text)', `Відносно попереднього місяця: <span style="color:${momColor};font-weight:700">${momSign}</span>`),
+      dashKpi('📊', `${collectRate}%`, 'Відсоток збору', collectRate >= 80 ? 'var(--c-success-text)' : collectRate >= 50 ? 'var(--c-warning-text)' : 'var(--c-danger-text)', `очік. ${expected.toLocaleString('uk-UA')} ₴`),
+      dashKpi('⚠️', `${pendingCount} учн.`, 'Не сплатили', pendingCount > 0 ? 'var(--c-danger-text)' : 'var(--c-success-text)', `борг: ${pendingAmt.toLocaleString('uk-UA')} ₴`),
+      dashKpi('💳', `${avgRevenue.toLocaleString('uk-UA')} ₴`, 'Середній чек', 'var(--c-brand-500)', `${payingCount} платників`),
     ].join('');
 
     // ── ③ STUDENTS & LEADS KPIs ──────────────────────────────────────────────
@@ -4364,13 +4364,13 @@ async function loadDashboardTab() {
       : 0;
 
     studentsEl.innerHTML = [
-      dashKpi('🎓', activeClients.length, 'Активних учнів', '#6C47FF', `+${trialClients.length} на пробному`),
-      dashKpi('⏸️', pausedClients.length, 'На паузі', pausedClients.length > 3 ? '#b45309' : '#888', 'ризик відтоку'),
-      dashKpi('🔴', churnedMonth.length, 'Відмовились (міс.)', churnedMonth.length > 0 ? '#dc2626' : '#15803d', 'відтік цього місяця'),
-      dashKpi('📥', unprocessed, 'Необроблені заявки', unprocessed > 0 ? '#dc2626' : '#15803d', `${newLeadsWeek} за тиждень`),
-      dashKpi('📈', `${convRate}%`, 'Конверсія в учні', convRate >= 30 ? '#15803d' : convRate >= 15 ? '#b45309' : '#dc2626', `${enrolledLeads} з ${totalLeads} заявок`),
+      dashKpi('🎓', activeClients.length, 'Активних учнів', 'var(--c-brand-500)', `+${trialClients.length} на пробному`),
+      dashKpi('⏸️', pausedClients.length, 'На паузі', pausedClients.length > 3 ? 'var(--c-warning-text)' : 'var(--c-gray-500)', 'ризик відтоку'),
+      dashKpi('🔴', churnedMonth.length, 'Відмовились (міс.)', churnedMonth.length > 0 ? 'var(--c-danger-text)' : 'var(--c-success-text)', 'відтік цього місяця'),
+      dashKpi('📥', unprocessed, 'Необроблені заявки', unprocessed > 0 ? 'var(--c-danger-text)' : 'var(--c-success-text)', `${newLeadsWeek} за тиждень`),
+      dashKpi('📈', `${convRate}%`, 'Конверсія в учні', convRate >= 30 ? 'var(--c-success-text)' : convRate >= 15 ? 'var(--c-warning-text)' : 'var(--c-danger-text)', `${enrolledLeads} з ${totalLeads} заявок`),
       dashKpi('🎂', validAges.length ? avgAge.toFixed(1) : '—', 'Середній вік дитини', '#0891b2', validAges.length ? `за ${validAges.length} учнями` : 'немає даних про вік'),
-      dashKpi('⏳', withEnroll.length ? avgLifetimeMonths.toFixed(1) + ' міс.' : '—', 'Лайфтайм учня', '#7c3aed', withEnroll.length ? `за ${withEnroll.length} учнями` : 'немає дати запису'),
+      dashKpi('⏳', withEnroll.length ? avgLifetimeMonths.toFixed(1) + ' міс.' : '—', 'Лайфтайм учня', 'var(--c-brand-700)', withEnroll.length ? `за ${withEnroll.length} учнями` : 'немає дати запису'),
     ].join('');
 
     // ── ④ CHARTS ─────────────────────────────────────────────────────────────
@@ -4401,12 +4401,12 @@ async function loadDashboardTab() {
         const hExp = Math.round(exp / maxV * 110);
         const mm   = parseInt(m.slice(5));
         return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px" title="${MONTH_NAMES[mm]}: зібрано ${v.toLocaleString('uk-UA')} ₴ / очік. ${exp.toLocaleString('uk-UA')} ₴">
-          <div style="font-size:9px;color:#888;white-space:nowrap">${v>0?(v/1000).toFixed(0)+'к':''}</div>
+          <div style="font-size:9px;color:var(--c-gray-500);white-space:nowrap">${v>0?(v/1000).toFixed(0)+'к':''}</div>
           <div style="width:100%;position:relative;height:${Math.max(hV,hExp)}px;display:flex;align-items:flex-end;gap:2px">
-            ${exp>0 ? `<div style="flex:1;background:#e0d9ff;border-radius:3px 3px 0 0;height:${hExp}px;min-height:3px"></div>` : ''}
-            <div style="flex:1;background:${m===ym?'#6C47FF':'#a78bfa'};border-radius:3px 3px 0 0;height:${hV}px;min-height:3px"></div>
+            ${exp>0 ? `<div style="flex:1;background:var(--c-brand-100);border-radius:3px 3px 0 0;height:${hExp}px;min-height:3px"></div>` : ''}
+            <div style="flex:1;background:${m===ym?'var(--c-brand-500)':'#a78bfa'};border-radius:3px 3px 0 0;height:${hV}px;min-height:3px"></div>
           </div>
-          <div style="font-size:9px;color:#888">${MONTH_NAMES[mm]}</div>
+          <div style="font-size:9px;color:var(--c-gray-500)">${MONTH_NAMES[mm]}</div>
         </div>`;
       }).join('');
 
@@ -4440,9 +4440,9 @@ async function loadDashboardTab() {
 
       revenueEl.innerHTML =
         `<div style="position:relative"><div style="display:flex;align-items:flex-end;gap:6px;height:130px">${barsHtml}</div>${trendSvg}</div>` +
-        `<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:#888">
+        `<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--c-gray-500)">
           <span><span style="display:inline-block;width:10px;height:10px;background:#a78bfa;border-radius:2px;margin-right:4px"></span>Очікувано</span>
-          <span><span style="display:inline-block;width:10px;height:10px;background:#6C47FF;border-radius:2px;margin-right:4px"></span>Зібрано</span>
+          <span><span style="display:inline-block;width:10px;height:10px;background:var(--c-brand-500);border-radius:2px;margin-right:4px"></span>Зібрано</span>
           <span><span style="display:inline-block;width:20px;height:2px;background:#f59e0b;border-radius:1px;margin-right:4px;vertical-align:middle"></span>Тренд</span>
         </div>`;
     }
@@ -4458,21 +4458,21 @@ async function loadDashboardTab() {
       const COLORS = { scratch:'#f59e0b', python:'#3b82f6', roblox:'#ef4444', web:'#8b5cf6', other:'#94a3b8' };
       courseChEl.innerHTML = Object.entries(courseCounts)
         .sort((a,b) => b[1]-a[1])
-        .map(([k,v]) => dashBar(COURSE_LABELS[k]||k, v, maxC, COLORS[k]||'#6C47FF'))
-        .join('') || '<div style="color:#aaa;font-size:12px">Немає даних</div>';
+        .map(([k,v]) => dashBar(COURSE_LABELS[k]||k, v, maxC, COLORS[k]||'var(--c-brand-500)'))
+        .join('') || '<div style="color:var(--c-gray-400);font-size:12px">Немає даних</div>';
     }
 
     // Leads funnel
     if (leadsChEl) {
       const STATUS_ORDER = ['new','contacted','trial_scheduled','enrolled','rejected'];
       const STATUS_LABELS2 = { new:'Нові', contacted:'Зв\'язались', trial_scheduled:'Пробний', enrolled:'Записані', rejected:'Відмовили' };
-      const STATUS_COLORS  = { new:'#3b82f6', contacted:'#f59e0b', trial_scheduled:'#8b5cf6', enrolled:'#15803d', rejected:'#dc2626' };
+      const STATUS_COLORS  = { new:'#3b82f6', contacted:'#f59e0b', trial_scheduled:'#8b5cf6', enrolled:'var(--c-success-text)', rejected:'var(--c-danger-text)' };
       const counts = {};
       leads.forEach(l => { counts[l.status] = (counts[l.status]||0)+1; });
       const maxL = Math.max(1, ...Object.values(counts));
       leadsChEl.innerHTML = STATUS_ORDER
         .map(st => counts[st] ? dashBar(STATUS_LABELS2[st], counts[st], maxL, STATUS_COLORS[st]) : '')
-        .join('') || '<div style="color:#aaa;font-size:12px">Немає заявок</div>';
+        .join('') || '<div style="color:var(--c-gray-400);font-size:12px">Немає заявок</div>';
     }
 
     // ── ⑤ UNPAID STUDENTS TABLE ──────────────────────────────────────────────
@@ -4488,17 +4488,17 @@ async function loadDashboardTab() {
           : '';
       }
       if (!unpaid.length) {
-        unpaidEl.innerHTML = '<div style="color:#15803d;font-size:13px;font-weight:600;padding:8px 0">✅ Всі учні сплатили за цей місяць</div>';
+        unpaidEl.innerHTML = '<div style="color:var(--c-success-text);font-size:13px;font-weight:600;padding:8px 0">✅ Всі учні сплатили за цей місяць</div>';
       } else {
         // Enrich with client course data
         const clientMap = {};
         clients.forEach(c => { clientMap[c.id] = c; });
         unpaidEl.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
           <thead><tr style="background:#fff5f5">
-            <th style="text-align:left;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">⚠️ Учень</th>
-            <th style="text-align:left;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">Курс</th>
-            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">Ціна навчання</th>
-            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">Телефон</th>
+            <th style="text-align:left;padding:8px 12px;border-bottom:2px solid #fecaca;color:var(--c-danger-text);font-size:11px;text-transform:uppercase">⚠️ Учень</th>
+            <th style="text-align:left;padding:8px 12px;border-bottom:2px solid #fecaca;color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Курс</th>
+            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Ціна навчання</th>
+            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Телефон</th>
             <th style="padding:8px 12px;border-bottom:2px solid #fecaca"></th>
           </tr></thead>
           <tbody>
@@ -4508,8 +4508,8 @@ async function loadDashboardTab() {
             return `<tr style="border-bottom:1px solid #fef2f2">
               <td style="padding:10px 12px;font-weight:600">${esc(r.clientName || cl.name || '—')}</td>
               <td style="padding:10px 12px"><span class="chip">${courseLabel}</span></td>
-              <td style="padding:10px 12px;font-weight:700;color:#dc2626;text-align:right">${Math.max(0,(parseFloat(r.expectedAmount)||0)-(parseFloat(r.paidAmount)||0)).toLocaleString('uk-UA')} ₴</td>
-              <td style="padding:10px 12px;color:#888;font-size:12px;text-align:right">${esc(cl.phone||'—')}</td>
+              <td style="padding:10px 12px;font-weight:700;color:var(--c-danger-text);text-align:right">${Math.max(0,(parseFloat(r.expectedAmount)||0)-(parseFloat(r.paidAmount)||0)).toLocaleString('uk-UA')} ₴</td>
+              <td style="padding:10px 12px;color:var(--c-gray-500);font-size:12px;text-align:right">${esc(cl.phone||'—')}</td>
               <td style="padding:10px 12px">
                 <button class="btn btn-ghost btn-sm" onclick="showTab('clients')" style="white-space:nowrap">Відкрити →</button>
               </td>
