@@ -1037,55 +1037,59 @@ tr:hover td{background:#faf9ff}
     </div><!-- /clientsTab -->
 
     <!-- TEACHER PROFILE MODAL (superadmin only) -->
-    <div class="modal-overlay" id="teacherProfileModal" style="display:none" onclick="if(event.target===this)closeTeacherProfile()">
-      <div class="modal-box" style="max-width:640px;max-height:90vh;overflow-y:auto">
-        <h3><span id="teacherProfileTitle">Особова справа</span><button class="btn btn-ghost btn-sm" onclick="closeTeacherProfile()">✕</button></h3>
-        <div class="modal-grid">
-          <div class="modal-group"><label class="modal-label">Ім'я</label><input class="modal-input" id="tp_name" placeholder="Ім'я"/></div>
-          <div class="modal-group"><label class="modal-label">Телефон</label><input class="modal-input" id="tp_phone" placeholder="+380..."/></div>
-          <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="tp_notes" rows="2" placeholder="Спеціалізація, примітки..."></textarea></div>
+    <div id="staffProfileTab" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="btn btn-ghost btn-sm" onclick="closeTeacherProfile()">← Назад</button>
+          <h2 style="font-size:18px;font-weight:800" id="teacherProfileTitle">Особова справа</h2>
         </div>
-        <!-- Teacher-only fields -->
-        <div id="tp_teacherSection">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin:14px 0 8px">📚 Оплата праці</div>
+        <button class="btn btn-primary" onclick="saveTeacherProfile()">💾 Зберегти</button>
+      </div>
+      <div style="max-width:760px">
+        <div style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:20px">
           <div class="modal-grid">
-            <div class="modal-group"><label class="modal-label">Тип оплати</label>
-              <select class="modal-input" id="tp_paymentType" onchange="onPaymentTypeChange(this.value)">
-                <option value="hourly">⏱ Погодинна</option>
-                <option value="monthly">📅 Місячна ставка</option>
-              </select>
+            <div class="modal-group"><label class="modal-label">Ім'я</label><input class="modal-input" id="tp_name" placeholder="Ім'я"/></div>
+            <div class="modal-group"><label class="modal-label">Телефон</label><input class="modal-input" id="tp_phone" placeholder="+380..."/></div>
+            <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="tp_notes" rows="2" placeholder="Спеціалізація, примітки..."></textarea></div>
+          </div>
+          <!-- Teacher-only fields -->
+          <div id="tp_teacherSection">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin:14px 0 8px">📚 Оплата праці</div>
+            <div class="modal-grid">
+              <div class="modal-group"><label class="modal-label">Тип оплати</label>
+                <select class="modal-input" id="tp_paymentType" onchange="onPaymentTypeChange(this.value)">
+                  <option value="hourly">⏱ Погодинна</option>
+                  <option value="monthly">📅 Місячна ставка</option>
+                </select>
+              </div>
+              <div class="modal-group" id="tp_hourlyWrap"><label class="modal-label">Ставка (₴/год)</label><input class="modal-input" type="number" id="tp_hourlyRate" placeholder="150" min="0"/></div>
+              <div class="modal-group" id="tp_lessonDurationWrap"><label class="modal-label">Тривалість уроку (хв)</label><input class="modal-input" type="number" id="tp_lessonDuration" placeholder="60" min="1"/></div>
+              <div class="modal-group" id="tp_monthlyWrap" style="display:none"><label class="modal-label">Місячна ставка (₴)</label><input class="modal-input" type="number" id="tp_monthlyRate" placeholder="12000" min="0"/></div>
             </div>
-            <div class="modal-group" id="tp_hourlyWrap"><label class="modal-label">Ставка (₴/год)</label><input class="modal-input" type="number" id="tp_hourlyRate" placeholder="150" min="0"/></div>
-            <div class="modal-group" id="tp_lessonDurationWrap"><label class="modal-label">Тривалість уроку (хв)</label><input class="modal-input" type="number" id="tp_lessonDuration" placeholder="60" min="1"/></div>
-            <div class="modal-group" id="tp_monthlyWrap" style="display:none"><label class="modal-label">Місячна ставка (₴)</label><input class="modal-input" type="number" id="tp_monthlyRate" placeholder="12000" min="0"/></div>
-          </div>
-          <!-- Salary calculation section -->
-          <div style="margin-top:12px;padding:14px;background:#f9f7ff;border-radius:10px;border:1px solid #e0d9ff">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">💰 Розрахунок зарплати</div>
-            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-              <select class="filter-select" id="tp_salaryMonth" style="min-width:160px">
-                <option value="">— Оберіть місяць —</option>
-              </select>
-              <button class="btn btn-primary btn-sm" onclick="loadTeacherSalary()" style="white-space:nowrap">📊 Розрахувати</button>
-              <div id="tp_salaryResult" style="font-size:14px;color:#6C47FF;font-weight:700;margin-top:6px;width:100%"></div>
+            <!-- Salary calculation section -->
+            <div style="margin-top:12px;padding:14px;background:#f9f7ff;border-radius:10px;border:1px solid #e0d9ff">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">💰 Розрахунок зарплати</div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <select class="filter-select" id="tp_salaryMonth" style="min-width:160px">
+                  <option value="">— Оберіть місяць —</option>
+                </select>
+                <button class="btn btn-primary btn-sm" onclick="loadTeacherSalary()" style="white-space:nowrap">📊 Розрахувати</button>
+                <div id="tp_salaryResult" style="font-size:14px;color:#6C47FF;font-weight:700;margin-top:6px;width:100%"></div>
+              </div>
+              <div id="tp_salaryBreakdown" style="margin-top:10px"></div>
             </div>
-            <div id="tp_salaryBreakdown" style="margin-top:10px"></div>
           </div>
-        </div>
-        <!-- Documents section -->
-        <div style="margin-top:16px;padding:14px;background:#f7f9ff;border-radius:10px;border:1px solid #dde8ff">
-          <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-            📎 Документи
-            <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
-              + Завантажити
-              <input type="file" style="display:none" id="tp_docInput" onchange="uploadStaffDoc()" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"/>
-            </label>
+          <!-- Documents section -->
+          <div style="margin-top:16px;padding:14px;background:#f7f9ff;border-radius:10px;border:1px solid #dde8ff">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+              📎 Документи
+              <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
+                + Завантажити
+                <input type="file" style="display:none" id="tp_docInput" onchange="uploadStaffDoc()" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"/>
+              </label>
+            </div>
+            <div id="tp_docsList" style="font-size:13px;color:#aaa">Немає документів</div>
           </div>
-          <div id="tp_docsList" style="font-size:13px;color:#aaa">Немає документів</div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-ghost" onclick="closeTeacherProfile()">Скасувати</button>
-          <button class="btn btn-primary" onclick="saveTeacherProfile()">💾 Зберегти</button>
         </div>
       </div>
     </div>
@@ -1397,6 +1401,11 @@ function onSiteChange() {
 function showTab(tab) {
   _currentTab = tab;
   localStorage.setItem(STORAGE_TAB_KEY, tab);
+  // staffProfileTab is a detail sub-view, not directly reachable from the
+  // sidebar — always collapse it on any tab switch so it can't stay visible
+  // underneath/alongside whatever tab is being switched to.
+  const staffProfileEl = document.getElementById('staffProfileTab');
+  if (staffProfileEl) staffProfileEl.style.display = 'none';
   ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
     const el = document.getElementById(t + 'Tab');
     if (el) el.style.display = t === tab ? '' : 'none';
@@ -4449,16 +4458,18 @@ async function openStaffProfile(adminId) {
     // Load docs
     await loadStaffDocs(adminId);
 
-    document.getElementById('teacherProfileModal').style.display = 'flex';
+    document.getElementById('adminsTab').style.display = 'none';
+    document.getElementById('staffProfileTab').style.display = '';
   } catch { showToast('Помилка завантаження', 'error'); }
 }
 
 const openTeacherProfile = openStaffProfile;
 
 function closeTeacherProfile() {
-  document.getElementById('teacherProfileModal').style.display = 'none';
   _currentTeacherId = null;
   _currentStaffRole = null;
+  document.getElementById('staffProfileTab').style.display = 'none';
+  showTab('admins');
 }
 
 async function saveTeacherProfile() {
@@ -4488,7 +4499,6 @@ async function saveTeacherProfile() {
     if (!res.ok) { const d = await res.json(); showToast(d.error || 'Помилка', 'error'); return; }
     showToast('Збережено ✓', 'success');
     closeTeacherProfile();
-    renderAdmins();
   } catch { showToast('Помилка сервера', 'error'); }
 }
 
