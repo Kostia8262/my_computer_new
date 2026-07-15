@@ -262,18 +262,22 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .att-header{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .att-month-nav{display:flex;align-items:center;gap:8px}
 .att-month-label{font-size:15px;font-weight:800;min-width:160px;text-align:center}
-.att-wrap{overflow-x:auto;background:#fff;border-radius:12px;border:1px solid #e8e4ff}
+.att-wrap{overflow-x:auto;background:var(--c-surface);border-radius:var(--r-lg);border:1px solid var(--c-border)}
 .att-table{border-collapse:collapse;font-size:12px}
-.att-table th{padding:8px 4px;text-align:center;font-size:11px;font-weight:700;color:#888;border-bottom:1px solid #f0eeff;white-space:nowrap;background:#faf9ff}
-.att-table th.aname{text-align:left;padding-left:14px;min-width:150px;background:#faf9ff}
-.att-table th.acourse{min-width:80px;background:#faf9ff}
-.att-table td{padding:3px;text-align:center;vertical-align:middle;border-bottom:1px solid #f8f7ff}
+.att-table th{padding:8px 4px;text-align:center;font-size:11px;font-weight:700;color:var(--c-gray-500);border-bottom:1px solid var(--c-border-soft);white-space:nowrap;background:var(--c-row-hover)}
+.att-table th.aname{text-align:left;padding-left:14px;min-width:150px;background:var(--c-row-hover)}
+.att-table th.acourse{min-width:80px;background:var(--c-row-hover)}
+.att-table td{padding:3px;text-align:center;vertical-align:middle;border-bottom:1px solid var(--c-border-faint)}
 .att-table td.aname{padding:8px 14px;text-align:left;font-weight:600;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis}
-.att-table td.acourse{padding:4px 8px;font-size:11px;color:#888;white-space:nowrap}
+.att-table td.acourse{padding:4px 8px;font-size:11px;color:var(--c-gray-500);white-space:nowrap}
 .att-table tr:last-child td{border-bottom:none}
+/* Calendar-cell status colors are a deliberate, more saturated palette
+   distinct from the standard badge tones — needed for glanceability in a
+   dense grid — kept as their own literal set, not forced onto the badge
+   semantic tokens (see design-system plan Phase 5 notes). */
 .att-cell{width:24px;height:24px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;transition:transform .1s;user-select:none;border:1px solid transparent;margin:1px}
 .att-cell:hover{transform:scale(1.25);z-index:1;position:relative}
-.att-none{background:#f0f0f0;color:#bbb}
+.att-none{background:#f0f0f0;color:var(--c-gray-300)}
 .att-present{background:#86efac;color:#15803d;border-color:#4ade80}
 .att-absent{background:#fca5a5;color:#dc2626;border-color:#f87171}
 .att-makeup{background:#fde68a;color:#92400e;border-color:#fbbf24}
@@ -300,41 +304,41 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* PAYMENTS SUB-TAB */
 .pay-table{width:100%;border-collapse:collapse;font-size:13px}
-.pay-table th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid #f0eeff;white-space:nowrap;background:#faf9ff}
-.pay-table td{padding:10px 12px;border-bottom:1px solid #f8f7ff;vertical-align:middle}
+.pay-table th{padding:10px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--c-gray-500);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--c-border-soft);white-space:nowrap;background:var(--c-row-hover)}
+.pay-table td{padding:10px 12px;border-bottom:1px solid var(--c-border-faint);vertical-align:middle}
 .pay-table tr:last-child td{border-bottom:none}
-.pay-table tr:hover td{background:#faf9ff}
-.debt-red{color:#dc2626;font-weight:700}
-.debt-ok{color:#15803d;font-weight:600}
+.pay-table tr:hover td{background:var(--c-row-hover)}
+.debt-red{color:var(--c-danger-text);font-weight:700}
+.debt-ok{color:var(--c-success-text);font-weight:600}
 
 /* MONTHLY PAYMENTS */
-.pay-month-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between;background:#fff;border-radius:10px;padding:12px 16px;border:1px solid #e8e4ff}
+.pay-month-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between;background:var(--c-surface);border-radius:var(--r-lg);padding:12px 16px;border:1px solid var(--c-border)}
 .pay-month-nav{display:flex;align-items:center;gap:6px}
 .pay-month-label{font-size:15px;font-weight:800;min-width:155px;text-align:center}
-.pay-alert{background:#fff0f0;border:1.5px solid #fecaca;border-radius:10px;padding:12px 16px;margin-bottom:14px}
-.pay-alert-title{font-size:13px;font-weight:700;color:#dc2626;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.pay-alert{background:var(--c-danger-bg);border:1.5px solid var(--c-danger-border);border-radius:var(--r-lg);padding:12px 16px;margin-bottom:14px}
+.pay-alert-title{font-size:13px;font-weight:700;color:var(--c-danger-text);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .pay-alert-names{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
-.pay-alert-badge{background:#fecaca;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600;color:#991b1b;white-space:nowrap}
-.mp-status-sel{padding:3px 7px;border-radius:6px;font-size:12px;font-weight:700;border:1.5px solid transparent;cursor:pointer;outline:none;min-width:120px}
+.pay-alert-badge{background:var(--c-danger-border);padding:2px 9px;border-radius:var(--r-lg);font-size:11px;font-weight:600;color:#991b1b;white-space:nowrap}
+.mp-status-sel{padding:3px 7px;border-radius:var(--r-sm);font-size:12px;font-weight:700;border:1.5px solid transparent;cursor:pointer;outline:none;min-width:120px}
 .mp-status-pending{background:var(--c-danger-bg);color:var(--c-danger-text);border-color:var(--c-danger-border)}
 .mp-status-paid{background:var(--c-success-bg);color:var(--c-success-text);border-color:var(--c-success-border)}
 .mp-status-partial{background:var(--c-warning-bg);color:var(--c-warning-text);border-color:var(--c-warning-border)}
 .mp-status-waived{background:var(--c-info-bg);color:var(--c-info-text);border-color:var(--c-info-border)}
 .mp-status-completed{background:var(--c-neutral-bg);color:var(--c-neutral-text);border-color:var(--c-neutral-border)}
-.mp-inline{padding:4px 7px;border:1.5px solid #e0d9ff;border-radius:6px;font-size:12px;outline:none;background:#fff;width:100%;min-width:60px}
-.mp-inline:focus{border-color:#6C47FF}
-.mp-no-month{text-align:center;padding:40px 20px;color:#888}
+.mp-inline{padding:4px 7px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-sm);font-size:12px;outline:none;background:var(--c-surface);width:100%;min-width:60px}
+.mp-inline:focus{border-color:var(--c-brand-500)}
+.mp-no-month{text-align:center;padding:40px 20px;color:var(--c-gray-500)}
 .mp-no-month h3{font-size:16px;margin-bottom:8px;color:#444}
-.mp-month-del{color:#dc2626;background:none;border:none;cursor:pointer;font-size:12px;padding:3px 6px;opacity:0.6}
+.mp-month-del{color:var(--c-danger-text);background:none;border:none;cursor:pointer;font-size:12px;padding:3px 6px;opacity:0.6}
 .mp-month-del:hover{opacity:1}
 
 /* PAY HISTORY MODAL */
 .pay-hist-list{max-height:320px;overflow-y:auto;margin-top:12px}
-.pay-hist-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0eeff}
+.pay-hist-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--c-border-soft)}
 .pay-hist-item:last-child{border-bottom:none}
-.pay-hist-amount{font-weight:700;font-size:15px;color:#6C47FF;min-width:80px}
-.pay-hist-date{font-size:12px;color:#888;min-width:85px}
-.pay-hist-method{font-size:11px;background:#f0eeff;color:#6C47FF;padding:2px 7px;border-radius:10px;font-weight:600}
+.pay-hist-amount{font-weight:700;font-size:15px;color:var(--c-brand-500);min-width:80px}
+.pay-hist-date{font-size:12px;color:var(--c-gray-500);min-width:85px}
+.pay-hist-method{font-size:11px;background:var(--c-brand-50);color:var(--c-brand-500);padding:2px 7px;border-radius:var(--r-lg);font-weight:600}
 .pay-hist-note{font-size:12px;color:#666;flex:1}
 
 /* CONTENT CMS */
@@ -393,9 +397,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 /* SCHEDULE VIEW */
 .sched-wrap{overflow-x:auto}
 .sched-tbl{border-collapse:collapse;min-width:600px;width:100%}
-.sched-tbl th{padding:10px 6px;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.4px;text-align:center;background:#faf9ff;border:1px solid #f0eeff}
-.sched-tbl td{border:1px solid #f0eeff;padding:3px;vertical-align:top;min-width:80px}
-.sched-time{font-size:11px;color:#aaa;font-weight:700;text-align:right;padding:8px;white-space:nowrap;background:#faf9ff;width:52px}
+.sched-tbl th{padding:10px 6px;font-size:11px;font-weight:700;color:var(--c-gray-500);text-transform:uppercase;letter-spacing:.4px;text-align:center;background:var(--c-row-hover);border:1px solid var(--c-border-soft)}
+.sched-tbl td{border:1px solid var(--c-border-soft);padding:3px;vertical-align:top;min-width:80px}
+.sched-time{font-size:11px;color:var(--c-gray-400);font-weight:700;text-align:right;padding:8px;white-space:nowrap;background:var(--c-row-hover);width:52px}
 .sched-card{border-radius:6px;padding:3px 7px;margin:2px 0;font-size:11px;font-weight:600;line-height:1.4;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* STAFF PROFILE — PDF export via browser print: hide chrome, show only the profile card */
 @media print{
@@ -1152,7 +1156,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
             <button class="btn btn-ghost btn-sm" onclick="goToCurrentSchedWeek()" title="Поточний тиждень" style="font-size:11px">Сьогодні</button>
           </div>
         </div>
-        <div style="background:#fff;border-radius:12px;border:1px solid #e8e4ff;padding:16px">
+        <div class="card">
           <div class="sched-wrap hscroll-native-hidden" id="schedGrid">
             <div class="empty" style="padding:40px">Завантаження...</div>
           </div>
@@ -2221,11 +2225,11 @@ function renderClientStats(stats) {
   if (!el) return;
   const newThisMonth = (_allClients || []).filter(c => c.status === 'new' && _isCurrentMonth(c.createdAt)).length;
   el.innerHTML = [
-    ['Всього', stats.total || 0, '#6C47FF'],
-    ['Нові', newThisMonth, '#2563eb'],
-    ['Активні', stats.active || 0, '#15803d'],
-    ['Пауза', stats.paused || 0, '#b45309'],
-    ['Завершили', stats.completed || 0, '#166534'],
+    ['Всього', stats.total || 0, 'var(--c-brand-500)'],
+    ['Нові', newThisMonth, 'var(--c-info-text)'],
+    ['Активні', stats.active || 0, 'var(--c-success-text)'],
+    ['Пауза', stats.paused || 0, 'var(--c-warning-text)'],
+    ['Завершили', stats.completed || 0, 'var(--c-done-text)'],
   ].map(([label, num, color]) => `
     <div class="stat"><div class="stat-num" style="color:${color}">${num}</div><div class="stat-label">${label}</div></div>
   `).join('');
@@ -2283,7 +2287,7 @@ function renderClients() {
 
       // Next-call coloring
       const ncStyle = c.nextContact && new Date(c.nextContact) < new Date()
-        ? 'color:#dc2626;font-weight:700' : '';
+        ? 'color:var(--c-danger-text);font-weight:700' : '';
 
       const schedLines = (c.scheduleDays && c.scheduleDays.length)
         ? c.scheduleDays.map(s => `${esc(DAYS_SHORT[s.day]||String(s.day))} ${esc(s.time||'')}`).join('<br>')
@@ -2291,7 +2295,7 @@ function renderClients() {
 
       return `<tr>
         <td class="td-tight" style="padding-left:12px"><input type="checkbox" ${_selectedClients.has(c.id)?'checked':''} onchange="toggleClientCheck(${c.id})"/></td>
-        <td style="color:#aaa;font-size:12px">#${c.id}</td>
+        <td style="color:var(--c-gray-400);font-size:12px">#${c.id}</td>
         <td><input class="notes-input" style="font-weight:600;min-width:90px"
           value="${esc(c.name||'')}"
           onblur="saveClientField(${c.id},'name',this.value)"
@@ -3011,7 +3015,7 @@ function renderAttCalendar() {
     const dow = new Date(date).getDay();
     const isWeekend = dow === 0 || dow === 6;
     const isToday   = date === today;
-    const style = (isToday ? `${TODAY_TINT};color:#6C47FF;font-weight:800` : '') + (isWeekend && !isToday ? 'color:#bbb' : '');
+    const style = (isToday ? `${TODAY_TINT};color:var(--c-brand-500);font-weight:800` : '') + (isWeekend && !isToday ? 'color:var(--c-gray-300)' : '');
     html += `<th style="${style}" title="${date}">${d}</th>`;
   }
   html += '</tr></thead><tbody>';
@@ -4751,8 +4755,8 @@ function renderSchedule() {
   for (let d = 1; d <= 7; d++) {
     const { date, str } = colDates[d - 1];
     const isToday  = date.toDateString() === todayStr;
-    const todayCss = isToday ? 'background:#f0eeff;color:#6C47FF;' : '';
-    html += `<th style="${todayCss}font-size:12px">${SCHED_DAYS_SHORT[d]}<br><span style="font-weight:400;font-size:11px;color:${isToday?'#6C47FF':'#aaa'}">${str}</span></th>`;
+    const todayCss = isToday ? 'background:var(--c-brand-50);color:var(--c-brand-500);' : '';
+    html += `<th style="${todayCss}font-size:12px">${SCHED_DAYS_SHORT[d]}<br><span style="font-weight:400;font-size:11px;color:${isToday?'var(--c-brand-500)':'var(--c-gray-400)'}">${str}</span></th>`;
   }
   html += '</tr></thead><tbody>';
 
@@ -4795,14 +4799,14 @@ function renderSchedule() {
                 const attSt2 = (_schedAttData[String(c.clientId)] || {})[isoDate] || '';
                 const [attBg2, attBr2] = _attDotColors(attSt2);
                 return `<div style="font-size:11px;display:flex;align-items:center;gap:4px;padding:2px 0;border-top:1px solid ${color}22">
-                  <span style="flex:1;color:#333">${esc(c.name)}${cl?` <span style="color:#aaa">(${cl})</span>`:''}</span>
+                  <span style="flex:1;color:var(--c-ink-soft)">${esc(c.name)}${cl?` <span style="color:var(--c-gray-400)">(${cl})</span>`:''}</span>
                   <button onclick="event.stopPropagation();openAttDropdown(event,${c.clientId},'${isoDate}')"
                     title="Відвідування" style="flex-shrink:0;width:12px;height:12px;border-radius:50%;border:1.5px solid ${attBr2};background:${attBg2};cursor:pointer;padding:0"></button>
                   <button onclick="event.stopPropagation();openSchedPopup(event,${c.clientId})"
                     style="font-size:9px;padding:1px 5px;border:1px solid ${color}44;border-radius:3px;background:white;color:${color};cursor:pointer">✏</button>
                 </div>`;
               }).join('')}
-              <div style="font-size:10px;color:#aaa;margin-top:3px">${time} · ${dateStr}</div>
+              <div style="font-size:10px;color:var(--c-gray-400);margin-top:3px">${time} · ${dateStr}</div>
             </div>
           </div>`;
         }).join('');
@@ -4818,6 +4822,8 @@ function renderSchedule() {
 }
 
 function _teacherColor(name) {
+  // Values are consumed as raw hex with an appended alpha suffix (e.g. `${color}22`)
+  // for the translucent card backgrounds below — must stay literal hex, not var().
   const palette = ['#6C47FF','#2563eb','#15803d','#b45309','#dc2626','#7c3aed','#0891b2'];
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
