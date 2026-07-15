@@ -293,7 +293,7 @@ tr:hover td{background:#faf9ff}
 <div class="login-wrap" id="loginWrap">
   <div class="login-box">
     <div class="logo-row">
-      <div class="logo-icon"><svg width="20" height="20" viewBox="0 0 32 32" fill="none"><path d="M8 11L13 16L8 21" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21H24" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+      <img src="/android-chrome-192x192.png" alt="My Computer Academy" width="36" height="36" style="border-radius:50%"/>
       <span style="font-weight:800">My Computer Academy</span>
     </div>
     <h1>Вхід в адмін-панель</h1>
@@ -308,9 +308,7 @@ tr:hover td{background:#faf9ff}
 <div class="app" id="app">
   <div class="topbar">
     <div class="topbar-left">
-      <div class="logo-icon" style="width:32px;height:32px;background:#6C47FF;border-radius:7px;display:flex;align-items:center;justify-content:center">
-        <svg width="18" height="18" viewBox="0 0 32 32" fill="none"><path d="M8 11L13 16L8 21" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21H24" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
-      </div>
+      <img src="/android-chrome-192x192.png" alt="My Computer Academy" width="32" height="32" style="border-radius:50%"/>
       <span id="panelTitle">Admin Panel</span>
       <span id="roleBadge" style="font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;margin-left:8px"></span>
     </div>
@@ -337,13 +335,33 @@ tr:hover td{background:#faf9ff}
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebarEl">
     <nav class="sidebar-nav">
-      <div class="sidebar-section">Навігація</div>
+      <div class="sidebar-section">Спільне</div>
       <button class="sidebar-item active" id="sideNav-leads" onclick="showTab('leads')">
         <span class="sidebar-icon">📋</span><span>Заявки</span>
       </button>
       <button class="sidebar-item" id="sideNav-clients" onclick="showTab('clients')">
         <span class="sidebar-icon">🗂</span><span>База клієнтів</span>
       </button>
+      <button class="sidebar-item management-visible" id="sideNav-dashboard" onclick="showTab('dashboard')" style="display:none">
+        <span class="sidebar-icon">📊</span><span>Дашборд</span>
+      </button>
+      <button class="sidebar-item superadmin-only" id="sideNav-admins" onclick="showTab('admins')" style="display:none">
+        <span class="sidebar-icon">👥</span><span>Співробітники</span>
+      </button>
+
+      <div class="sidebar-section" style="margin-top:16px">Сайт</div>
+      <div style="padding:0 16px 12px">
+        <select id="siteSelector" class="modal-input" style="width:100%;font-size:13px" onchange="onSiteChange()">
+          <option value="">mycomputer.education</option>
+          <option value="https://mycomputer.school">mycomputer.school</option>
+          <option value="https://webdesign.mycomputer.education">webdesign.mycomputer.education</option>
+          <option value="https://python.mycomputer.education">python.mycomputer.education</option>
+          <option value="https://minecraft.mycomputer.education">minecraft.mycomputer.education</option>
+          <option value="https://roblox.mycomputer.education">roblox.mycomputer.education</option>
+        </select>
+      </div>
+
+      <div class="sidebar-section">Контент сайту</div>
       <button class="sidebar-item" id="sideNav-courses" onclick="showTab('courses')">
         <span class="sidebar-icon">🎓</span><span>Курси</span>
       </button>
@@ -362,12 +380,8 @@ tr:hover td{background:#faf9ff}
       <button class="sidebar-item" id="sideNav-reviews" onclick="showTab('reviews')">
         <span class="sidebar-icon">⭐</span><span>Відгуки</span>
       </button>
-      <div class="sidebar-section">Налаштування</div>
-      <button class="sidebar-item management-visible" id="sideNav-dashboard" onclick="showTab('dashboard')" style="display:none">
-        <span class="sidebar-icon">📊</span><span>Дашборд</span>
-      </button>
-      <button class="sidebar-item superadmin-only" id="sideNav-admins" onclick="showTab('admins')" style="display:none">
-        <span class="sidebar-icon">👥</span><span>Співробітники</span>
+      <button class="sidebar-item" id="sideNav-seo" onclick="showTab('seo')">
+        <span class="sidebar-icon">🔍</span><span>SEO тексти</span>
       </button>
     </nav>
   </div>
@@ -420,17 +434,6 @@ tr:hover td{background:#faf9ff}
       </div>
     </div>
 
-    <!-- ALERTS PANEL (always visible) -->
-    <div class="alerts-panel" id="alertsPanel">
-      <div class="alerts-panel__header" onclick="toggleAlerts()">
-        <span style="font-size:16px">⚠️</span>
-        <span class="alerts-panel__title" id="alertsTitle">Завантаження підказок...</span>
-        <span class="alerts-panel__badge" id="alertsBadge">...</span>
-        <span id="alertsChevron" style="font-size:12px;color:#888">▼</span>
-      </div>
-      <div class="alerts-panel__body" id="alertsBody"></div>
-    </div>
-
     <!-- NEW LEAD MODAL -->
     <div class="modal-overlay" id="newLeadModal" style="display:none" onclick="if(event.target===this)closeNewLeadModal()">
       <div class="modal-box" style="max-width:480px">
@@ -439,13 +442,9 @@ tr:hover td{background:#faf9ff}
           <div class="modal-group"><label class="modal-label">Ім'я дитини *</label><input class="modal-input" id="nl_name" placeholder="Ім'я дитини"/></div>
           <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="nl_age" type="number" placeholder="7"/></div>
           <div class="modal-group"><label class="modal-label">Курс</label>
-            <select class="modal-input" id="nl_course">
+            <select class="modal-input course-dynamic-select" id="nl_course" data-empty-label="— Не вказано —">
               <option value="">— Не вказано —</option>
-              <option value="scratch">Scratch</option>
-              <option value="python">Python</option>
-              <option value="roblox">Roblox</option>
-              <option value="web">Веб-розробка</option>
-              <option value="help">Допоможіть обрати</option>
+              <option value="help" data-keep>Допоможіть обрати</option>
             </select>
           </div>
           <div class="modal-group"><label class="modal-label">Телефон *</label><input class="modal-input" id="nl_phone" placeholder="+380671234567"/></div>
@@ -558,13 +557,21 @@ tr:hover td{background:#faf9ff}
           <div class="modal-group"><label class="modal-label">ID курсу *</label><input class="modal-input" id="crs_id" placeholder="scratch"/></div>
           <div class="modal-group"><label class="modal-label">Emoji</label><input class="modal-input" id="crs_emoji" placeholder="🧩" style="font-size:20px"/></div>
           <div class="modal-group full"><label class="modal-label">Назва курсу *</label><input class="modal-input" id="crs_name" placeholder="Scratch: візуальне програмування"/></div>
-          <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="crs_age" placeholder="6–10 років"/></div>
+          <div class="modal-group"><label class="modal-label">Вік (текст)</label><input class="modal-input" id="crs_age" placeholder="6–10 років"/></div>
+          <div class="modal-group full"><label class="modal-label">Вікові групи (фільтр) <span style="font-weight:400;opacity:.6">(можна обрати декілька — курс з'явиться на кожній обраній вкладці)</span></label>
+            <div id="crs_age_group_boxes" style="display:flex;gap:16px;flex-wrap:wrap;padding:8px 0">
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400"><input type="checkbox" class="crs-age-box" value="6-10" style="width:16px;height:16px;accent-color:#6C47FF;cursor:pointer"/> 6–10 років</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400"><input type="checkbox" class="crs-age-box" value="10-14" style="width:16px;height:16px;accent-color:#6C47FF;cursor:pointer"/> 10–14 років</label>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-weight:400"><input type="checkbox" class="crs-age-box" value="14-18" style="width:16px;height:16px;accent-color:#6C47FF;cursor:pointer"/> 14–18 років</label>
+            </div>
+          </div>
           <div class="modal-group"><label class="modal-label">Тривалість</label><input class="modal-input" id="crs_duration" placeholder="3 місяці"/></div>
           <div class="modal-group"><label class="modal-label">К-сть занять</label><input class="modal-input" type="number" id="crs_lessonsCount" placeholder="24"/></div>
           <div class="modal-group"><label class="modal-label">Розмір групи</label><input class="modal-input" type="number" id="crs_groupSize" placeholder="6"/></div>
           <div class="modal-group"><label class="modal-label">Ціна (₴/міс)</label><input class="modal-input" type="number" id="crs_price" placeholder="3600"/></div>
           <div class="modal-group"><label class="modal-label">Колір (hex)</label><input class="modal-input" type="color" id="crs_color" value="#6C47FF"/></div>
           <div class="modal-group full"><label class="modal-label">Опис</label><textarea class="modal-input" id="crs_description" rows="3" placeholder="Короткий опис для лендингу..."></textarea></div>
+          <div class="modal-group full"><label class="modal-label">Особливості курсу <span style="font-weight:400;opacity:.6">(по одному рядку — відображаються на картці)</span></label><textarea class="modal-input" id="crs_features" rows="4" placeholder="✓ Основи роботи з ПК&#10;✓ Word, Excel, PowerPoint&#10;✓ Безпека в інтернеті"></textarea></div>
           <div class="modal-group"><label class="modal-label">Статус</label>
             <select class="modal-input" id="crs_active">
               <option value="true">✅ Активний</option>
@@ -589,9 +596,6 @@ tr:hover td{background:#faf9ff}
           </select>
           <button class="btn btn-primary btn-sm" onclick="openAddModuleModal()">+ Додати модуль</button>
         </div>
-      </div>
-      <div style="background:#FFF8E1;border:1px solid #F0C36D;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#7A5C00">
-        ⚠️ Зміни тут одразу зʼявляються на сторінці курсу (<code>/courses/…</code>), але <strong>не</strong> на блоці програми на головній сторінці — там окремий статичний текст, який треба оновлювати вручну в коді.
       </div>
       <div id="curriculumContent">
         <div class="empty" style="padding:60px 20px">Оберіть курс, щоб переглянути програму</div>
@@ -727,6 +731,67 @@ tr:hover td{background:#faf9ff}
       </div>
     </div>
 
+    <!-- SEO TEXTS TAB -->
+    <div id="seoTab" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:12px">
+        <h2 style="font-size:18px;font-weight:800">🔍 SEO тексти</h2>
+        <button class="btn btn-sm" style="background:#f3f0ff;color:#6C47FF;border:1px solid #ddd8ff;font-size:13px" onclick="_seoData=null;loadSeoTab()">↺ Оновити</button>
+      </div>
+      <p style="font-size:13px;color:#888;margin-bottom:28px">Ці тексти <strong>приховані від відвідувачів</strong> сайту, але індексуються пошуковими системами. Використовуйте для ключових слів, географічних запитів та семантичного охоплення.</p>
+
+      <!-- MAIN PAGE -->
+      <div style="background:#fff;border:1px solid #e8e4ff;border-radius:14px;padding:28px 32px;margin-bottom:24px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+          <span style="font-size:20px">🏠</span>
+          <span style="font-size:16px;font-weight:700;color:#1a1a2e">Головна сторінка</span>
+          <span style="font-size:12px;background:#f3f0ff;color:#6C47FF;padding:2px 10px;border-radius:20px;font-weight:500">mycomputer.education</span>
+        </div>
+        <p style="font-size:12.5px;color:#aaa;margin-bottom:24px">Блок вставляється між секціями сторінки. Прихований від користувачів через CSS, але видимий пошуковим роботам.</p>
+
+        <div style="margin-bottom:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <label style="font-size:13px;font-weight:600;color:#374151">Заголовок H2 <span style="font-weight:400;color:#9ca3af">(необов'язково)</span></label>
+            <span id="seo_heading_count" style="font-size:12px;color:#9ca3af">0 символів</span>
+          </div>
+          <input id="seo_main_heading"
+            style="width:100%;box-sizing:border-box;padding:12px 16px;font-size:15px;border:1.5px solid #e5e7eb;border-radius:10px;font-family:inherit;outline:none;transition:border .2s;color:#1a1a2e"
+            onfocus="this.style.borderColor='#6C47FF'" onblur="this.style.borderColor='#e5e7eb'"
+            oninput="document.getElementById('seo_heading_count').textContent=this.value.length+' символів'"
+            placeholder="Школа програмування для дітей у Дніпрі — My Computer Academy"/>
+        </div>
+
+        <div style="margin-bottom:24px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <label style="font-size:13px;font-weight:600;color:#374151">Текст абзацу <span style="font-weight:400;color:#9ca3af">(необов'язково)</span></label>
+            <span id="seo_text_count" style="font-size:12px;color:#9ca3af">0 символів</span>
+          </div>
+          <textarea id="seo_main_text"
+            rows="6"
+            style="width:100%;box-sizing:border-box;padding:14px 16px;font-size:15px;line-height:1.7;border:1.5px solid #e5e7eb;border-radius:10px;font-family:inherit;outline:none;transition:border .2s;resize:vertical;color:#1a1a2e"
+            onfocus="this.style.borderColor='#6C47FF'" onblur="this.style.borderColor='#e5e7eb'"
+            oninput="document.getElementById('seo_text_count').textContent=this.value.length+' символів'"
+            placeholder="My Computer Academy — це онлайн та офлайн школа програмування для дітей від 6 до 18 років у Дніпрі. Scratch, Python, Roblox Studio, Веб-розробка HTML CSS JS. Перший пробний урок безкоштовно."></textarea>
+          <p style="font-size:12px;color:#9ca3af;margin-top:6px">Рекомендовано 100–300 символів. Вживайте географічні запити (Дніпро), назви курсів та цільову аудиторію.</p>
+        </div>
+
+        <!-- PREVIEW -->
+        <div id="seo_preview_wrap" style="background:#f9f8ff;border:1px solid #e8e4ff;border-radius:10px;padding:16px 18px;margin-bottom:24px;display:none">
+          <p style="font-size:11.5px;font-weight:600;color:#6C47FF;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Попередній перегляд (як бачить краулер)</p>
+          <div style="border-left:3px solid #6C47FF;padding-left:14px">
+            <p id="seo_preview_heading" style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:6px;display:none"></p>
+            <p id="seo_preview_text" style="font-size:14px;color:#374151;line-height:1.7"></p>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <button class="btn btn-primary" style="padding:11px 28px;font-size:14px;font-weight:600" onclick="saveSeoTexts()">Зберегти</button>
+          <button class="btn btn-sm" style="background:#f9f8ff;color:#6C47FF;border:1px solid #ddd8ff;font-size:13px;padding:9px 18px" onclick="toggleSeoPreview()">👁 Переглянути</button>
+          <span id="seoSaveOk"  style="font-size:13px;color:#22c55e;display:none">✓ Збережено!</span>
+          <span id="seoSaveErr" style="font-size:13px;color:#ef4444;display:none">Помилка збереження</span>
+        </div>
+      </div>
+    </div>
+
     <!-- DASHBOARD TAB (superadmin only) -->
     <div id="dashboardTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
@@ -808,13 +873,9 @@ tr:hover td{background:#faf9ff}
             <option value="completed">✅ Завершив</option>
             <option value="churned">🔴 Відмовився</option>
           </select>
-          <select class="filter-select" id="clientCourseFilter" onchange="renderClients()">
+          <select class="filter-select course-dynamic-select" id="clientCourseFilter" data-empty-label="Всі курси" onchange="renderClients()">
             <option value="">Всі курси</option>
-            <option value="scratch">Scratch</option>
-            <option value="python">Python</option>
-            <option value="roblox">Roblox</option>
-            <option value="web">Веб</option>
-            <option value="other">Інше</option>
+            <option value="other" data-keep>Інше</option>
           </select>
           <button class="btn btn-primary btn-sm" onclick="openClientModal(null)">+ Додати клієнта</button>
           <button class="btn btn-ghost   btn-sm" id="archiveToggleBtn" onclick="toggleArchive()">📦 Архів</button>
@@ -982,7 +1043,26 @@ tr:hover td{background:#faf9ff}
               <div class="modal-group"><label class="modal-label">Повне ім'я (ПІБ)</label><input class="modal-input" id="tp_fullName" placeholder="Прізвище Ім'я По батькові"/></div>
               <div class="modal-group"><label class="modal-label">Телефон</label><input class="modal-input" id="tp_phone" placeholder="+380..."/></div>
               <div class="modal-group"><label class="modal-label">Місто</label><input class="modal-input" id="tp_city" placeholder="Дніпро"/></div>
-              <div class="modal-group"><label class="modal-label">Посада</label><input class="modal-input" id="tp_jobTitle" placeholder="Викладач Python"/></div>
+              <div class="modal-group"><label class="modal-label">Посада</label>
+                <select class="modal-input" id="tp_jobTitle" onchange="onJobTitleChange(this.value)">
+                  <option value="">— Не вказано —</option>
+                  <option value="Викладач Python">Викладач Python</option>
+                  <option value="Викладач Minecraft">Викладач Minecraft</option>
+                  <option value="Викладач Roblox">Викладач Roblox</option>
+                  <option value="Викладач Web-дизайну">Викладач Web-дизайну</option>
+                  <option value="Викладач графічного дизайну">Викладач графічного дизайну</option>
+                  <option value="Викладач UI/UX дизайну">Викладач UI/UX дизайну</option>
+                  <option value="Менеджер з продажу">Менеджер з продажу</option>
+                  <option value="Адміністратор">Адміністратор</option>
+                  <option value="HR-менеджер">HR-менеджер</option>
+                  <option value="Маркетолог">Маркетолог</option>
+                  <option value="Бухгалтер">Бухгалтер</option>
+                  <option value="Керівник філії">Керівник філії</option>
+                  <option value="Технічний директор">Технічний директор</option>
+                  <option value="custom">Інше...</option>
+                </select>
+                <input class="modal-input" id="tp_jobTitleOther" placeholder="Вкажіть посаду" style="display:none;margin-top:8px"/>
+              </div>
               <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="tp_notes" rows="2" placeholder="Спеціалізація, примітки..."></textarea></div>
             </div>
             <!-- Teacher-only fields -->
@@ -1072,6 +1152,7 @@ tr:hover td{background:#faf9ff}
         </div>
         <div id="faqEditor"><div class="empty" style="padding:30px">Завантаження...</div></div>
       </div>
+
     </div>
 
     <!-- LEADS TAB -->
@@ -1090,13 +1171,9 @@ tr:hover td{background:#faf9ff}
         <option value="enrolled">🟢 Записані</option>
         <option value="rejected">🔴 Відмова</option>
       </select>
-      <select class="filter-select" id="courseFilter" onchange="renderTable()">
+      <select class="filter-select course-dynamic-select" id="courseFilter" data-empty-label="Всі курси" onchange="renderTable()">
         <option value="">Всі курси</option>
-        <option value="scratch">Scratch</option>
-        <option value="python">Python</option>
-        <option value="roblox">Roblox</option>
-        <option value="web">Веб-розробка</option>
-        <option value="help">Допоможіть обрати</option>
+        <option value="help" data-keep>Допоможіть обрати</option>
       </select>
       <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">+ Нова заявка</button>
     </div>
@@ -1145,6 +1222,14 @@ let currentPage   = 1;
 let token         = localStorage.getItem(STORAGE_KEY) || '';
 let currentRole   = '';
 let _teachersList = []; // [{id, name}] loaded on init
+
+// ── MULTI-SITE CONTENT SWITCHER ───────────────────────────────────────────────
+// '' = mycomputer.education (default/current site) — every apiUrl()/authHeaders()
+// call resolves to the exact same relative path + token as before this feature existed.
+const STORAGE_SITE_KEY = 'mca_admin_site';
+let apiBase = localStorage.getItem(STORAGE_SITE_KEY) || '';
+function apiUrl(path) { return apiBase + path; }
+function authHeaders(extra) { return Object.assign({ 'x-admin-token': token }, extra || {}); }
 
 const ROLE_LABELS = {
   superadmin:    '⭐ Суперадмін',
@@ -1244,6 +1329,8 @@ function buildTeacherSelect(currentVal, extraStyle) {
 async function showApp() {
   document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('app').style.display       = 'flex';
+  const siteSel = document.getElementById('siteSelector');
+  if (siteSel) siteSel.value = apiBase;
   const ok = await loadMe();
   if (!ok) return; // token invalid — doLogout() already fired inside loadMe
   await loadTeachersList();
@@ -1316,6 +1403,29 @@ async function loadMe() {
 
 let _currentTab = 'leads';
 
+// In-scope site-aware tabs whose data must be refetched when the site switches.
+const SITE_AWARE_TABS = ['courses', 'curriculum', 'content', 'modules', 'articles', 'reviews', 'seo'];
+
+function onSiteChange() {
+  const sel = document.getElementById('siteSelector');
+  apiBase = sel.value;
+  localStorage.setItem(STORAGE_SITE_KEY, apiBase);
+  // Clear memoized caches so the currently active (or next opened) tab re-fetches from the new site.
+  _cmsData = null;
+  _seoData = null;
+  _allCourses = null;
+  // Close any open edit modals and reset their IDs — a course/article/review/module id
+  // from the previous site is meaningless (and won't exist) on the newly selected one.
+  closeCourseModal();
+  closeModuleModal();
+  closeArticleModal();
+  closeReviewModal();
+  _editingCourse = null;
+  _curriculumCourseId = null;
+  _editingModuleIdx = null;
+  if (SITE_AWARE_TABS.includes(_currentTab)) showTab(_currentTab);
+}
+
 function showTab(tab) {
   _currentTab = tab;
   localStorage.setItem(STORAGE_TAB_KEY, tab);
@@ -1324,12 +1434,12 @@ function showTab(tab) {
   // underneath/alongside whatever tab is being switched to.
   const staffProfileEl = document.getElementById('staffProfileTab');
   if (staffProfileEl) staffProfileEl.style.display = 'none';
-  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','dashboard'].forEach(t => {
+  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
     const el = document.getElementById(t + 'Tab');
     if (el) el.style.display = t === tab ? '' : 'none';
   });
   // Sidebar active state
-  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','dashboard'].forEach(t => {
+  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
     const btn = document.getElementById('sideNav-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
   });
@@ -1351,6 +1461,7 @@ function showTab(tab) {
   if (tab === 'modules')    loadModulesTab();
   if (tab === 'articles')   loadArticlesTab();
   if (tab === 'reviews')    loadReviewsTab();
+  if (tab === 'seo')        loadSeoTab();
   if (tab === 'dashboard')  loadDashboardTab();
 }
 
@@ -1423,7 +1534,7 @@ function renderTable() {
   } else {
     tbody.innerHTML = page.map(l => `
       <tr id="row-${l.id}">
-        <td style="color:#aaa;font-size:12px">#${l.id}</td>
+        <td style="color:#aaa;font-size:12px">#${l.id}${l.source ? `<br><span style="color:#6C47FF;font-size:10px;font-weight:600" title="${esc(l.source)}">${esc(l.source)}</span>` : ''}</td>
         <td style="font-weight:600"><input class="notes-input" style="font-weight:600" value="${esc(l.child_name)}" onblur="saveLeadFields(${l.id},{child_name:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td><input class="notes-input" style="width:42px;text-align:center" value="${esc(String(l.age||''))}" placeholder="вік" onblur="saveLeadFields(${l.id},{age:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td>
@@ -1716,6 +1827,7 @@ async function loadAlerts() {
 
 function renderAlerts(data) {
   const panel  = document.getElementById('alertsPanel');
+  if (!panel) return;
   const title  = document.getElementById('alertsTitle');
   const badge  = document.getElementById('alertsBadge');
   const body   = document.getElementById('alertsBody');
@@ -1835,10 +1947,11 @@ function renderClients() {
   } else {
     tbody.innerHTML = page.map(c => {
       // Option lists
-      const courseOpts = [
-        ['','— курс —'],['scratch','Scratch'],['python','Python'],
-        ['roblox','Roblox'],['web','Веб'],['other','Інше'],
-      ].map(([v,l]) => `<option value="${v}"${c.course===v?' selected':''}>${l}</option>`).join('');
+      const courseOpts = `<option value=""${!c.course?' selected':''}>— курс —</option>` +
+        (_allCourses || []).filter(x => x.active !== false).map(x =>
+          `<option value="${x.id}"${c.course===x.id?' selected':''}>${x.emoji||''} ${esc(x.name)}</option>`
+        ).join('') +
+        `<option value="other"${c.course==='other'?' selected':''}>Інше</option>`;
 
       const statusOpts = Object.entries(CLIENT_STATUS_LABELS)
         .map(([v,l]) => `<option value="${v}"${c.status===v?' selected':''}>${l}</option>`).join('');
@@ -2835,7 +2948,7 @@ function showCmsSection(section) {
 
 async function loadContentData() {
   try {
-    const res = await fetch('/api/content', { headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl('/api/content'), { headers: authHeaders() });
     _cmsData = await res.json();
     renderPricingEditor(_cmsData.pricing || []);
     renderFaqEditor(_cmsData.faq || []);
@@ -2902,9 +3015,9 @@ async function savePricing() {
     priceUnit: { ua: document.getElementById(`pUnitUa_${i}`)?.value||'', ru: document.getElementById(`pUnitRu_${i}`)?.value||'' },
   }));
   try {
-    const res = await fetch('/api/content/pricing', {
+    const res = await fetch(apiUrl('/api/content/pricing'), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(cards),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
@@ -2964,9 +3077,9 @@ function deleteFaqItem(idx) {
 async function saveFaq() {
   const items = collectFaqFromForm();
   try {
-    const res = await fetch('/api/content/faq', {
+    const res = await fetch(apiUrl('/api/content/faq'), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(items),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
@@ -2981,7 +3094,7 @@ let _editingCourse = null;
 
 async function loadCoursesTab() {
   try {
-    const res = await fetch('/api/courses?all=1', { headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl('/api/courses?all=1'), { headers: authHeaders() });
     const d = await res.json();
     _allCourses = d.courses || [];
     renderCoursesGrid();
@@ -3027,22 +3140,29 @@ function openCourseModal(id) {
   _editingCourse = id;
   const fields = ['id','name','emoji','age','duration','lessonsCount','groupSize','price','description'];
   fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el) el.value = ''; });
-  document.getElementById('crs_color').value = '#6C47FF';
-  document.getElementById('crs_active').value = 'true';
+  document.getElementById('crs_color').value    = '#6C47FF';
+  document.getElementById('crs_active').value   = 'true';
+  document.querySelectorAll('.crs-age-box').forEach(b => b.checked = false);
+  document.getElementById('crs_features').value  = '';
   document.getElementById('courseModalTitle').textContent = id ? 'Редагувати курс' : 'Новий курс';
   document.getElementById('crs_id').disabled = !!id;
   if (id) {
     const c = _allCourses?.find(x => x.id === id);
     if (c) {
       fields.forEach(f => { const el = document.getElementById('crs_' + f); if (el && c[f] != null) el.value = c[f]; });
-      document.getElementById('crs_color').value  = c.color  || '#6C47FF';
-      document.getElementById('crs_active').value = String(c.active !== false);
+      document.getElementById('crs_color').value     = c.color     || '#6C47FF';
+      document.getElementById('crs_active').value    = String(c.active !== false);
+      const selectedAges = (c.age_group || '').split(',').map(s => s.trim()).filter(Boolean);
+      document.querySelectorAll('.crs-age-box').forEach(b => b.checked = selectedAges.includes(b.value));
+      if (Array.isArray(c.features)) {
+        document.getElementById('crs_features').value = c.features.map(f => typeof f === 'string' ? f : (f.ua || '')).join('\n');
+      }
     }
   }
   document.getElementById('courseModal').style.display = 'flex';
 }
 
-function closeCourseModal() { document.getElementById('courseModal').style.display = 'none'; }
+function closeCourseModal() { document.getElementById('courseModal').style.display = 'none'; _editingCourse = null; }
 
 async function saveCourse() {
   const idVal = document.getElementById('crs_id')?.value.trim();
@@ -3054,6 +3174,7 @@ async function saveCourse() {
     name,
     emoji:        document.getElementById('crs_emoji')?.value.trim()        || '📚',
     age:          document.getElementById('crs_age')?.value.trim()          || '',
+    age_group:    Array.from(document.querySelectorAll('.crs-age-box:checked')).map(b => b.value).join(','),
     duration:     document.getElementById('crs_duration')?.value.trim()     || '',
     lessonsCount: document.getElementById('crs_lessonsCount')?.value        || 0,
     groupSize:    document.getElementById('crs_groupSize')?.value           || 0,
@@ -3061,13 +3182,14 @@ async function saveCourse() {
     description:  document.getElementById('crs_description')?.value.trim() || '',
     color:        document.getElementById('crs_color')?.value               || '#6C47FF',
     active:       document.getElementById('crs_active')?.value === 'true',
+    features:     (document.getElementById('crs_features')?.value || '').split('\n').map(s => s.trim()).filter(Boolean),
   };
   try {
-    const url    = _editingCourse ? `/api/courses/${_editingCourse}` : '/api/courses';
+    const url    = apiUrl(_editingCourse ? `/api/courses/${_editingCourse}` : '/api/courses');
     const method = _editingCourse ? 'PATCH' : 'POST';
     const res = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(data),
     });
     const json = await res.json();
@@ -3081,7 +3203,7 @@ async function saveCourse() {
 async function deleteCourse(id) {
   if (!confirm(`Видалити курс "${id}"?`)) return;
   try {
-    const res = await fetch(`/api/courses/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl(`/api/courses/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
     showToast('Курс видалено ✓', 'success');
     await loadCoursesTab();
@@ -3092,9 +3214,9 @@ async function hideCourse(id, currentlyActive) {
   const label = currentlyActive ? 'приховати' : 'показати';
   if (!confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} курс "${id}"?`)) return;
   try {
-    const res = await fetch(`/api/courses/${id}`, {
+    const res = await fetch(apiUrl(`/api/courses/${id}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ active: !currentlyActive }),
     });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -3107,14 +3229,17 @@ function _populateCourseDropdowns() {
   if (!_allCourses) return;
   // Sync COURSE_LABELS so leads table course column reflects all courses
   _allCourses.forEach(c => { if (!COURSE_LABELS[c.id]) COURSE_LABELS[c.id] = c.name; });
-  // Update all course <select> elements in the admin (client form + filters)
-  const opts = '<option value="">— Курс —</option>' +
-    _allCourses.filter(c => c.active !== false).map(c =>
-      `<option value="${c.id}">${c.emoji} ${esc(c.name)}</option>`
-    ).join('');
+  // Update all course <select> elements in the admin (client/lead forms + filters).
+  // `data-empty-label` overrides the leading placeholder text; any <option data-keep>
+  // (e.g. "Допоможіть обрати") survives the rebuild, appended after real courses.
+  const courseOptsHtml = _allCourses.filter(c => c.active !== false).map(c =>
+    `<option value="${c.id}">${c.emoji || ''} ${esc(c.name)}</option>`
+  ).join('');
   document.querySelectorAll('.course-dynamic-select').forEach(sel => {
     const cur = sel.value;
-    sel.innerHTML = opts;
+    const emptyLabel = sel.dataset.emptyLabel || '— Курс —';
+    const keepHtml = Array.from(sel.querySelectorAll('option[data-keep]')).map(o => o.outerHTML).join('');
+    sel.innerHTML = `<option value="">${emptyLabel}</option>` + courseOptsHtml + keepHtml;
     if (cur) sel.value = cur;
   });
 }
@@ -3127,7 +3252,7 @@ async function loadCurriculumTab() {
   // Ensure courses are loaded
   if (!_allCourses) {
     try {
-      const res = await fetch('/api/courses?all=1', { headers: { 'x-admin-token': token } });
+      const res = await fetch(apiUrl('/api/courses?all=1'), { headers: authHeaders() });
       const d = await res.json();
       _allCourses = d.courses || [];
     } catch { showToast('Помилка завантаження курсів', 'error'); return; }
@@ -3210,7 +3335,7 @@ function openEditModuleModal(idx) {
   document.getElementById('moduleModal').style.display = 'flex';
 }
 
-function closeModuleModal() { document.getElementById('moduleModal').style.display = 'none'; }
+function closeModuleModal() { document.getElementById('moduleModal').style.display = 'none'; _editingModuleIdx = null; }
 
 async function saveModule() {
   const num   = document.getElementById('mod_num')?.value.trim();
@@ -3226,9 +3351,9 @@ async function saveModule() {
     curriculum.push({ num, title, desc });
   }
   try {
-    const res = await fetch(`/api/courses/${_curriculumCourseId}`, {
+    const res = await fetch(apiUrl(`/api/courses/${_curriculumCourseId}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ curriculum }),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
@@ -3246,9 +3371,9 @@ async function deleteModule(idx) {
   const curriculum = [...(course.curriculum || [])];
   curriculum.splice(idx, 1);
   try {
-    const res = await fetch(`/api/courses/${_curriculumCourseId}`, {
+    const res = await fetch(apiUrl(`/api/courses/${_curriculumCourseId}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ curriculum }),
     });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -3278,7 +3403,7 @@ let _modulesVisibility = null;
 
 async function loadModulesTab() {
   try {
-    const res  = await fetch('/api/content', { headers: { 'x-admin-token': token } });
+    const res  = await fetch(apiUrl('/api/content'), { headers: authHeaders() });
     const data = await res.json();
     _modulesVisibility = data.modules || {};
     renderModulesList();
@@ -3304,9 +3429,9 @@ async function saveModuleVisibility() {
     visibility[s.key] = cb ? cb.checked : true;
   });
   try {
-    const res = await fetch('/api/content/modules', {
+    const res = await fetch(apiUrl('/api/content/modules'), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(visibility),
     });
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
@@ -3321,7 +3446,7 @@ let _articleEditId = null;
 
 async function loadArticlesTab() {
   try {
-    const res = await fetch('/api/articles?all=1', { headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl('/api/articles?all=1'), { headers: authHeaders() });
     const data = await res.json();
     _articles = data.articles || [];
     renderArticlesTable();
@@ -3410,10 +3535,10 @@ async function saveArticle() {
   };
   try {
     const method = _articleEditId ? 'PATCH' : 'POST';
-    const url    = _articleEditId ? `/api/articles/${_articleEditId}` : '/api/articles';
+    const url    = apiUrl(_articleEditId ? `/api/articles/${_articleEditId}` : '/api/articles');
     const res    = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -3428,7 +3553,7 @@ async function deleteArticle(id) {
   const a = _articles.find(x => x.id === id);
   if (!a || !confirm(`Видалити статтю "${a.title}"?`)) return;
   try {
-    const res = await fetch(`/api/articles/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl(`/api/articles/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка видалення', 'error'); return; }
     showToast('Статтю видалено', 'success');
     loadArticlesTab();
@@ -3440,9 +3565,9 @@ async function hideArticle(id, currentlyActive) {
   const label = currentlyActive ? 'сховати' : 'показати';
   if (!a || !confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} статтю "${a.title}"?`)) return;
   try {
-    const res = await fetch(`/api/articles/${id}`, {
+    const res = await fetch(apiUrl(`/api/articles/${id}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ active: !currentlyActive }),
     });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -3457,7 +3582,7 @@ let _reviewEditId = null;
 
 async function loadReviewsTab() {
   try {
-    const res = await fetch('/api/reviews', { headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl('/api/reviews'), { headers: authHeaders() });
     const data = await res.json();
     _reviews = data.reviews || [];
     renderReviewsTable();
@@ -3538,9 +3663,9 @@ async function saveReview() {
   };
   try {
     const method = _reviewEditId ? 'PATCH' : 'POST';
-    const url    = _reviewEditId ? `/api/reviews/${_reviewEditId}` : '/api/reviews';
+    const url    = apiUrl(_reviewEditId ? `/api/reviews/${_reviewEditId}` : '/api/reviews');
     const res    = await fetch(url, {
-      method, headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      method, headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -3555,7 +3680,7 @@ async function deleteReview(id) {
   const r = _reviews.find(x => x.id === id);
   if (!r || !confirm(`Видалити відгук від "${r.name}"?`)) return;
   try {
-    const res = await fetch(`/api/reviews/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    const res = await fetch(apiUrl(`/api/reviews/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
     showToast('Відгук видалено', 'success');
     loadReviewsTab();
@@ -3567,9 +3692,9 @@ async function hideReview(id, currentlyActive) {
   const label = currentlyActive ? 'сховати' : 'показати';
   if (!r || !confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} відгук від "${r.name}"?`)) return;
   try {
-    const res = await fetch(`/api/reviews/${id}`, {
+    const res = await fetch(apiUrl(`/api/reviews/${id}`), {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ active: !currentlyActive }),
     });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -4315,6 +4440,10 @@ function onPaymentTypeChange(val) {
   document.getElementById('tp_monthlyWrap').style.display       = val === 'monthly' ? '' : 'none';
 }
 
+function onJobTitleChange(val) {
+  document.getElementById('tp_jobTitleOther').style.display = val === 'custom' ? '' : 'none';
+}
+
 async function openStaffProfile(adminId) {
   if (currentRole !== 'superadmin') return;
   _currentTeacherId = adminId;
@@ -4330,7 +4459,17 @@ async function openStaffProfile(adminId) {
     document.getElementById('tp_fullName').value = admin.fullName || '';
     document.getElementById('tp_phone').value    = admin.phone    || '';
     document.getElementById('tp_city').value     = admin.city     || '';
-    document.getElementById('tp_jobTitle').value = admin.jobTitle || '';
+    const jobTitleSel = document.getElementById('tp_jobTitle');
+    const jtOptions = Array.from(jobTitleSel.options).map(o => o.value);
+    const jt = admin.jobTitle || '';
+    if (jt && !jtOptions.includes(jt)) {
+      jobTitleSel.value = 'custom';
+      document.getElementById('tp_jobTitleOther').value = jt;
+    } else {
+      jobTitleSel.value = jt;
+      document.getElementById('tp_jobTitleOther').value = '';
+    }
+    onJobTitleChange(jobTitleSel.value);
     document.getElementById('tp_notes').value    = admin.notes    || '';
     document.getElementById('tp_hireDate').value = admin.hireDate || '';
     document.getElementById('tp_birthday').value = admin.birthday || '';
@@ -4395,7 +4534,9 @@ async function saveTeacherProfile() {
     fullName: document.getElementById('tp_fullName').value.trim(),
     phone:    document.getElementById('tp_phone').value.trim(),
     city:     document.getElementById('tp_city').value.trim(),
-    jobTitle: document.getElementById('tp_jobTitle').value.trim(),
+    jobTitle: (document.getElementById('tp_jobTitle').value === 'custom'
+      ? document.getElementById('tp_jobTitleOther').value.trim()
+      : document.getElementById('tp_jobTitle').value),
     notes:    document.getElementById('tp_notes').value.trim(),
     hireDate: document.getElementById('tp_hireDate').value,
     birthday: document.getElementById('tp_birthday').value,
@@ -4680,6 +4821,70 @@ async function loadTeacherSalary() {
       breakdownEl.innerHTML = '<div style="color:#aaa;font-size:12px;margin-top:6px">Учнів у цього викладача не знайдено</div>';
     }
   } catch { resultEl.textContent = '⚠️ Помилка'; }
+}
+
+// ── SEO TEXTS ────────────────────────────────────────────────────────────────
+let _seoData = null;
+
+async function loadSeoTab() {
+  if (_seoData) { renderSeoTab(); return; }
+  try {
+    const r = await fetch(apiUrl('/api/content'), { headers: authHeaders() });
+    const d = await r.json();
+    _seoData = d.seo || { pages: [] };
+    renderSeoTab();
+  } catch(e) { console.error('SEO load error:', e); }
+}
+
+function renderSeoTab() {
+  const main = (_seoData?.pages || []).find(p => p.id === 'main') || {};
+  const h = document.getElementById('seo_main_heading');
+  const t = document.getElementById('seo_main_text');
+  if (h) {
+    h.value = main.heading || '';
+    const hc = document.getElementById('seo_heading_count');
+    if (hc) hc.textContent = h.value.length + ' символів';
+  }
+  if (t) {
+    t.value = main.text || '';
+    const tc = document.getElementById('seo_text_count');
+    if (tc) tc.textContent = t.value.length + ' символів';
+  }
+}
+
+function toggleSeoPreview() {
+  const wrap = document.getElementById('seo_preview_wrap');
+  if (!wrap) return;
+  const heading = (document.getElementById('seo_main_heading')?.value || '').trim();
+  const text    = (document.getElementById('seo_main_text')?.value    || '').trim();
+  if (!heading && !text) { wrap.style.display = 'none'; return; }
+  const ph = document.getElementById('seo_preview_heading');
+  const pt = document.getElementById('seo_preview_text');
+  if (ph) { ph.textContent = heading; ph.style.display = heading ? '' : 'none'; }
+  if (pt) pt.textContent = text;
+  wrap.style.display = wrap.style.display === 'none' ? '' : 'none';
+}
+
+async function saveSeoTexts() {
+  const heading = (document.getElementById('seo_main_heading')?.value || '').trim();
+  const text    = (document.getElementById('seo_main_text')?.value    || '').trim();
+  const pages   = [{ id: 'main', label: `Головна сторінка (${apiBase ? apiBase.replace('https://','') : 'mycomputer.education'})`, heading, text }];
+  _seoData = { pages };
+  const okEl  = document.getElementById('seoSaveOk');
+  const errEl = document.getElementById('seoSaveErr');
+  try {
+    const r = await fetch(apiUrl('/api/content/seo'), {
+      method: 'PUT',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ pages }),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    okEl.style.display = ''; errEl.style.display = 'none';
+    setTimeout(() => { okEl.style.display = 'none'; }, 2500);
+  } catch(e) {
+    errEl.style.display = ''; okEl.style.display = 'none';
+    setTimeout(() => { errEl.style.display = 'none'; }, 3000);
+  }
 }
 
 // ── AUTO LOGIN if token saved ─────────────────────────────────────────────────

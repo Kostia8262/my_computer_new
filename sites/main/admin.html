@@ -434,17 +434,6 @@ tr:hover td{background:#faf9ff}
       </div>
     </div>
 
-    <!-- ALERTS PANEL (always visible) -->
-    <div class="alerts-panel" id="alertsPanel">
-      <div class="alerts-panel__header" onclick="toggleAlerts()">
-        <span style="font-size:16px">⚠️</span>
-        <span class="alerts-panel__title" id="alertsTitle">Завантаження підказок...</span>
-        <span class="alerts-panel__badge" id="alertsBadge">...</span>
-        <span id="alertsChevron" style="font-size:12px;color:#888">▼</span>
-      </div>
-      <div class="alerts-panel__body" id="alertsBody"></div>
-    </div>
-
     <!-- NEW LEAD MODAL -->
     <div class="modal-overlay" id="newLeadModal" style="display:none" onclick="if(event.target===this)closeNewLeadModal()">
       <div class="modal-box" style="max-width:480px">
@@ -1054,7 +1043,26 @@ tr:hover td{background:#faf9ff}
               <div class="modal-group"><label class="modal-label">Повне ім'я (ПІБ)</label><input class="modal-input" id="tp_fullName" placeholder="Прізвище Ім'я По батькові"/></div>
               <div class="modal-group"><label class="modal-label">Телефон</label><input class="modal-input" id="tp_phone" placeholder="+380..."/></div>
               <div class="modal-group"><label class="modal-label">Місто</label><input class="modal-input" id="tp_city" placeholder="Дніпро"/></div>
-              <div class="modal-group"><label class="modal-label">Посада</label><input class="modal-input" id="tp_jobTitle" placeholder="Викладач Python"/></div>
+              <div class="modal-group"><label class="modal-label">Посада</label>
+                <select class="modal-input" id="tp_jobTitle" onchange="onJobTitleChange(this.value)">
+                  <option value="">— Не вказано —</option>
+                  <option value="Викладач Python">Викладач Python</option>
+                  <option value="Викладач Minecraft">Викладач Minecraft</option>
+                  <option value="Викладач Roblox">Викладач Roblox</option>
+                  <option value="Викладач Web-дизайну">Викладач Web-дизайну</option>
+                  <option value="Викладач графічного дизайну">Викладач графічного дизайну</option>
+                  <option value="Викладач UI/UX дизайну">Викладач UI/UX дизайну</option>
+                  <option value="Менеджер з продажу">Менеджер з продажу</option>
+                  <option value="Адміністратор">Адміністратор</option>
+                  <option value="HR-менеджер">HR-менеджер</option>
+                  <option value="Маркетолог">Маркетолог</option>
+                  <option value="Бухгалтер">Бухгалтер</option>
+                  <option value="Керівник філії">Керівник філії</option>
+                  <option value="Технічний директор">Технічний директор</option>
+                  <option value="custom">Інше...</option>
+                </select>
+                <input class="modal-input" id="tp_jobTitleOther" placeholder="Вкажіть посаду" style="display:none;margin-top:8px"/>
+              </div>
               <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="tp_notes" rows="2" placeholder="Спеціалізація, примітки..."></textarea></div>
             </div>
             <!-- Teacher-only fields -->
@@ -1819,6 +1827,7 @@ async function loadAlerts() {
 
 function renderAlerts(data) {
   const panel  = document.getElementById('alertsPanel');
+  if (!panel) return;
   const title  = document.getElementById('alertsTitle');
   const badge  = document.getElementById('alertsBadge');
   const body   = document.getElementById('alertsBody');
@@ -4431,6 +4440,10 @@ function onPaymentTypeChange(val) {
   document.getElementById('tp_monthlyWrap').style.display       = val === 'monthly' ? '' : 'none';
 }
 
+function onJobTitleChange(val) {
+  document.getElementById('tp_jobTitleOther').style.display = val === 'custom' ? '' : 'none';
+}
+
 async function openStaffProfile(adminId) {
   if (currentRole !== 'superadmin') return;
   _currentTeacherId = adminId;
@@ -4446,7 +4459,17 @@ async function openStaffProfile(adminId) {
     document.getElementById('tp_fullName').value = admin.fullName || '';
     document.getElementById('tp_phone').value    = admin.phone    || '';
     document.getElementById('tp_city').value     = admin.city     || '';
-    document.getElementById('tp_jobTitle').value = admin.jobTitle || '';
+    const jobTitleSel = document.getElementById('tp_jobTitle');
+    const jtOptions = Array.from(jobTitleSel.options).map(o => o.value);
+    const jt = admin.jobTitle || '';
+    if (jt && !jtOptions.includes(jt)) {
+      jobTitleSel.value = 'custom';
+      document.getElementById('tp_jobTitleOther').value = jt;
+    } else {
+      jobTitleSel.value = jt;
+      document.getElementById('tp_jobTitleOther').value = '';
+    }
+    onJobTitleChange(jobTitleSel.value);
     document.getElementById('tp_notes').value    = admin.notes    || '';
     document.getElementById('tp_hireDate').value = admin.hireDate || '';
     document.getElementById('tp_birthday').value = admin.birthday || '';
@@ -4511,7 +4534,9 @@ async function saveTeacherProfile() {
     fullName: document.getElementById('tp_fullName').value.trim(),
     phone:    document.getElementById('tp_phone').value.trim(),
     city:     document.getElementById('tp_city').value.trim(),
-    jobTitle: document.getElementById('tp_jobTitle').value.trim(),
+    jobTitle: (document.getElementById('tp_jobTitle').value === 'custom'
+      ? document.getElementById('tp_jobTitleOther').value.trim()
+      : document.getElementById('tp_jobTitle').value),
     notes:    document.getElementById('tp_notes').value.trim(),
     hireDate: document.getElementById('tp_hireDate').value,
     birthday: document.getElementById('tp_birthday').value,
