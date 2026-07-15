@@ -47,7 +47,13 @@ a{color:#6C47FF;text-decoration:none}
 .search:focus{border-color:#6C47FF}
 .filter-select{padding:9px 12px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:13px;outline:none;background:#fff;cursor:pointer}
 .filter-select:focus{border-color:#6C47FF}
-select.filter-select,select.modal-input{padding-right:30px}
+select.filter-select,select.modal-input{
+  padding-right:34px;
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+}
 
 /* TABLE */
 .table-wrap{background:#fff;border-radius:12px;border:1px solid #e8e4ff;overflow:auto}
@@ -195,14 +201,14 @@ tr:hover td{background:#faf9ff}
 .att-drop-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 /* Schedule pickers in client modal */
 .sched-row{display:flex;gap:8px;margin-bottom:6px}
-.sched-row select{flex:1;padding:7px 28px 7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff}
+.sched-row select{flex:1;padding:7px 30px 7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .sched-row select:focus{outline:none;border-color:#6C47FF}
 /* Schedule quick-edit popup */
 .sched-popup{position:fixed;z-index:9999;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(108,71,255,.18);border:1px solid #e8e4ff;padding:16px;min-width:260px}
 .sched-popup h5{font-size:13px;font-weight:700;margin-bottom:10px;color:#333}
 .sched-popup-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
 .sched-popup-row label{font-size:11px;color:#888;min-width:40px}
-.sched-popup-row select{flex:1;padding:5px 24px 5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px}
+.sched-popup-row select{flex:1;padding:5px 26px 5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 .sched-popup-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;border-top:1px solid #f0eeff;padding-top:10px}
 
 /* PAYMENTS SUB-TAB */
