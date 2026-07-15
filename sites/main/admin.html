@@ -1076,9 +1076,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
           <span class="att-legend-item"><span class="att-legend-dot" style="background:#ede9fe;border:1px solid #c4b5fd"></span>За розкладом</span>
           <span style="font-size:11px;color:#aaa;margin-left:auto">Натисніть на клітинку, щоб змінити статус</span>
         </div>
-        <div class="att-wrap">
+        <div class="att-wrap hscroll-native-hidden" id="attWrap">
           <div id="attCalendar" style="min-height:200px;padding:12px"><div class="empty" style="padding:40px">Завантаження...</div></div>
         </div>
+        <div id="attHScrollBar" class="sticky-hscroll"><div id="attHScrollInner"></div></div>
       </div>
 
       <!-- ── SUB-TAB: SCHEDULE ── -->
@@ -1098,10 +1099,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
           </div>
         </div>
         <div style="background:#fff;border-radius:12px;border:1px solid #e8e4ff;padding:16px">
-          <div class="sched-wrap" id="schedGrid">
+          <div class="sched-wrap hscroll-native-hidden" id="schedGrid">
             <div class="empty" style="padding:40px">Завантаження...</div>
           </div>
         </div>
+        <div id="schedHScrollBar" class="sticky-hscroll"><div id="schedHScrollInner"></div></div>
       </div>
 
     </div><!-- /clientsTab -->
@@ -1773,6 +1775,8 @@ const _hscrollTargets = [
   { wrapId: 'leadsTableWrap',   barId: 'leadsHScrollBar',   innerId: 'leadsHScrollInner',   active: () => _currentTab === 'leads' },
   { wrapId: 'clientsTableWrap', barId: 'clientsHScrollBar', innerId: 'clientsHScrollInner', active: () => _currentTab === 'clients' && _clientsSubTab === 'base' },
   { wrapId: 'payTableWrap',     barId: 'payHScrollBar',     innerId: 'payHScrollInner',     active: () => _currentTab === 'clients' && _clientsSubTab === 'payments' },
+  { wrapId: 'attWrap',          barId: 'attHScrollBar',     innerId: 'attHScrollInner',     active: () => _currentTab === 'clients' && _clientsSubTab === 'attendance' },
+  { wrapId: 'schedGrid',        barId: 'schedHScrollBar',   innerId: 'schedHScrollInner',   active: () => _currentTab === 'clients' && _clientsSubTab === 'schedule' },
 ];
 let _hscrollSyncing = false;
 
@@ -2930,7 +2934,7 @@ function renderAttCalendar() {
     !['churned','completed'].includes(c.status) &&
     (filterTeacher === '' || c.teacher === filterTeacher)
   );
-  if (!clients.length) { cal.innerHTML = '<div class="empty" style="padding:40px">Немає учнів' + (filterTeacher ? ` для ${esc(filterTeacher)}` : '') + '</div>'; return; }
+  if (!clients.length) { cal.innerHTML = '<div class="empty" style="padding:40px">Немає учнів' + (filterTeacher ? ` для ${esc(filterTeacher)}` : '') + '</div>'; setTimeout(_syncAllHScroll, 0); return; }
 
   // Build scheduled DOW set per client (1=Mon…7=Sun, ISO-style)
   const clientSched = {};
@@ -2985,6 +2989,7 @@ function renderAttCalendar() {
   });
   html += '</tbody></table>';
   cal.innerHTML = html;
+  setTimeout(_syncAllHScroll, 0);
 }
 
 // ── SCHEDULE QUICK-EDIT POPUP (shared by the clients table and the leads
@@ -4654,6 +4659,7 @@ function renderSchedule() {
 
   if (!clients.length) {
     gridEl.innerHTML = '<div class="empty" style="padding:40px">Немає учнів з розкладом' + (filterTeacher ? ` для ${filterTeacher}` : '') + '</div>';
+    setTimeout(_syncAllHScroll, 0);
     return;
   }
 
@@ -4754,6 +4760,7 @@ function renderSchedule() {
 
   html += '</tbody></table>';
   gridEl.innerHTML = html;
+  setTimeout(_syncAllHScroll, 0);
 }
 
 function _teacherColor(name) {
