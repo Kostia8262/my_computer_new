@@ -2865,8 +2865,17 @@ function exportClientsCSV() {
   showToast('CSV клієнтів завантажено ✓', 'success');
 }
 
+// Neutralizes CSV/Excel formula injection: a cell value starting with =+-@ (or a
+// tab/CR that could smuggle one after leading whitespace) gets a leading apostrophe,
+// which Excel/Sheets render as plain text instead of evaluating as a formula.
+// Needed because client/lead names originate from an unauthenticated public form.
+function csvSafeCell(v) {
+  const s = String(v);
+  return /^[=+\-@\t\r]/.test(s) ? `'${s}` : s;
+}
+
 function downloadCSV(rows, filename) {
-  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const csv = rows.map(r => r.map(v => `"${csvSafeCell(v).replace(/"/g,'""')}"`).join(',')).join('\r\n');
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
 }

@@ -811,7 +811,7 @@ app.post('/api/leads', leadsLimiter, (req, res) => {
 });
 
 // POST /api/leads/admin — admin-only lead creation (no public rate limit)
-app.post('/api/leads/admin', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/leads/admin', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { child_name, age, phone, course, email, teacher, notes } = req.body;
   if (!child_name || child_name.trim().length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я (мін. 2 символи)' });
   if (!phone || String(phone).replace(/\D/g,'').length < 10) return res.status(400).json({ error: 'Невірний формат телефону' });
@@ -860,7 +860,7 @@ app.get('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
 });
 
 // PATCH /api/leads/:id
-app.patch('/api/leads/:id', adminLimiter, requireAdmin, (req, res) => {
+app.patch('/api/leads/:id', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const id = parseInt(req.params.id);
   const { status, notes, child_name, phone, age, course, email, teacher, schedule } = req.body;
   const valid = ['new', 'contacted', 'trial_scheduled', 'enrolled', 'rejected'];
@@ -1039,14 +1039,14 @@ app.get('/api/clients', adminLimiter, requireAdmin, (req, res) => {
   res.json({ success: true, clients: clientsDb.getAll(), stats: clientsDb.getStats() });
 });
 
-app.post('/api/clients', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/clients', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const data = sanitizeClient(req.body);
   if (!data.name || data.name.length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я' });
   const client = clientsDb.create(data);
   res.status(201).json({ success: true, client });
 });
 
-app.patch('/api/clients/:id', adminLimiter, requireAdmin, (req, res) => {
+app.patch('/api/clients/:id', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const id = parseInt(req.params.id);
   const before = clientsDb.getById(id);
   if (!before) return res.status(404).json({ error: 'Not found' });
@@ -1172,7 +1172,7 @@ app.get('/api/alerts', adminLimiter, requireAdmin, (req, res) => {
 });
 
 // ── CSV IMPORT API ────────────────────────────────────────────────────────────
-app.post('/api/leads/import', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/leads/import', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const rows = req.body;
   if (!Array.isArray(rows)) return res.status(400).json({ error: 'Expected array' });
   let imported = 0;
@@ -1196,7 +1196,7 @@ app.post('/api/leads/import', adminLimiter, requireAdmin, (req, res) => {
   res.json({ success: true, imported, errors });
 });
 
-app.post('/api/clients/import', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/clients/import', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const rows = req.body;
   if (!Array.isArray(rows)) return res.status(400).json({ error: 'Expected array' });
   let imported = 0;
@@ -1220,7 +1220,7 @@ app.get('/api/payments', adminLimiter, requireAdmin, (req, res) => {
   res.json({ success: true, payments: paymentsDb.getAll(clientId) });
 });
 
-app.post('/api/payments', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/payments', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { clientId, amount, date, method, note } = req.body;
   if (!clientId) return res.status(400).json({ error: 'clientId обов\'язковий' });
   if (!amount || parseFloat(amount) <= 0) return res.status(400).json({ error: 'Сума має бути більше 0' });
@@ -1235,7 +1235,7 @@ app.post('/api/payments', adminLimiter, requireAdmin, (req, res) => {
   res.status(201).json({ success: true, payment });
 });
 
-app.delete('/api/payments/:id', adminLimiter, requireAdmin, (req, res) => {
+app.delete('/api/payments/:id', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const id = parseInt(req.params.id);
   const payment = paymentsDb.getById(id);
   if (!payment) return res.status(404).json({ error: 'Not found' });
@@ -1257,7 +1257,7 @@ app.get('/api/monthly-payments/:ym', adminLimiter, requireAdmin, (req, res) => {
   res.json({ success: true, ym, records: records || [] });
 });
 
-app.post('/api/monthly-payments/:ym', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/monthly-payments/:ym', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { ym } = req.params;
   if (!/^\d{4}-\d{2}$/.test(ym)) return res.status(400).json({ error: 'Format: YYYY-MM' });
   if (!Array.isArray(req.body.records)) return res.status(400).json({ error: 'records[] required' });
@@ -1265,7 +1265,7 @@ app.post('/api/monthly-payments/:ym', adminLimiter, requireAdmin, (req, res) => 
   res.status(result.alreadyExists ? 200 : 201).json({ success: true, ...result });
 });
 
-app.patch('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, (req, res) => {
+app.patch('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { ym, clientId } = req.params;
   const monthData = monthlyPayDb.getMonth(ym);
   if (!monthData) return res.status(404).json({ error: 'Month not found' });
@@ -1280,7 +1280,7 @@ app.patch('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, (re
 });
 
 // Upsert: create record if missing, update if exists (used for "virtual" rows added client-side)
-app.put('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, (req, res) => {
+app.put('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { ym, clientId } = req.params;
   if (!monthlyPayDb.getMonth(ym)) return res.status(404).json({ error: 'Month not found' });
   const client = clientsDb.getById(parseInt(clientId));
@@ -1291,7 +1291,7 @@ app.put('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, (req,
   res.status(200).json({ success: true, record });
 });
 
-app.delete('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, (req, res) => {
+app.delete('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { ym, clientId } = req.params;
   const ok = monthlyPayDb.removeRecord(ym, parseInt(clientId));
   if (!ok) return res.status(404).json({ error: 'Not found' });
@@ -1320,7 +1320,7 @@ app.get('/api/content', (req, res) => {
 });
 
 // Admin: update a section (pricing | faq | courses | modules)
-app.put('/api/content/:section', adminLimiter, requireAdmin, (req, res) => {
+app.put('/api/content/:section', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { section } = req.params;
   const allowed = ['pricing', 'faq', 'courses', 'modules'];
   if (!allowed.includes(section)) return res.status(400).json({ error: 'Unknown section' });
@@ -1337,20 +1337,20 @@ app.get('/api/courses', (req, res) => {
   res.json({ success: true, courses: all ? coursesDb.getAll() : coursesDb.getActive() });
 });
 
-app.post('/api/courses', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/courses', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const course = coursesDb.create(req.body);
   if (!course) return res.status(409).json({ error: 'ID вже існує' });
   res.status(201).json({ success: true, course });
 });
 
-app.patch('/api/courses/:id', adminLimiter, requireAdmin, (req, res) => {
+app.patch('/api/courses/:id', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   if (!SAFE_ID_RE.test(req.params.id)) return res.status(400).json({ error: 'Invalid course ID' });
   const course = coursesDb.update(req.params.id, req.body);
   if (!course) return res.status(404).json({ error: 'Курс не знайдено' });
   res.json({ success: true, course });
 });
 
-app.delete('/api/courses/:id', adminLimiter, requireAdmin, (req, res) => {
+app.delete('/api/courses/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   if (!SAFE_ID_RE.test(req.params.id)) return res.status(400).json({ error: 'Invalid course ID' });
   const ok = coursesDb.delete(req.params.id);
   if (!ok) return res.status(404).json({ error: 'Курс не знайдено' });
@@ -1373,13 +1373,13 @@ app.get('/api/articles/:id', (req, res) => {
   res.json({ success: true, article });
 });
 
-app.post('/api/articles', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/articles', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const article = articlesDb.create(req.body);
   if (!article) return res.status(409).json({ error: 'Slug вже існує' });
   res.status(201).json({ success: true, article });
 });
 
-app.patch('/api/articles/:id', adminLimiter, requireAdmin, (req, res) => {
+app.patch('/api/articles/:id', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const id = parseInt(req.params.id) || 0;
   const article = articlesDb.update(id, req.body);
   if (!article) return res.status(404).json({ error: 'Статтю не знайдено' });
@@ -1402,14 +1402,14 @@ app.get('/api/reviews', (req, res) => {
   res.json({ success: true, reviews });
 });
 
-app.post('/api/reviews', adminLimiter, requireAdmin, (req, res) => {
+app.post('/api/reviews', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { name, initials, role, text, rating, active } = req.body;
   if (!name || !text) return res.status(400).json({ error: 'name та text обов\'язкові' });
   const review = reviewsDb.create({ name: sanitize(name), initials: sanitize(initials), role: sanitize(role), text: sanitize(text), rating, active });
   res.status(201).json({ success: true, review });
 });
 
-app.patch('/api/reviews/:id', adminLimiter, requireAdmin, (req, res) => {
+app.patch('/api/reviews/:id', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const id = parseInt(req.params.id) || 0;
   const { name, initials, role, text, rating, active } = req.body;
   const patch = {};
