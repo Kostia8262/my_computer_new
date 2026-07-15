@@ -55,11 +55,12 @@ a{color:var(--c-brand-500);text-decoration:none}
 
 /* LAYOUT */
 .app{display:none;flex-direction:column;min-height:100vh;overflow:hidden}
-.topbar{background:var(--c-surface);border-bottom:1px solid var(--c-border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:10}
+.topbar{background:var(--c-surface);border-bottom:1px solid var(--c-border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:10;box-shadow:0 1px 0 var(--c-border),0 4px 16px rgba(20,14,60,.05)}
 .topbar-left{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
 .topbar-right{display:flex;align-items:center;gap:12px}
 .btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.btn-primary{background:var(--c-brand-500);color:#fff}.btn-primary:hover{background:var(--c-brand-600)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--c-brand-500);color:#fff;box-shadow:0 2px 8px rgba(108,71,255,.28)}.btn-primary:hover{background:var(--c-brand-600);box-shadow:0 4px 14px rgba(108,71,255,.4)}
 .btn-ghost{background:var(--c-brand-50);color:var(--c-brand-500);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
 .btn-danger{background:#fff0f0;color:#e53e3e;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
 .btn-sm{padding:5px 10px;font-size:12px}
@@ -68,14 +69,16 @@ a{color:var(--c-brand-500);text-decoration:none}
 
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px}
-.stat{background:var(--c-surface);border-radius:var(--r-lg);padding:18px;border:1px solid var(--c-border)}
+.stat{background:var(--c-surface);border-radius:var(--r-lg);padding:18px;border:1px solid var(--c-border);box-shadow:var(--shadow-sm);transition:transform .15s ease,box-shadow .15s ease}
+.stat:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(108,71,255,.16)}
 .stat-num{font-size:var(--fs-4xl);font-weight:var(--fw-black);color:var(--c-brand-500)}
 .stat-label{font-size:var(--fs-base);color:var(--c-gray-500);margin-top:2px}
 
 /* CARD — shared surface wrapper, replaces the ~10+ places that hand-write
    this inline (dashboard panels, staff-profile sidebar cards, etc).
    Adopted page-by-page during the design-system rollout, not all at once. */
-.card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:var(--sp-4)}
+.card{background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-lg);padding:var(--sp-4);box-shadow:var(--shadow-sm);transition:box-shadow .15s ease}
+.page-title{font-size:20px;font-weight:800;letter-spacing:-.3px;color:var(--c-ink)}
 
 /* TOOLBAR */
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
@@ -92,7 +95,7 @@ select.filter-select,select.modal-input{
 }
 
 /* TABLE */
-.table-wrap{background:var(--c-surface);border-radius:var(--r-lg);border:1px solid var(--c-border);overflow:auto}
+.table-wrap{background:var(--c-surface);border-radius:var(--r-lg);border:1px solid var(--c-border);overflow:auto;box-shadow:var(--shadow-sm)}
 /* Wide tables (leads/clients) hide their own native horizontal scrollbar —
    the fixed .sticky-hscroll bar below is the single visible/usable one, always
    reachable regardless of vertical scroll position, so there's never a second
@@ -224,8 +227,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .sidebar-nav{padding:14px 10px;flex:1}
 .sidebar-section{font-size:10px;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.8px;padding:16px 10px 6px}
 .sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;font-size:13.5px;font-weight:600;color:#555;cursor:pointer;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
-.sidebar-item:hover{background:#f0eeff;color:#6C47FF}
-.sidebar-item.active{background:#6C47FF;color:#fff}
+.sidebar-item:hover{background:var(--c-brand-50);color:var(--c-brand-500)}
+.sidebar-item.active{background:var(--c-brand-500);color:#fff;box-shadow:0 4px 12px rgba(108,71,255,.35)}
 .sidebar-icon{font-size:15px;width:20px;flex-shrink:0;text-align:center}
 .main{flex:1;padding:24px;overflow-y:auto;min-width:0}
 @media(max-width:900px){
@@ -514,7 +517,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- ADMINS TAB (superadmin only) -->
     <div id="adminsTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <h2 style="font-size:18px;font-weight:800">👥 Співробітники</h2>
+        <h2 class="page-title">👥 Співробітники</h2>
         <button class="btn btn-primary btn-sm" onclick="showCreateAdminForm()">+ Додати співробітника</button>
       </div>
       <div id="createAdminForm" class="card" style="display:none;padding:20px;margin-bottom:20px">
@@ -667,7 +670,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- COURSES TAB -->
     <div id="coursesTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <h2 style="font-size:18px;font-weight:800">🎓 Управління курсами</h2>
+        <h2 class="page-title">🎓 Управління курсами</h2>
         <button class="btn btn-primary btn-sm" onclick="openCourseModal(null)">+ Новий курс</button>
       </div>
       <div id="coursesGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
@@ -713,7 +716,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- CURRICULUM TAB -->
     <div id="curriculumTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
-        <h2 style="font-size:18px;font-weight:800">📝 Програми курсів</h2>
+        <h2 class="page-title">📝 Програми курсів</h2>
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
           <select id="curriculumCourseSelect" class="filter-select" style="min-width:200px" onchange="loadCurriculumForCourse(this.value)">
             <option value="">— Оберіть курс —</option>
@@ -745,7 +748,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- MODULES TAB -->
     <div id="modulesTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <h2 style="font-size:18px;font-weight:800">🔲 Модулі сайту</h2>
+        <h2 class="page-title">🔲 Модулі сайту</h2>
         <button class="btn btn-primary btn-sm" onclick="saveModuleVisibility()">💾 Зберегти</button>
       </div>
       <div style="background:var(--c-surface);border-radius:var(--r-xl);border:1px solid var(--c-border);padding:24px;max-width:560px">
@@ -757,7 +760,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- ARTICLES TAB -->
     <div id="articlesTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-        <h2 style="font-size:18px;font-weight:800">📰 Статті / Блог</h2>
+        <h2 class="page-title">📰 Статті / Блог</h2>
         <button class="btn btn-primary btn-sm" onclick="openArticleModal(null)">+ Нова стаття</button>
       </div>
       <div class="table-wrap">
@@ -804,7 +807,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- ── REVIEWS TAB ── -->
     <div id="reviewsTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-        <h2 style="font-size:18px;font-weight:800">⭐ Відгуки</h2>
+        <h2 class="page-title">⭐ Відгуки</h2>
         <button class="btn btn-primary btn-sm" onclick="openReviewModal(null)">+ Додати відгук</button>
       </div>
       <div class="table-wrap">
@@ -858,7 +861,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- SEO TEXTS TAB -->
     <div id="seoTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:12px">
-        <h2 style="font-size:18px;font-weight:800">🔍 SEO тексти</h2>
+        <h2 class="page-title">🔍 SEO тексти</h2>
         <button class="btn btn-ghost btn-sm" style="font-size:13px" onclick="_seoData=null;loadSeoTab()">↺ Оновити</button>
       </div>
       <p style="font-size:13px;color:var(--c-gray-500);margin-bottom:28px">Ці тексти <strong>приховані від відвідувачів</strong> сайту, але індексуються пошуковими системами. Використовуйте для ключових слів, географічних запитів та семантичного охоплення.</p>
@@ -920,7 +923,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <div id="dashboardTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
         <div>
-          <h2 style="font-size:18px;font-weight:800;margin-bottom:2px">📊 Дашборд школи</h2>
+          <h2 class="page-title" style="margin-bottom:2px">📊 Дашборд школи</h2>
           <div style="font-size:12px;color:var(--c-gray-400)" id="dashLastUpdated">—</div>
         </div>
         <button class="btn btn-ghost btn-sm" onclick="loadDashboardTab()">🔄 Оновити</button>
@@ -1171,7 +1174,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
         <div style="display:flex;align-items:center;gap:12px">
           <button class="btn btn-ghost btn-sm" onclick="closeTeacherProfile()">← Назад</button>
-          <h2 style="font-size:18px;font-weight:800" id="teacherProfileTitle">Особова справа</h2>
+          <h2 class="page-title" id="teacherProfileTitle">Особова справа</h2>
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn btn-ghost no-print" onclick="window.print()">🖨️ Експорт у PDF</button>
@@ -1308,7 +1311,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- CONTENT TAB -->
     <div id="contentTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-        <h2 style="font-size:18px;font-weight:800">✏️ Управління контентом</h2>
+        <h2 class="page-title">✏️ Управління контентом</h2>
       </div>
       <div class="cms-subtabs">
         <button class="cms-subtab active" id="cmsTabPricing" onclick="showCmsSection('pricing')">💰 Варіанти навчання</button>
