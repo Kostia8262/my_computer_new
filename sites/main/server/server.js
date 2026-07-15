@@ -1636,7 +1636,7 @@ app.patch('/api/courses/:id', adminLimiter, requireAdmin, (req, res) => {
   res.json({ success: true, course });
 });
 
-app.delete('/api/courses/:id', adminLimiter, requireAdmin, (req, res) => {
+app.delete('/api/courses/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   if (!SAFE_ID_RE.test(req.params.id)) return res.status(400).json({ error: 'Invalid course ID' });
   const ok = coursesDb.delete(req.params.id);
   if (!ok) return res.status(404).json({ error: 'Курс не знайдено' });

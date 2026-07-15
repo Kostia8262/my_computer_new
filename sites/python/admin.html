@@ -590,6 +590,9 @@ tr:hover td{background:#faf9ff}
           <button class="btn btn-primary btn-sm" onclick="openAddModuleModal()">+ Додати модуль</button>
         </div>
       </div>
+      <div style="background:#FFF8E1;border:1px solid #F0C36D;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#7A5C00">
+        ⚠️ Зміни тут одразу зʼявляються на сторінці курсу (<code>/courses/…</code>), але <strong>не</strong> на блоці програми на головній сторінці — там окремий статичний текст, який треба оновлювати вручну в коді.
+      </div>
       <div id="curriculumContent">
         <div class="empty" style="padding:60px 20px">Оберіть курс, щоб переглянути програму</div>
       </div>
@@ -1023,7 +1026,6 @@ tr:hover td{background:#faf9ff}
       <div class="cms-subtabs">
         <button class="cms-subtab active" id="cmsTabPricing" onclick="showCmsSection('pricing')">💰 Варіанти навчання</button>
         <button class="cms-subtab" id="cmsTabFaq" onclick="showCmsSection('faq')">❓ Питання та відповіді</button>
-        <button class="cms-subtab" id="cmsTabCourses" onclick="showCmsSection('courses')">📚 Курси</button>
       </div>
 
       <!-- PRICING SECTION -->
@@ -1045,18 +1047,6 @@ tr:hover td{background:#faf9ff}
           </div>
         </div>
         <div id="faqEditor"><div class="empty" style="padding:30px">Завантаження...</div></div>
-      </div>
-
-      <!-- COURSES SECTION -->
-      <div id="cmsCourses" class="cms-section" style="display:none">
-        <div class="cms-section-title">
-          📚 Курси
-          <div style="display:flex;gap:8px;margin-left:auto">
-            <button class="btn btn-ghost btn-sm" onclick="addCourse()">+ Додати курс</button>
-            <button class="btn btn-primary btn-sm" onclick="saveCourses()">💾 Зберегти</button>
-          </div>
-        </div>
-        <div id="coursesEditor"><div class="empty" style="padding:30px">Завантаження...</div></div>
       </div>
     </div>
 
@@ -2808,7 +2798,7 @@ function parseCSVRow(line) {
 let _cmsData = null;
 
 function showCmsSection(section) {
-  ['Pricing','Faq','Courses'].forEach(s => {
+  ['Pricing','Faq'].forEach(s => {
     document.getElementById('cms' + s).style.display = s.toLowerCase() === section ? '' : 'none';
     document.getElementById('cmsTab' + s).classList.toggle('active', s.toLowerCase() === section);
   });
@@ -2820,7 +2810,6 @@ async function loadContentData() {
     _cmsData = await res.json();
     renderPricingEditor(_cmsData.pricing || []);
     renderFaqEditor(_cmsData.faq || []);
-    renderCoursesEditor(_cmsData.courses || []);
   } catch { showToast('Помилка завантаження контенту', 'error'); }
 }
 
@@ -2954,121 +2943,6 @@ async function saveFaq() {
     if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
     _cmsData.faq = items;
     showToast('FAQ збережено ✓', 'success');
-  } catch { showToast('Помилка сервера', 'error'); }
-}
-
-// ── COURSES EDITOR ─────────────────────────────────────────────────────────────
-function collectCoursesFromForm() {
-  return (_cmsData.courses || []).map((c, i) => ({
-    ...c,
-    emoji:     document.getElementById(`cEmoji_${i}`)?.value||'',
-    slug:      document.getElementById(`cSlug_${i}`)?.value||'',
-    popular:   document.getElementById(`cPopular_${i}`)?.checked||false,
-    age:       { ua: document.getElementById(`cAgeUa_${i}`)?.value||'', ru: document.getElementById(`cAgeRu_${i}`)?.value||'' },
-    title:     { ua: document.getElementById(`cTitleUa_${i}`)?.value||'', ru: document.getElementById(`cTitleRu_${i}`)?.value||'' },
-    desc:      { ua: document.getElementById(`cDescUa_${i}`)?.value||'', ru: document.getElementById(`cDescRu_${i}`)?.value||'' },
-    features:  (c.features||[]).map((_,fi) => ({
-      ua: document.getElementById(`cFeatUa_${i}_${fi}`)?.value||'',
-      ru: document.getElementById(`cFeatRu_${i}_${fi}`)?.value||'',
-    })),
-    duration:  { ua: document.getElementById(`cDurUa_${i}`)?.value||'', ru: document.getElementById(`cDurRu_${i}`)?.value||'' },
-    groupSize: { ua: document.getElementById(`cGroupUa_${i}`)?.value||'', ru: document.getElementById(`cGroupRu_${i}`)?.value||'' },
-  }));
-}
-
-function renderCoursesEditor(courses) {
-  const el = document.getElementById('coursesEditor');
-  if (!courses.length) { el.innerHTML = '<div class="empty" style="padding:30px">Курсів немає. Натисніть «+ Додати курс».</div>'; return; }
-  el.innerHTML = courses.map((c, i) => `
-    <div class="cms-card">
-      <div class="cms-card-header">
-        <span>${esc(c.emoji||'📚')} Курс ${i+1}</span>
-        <div style="display:flex;gap:8px;align-items:center">
-          <label class="cms-toggle">
-            <input type="checkbox" id="cPopular_${i}" ${c.popular?'checked':''}> Популярний
-          </label>
-          <button class="btn btn-danger btn-sm" onclick="deleteCourse(${i})">✕</button>
-        </div>
-      </div>
-      <div class="cms-grid2" style="margin-bottom:10px">
-        <div><label class="cms-label">Emoji</label>
-          <input class="cms-input" id="cEmoji_${i}" value="${esc(c.emoji||'')}" style="font-size:18px"/></div>
-        <div><label class="cms-label">Slug (URL: /courses/slug)</label>
-          <input class="cms-input" id="cSlug_${i}" value="${esc(c.slug||'')}"/></div>
-      </div>
-      <div class="cms-grid2" style="margin-bottom:10px">
-        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Назва UA</label>
-          <input class="cms-input" id="cTitleUa_${i}" value="${esc(c.title?.ua||'')}"/></div>
-        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Назва RU</label>
-          <input class="cms-input" id="cTitleRu_${i}" value="${esc(c.title?.ru||'')}"/></div>
-      </div>
-      <div class="cms-grid2" style="margin-bottom:10px">
-        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Вік UA</label>
-          <input class="cms-input" id="cAgeUa_${i}" value="${esc(c.age?.ua||'')}"/></div>
-        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Вік RU</label>
-          <input class="cms-input" id="cAgeRu_${i}" value="${esc(c.age?.ru||'')}"/></div>
-      </div>
-      <div class="cms-grid2" style="margin-bottom:10px">
-        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Опис UA</label>
-          <textarea class="cms-textarea" id="cDescUa_${i}">${esc(c.desc?.ua||'')}</textarea></div>
-        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Опис RU</label>
-          <textarea class="cms-textarea" id="cDescRu_${i}">${esc(c.desc?.ru||'')}</textarea></div>
-      </div>
-      <div style="margin-bottom:10px">
-        <label class="cms-label">Особливості (UA / RU):</label>
-        ${(c.features||[]).map((f,fi) => `
-          <div class="cms-features-row">
-            <input class="cms-input" id="cFeatUa_${i}_${fi}" value="${esc(f.ua||'')}" placeholder="🇺🇦 UA"/>
-            <input class="cms-input" id="cFeatRu_${i}_${fi}" value="${esc(f.ru||'')}" placeholder="🇷🇺 RU"/>
-          </div>`).join('')}
-      </div>
-      <div class="cms-grid2" style="margin-bottom:10px">
-        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Тривалість UA</label>
-          <input class="cms-input" id="cDurUa_${i}" value="${esc(c.duration?.ua||'')}"/></div>
-        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Тривалість RU</label>
-          <input class="cms-input" id="cDurRu_${i}" value="${esc(c.duration?.ru||'')}"/></div>
-      </div>
-      <div class="cms-grid2">
-        <div><label class="cms-label"><span class="lang-flag">🇺🇦</span>Розмір групи UA</label>
-          <input class="cms-input" id="cGroupUa_${i}" value="${esc(c.groupSize?.ua||'')}"/></div>
-        <div><label class="cms-label"><span class="lang-flag">🇷🇺</span>Розмір групи RU</label>
-          <input class="cms-input" id="cGroupRu_${i}" value="${esc(c.groupSize?.ru||'')}"/></div>
-      </div>
-    </div>`).join('');
-}
-
-function addCourse() {
-  _cmsData.courses = collectCoursesFromForm();
-  const maxId = _cmsData.courses.reduce((m,c) => Math.max(m, c.id||0), 0);
-  _cmsData.courses.push({
-    id: maxId+1, emoji:'📚', slug:'new-course',
-    headerClass:'course-card__header--scratch', popular:false,
-    age:{ua:'',ru:''}, title:{ua:'',ru:''}, desc:{ua:'',ru:''},
-    features:[{ua:'',ru:''},{ua:'',ru:''},{ua:'',ru:''}],
-    duration:{ua:'',ru:''}, groupSize:{ua:'',ru:''},
-  });
-  renderCoursesEditor(_cmsData.courses);
-  showToast('Додано новий курс', 'success');
-}
-
-function deleteCourse(idx) {
-  if (!confirm(`Видалити курс ${idx+1}?`)) return;
-  _cmsData.courses = collectCoursesFromForm();
-  _cmsData.courses.splice(idx, 1);
-  renderCoursesEditor(_cmsData.courses);
-}
-
-async function saveCourses() {
-  const courses = collectCoursesFromForm();
-  try {
-    const res = await fetch('/api/content/courses', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
-      body: JSON.stringify(courses),
-    });
-    if (!res.ok) { showToast('Помилка збереження', 'error'); return; }
-    _cmsData.courses = courses;
-    showToast('Курси збережено ✓', 'success');
   } catch { showToast('Помилка сервера', 'error'); }
 }
 
