@@ -376,6 +376,18 @@ app.get('/data/articles.json', (req, res) => {
   res.json(articlesDb.getAll());
 });
 
+// Admin panel — no-store so updates apply immediately. Registered before
+// express.static() so it takes precedence over the static handler, which
+// would otherwise match admin.html first.
+app.get('/admin', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, '..', 'admin.html'));
+});
+app.get('/admin.html', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, '..', 'admin.html'));
+});
+
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: '1d',           // cache versioned assets (css?v=, js?v=) 1 day
@@ -882,16 +894,6 @@ app.delete('/api/leads/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-});
-
-// Admin panel — no cache so updates apply immediately
-app.get('/admin', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(path.join(__dirname, '..', 'admin.html'));
-});
-app.get('/admin.html', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(path.join(__dirname, '..', 'admin.html'));
 });
 
 // Known single-page routes → index.html

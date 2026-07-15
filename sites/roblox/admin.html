@@ -4477,11 +4477,11 @@ async function openStaffProfile(adminId) {
     updateBirthdayDisplay();
     renderStaffProfileAccess(admin);
 
-    // Show/hide teacher-specific section
-    const isTeacher = admin.role === 'teacher';
-    document.getElementById('tp_teacherSection').style.display = isTeacher ? '' : 'none';
+    // Show/hide payment section — every paid role except superadmin (the owner)
+    const showPayment = admin.role !== 'superadmin';
+    document.getElementById('tp_teacherSection').style.display = showPayment ? '' : 'none';
 
-    if (isTeacher) {
+    if (showPayment) {
       const pt = admin.paymentType || 'hourly';
       document.getElementById('tp_paymentType').value    = pt;
       document.getElementById('tp_hourlyRate').value     = admin.hourlyRate    != null ? admin.hourlyRate    : '';
@@ -4542,7 +4542,7 @@ async function saveTeacherProfile() {
     birthday: document.getElementById('tp_birthday').value,
   };
   if (!patch.name || patch.name.length < 2) { showToast('Вкажіть ім\'я', 'error'); return; }
-  if (_currentStaffRole === 'teacher') {
+  if (_currentStaffRole !== 'superadmin') {
     const pt = document.getElementById('tp_paymentType').value;
     patch.paymentType    = pt;
     patch.lessonDuration = parseInt(document.getElementById('tp_lessonDuration').value) || 60;
