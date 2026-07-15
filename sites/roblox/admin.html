@@ -125,11 +125,11 @@ tr:hover td{background:var(--c-row-hover)}
 .chip{display:inline-flex;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:#f0eeff;color:#6C47FF}
 
 /* STATUS SELECT */
-.status-sel{padding:4px 22px 4px 8px;border:1.5px solid #e0d9ff;border-radius:6px;font-size:12px;background-color:#fff;cursor:pointer;outline:none;
+.status-sel{padding:4px 22px 4px 8px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-sm);font-size:12px;background-color:var(--c-surface);cursor:pointer;outline:none;
   appearance:none;-webkit-appearance:none;-moz-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 8px center}
-.status-sel:focus{border-color:#6C47FF}
+.status-sel:focus{border-color:var(--c-brand-500)}
 /* Icon-only status dropdown: hides the label text (color:transparent), keeps the
    colored circle emoji visible (emoji glyphs ignore text color), full text still
    shows once the native list is opened since <option> gets its own explicit color. */
@@ -144,7 +144,7 @@ tr:hover td{background:var(--c-row-hover)}
 .status-sel-wrap{position:relative;display:inline-block}
 .status-dot{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;pointer-events:none}
 .status-sel-icon{width:54px;padding:4px 20px 4px 22px;color:transparent;text-shadow:none;text-align:left;background-position:right 6px center}
-.status-sel-icon option{color:#333}
+.status-sel-icon option{color:var(--c-ink-soft)}
 
 /* NOTES */
 .notes-input{width:100%;padding:4px 8px;border:1.5px solid #e0d9ff;border-radius:6px;font-size:12px;outline:none;min-width:120px}
@@ -166,7 +166,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .toast.error{background:#dc2626}
 
 /* PAGINATION */
-.pager{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid #f0eeff;font-size:13px;color:#888}
+.pager{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-top:1px solid var(--c-border-soft);font-size:13px;color:var(--c-gray-500)}
 .pager-btns{display:flex;gap:6px}
 
 @media(max-width:700px){
@@ -387,9 +387,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .gs-item-sub{font-size:11px;color:#888;flex-shrink:0}
 .gs-empty{padding:16px 14px;text-align:center;color:#aaa;font-size:13px}
 /* BULK ACTIONS BAR */
-.bulk-bar{display:none;align-items:center;gap:8px;padding:10px 14px;background:#ede9fe;border-radius:10px;margin-bottom:10px;flex-wrap:wrap;border:1.5px solid #c4b5fd}
+.bulk-bar{display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--c-trial-bg);border-radius:var(--r-md);margin-bottom:10px;flex-wrap:wrap;border:1.5px solid var(--c-trial-border)}
 .bulk-bar.show{display:flex}
-.bulk-count{font-weight:700;color:#6C47FF;font-size:13px}
+.bulk-count{font-weight:700;color:var(--c-brand-500);font-size:13px}
 /* SCHEDULE VIEW */
 .sched-wrap{overflow-x:auto}
 .sched-tbl{border-collapse:collapse;min-width:600px;width:100%}
@@ -1692,10 +1692,10 @@ function renderStats() {
 
   document.getElementById('statsRow').innerHTML = `
     <div class="stat"><div class="stat-num">${counts.total}</div><div class="stat-label">Всього заявок</div></div>
-    <div class="stat"><div class="stat-num" style="color:#2563eb">${counts.new}</div><div class="stat-label">Нові</div></div>
-    <div class="stat"><div class="stat-num" style="color:#b45309">${counts.contacted}</div><div class="stat-label">Зв'язалися</div></div>
-    <div class="stat"><div class="stat-num" style="color:#7c3aed">${counts.trial_scheduled}</div><div class="stat-label">Пробний заплановано</div></div>
-    <div class="stat"><div class="stat-num" style="color:#15803d">${counts.enrolled}</div><div class="stat-label">Записані</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--c-info-text)">${counts.new}</div><div class="stat-label">Нові</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--c-warning-text)">${counts.contacted}</div><div class="stat-label">Зв'язалися</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--c-trial-text)">${counts.trial_scheduled}</div><div class="stat-label">Пробний заплановано</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--c-success-text)">${counts.enrolled}</div><div class="stat-label">Записані</div></div>
   `;
 }
 
@@ -1724,7 +1724,7 @@ function renderTable() {
     tbody.innerHTML = page.map(l => `
       <tr id="row-${l.id}">
         <td class="td-tight" style="padding-left:12px"><input type="checkbox" ${_selectedLeads.has(l.id)?'checked':''} onchange="toggleLeadCheck(${l.id})"/></td>
-        <td style="color:#aaa;font-size:12px;white-space:nowrap">#${l.id}${l.source ? ` <span style="cursor:help" title="${esc(SOURCE_LABELS[l.source]||l.source)}">🌐</span>` : ''}</td>
+        <td style="color:var(--c-gray-400);font-size:12px;white-space:nowrap">#${l.id}${l.source ? ` <span style="cursor:help" title="${esc(SOURCE_LABELS[l.source]||l.source)}">🌐</span>` : ''}</td>
         <td style="font-weight:600"><input class="notes-input" style="font-weight:600" value="${esc(l.child_name)}" onblur="saveLeadFields(${l.id},{child_name:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td>
           <select class="status-sel" onchange="changeStatus(${l.id}, this.value)">
@@ -1753,7 +1753,7 @@ function renderTable() {
           <input class="notes-input" value="${esc(l.notes||'')}" placeholder="Нотатки..."
             onblur="saveNotes(${l.id}, this.value)" onkeydown="if(event.key==='Enter')this.blur()"/>
         </td>
-        <td style="color:#aaa;font-size:12px;white-space:nowrap">${l.created_at||''}</td>
+        <td style="color:var(--c-gray-400);font-size:12px;white-space:nowrap">${l.created_at||''}</td>
         <td>
           ${currentRole === 'superadmin' ? `<button class="btn btn-danger btn-sm" onclick="deleteLead(${l.id})">✕</button>` : ''}
         </td>
