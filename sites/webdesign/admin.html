@@ -57,8 +57,15 @@ select.filter-select,select.modal-input{
 
 /* TABLE */
 .table-wrap{background:#fff;border-radius:12px;border:1px solid #e8e4ff;overflow:auto}
-/* Shadow horizontal scrollbar, fixed to the viewport bottom, shown only while
-   the real table's bottom edge (and thus its own scrollbar) is off-screen. */
+/* Wide tables (leads/clients) hide their own native horizontal scrollbar —
+   the fixed .sticky-hscroll bar below is the single visible/usable one, always
+   reachable regardless of vertical scroll position, so there's never a second
+   (redundant, easy-to-miss) native scrollbar competing with it. Still fully
+   scrollable via wheel/trackpad/drag, just without the native chrome. */
+.hscroll-native-hidden{scrollbar-width:none;-ms-overflow-style:none}
+.hscroll-native-hidden::-webkit-scrollbar{display:none}
+/* Shadow horizontal scrollbar, fixed to the viewport bottom, shown whenever
+   its table needs horizontal scrolling at all. */
 .sticky-hscroll{position:fixed;bottom:0;height:14px;overflow-x:scroll;overflow-y:hidden;z-index:200;display:none;background:#fff;border-top:1px solid #e8e4ff}
 .sticky-hscroll div{height:1px}
 table{width:100%;border-collapse:collapse;font-size:14px}
@@ -90,12 +97,27 @@ tr:hover td{background:#faf9ff}
 /* Icon-only status dropdown: hides the label text (color:transparent), keeps the
    colored circle emoji visible (emoji glyphs ignore text color), full text still
    shows once the native list is opened since <option> gets its own explicit color. */
-.status-sel-icon{width:54px;padding:4px 20px 4px 8px;color:transparent;text-align:left;background-position:right 6px center}
+/* Icon-only status dropdown: relying on color:transparent to hide the label
+   text while a colored-circle emoji "shows through" is unreliable — some
+   Windows font fallbacks render circle emoji as a color-respecting glyph, so
+   the text doesn't fully disappear. Instead the select's own text is fully
+   hidden (indistinguishable from the background) and a real colored dot is
+   drawn on top via a separate absolutely-positioned span — guaranteed correct
+   regardless of emoji font rendering. <option> keeps its own color so the
+   opened native list still shows full text normally. */
+.status-sel-wrap{position:relative;display:inline-block}
+.status-dot{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;pointer-events:none}
+.status-sel-icon{width:54px;padding:4px 20px 4px 22px;color:transparent;text-shadow:none;text-align:left;background-position:right 6px center}
 .status-sel-icon option{color:#333}
 
 /* NOTES */
 .notes-input{width:100%;padding:4px 8px;border:1.5px solid #e0d9ff;border-radius:6px;font-size:12px;outline:none;min-width:120px}
 .notes-input:focus{border-color:#6C47FF}
+/* Setting appearance:textfield on the input itself is not reliably enough in
+   Chrome/Edge — the spin-button pseudo-elements need to be targeted directly,
+   or they keep reserving visible width even when "hidden". */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* EMPTY */
 .empty{padding:60px 20px;text-align:center;color:#aaa}
@@ -507,12 +529,14 @@ tr:hover td{background:#faf9ff}
           <div class="modal-group"><label class="modal-label">Телефон *</label><input class="modal-input" id="cf_phone" placeholder="+380954624672"/></div>
           <div class="modal-group"><label class="modal-label">Email</label><input class="modal-input" id="cf_email" type="email" placeholder="email@gmail.com"/></div>
           <div class="modal-group"><label class="modal-label">Статус</label>
-            <select class="modal-input" id="cf_status">
+            <select class="modal-input" id="cf_status" onchange="onClientStatusChangeInModal(this.value)">
               <option value="new">🔵 Новий</option><option value="trial">🟣 Пробний урок</option>
               <option value="active">🟢 Активний</option><option value="paused">🟡 Пауза</option>
               <option value="completed">✅ Завершив курс</option><option value="churned">🔴 Відмовився</option>
             </select>
           </div>
+          <div class="modal-group" id="cf_certWrap" style="display:none"><label class="modal-label">№ сертифіката</label><input class="modal-input" id="cf_certificateNumber" placeholder="MCA-2026-001"/></div>
+          <div class="modal-group" id="cf_certDateWrap" style="display:none"><label class="modal-label">Дата сертифіката</label><input class="modal-input" id="cf_certificateDate" type="date"/></div>
           <div class="modal-group"><label class="modal-label">Джерело</label>
             <select class="modal-input" id="cf_source">
               <option value="website">🌐 Сайт</option><option value="referral">👥 Рекомендація</option>
@@ -915,7 +939,7 @@ tr:hover td{background:#faf9ff}
         </div>
 
         <!-- Client table -->
-        <div class="table-wrap" id="clientsTableWrap" style="overflow-x:auto">
+        <div class="table-wrap hscroll-native-hidden" id="clientsTableWrap" style="overflow-x:auto">
           <table id="clientsTable" style="min-width:980px">
             <thead><tr>
               <th class="td-tight" style="width:34px;padding-left:12px"><input type="checkbox" id="clientSelectAll" onchange="toggleAllClientChecks()"/></th>
@@ -928,7 +952,7 @@ tr:hover td{background:#faf9ff}
               <th style="width:96px">Формат</th>
               <th>Розклад</th>
               <th>Викладач</th>
-              <th style="width:82px">Взнос</th>
+              <th style="width:82px">Ціна навчання</th>
               <th style="width:110px">Наст. дзвінок</th>
               <th>Нотатки</th>
               <th style="width:60px"></th>
@@ -999,7 +1023,7 @@ tr:hover td{background:#faf9ff}
                 <thead><tr>
                   <th style="width:36px;text-align:center"><input type="checkbox" id="paySelectAll" onclick="toggleAllPayChecks()" title="Вибрати всіх"/></th>
                   <th>Учень</th><th>Курс</th><th>Формат</th><th>Розклад</th>
-                  <th>Взнос ₴</th><th>Сплачено ₴</th><th>Статус</th>
+                  <th>Ціна навчання ₴</th><th>Сплачено ₴</th><th>Статус</th>
                   <th>Дата оплати</th><th>Спосіб</th><th>Нотатка</th><th style="width:32px"></th>
                 </tr></thead>
                 <tbody id="monthPayBody"></tbody>
@@ -1254,11 +1278,19 @@ tr:hover td{background:#faf9ff}
       <button class="btn btn-primary btn-sm" onclick="openNewLeadModal()">+ Нова заявка</button>
     </div>
 
+    <!-- Bulk actions bar (appears when rows selected) -->
+    <div class="bulk-bar" id="leadBulkBar">
+      <span class="bulk-count" id="leadBulkCount">0 вибрано</span>
+      <button class="btn btn-danger btn-sm superadmin-only" onclick="bulkDeleteLeads()">✕ Видалити</button>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearLeadSelection()">✕ Скасувати</button>
+    </div>
+
     <!-- TABLE -->
-    <div class="table-wrap" id="leadsTableWrap">
+    <div class="table-wrap hscroll-native-hidden" id="leadsTableWrap">
       <table id="leadsTable">
         <thead>
           <tr>
+            <th class="td-tight" style="width:34px;padding-left:12px"><input type="checkbox" id="leadSelectAll" onchange="toggleAllLeadChecks()"/></th>
             <th>#</th>
             <th>Ім'я дитини</th>
             <th>Статус</th>
@@ -1293,11 +1325,9 @@ tr:hover td{background:#faf9ff}
 const STORAGE_KEY        = 'mca_admin_token';
 const STORAGE_TAB_KEY    = 'mca_admin_tab';
 const STORAGE_SUBTAB_KEY = 'mca_admin_subtab';
-const PAGE_SIZE       = 20;
 
 let allLeads      = [];
 let filtered      = [];
-let currentPage   = 1;
 let token         = localStorage.getItem(STORAGE_KEY) || '';
 let currentRole   = '';
 let _teachersList = []; // [{id, name}] loaded on init
@@ -1566,7 +1596,6 @@ async function loadLeads() {
     if (res.status === 401) { doLogout(); return; }
     const data = await res.json();
     allLeads = data.leads || [];
-    currentPage = 1;
     renderStats();
     renderTable();
   } catch {
@@ -1607,17 +1636,16 @@ function renderTable() {
     return true;
   });
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  if (currentPage > totalPages) currentPage = totalPages;
-  const page = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+  const page = filtered;
 
   const tbody = document.getElementById('leadsBody');
   if (!page.length) {
-    tbody.innerHTML = `<tr><td colspan="11"><div class="empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6M9 16h6M7 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1h-3M9 4a2 2 0 002 2h2a2 2 0 002-2M9 4a2 2 0 012-2h2a2 2 0 012 2"/></svg><div>Заявок не знайдено</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="12"><div class="empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12h6M9 16h6M7 4H4a1 1 0 00-1 1v14a1 1 0 001 1h16a1 1 0 001-1V5a1 1 0 00-1-1h-3M9 4a2 2 0 002 2h2a2 2 0 002-2M9 4a2 2 0 012-2h2a2 2 0 012 2"/></svg><div>Заявок не знайдено</div></div></td></tr>`;
   } else {
     tbody.innerHTML = page.map(l => `
       <tr id="row-${l.id}">
-        <td style="color:#aaa;font-size:12px">#${l.id}${l.source ? `<br><span style="color:#6C47FF;font-size:10px;font-weight:600" title="${esc(l.source)}">${esc(l.source)}</span>` : ''}</td>
+        <td class="td-tight" style="padding-left:12px"><input type="checkbox" ${_selectedLeads.has(l.id)?'checked':''} onchange="toggleLeadCheck(${l.id})"/></td>
+        <td style="color:#aaa;font-size:12px;white-space:nowrap">#${l.id}${l.source ? ` <span style="cursor:help" title="${esc(SOURCE_LABELS[l.source]||l.source)}">🌐</span>` : ''}</td>
         <td style="font-weight:600"><input class="notes-input" style="font-weight:600" value="${esc(l.child_name)}" onblur="saveLeadFields(${l.id},{child_name:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td>
           <select class="status-sel" onchange="changeStatus(${l.id}, this.value)">
@@ -1626,7 +1654,7 @@ function renderTable() {
             ).join('')}
           </select>
         </td>
-        <td class="td-tight"><input class="notes-input" style="width:26px;padding:4px;text-align:center;min-width:0;appearance:textfield;-webkit-appearance:textfield;-moz-appearance:textfield" type="number" value="${esc(String(l.age||''))}" placeholder="вік" onblur="saveLeadFields(${l.id},{age:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
+        <td class="td-tight"><input class="notes-input" style="width:34px;padding:4px;text-align:center;min-width:0;appearance:textfield;-webkit-appearance:textfield;-moz-appearance:textfield" type="number" value="${esc(String(l.age||''))}" placeholder="вік" onblur="saveLeadFields(${l.id},{age:this.value})" onkeydown="if(event.key==='Enter')this.blur()"/></td>
         <td>
           <select class="status-sel" style="width:130px;text-overflow:ellipsis" title="${esc(COURSE_LABELS[l.course]||l.course||'')}" onchange="saveLeadFields(${l.id},{course:this.value})">
             <option value="">—</option>
@@ -1654,17 +1682,65 @@ function renderTable() {
     `).join('');
   }
 
-  document.getElementById('pager').innerHTML = `
-    <span>${filtered.length} заявок · стор. ${currentPage} з ${totalPages}</span>
-    <div class="pager-btns">
-      <button class="btn btn-ghost btn-sm" onclick="gotoPage(${currentPage-1})" ${currentPage<=1?'disabled':''}>‹ Назад</button>
-      <button class="btn btn-ghost btn-sm" onclick="gotoPage(${currentPage+1})" ${currentPage>=totalPages?'disabled':''}>Далі ›</button>
-    </div>
-  `;
+  document.getElementById('pager').innerHTML = `<span>${filtered.length} заявок</span>`;
+  _updateLeadBulkBar();
   setTimeout(_syncLeadsHScroll, 0);
 }
 
-function gotoPage(p) { currentPage = p; renderTable(); }
+// ── BULK LEAD SELECTION / DELETE ──────────────────────────────────────────────
+let _selectedLeads = new Set();
+
+function toggleLeadCheck(id) {
+  if (_selectedLeads.has(id)) _selectedLeads.delete(id);
+  else _selectedLeads.add(id);
+  _updateLeadBulkBar();
+}
+
+function toggleAllLeadChecks() {
+  const masterCb = document.getElementById('leadSelectAll');
+  const checkAll = masterCb ? masterCb.checked : false;
+  const ids = filtered.map(l => l.id);
+  if (checkAll) ids.forEach(id => _selectedLeads.add(id));
+  else ids.forEach(id => _selectedLeads.delete(id));
+  renderTable();
+}
+
+function _updateLeadBulkBar() {
+  const bar   = document.getElementById('leadBulkBar');
+  const count = document.getElementById('leadBulkCount');
+  const n = _selectedLeads.size;
+  if (bar)   bar.classList.toggle('show', n > 0);
+  if (count) count.textContent = `${n} вибрано`;
+  const masterCb = document.getElementById('leadSelectAll');
+  if (masterCb && filtered.length) {
+    const onPage = filtered.filter(l => _selectedLeads.has(l.id)).length;
+    masterCb.checked       = onPage > 0 && onPage === filtered.length;
+    masterCb.indeterminate = onPage > 0 && onPage < filtered.length;
+  }
+}
+
+function clearLeadSelection() {
+  _selectedLeads.clear();
+  renderTable();
+}
+
+async function bulkDeleteLeads() {
+  if (!_selectedLeads.size) return;
+  const ids = [..._selectedLeads];
+  if (!confirm(`Видалити ${ids.length} заявок? Цю дію не можна скасувати.`)) return;
+  let deleted = 0;
+  for (const id of ids) {
+    try {
+      const res = await fetch(`/api/leads/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+      if (res.ok) deleted++;
+    } catch {}
+  }
+  allLeads = allLeads.filter(l => !_selectedLeads.has(l.id));
+  _selectedLeads.clear();
+  renderStats();
+  renderTable();
+  showToast(`Видалено ${deleted} з ${ids.length} заявок`, deleted === ids.length ? 'success' : 'error');
+}
 
 // ── STICKY HORIZONTAL SCROLLBAR (leads + clients tables) ──────────────────────
 // Shared shadow-scrollbar mechanism: shown pinned to the viewport bottom only
@@ -1683,9 +1759,8 @@ function _syncOneHScroll({ wrapId, barId, innerId, active }) {
   if (!wrap || !bar || !inner) return;
   if (!active()) { bar.style.display = 'none'; return; }
   const needsScroll = wrap.scrollWidth > wrap.clientWidth + 2;
-  const rect = wrap.getBoundingClientRect();
-  const tableBottomOffscreen = rect.bottom > window.innerHeight;
-  if (needsScroll && tableBottomOffscreen) {
+  if (needsScroll) {
+    const rect = wrap.getBoundingClientRect();
     bar.style.display = 'block';
     bar.style.left    = rect.left  + 'px';
     bar.style.width   = rect.width + 'px';
@@ -2030,16 +2105,18 @@ function toggleAlerts() {
 // ── CLIENTS ───────────────────────────────────────────────────────────────────
 // ── CLIENT BASE ───────────────────────────────────────────────────────────────
 let _allClients      = null;
-let _clientPage      = 1;
 let _showArchive     = false;
 let _editingClientId = null;
 let _selectedClients = new Set();
 let _clientsPageIds  = [];
-const CLIENT_PAGE_SIZE = 20;
 
 const CLIENT_STATUS_LABELS = {
   new: '🔵 Новий', trial: '🟣 Пробний', active: '🟢 Активний',
   paused: '🟡 Пауза', completed: '✅ Завершив', churned: '🔴 Відмовився',
+};
+const STATUS_DOT_COLORS = {
+  new: '#3b82f6', trial: '#a855f7', active: '#22c55e',
+  paused: '#eab308', completed: '#16a34a', churned: '#ef4444',
 };
 const SOURCE_LABELS = {
   website: '🌐 Сайт', referral: '👥 Рекомендація', social: '📱 Соцмережі',
@@ -2052,7 +2129,6 @@ async function loadClients() {
     if (res.status === 401) { doLogout(); return; }
     const data = await res.json();
     _allClients = data.clients || [];
-    _clientPage = 1;
     renderClientStats(data.stats || {});
     renderClients();
   } catch { showToast('Помилка завантаження бази клієнтів', 'error'); }
@@ -2065,7 +2141,6 @@ function renderClientStats(stats) {
   el.innerHTML = [
     ['Всього', stats.total || 0, '#6C47FF'],
     ['Нові', newThisMonth, '#2563eb'],
-    ['Пробний', stats.trial || 0, '#7c3aed'],
     ['Активні', stats.active || 0, '#15803d'],
     ['Пауза', stats.paused || 0, '#b45309'],
     ['Завершили', stats.completed || 0, '#166534'],
@@ -2094,9 +2169,7 @@ function renderClients() {
     return true;
   });
 
-  const totalPages = Math.max(1, Math.ceil(list.length / CLIENT_PAGE_SIZE));
-  if (_clientPage > totalPages) _clientPage = totalPages;
-  const page = list.slice((_clientPage - 1) * CLIENT_PAGE_SIZE, _clientPage * CLIENT_PAGE_SIZE);
+  const page = list;
   _clientsPageIds = page.map(c => c.id);
 
   const tbody = document.getElementById('clientsBody');
@@ -2141,9 +2214,12 @@ function renderClients() {
           value="${esc(c.name||'')}"
           onblur="saveClientField(${c.id},'name',this.value)"
           onkeydown="if(event.key==='Enter')this.blur()"/></td>
-        <td class="td-tight"><select class="status-sel status-sel-icon cs-${c.status||'new'}" title="${esc(CLIENT_STATUS_LABELS[c.status]||'')}"
-          onchange="saveClientField(${c.id},'status',this.value);this.className='status-sel status-sel-icon cs-'+this.value;this.title=CLIENT_STATUS_LABELS[this.value]||''"
-          >${statusOpts}</select></td>
+        <td class="td-tight"><span class="status-sel-wrap">
+          <span class="status-dot" id="statusDot${c.id}" style="background:${STATUS_DOT_COLORS[c.status]||'#999'}"></span>
+          <select class="status-sel status-sel-icon cs-${c.status||'new'}" title="${esc(CLIENT_STATUS_LABELS[c.status]||'')}"
+            onchange="saveClientField(${c.id},'status',this.value);this.className='status-sel status-sel-icon cs-'+this.value;this.title=CLIENT_STATUS_LABELS[this.value]||'';document.getElementById('statusDot${c.id}').style.background=STATUS_DOT_COLORS[this.value]||'#999'"
+            >${statusOpts}</select>
+        </span></td>
         <td class="td-tight"><input class="notes-input" style="width:34px;padding:4px;text-align:center;min-width:0;appearance:textfield;-webkit-appearance:textfield;-moz-appearance:textfield" type="number"
           value="${c.age ?? ''}" placeholder="вік"
           onblur="saveClientField(${c.id},'age',this.value)"
@@ -2184,14 +2260,7 @@ function renderClients() {
   }
 
   const pager = document.getElementById('clientsPager');
-  if (pager) pager.innerHTML = `
-    <span>${list.length} клієнтів · стор. ${_clientPage} з ${totalPages}</span>
-    <div class="pager-btns">
-      <button class="btn btn-ghost btn-sm" onclick="_clientPage=${_clientPage-1};renderClients()"
-        ${_clientPage<=1?'disabled':''}>‹</button>
-      <button class="btn btn-ghost btn-sm" onclick="_clientPage=${_clientPage+1};renderClients()"
-        ${_clientPage>=totalPages?'disabled':''}>›</button>
-    </div>`;
+  if (pager) pager.innerHTML = `<span>${list.length} клієнтів</span>`;
   _updateClientBulkBar();
   setTimeout(_syncAllHScroll, 0);
 }
@@ -2250,7 +2319,6 @@ async function bulkDeleteClients() {
 
 function toggleArchive() {
   _showArchive = !_showArchive;
-  _clientPage  = 1;
   const btn = document.getElementById('archiveToggleBtn');
   if (btn) {
     btn.textContent      = _showArchive ? '📋 Активні'  : '📦 Архів';
@@ -2265,7 +2333,7 @@ function openClientModal(id) {
   _editingClientId = id;
   const modal = document.getElementById('clientModal');
   document.getElementById('clientModalTitle').textContent = id ? 'Редагувати клієнта' : 'Новий клієнт';
-  const fields = ['name','age','course','phone','email','status','source','monthlyFee','totalPaid','enrolledDate','trialDate','lastContact','nextContact','manager','teacher','lessonType','city','notes'];
+  const fields = ['name','age','course','phone','email','status','source','monthlyFee','totalPaid','enrolledDate','trialDate','lastContact','nextContact','manager','teacher','lessonType','city','notes','certificateNumber','certificateDate'];
   fields.forEach(f => { const el = document.getElementById('cf_' + f); if (el) el.value = ''; });
   // Populate teacher dropdown
   const teacherSel = document.getElementById('cf_teacher');
@@ -2278,6 +2346,7 @@ function openClientModal(id) {
   const noteEl = document.getElementById('cf_scheduleNote');
   if (noteEl) noteEl.value = '';
   onLessonTypeChange('group');
+  onClientStatusChangeInModal('new');
 
   if (id) {
     const c = _allClients?.find(x => x.id === id);
@@ -2286,6 +2355,7 @@ function openClientModal(id) {
         const el = document.getElementById('cf_' + f);
         if (el && c[f] != null) el.value = c[f];
       });
+      onClientStatusChangeInModal(c.status || 'new');
       // Populate schedule pickers
       const lt = c.lessonType || 'group';
       onLessonTypeChange(lt);
@@ -2318,7 +2388,8 @@ async function saveClient() {
 
   const data = {};
   ['name','age','course','phone','email','status','source','monthlyFee','totalPaid',
-   'enrolledDate','trialDate','lastContact','nextContact','manager','teacher','lessonType','city','notes'].forEach(f => {
+   'enrolledDate','trialDate','lastContact','nextContact','manager','teacher','lessonType','city','notes',
+   'certificateNumber','certificateDate'].forEach(f => {
     const el = document.getElementById('cf_' + f);
     if (el) data[f] = el.value;
   });
@@ -2443,6 +2514,17 @@ function onLessonTypeChange(val) {
   document.getElementById('scheduleStructured').style.display = isFree ? 'none' : '';
   document.getElementById('scheduleTextWrap').style.display   = isFree ? '' : 'none';
   document.getElementById('schedSlot2').style.display = val === 'group2' ? '' : 'none';
+}
+
+// Certificate number/date only matter once a client has finished the course —
+// kept in the detail modal only, never a table column (so the client grid we
+// just spent a whole round narrowing down doesn't grow a rarely-used field).
+function onClientStatusChangeInModal(val) {
+  const show = val === 'completed';
+  const certWrap     = document.getElementById('cf_certWrap');
+  const certDateWrap = document.getElementById('cf_certDateWrap');
+  if (certWrap)     certWrap.style.display     = show ? '' : 'none';
+  if (certDateWrap) certDateWrap.style.display = show ? '' : 'none';
 }
 
 function buildScheduleText(days, note) {
@@ -3087,7 +3169,7 @@ function _exportClientsExcel() {
     if (q) { const h = [c.name,c.phone,c.email,c.course,c.teacher,c.notes].join(' ').toLowerCase(); if (!h.includes(q)) return false; }
     return true;
   });
-  const headers = ['#','ПІБ','Вік','Курс','Телефон','Email','Статус','Формат','Викладач','Розклад','Взнос','Сплачено','Дата запису','Наст. дзвінок','Місто','Нотатки'];
+  const headers = ['#','ПІБ','Вік','Курс','Телефон','Email','Статус','Формат','Викладач','Розклад','Ціна навчання','Сплачено','Дата запису','Наст. дзвінок','Місто','Нотатки'];
   const rows = data.map(c => [
     c.id, c.name, c.age ?? '', COURSE_LABELS[c.course]||c.course||'',
     c.phone, c.email||'',
@@ -4273,7 +4355,7 @@ async function loadDashboardTab() {
           <thead><tr style="background:#fff5f5">
             <th style="text-align:left;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">⚠️ Учень</th>
             <th style="text-align:left;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">Курс</th>
-            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">Взнос</th>
+            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">Ціна навчання</th>
             <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:#dc2626;font-size:11px;text-transform:uppercase">Телефон</th>
             <th style="padding:8px 12px;border-bottom:2px solid #fecaca"></th>
           </tr></thead>

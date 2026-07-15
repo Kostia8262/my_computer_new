@@ -1017,6 +1017,8 @@ function sanitizeClient(body) {
     scheduleDays: Array.isArray(body.scheduleDays) ? body.scheduleDays : [],
     lessonType:   s(body.lessonType) || null,
     city:         s(body.city),
+    certificateNumber: s(body.certificateNumber) || null,
+    certificateDate:   s(body.certificateDate) || null,
   };
 }
 
@@ -1045,6 +1047,8 @@ function sanitizeClientPatch(body) {
   if ('scheduleDays' in body) p.scheduleDays = Array.isArray(body.scheduleDays) ? body.scheduleDays : [];
   if ('lessonType'   in body) p.lessonType   = s(body.lessonType) || null;
   if ('city'         in body) p.city         = s(body.city);
+  if ('certificateNumber' in body) p.certificateNumber = s(body.certificateNumber) || null;
+  if ('certificateDate'   in body) p.certificateDate   = s(body.certificateDate) || null;
   return p;
 }
 

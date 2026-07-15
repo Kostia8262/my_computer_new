@@ -33,6 +33,8 @@ function fromRow(row) {
     lessonType: row.lesson_type,
     city: row.city,
     sourceLeadId: row.source_lead_id,
+    certificateNumber: row.certificate_number,
+    certificateDate: row.certificate_date,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -96,6 +98,7 @@ module.exports = {
       totalPaid: 'total_paid', notes: 'notes', manager: 'manager', teacher: 'teacher',
       schedule: 'schedule', scheduleDays: 'schedule_days', lessonType: 'lesson_type',
       city: 'city', sourceLeadId: 'source_lead_id',
+      certificateNumber: 'certificate_number', certificateDate: 'certificate_date',
     };
     const sets = ['updated_at = @updated_at'];
     const params = { id, updated_at: nowIso() };

@@ -158,6 +158,15 @@ CREATE TABLE IF NOT EXISTS clients (
   created_at     TEXT NOT NULL,
   updated_at     TEXT NOT NULL
 );
+`);
+
+// Certificate number/date for clients who finished a course — modal-only
+// fields, not part of the original schema.
+['certificate_number', 'certificate_date'].forEach(col => {
+  try { db.exec(`ALTER TABLE clients ADD COLUMN ${col} TEXT`); } catch { /* already exists */ }
+});
+
+db.exec(`
 
 CREATE TABLE IF NOT EXISTS attendance (
   client_id INTEGER NOT NULL,
