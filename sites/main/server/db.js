@@ -55,6 +55,16 @@ CREATE TABLE IF NOT EXISTS admins (
   updated_at      TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_admins_token ON admins(token);
+`);
+
+// Idempotent column additions for the staff-profile page (full name, city,
+// job title, hire date, birthday) — safe to run on every boot; SQLite has no
+// "ADD COLUMN IF NOT EXISTS", so a duplicate-column error is just swallowed.
+['full_name', 'city', 'job_title', 'hire_date', 'birthday'].forEach(col => {
+  try { db.exec(`ALTER TABLE admins ADD COLUMN ${col} TEXT`); } catch { /* already exists */ }
+});
+
+db.exec(`
 
 CREATE TABLE IF NOT EXISTS articles (
   id           INTEGER PRIMARY KEY AUTOINCREMENT,

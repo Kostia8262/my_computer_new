@@ -973,50 +973,70 @@ tr:hover td{background:#faf9ff}
         </div>
         <button class="btn btn-primary" onclick="saveTeacherProfile()">💾 Зберегти</button>
       </div>
-      <div style="max-width:760px">
-        <div style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:20px">
-          <div class="modal-grid">
-            <div class="modal-group"><label class="modal-label">Ім'я</label><input class="modal-input" id="tp_name" placeholder="Ім'я"/></div>
-            <div class="modal-group"><label class="modal-label">Телефон</label><input class="modal-input" id="tp_phone" placeholder="+380..."/></div>
-            <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="tp_notes" rows="2" placeholder="Спеціалізація, примітки..."></textarea></div>
-          </div>
-          <!-- Teacher-only fields -->
-          <div id="tp_teacherSection">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin:14px 0 8px">📚 Оплата праці</div>
+      <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start;max-width:1080px">
+        <!-- LEFT: main form -->
+        <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+          <div style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:20px">
             <div class="modal-grid">
-              <div class="modal-group"><label class="modal-label">Тип оплати</label>
-                <select class="modal-input" id="tp_paymentType" onchange="onPaymentTypeChange(this.value)">
-                  <option value="hourly">⏱ Погодинна</option>
-                  <option value="monthly">📅 Місячна ставка</option>
-                </select>
-              </div>
-              <div class="modal-group" id="tp_hourlyWrap"><label class="modal-label">Ставка (₴/год)</label><input class="modal-input" type="number" id="tp_hourlyRate" placeholder="150" min="0"/></div>
-              <div class="modal-group" id="tp_lessonDurationWrap"><label class="modal-label">Тривалість уроку (хв)</label><input class="modal-input" type="number" id="tp_lessonDuration" placeholder="60" min="1"/></div>
-              <div class="modal-group" id="tp_monthlyWrap" style="display:none"><label class="modal-label">Місячна ставка (₴)</label><input class="modal-input" type="number" id="tp_monthlyRate" placeholder="12000" min="0"/></div>
+              <div class="modal-group"><label class="modal-label">Ім'я</label><input class="modal-input" id="tp_name" placeholder="Ім'я"/></div>
+              <div class="modal-group"><label class="modal-label">Повне ім'я (ПІБ)</label><input class="modal-input" id="tp_fullName" placeholder="Прізвище Ім'я По батькові"/></div>
+              <div class="modal-group"><label class="modal-label">Телефон</label><input class="modal-input" id="tp_phone" placeholder="+380..."/></div>
+              <div class="modal-group"><label class="modal-label">Місто</label><input class="modal-input" id="tp_city" placeholder="Дніпро"/></div>
+              <div class="modal-group"><label class="modal-label">Посада</label><input class="modal-input" id="tp_jobTitle" placeholder="Викладач Python"/></div>
+              <div class="modal-group full"><label class="modal-label">Нотатки</label><textarea class="modal-input" id="tp_notes" rows="2" placeholder="Спеціалізація, примітки..."></textarea></div>
             </div>
-            <!-- Salary calculation section -->
-            <div style="margin-top:12px;padding:14px;background:#f9f7ff;border-radius:10px;border:1px solid #e0d9ff">
-              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">💰 Розрахунок зарплати</div>
-              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <select class="filter-select" id="tp_salaryMonth" style="min-width:160px">
-                  <option value="">— Оберіть місяць —</option>
-                </select>
-                <button class="btn btn-primary btn-sm" onclick="loadTeacherSalary()" style="white-space:nowrap">📊 Розрахувати</button>
-                <div id="tp_salaryResult" style="font-size:14px;color:#6C47FF;font-weight:700;margin-top:6px;width:100%"></div>
+            <!-- Teacher-only fields -->
+            <div id="tp_teacherSection">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin:14px 0 8px">📚 Оплата праці</div>
+              <div class="modal-grid">
+                <div class="modal-group"><label class="modal-label">Тип оплати</label>
+                  <select class="modal-input" id="tp_paymentType" onchange="onPaymentTypeChange(this.value)">
+                    <option value="hourly">⏱ Погодинна</option>
+                    <option value="monthly">📅 Місячна ставка</option>
+                  </select>
+                </div>
+                <div class="modal-group" id="tp_hourlyWrap"><label class="modal-label">Ставка (₴/год)</label><input class="modal-input" type="number" id="tp_hourlyRate" placeholder="150" min="0"/></div>
+                <div class="modal-group" id="tp_lessonDurationWrap"><label class="modal-label">Тривалість уроку (хв)</label><input class="modal-input" type="number" id="tp_lessonDuration" placeholder="60" min="1"/></div>
+                <div class="modal-group" id="tp_monthlyWrap" style="display:none"><label class="modal-label">Місячна ставка (₴)</label><input class="modal-input" type="number" id="tp_monthlyRate" placeholder="12000" min="0"/></div>
               </div>
-              <div id="tp_salaryBreakdown" style="margin-top:10px"></div>
+              <!-- Salary calculation section -->
+              <div style="margin-top:12px;padding:14px;background:#f9f7ff;border-radius:10px;border:1px solid #e0d9ff">
+                <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">💰 Розрахунок зарплати</div>
+                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                  <select class="filter-select" id="tp_salaryMonth" style="min-width:160px">
+                    <option value="">— Оберіть місяць —</option>
+                  </select>
+                  <button class="btn btn-primary btn-sm" onclick="loadTeacherSalary()" style="white-space:nowrap">📊 Розрахувати</button>
+                  <div id="tp_salaryResult" style="font-size:14px;color:#6C47FF;font-weight:700;margin-top:6px;width:100%"></div>
+                </div>
+                <div id="tp_salaryBreakdown" style="margin-top:10px"></div>
+              </div>
+            </div>
+            <!-- Documents section -->
+            <div style="margin-top:16px;padding:14px;background:#f7f9ff;border-radius:10px;border:1px solid #dde8ff">
+              <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+                📎 Документи
+                <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
+                  + Завантажити
+                  <input type="file" style="display:none" id="tp_docInput" onchange="uploadStaffDoc()" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"/>
+                </label>
+              </div>
+              <div id="tp_docsList" style="font-size:13px;color:#aaa">Немає документів</div>
             </div>
           </div>
-          <!-- Documents section -->
-          <div style="margin-top:16px;padding:14px;background:#f7f9ff;border-radius:10px;border:1px solid #dde8ff">
-            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-              📎 Документи
-              <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
-                + Завантажити
-                <input type="file" style="display:none" id="tp_docInput" onchange="uploadStaffDoc()" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"/>
-              </label>
-            </div>
-            <div id="tp_docsList" style="font-size:13px;color:#aaa">Немає документів</div>
+        </div>
+        <!-- RIGHT: access + tenure/birthday sidebar -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:16px">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">🔑 Доступ</div>
+            <div id="tp_accessBlock"></div>
+          </div>
+          <div style="background:#fff;border:1px solid #e8e4ff;border-radius:12px;padding:16px">
+            <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888;margin-bottom:10px">📅 Стаж та дата народження</div>
+            <div class="modal-group" style="margin-bottom:10px"><label class="modal-label">Дата працевлаштування</label><input class="modal-input" type="date" id="tp_hireDate" oninput="updateTenureDisplay()"/></div>
+            <div id="tp_tenureDisplay" style="font-size:13px;color:#6C47FF;font-weight:600;margin-bottom:14px"></div>
+            <div class="modal-group" style="margin-bottom:10px"><label class="modal-label">Дата народження</label><input class="modal-input" type="date" id="tp_birthday" oninput="updateBirthdayDisplay()"/></div>
+            <div id="tp_birthdayDisplay" style="font-size:13px;color:#6C47FF;font-weight:600"></div>
           </div>
         </div>
       </div>
@@ -4306,9 +4326,17 @@ async function openStaffProfile(adminId) {
     _currentStaffRole = admin.role;
 
     document.getElementById('teacherProfileTitle').textContent = `👤 ${admin.name}`;
-    document.getElementById('tp_name').value  = admin.name  || '';
-    document.getElementById('tp_phone').value = admin.phone || '';
-    document.getElementById('tp_notes').value = admin.notes || '';
+    document.getElementById('tp_name').value     = admin.name     || '';
+    document.getElementById('tp_fullName').value = admin.fullName || '';
+    document.getElementById('tp_phone').value    = admin.phone    || '';
+    document.getElementById('tp_city').value     = admin.city     || '';
+    document.getElementById('tp_jobTitle').value = admin.jobTitle || '';
+    document.getElementById('tp_notes').value    = admin.notes    || '';
+    document.getElementById('tp_hireDate').value = admin.hireDate || '';
+    document.getElementById('tp_birthday').value = admin.birthday || '';
+    updateTenureDisplay();
+    updateBirthdayDisplay();
+    renderStaffProfileAccess(admin);
 
     // Show/hide teacher-specific section
     const isTeacher = admin.role === 'teacher';
@@ -4344,6 +4372,8 @@ async function openStaffProfile(adminId) {
 
     document.getElementById('adminsTab').style.display = 'none';
     document.getElementById('staffProfileTab').style.display = '';
+    const alertsEl = document.getElementById('alertsPanel');
+    if (alertsEl) alertsEl.style.display = 'none';
   } catch { showToast('Помилка завантаження', 'error'); }
 }
 
@@ -4353,15 +4383,22 @@ function closeTeacherProfile() {
   _currentTeacherId = null;
   _currentStaffRole = null;
   document.getElementById('staffProfileTab').style.display = 'none';
+  const alertsEl = document.getElementById('alertsPanel');
+  if (alertsEl) alertsEl.style.display = '';
   showTab('admins');
 }
 
 async function saveTeacherProfile() {
   if (!_currentTeacherId) return;
   const patch = {
-    name:  document.getElementById('tp_name').value.trim(),
-    phone: document.getElementById('tp_phone').value.trim(),
-    notes: document.getElementById('tp_notes').value.trim(),
+    name:     document.getElementById('tp_name').value.trim(),
+    fullName: document.getElementById('tp_fullName').value.trim(),
+    phone:    document.getElementById('tp_phone').value.trim(),
+    city:     document.getElementById('tp_city').value.trim(),
+    jobTitle: document.getElementById('tp_jobTitle').value.trim(),
+    notes:    document.getElementById('tp_notes').value.trim(),
+    hireDate: document.getElementById('tp_hireDate').value,
+    birthday: document.getElementById('tp_birthday').value,
   };
   if (!patch.name || patch.name.length < 2) { showToast('Вкажіть ім\'я', 'error'); return; }
   if (_currentStaffRole === 'teacher') {
@@ -4382,8 +4419,119 @@ async function saveTeacherProfile() {
     });
     if (!res.ok) { const d = await res.json(); showToast(d.error || 'Помилка', 'error'); return; }
     showToast('Збережено ✓', 'success');
-    closeTeacherProfile();
+    document.getElementById('teacherProfileTitle').textContent = `👤 ${patch.name}`;
+    renderAdmins(); // keep the background staff list fresh for when the user goes back
   } catch { showToast('Помилка сервера', 'error'); }
+}
+
+// ── STAFF PROFILE: access block (role/token/revoke/regenerate, right sidebar) ─
+function renderStaffProfileAccess(admin) {
+  const el = document.getElementById('tp_accessBlock');
+  if (!el) return;
+  const roleLbl  = ROLE_LABELS[admin.role]      || admin.role || '—';
+  const roleBg   = ROLE_COLORS[admin.role]      || '#f0eeff';
+  const roleClr  = ROLE_TEXT_COLORS[admin.role] || '#6C47FF';
+  const statusHtml = admin.active
+    ? '<span class="badge badge-enrolled">Активний</span>'
+    : '<span class="badge badge-rejected">Відкликано</span>';
+  const actionHtml = admin.active
+    ? `<code style="font-size:11px;background:#f0eeff;padding:6px 8px;border-radius:4px;word-break:break-all;user-select:all;display:block;margin:10px 0">${esc(admin.token)}</code>
+       <div style="display:flex;gap:8px;flex-wrap:wrap">
+         <button class="btn btn-ghost btn-sm" onclick="copyToken('${esc(admin.token)}')">📋 Копіювати</button>
+         <button class="btn btn-danger btn-sm" onclick="revokeStaffTokenFromProfile()">🔒 Відкликати</button>
+       </div>`
+    : `<div style="color:#aaa;font-size:12px;margin:10px 0">Токен відкликано — вхід недоступний</div>
+       <button class="btn btn-primary btn-sm" onclick="regenerateStaffTokenFromProfile()">🔄 Відновити токен</button>`;
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+      <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:${roleBg};color:${roleClr}">${esc(roleLbl)}</span>
+      ${statusHtml}
+    </div>
+    ${actionHtml}`;
+}
+
+async function refreshStaffProfileAccess() {
+  if (!_currentTeacherId) return;
+  try {
+    const res = await fetch('/api/admins', { headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    const admin = (data.admins || []).find(a => a.id === _currentTeacherId);
+    if (admin) renderStaffProfileAccess(admin);
+  } catch { /* keep showing the previous state on failure */ }
+}
+
+async function revokeStaffTokenFromProfile() {
+  if (!_currentTeacherId) return;
+  if (!confirm('Відкликати токен цього співробітника? Він більше не зможе увійти.')) return;
+  try {
+    const res = await fetch(`/api/admins/${_currentTeacherId}/revoke`, { method: 'PATCH', headers: { 'x-admin-token': token } });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
+    showToast('Токен відкликано ✓', 'success');
+    await refreshStaffProfileAccess();
+    renderAdmins();
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function regenerateStaffTokenFromProfile() {
+  if (!_currentTeacherId) return;
+  if (!confirm('Згенерувати новий токен для цього співробітника? Старий токен перестане працювати.')) return;
+  try {
+    const res = await fetch(`/api/admins/${_currentTeacherId}/regenerate-token`, { method: 'POST', headers: { 'x-admin-token': token } });
+    const data = await res.json();
+    if (!res.ok) { showToast(data.error || 'Помилка', 'error'); return; }
+    showToast('Новий токен згенеровано ✓', 'success');
+    await refreshStaffProfileAccess();
+    renderAdmins();
+  } catch { showToast('Помилка сервера', 'error'); }
+}
+
+// ── STAFF PROFILE: tenure / birthday helpers ──────────────────────────────────
+function _pluralUk(n, one, few, many) {
+  const mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+  return many;
+}
+
+function updateTenureDisplay() {
+  const el = document.getElementById('tp_tenureDisplay');
+  const val = document.getElementById('tp_hireDate')?.value;
+  if (!el) return;
+  if (!val) { el.textContent = ''; return; }
+  const start = new Date(val + 'T00:00:00');
+  if (isNaN(start)) { el.textContent = ''; return; }
+  const now = new Date();
+  if (start > now) { el.textContent = '⏳ Ще не почав(-ла) роботу'; return; }
+  let years = now.getFullYear() - start.getFullYear();
+  let months = now.getMonth() - start.getMonth();
+  if (now.getDate() < start.getDate()) months--;
+  if (months < 0) { years--; months += 12; }
+  const parts = [];
+  if (years > 0)  parts.push(`${years} ${_pluralUk(years, 'рік', 'роки', 'років')}`);
+  parts.push(`${months} ${_pluralUk(months, 'місяць', 'місяці', 'місяців')}`);
+  el.textContent = `🕒 Стаж: ${parts.join(' ')}`;
+}
+
+function updateBirthdayDisplay() {
+  const el = document.getElementById('tp_birthdayDisplay');
+  const val = document.getElementById('tp_birthday')?.value;
+  if (!el) return;
+  if (!val) { el.textContent = ''; return; }
+  const bd = new Date(val + 'T00:00:00');
+  if (isNaN(bd)) { el.textContent = ''; return; }
+  const now = new Date();
+  let age = now.getFullYear() - bd.getFullYear();
+  const hadBirthdayThisYear = (now.getMonth() > bd.getMonth()) ||
+    (now.getMonth() === bd.getMonth() && now.getDate() >= bd.getDate());
+  if (!hadBirthdayThisYear) age--;
+  let next = new Date(now.getFullYear(), bd.getMonth(), bd.getDate());
+  if (next < new Date(now.getFullYear(), now.getMonth(), now.getDate())) {
+    next = new Date(now.getFullYear() + 1, bd.getMonth(), bd.getDate());
+  }
+  const daysUntil = Math.round((next - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / 86400000);
+  const dd = String(bd.getDate()).padStart(2, '0'), mm = String(bd.getMonth() + 1).padStart(2, '0');
+  const untilTxt = daysUntil === 0 ? 'сьогодні 🎉' : `через ${daysUntil} ${_pluralUk(daysUntil, 'день', 'дні', 'днів')}`;
+  el.textContent = `🎂 ${dd}.${mm} · ${age} ${_pluralUk(age, 'рік', 'роки', 'років')} · ${untilTxt}`;
 }
 
 async function regenerateAdminToken(id) {

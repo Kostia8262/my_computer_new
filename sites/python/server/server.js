@@ -542,7 +542,7 @@ app.patch('/api/admins/:id/profile', adminLimiter, requireSuperAdmin, (req, res)
   const id = parseInt(req.params.id);
   if (!id) return res.status(400).json({ error: 'Invalid ID' });
   const patch = {};
-  const { name, hourlyRate, lessonDuration, notes, phone, paymentType, monthlyRate } = req.body;
+  const { name, hourlyRate, lessonDuration, notes, phone, paymentType, monthlyRate, fullName, city, jobTitle, hireDate, birthday } = req.body;
   if (name           !== undefined) patch.name           = sanitize(name);
   if (hourlyRate     !== undefined) patch.hourlyRate     = parseFloat(hourlyRate)    || 0;
   if (lessonDuration !== undefined) patch.lessonDuration = parseInt(lessonDuration)  || 60;
@@ -550,6 +550,11 @@ app.patch('/api/admins/:id/profile', adminLimiter, requireSuperAdmin, (req, res)
   if (phone          !== undefined) patch.phone          = sanitize(phone);
   if (paymentType    !== undefined) patch.paymentType    = sanitize(paymentType);
   if (monthlyRate    !== undefined) patch.monthlyRate    = parseFloat(monthlyRate)   || 0;
+  if (fullName       !== undefined) patch.fullName       = sanitize(fullName);
+  if (city           !== undefined) patch.city           = sanitize(city);
+  if (jobTitle       !== undefined) patch.jobTitle       = sanitize(jobTitle);
+  if (hireDate       !== undefined) patch.hireDate       = sanitize(hireDate);
+  if (birthday       !== undefined) patch.birthday       = sanitize(birthday);
   const admin = adminsDb.update(id, patch);
   if (!admin) return res.status(404).json({ error: 'Не знайдено' });
   res.json({ success: true, admin });
