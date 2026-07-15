@@ -286,21 +286,21 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .att-legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0}
 .att-legend-item{display:flex;align-items:center;gap:5px}
 .att-scheduled{background:#ede9fe;color:#7c3aed;border-color:#c4b5fd}
-.att-drop{position:fixed;z-index:9999;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.18);border:1px solid #e8e4ff;padding:5px;min-width:155px}
-.att-drop-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:none;cursor:pointer;border-radius:6px;font-size:12px;font-weight:600;text-align:left;color:#333}
-.att-drop-btn:hover{background:#f0eeff}
+.att-drop{position:fixed;z-index:9999;background:var(--c-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-md);border:1px solid var(--c-border);padding:5px;min-width:155px}
+.att-drop-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:none;cursor:pointer;border-radius:var(--r-sm);font-size:12px;font-weight:600;text-align:left;color:var(--c-ink-soft)}
+.att-drop-btn:hover{background:var(--c-brand-50)}
 .att-drop-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 /* Schedule pickers in client modal */
 .sched-row{display:flex;gap:8px;margin-bottom:6px}
 .sched-row select{flex:1;padding:7px 30px 7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-.sched-row select:focus{outline:none;border-color:#6C47FF}
+.sched-row select:focus{outline:none;border-color:var(--c-brand-500)}
 /* Schedule quick-edit popup */
-.sched-popup{position:fixed;z-index:9999;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(108,71,255,.18);border:1px solid #e8e4ff;padding:16px;min-width:260px}
-.sched-popup h5{font-size:13px;font-weight:700;margin-bottom:10px;color:#333}
+.sched-popup{position:fixed;z-index:9999;background:var(--c-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-md);border:1px solid var(--c-border);padding:16px;min-width:260px}
+.sched-popup h5{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--c-ink-soft)}
 .sched-popup-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
-.sched-popup-row label{font-size:11px;color:#888;min-width:40px}
+.sched-popup-row label{font-size:11px;color:var(--c-gray-500);min-width:40px}
 .sched-popup-row select{flex:1;padding:5px 26px 5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
-.sched-popup-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;border-top:1px solid #f0eeff;padding-top:10px}
+.sched-popup-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;border-top:1px solid var(--c-border-soft);padding-top:10px}
 
 /* PAYMENTS SUB-TAB */
 .pay-table{width:100%;border-collapse:collapse;font-size:13px}
