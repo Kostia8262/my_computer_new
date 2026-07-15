@@ -1018,31 +1018,38 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
               <button id="bulkDelBtn" class="btn btn-danger btn-sm" style="display:none" onclick="bulkPayAction('delete')">✕ Видалити</button>
               <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearPaySelection()">✕ Скасувати</button>
             </div>
-            <div class="table-wrap" style="overflow-x:auto">
+            <div class="table-wrap hscroll-native-hidden" id="payTableWrap" style="overflow-x:auto">
               <table class="pay-table" style="min-width:900px">
                 <thead><tr>
                   <th style="width:36px;text-align:center"><input type="checkbox" id="paySelectAll" onclick="toggleAllPayChecks()" title="Вибрати всіх"/></th>
-                  <th>Учень</th><th>Курс</th><th>Формат</th><th>Розклад</th>
-                  <th>Ціна навчання ₴</th><th>Сплачено ₴</th><th>Статус</th>
+                  <th>Учень</th><th>Ціна навчання ₴</th><th>Сплачено ₴</th><th>Статус</th>
+                  <th style="width:130px">Курс</th><th>Формат</th>
                   <th>Дата оплати</th><th>Спосіб</th><th>Нотатка</th><th style="width:32px"></th>
                 </tr></thead>
                 <tbody id="monthPayBody"></tbody>
               </table>
             </div>
+            <div id="payHScrollBar" class="sticky-hscroll"><div id="payHScrollInner"></div></div>
           </div>
         </div>
       </div>
 
       <!-- ── SUB-TAB: ATTENDANCE ── -->
       <div id="csubAttendance" style="display:none">
-        <div class="att-header">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <h3 style="font-size:15px;font-weight:800;margin:0">📅 Відвідування за місяць</h3>
+            <select class="filter-select" id="attTeacherFilter" onchange="renderAttCalendar()">
+              <option value="">Всі викладачі</option>
+            </select>
+          </div>
           <div class="att-month-nav">
             <button class="btn btn-ghost btn-sm" onclick="changeAttMonth(-1)">‹</button>
             <span class="att-month-label" id="attMonthLabel">Червень 2026</span>
             <button class="btn btn-ghost btn-sm" onclick="changeAttMonth(1)">›</button>
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="loadAttendance()">🔄 Оновити</button>
-          <button class="btn btn-ghost btn-sm" onclick="exportAttendanceCSV()">📥 CSV</button>
+          <button class="btn btn-ghost btn-sm" style="display:none" onclick="loadAttendance()">🔄 Оновити</button>
+          <button class="btn btn-ghost btn-sm" style="display:none" onclick="exportAttendanceCSV()">📥 CSV</button>
         </div>
         <div class="att-legend">
           <span class="att-legend-item"><span class="att-legend-dot" style="background:#86efac;border:1px solid #4ade80"></span>Присутній</span>
@@ -1749,6 +1756,7 @@ async function bulkDeleteLeads() {
 const _hscrollTargets = [
   { wrapId: 'leadsTableWrap',   barId: 'leadsHScrollBar',   innerId: 'leadsHScrollInner',   active: () => _currentTab === 'leads' },
   { wrapId: 'clientsTableWrap', barId: 'clientsHScrollBar', innerId: 'clientsHScrollInner', active: () => _currentTab === 'clients' && _clientsSubTab === 'base' },
+  { wrapId: 'payTableWrap',     barId: 'payHScrollBar',     innerId: 'payHScrollInner',     active: () => _currentTab === 'clients' && _clientsSubTab === 'payments' },
 ];
 let _hscrollSyncing = false;
 
@@ -2696,7 +2704,7 @@ function renderMonthPayments() {
 
   const tbody = document.getElementById('monthPayBody');
   if (!rows.length) {
-    tbody.innerHTML = `<tr><td colspan="12"><div class="empty">Записів не знайдено</div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="11"><div class="empty">Записів не знайдено</div></td></tr>`;
     return;
   }
 
@@ -2713,12 +2721,14 @@ function renderMonthPayments() {
     const c = r.client;
     const statusCls = MP_STATUS_CLASS[r.status] || '';
     const isChecked = _selectedPayments.has(r.clientId);
+    const courseOpts = c ? `<option value=""${!c.course?' selected':''}>— курс —</option>` +
+      (_allCourses || []).filter(x => x.active !== false).map(x =>
+        `<option value="${x.id}"${c.course===x.id?' selected':''}>${x.emoji||''} ${esc(x.name)}</option>`
+      ).join('') +
+      `<option value="other"${c.course==='other'?' selected':''}>Інше</option>` : '';
     return `<tr>
       <td style="padding:4px 6px;text-align:center"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePayCheck(${r.clientId})"/></td>
       <td style="font-weight:600;white-space:nowrap">${esc((c?.name) || r.clientName || '#'+r.clientId)}</td>
-      <td style="font-size:12px">${c?.course ? `<span class="chip">${COURSE_LABELS[c.course]||c.course}</span>` : '—'}</td>
-      <td style="font-size:12px">${LESSON_TYPE_LABELS[c?.lessonType] || '—'}</td>
-      <td style="font-size:11px;color:#888;white-space:nowrap;max-width:110px;overflow:hidden;text-overflow:ellipsis">${esc(c?.schedule || '—')}</td>
       <td><input class="mp-inline" style="width:72px" type="number" value="${r.expectedAmount||''}" placeholder="0"
         onblur="updateMpRecord(${r.clientId},'expectedAmount',this.value)"/></td>
       <td><input class="mp-inline" style="width:72px" type="number" value="${r.paidAmount||''}" placeholder="0"
@@ -2728,6 +2738,9 @@ function renderMonthPayments() {
           ${statusOpts.replace(`value="${r.status}"`, `value="${r.status}" selected`)}
         </select>
       </td>
+      <td>${c ? `<select class="status-sel" style="width:130px;text-overflow:ellipsis" title="${esc((_allCourses||[]).find(x=>x.id===c.course)?.name || c.course || '')}"
+          onchange="savePayCourseField(${r.clientId},this.value)">${courseOpts}</select>` : '—'}</td>
+      <td style="font-size:12px">${LESSON_TYPE_LABELS[c?.lessonType] || '—'}</td>
       <td><input class="mp-inline" style="width:105px" type="date" value="${r.paidDate||''}"
         onblur="updateMpRecord(${r.clientId},'paidDate',this.value)"/></td>
       <td>
@@ -2744,6 +2757,12 @@ function renderMonthPayments() {
     </tr>`;
   }).join('');
   _updateBulkBar();
+  setTimeout(_syncAllHScroll, 0);
+}
+
+async function savePayCourseField(clientId, value) {
+  await saveClientField(clientId, 'course', value);
+  renderMonthPayments();
 }
 
 async function updateMpRecord(clientId, field, value) {
@@ -2848,11 +2867,29 @@ const ATT_CYCLE = ['', 'present', 'absent', 'makeup', 'cancelled'];
 const ATT_LABELS = { '': '', present: '✓', absent: '✗', makeup: 'В', cancelled: '—' };
 const MONTHS_UA = ['Січень','Лютий','Березень','Квітень','Травень','Червень','Липень','Серпень','Вересень','Жовтень','Листопад','Грудень'];
 
+function _refreshAttTeacherFilter() {
+  const sel = document.getElementById('attTeacherFilter');
+  if (!sel) return;
+  const currentVal = sel.value;
+  sel.innerHTML = '<option value="">Всі викладачі</option>';
+  const names = _teachersList.length
+    ? _teachersList.map(t => t.name)
+    : [...new Set((_allClients || []).map(c => c.teacher).filter(Boolean))].sort();
+  names.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    if (t === currentVal) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
 async function loadAttendance() {
   const label = document.getElementById('attMonthLabel');
   if (label) label.textContent = `${MONTHS_UA[_attMonth-1]} ${_attYear}`;
   const cal = document.getElementById('attCalendar');
   if (cal) cal.innerHTML = '<div class="empty" style="padding:40px">Завантаження...</div>';
+  if (!_allClients) await loadClients();
+  _refreshAttTeacherFilter();
   try {
     const res = await fetch(`/api/attendance?year=${_attYear}&month=${_attMonth}`, { headers: { 'x-admin-token': token } });
     const data = await res.json();
@@ -2872,8 +2909,12 @@ function renderAttCalendar() {
   const cal = document.getElementById('attCalendar');
   if (!cal || !_allClients) return;
 
-  const clients = _allClients.filter(c => !['churned','completed'].includes(c.status));
-  if (!clients.length) { cal.innerHTML = '<div class="empty" style="padding:40px">Активних клієнтів немає</div>'; return; }
+  const filterTeacher = document.getElementById('attTeacherFilter')?.value || '';
+  const clients = _allClients.filter(c =>
+    !['churned','completed'].includes(c.status) &&
+    (filterTeacher === '' || c.teacher === filterTeacher)
+  );
+  if (!clients.length) { cal.innerHTML = '<div class="empty" style="padding:40px">Немає учнів' + (filterTeacher ? ` для ${esc(filterTeacher)}` : '') + '</div>'; return; }
 
   // Build scheduled DOW set per client (1=Mon…7=Sun, ISO-style)
   const clientSched = {};
@@ -2885,6 +2926,9 @@ function renderAttCalendar() {
 
   const daysInMonth = new Date(_attYear, _attMonth, 0).getDate();
   const today = new Date().toISOString().slice(0,10);
+  // Semi-transparent overlay (not a background swap) on today's whole column,
+  // so it stays visible at a glance without fighting each cell's own status color.
+  const TODAY_TINT = 'box-shadow:inset 0 0 0 1000px rgba(108,71,255,.08)';
 
   let html = `<table class="att-table"><thead><tr>
     <th class="aname">Учень</th><th class="acourse">Курс</th>`;
@@ -2893,7 +2937,7 @@ function renderAttCalendar() {
     const dow = new Date(date).getDay();
     const isWeekend = dow === 0 || dow === 6;
     const isToday   = date === today;
-    const style = isToday ? 'background:#fff0e8;color:#e53e3e' : (isWeekend ? 'color:#bbb' : '');
+    const style = (isToday ? `${TODAY_TINT};color:#6C47FF;font-weight:800` : '') + (isWeekend && !isToday ? 'color:#bbb' : '');
     html += `<th style="${style}" title="${date}">${d}</th>`;
   }
   html += '</tr></thead><tbody>';
@@ -2916,9 +2960,10 @@ function renderAttCalendar() {
       const dow = new Date(date).getDay();
       const isoDow = dow === 0 ? 7 : dow; // JS 0=Sun → ISO 7=Sun
       const isScheduled = schedSet?.has(isoDow);
+      const isToday = date === today;
       const cls = status ? `att-${status}` : (isScheduled ? 'att-scheduled' : 'att-none');
       const lbl = ATT_LABELS[status] || (isScheduled && !status ? '·' : '');
-      html += `<td><span class="att-cell ${cls}" onclick="openAttDropdown(event,${c.id},'${date}')" title="${date}">${lbl}</span></td>`;
+      html += `<td style="${isToday ? TODAY_TINT : ''}"><span class="att-cell ${cls}" onclick="openAttDropdown(event,${c.id},'${date}')" title="${date}">${lbl}</span></td>`;
     }
     html += '</tr>';
   });
