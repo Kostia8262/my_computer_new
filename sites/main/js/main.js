@@ -938,3 +938,167 @@ function showToast(msg, type = 'success') {
     }
   });
 }());
+
+/* ===================================================
+   WATER RIPPLE — cursor/touch leaves ripples on a simulated
+   water surface (classic 2-buffer height-field wave equation,
+   simulated at low resolution then upscaled with smoothing —
+   cheap enough to run at 60fps, no WebGL needed).
+   =================================================== */
+(function waterRipple() {
+  const canvas = document.getElementById('waterCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const SIM_W = 220;
+  let simH = 60;
+  let cur, prev, next;
+  let cssW = 0, cssH = 0;
+  let offCanvas, offCtx, imgData, pixels;
+  let lastRippleGX = -10, lastRippleGY = -10;
+  let dropTimer = 40;
+  let rafId = null;
+  let resizeTimer = null;
+
+  // Reuse the site's own tokens: --dark-bg as the resting surface,
+  // --color-primary-mid as the highlight where the ripple catches light.
+  const BASE = [13, 12, 26];
+  const HI    = [139, 111, 255];
+
+  function buildBuffers() {
+    const n = SIM_W * simH;
+    cur = new Float32Array(n);
+    prev = new Float32Array(n);
+    next = new Float32Array(n);
+    offCanvas = document.createElement('canvas');
+    offCanvas.width = SIM_W;
+    offCanvas.height = simH;
+    offCtx = offCanvas.getContext('2d');
+    imgData = offCtx.createImageData(SIM_W, simH);
+    pixels = imgData.data;
+  }
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    cssW = rect.width; cssH = rect.height;
+    if (!cssW || !cssH) return;
+    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width  = Math.round(cssW * DPR);
+    canvas.height = Math.round(cssH * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    simH = Math.max(40, Math.round(SIM_W * (cssH / cssW)));
+    buildBuffers();
+    render();
+  }
+
+  function drop(gx, gy, strength) {
+    for (let dy = -1; dy <= 1; dy++) {
+      for (let dx = -1; dx <= 1; dx++) {
+        const xx = gx + dx, yy = gy + dy;
+        if (xx > 0 && xx < SIM_W - 1 && yy > 0 && yy < simH - 1) {
+          cur[yy * SIM_W + xx] += strength;
+        }
+      }
+    }
+  }
+
+  function step() {
+    const w = SIM_W, h = simH;
+    for (let y = 1; y < h - 1; y++) {
+      const row = y * w;
+      for (let x = 1; x < w - 1; x++) {
+        const i = row + x;
+        next[i] = (cur[i - 1] + cur[i + 1] + cur[i - w] + cur[i + w]) / 2 - prev[i];
+        next[i] *= 0.978;
+      }
+    }
+    const tmp = prev; prev = cur; cur = next; next = tmp;
+  }
+
+  function render() {
+    const w = SIM_W, h = simH;
+    let p = 0;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const i = y * w + x;
+        const dx = (x > 0 && x < w - 1) ? cur[i + 1] - cur[i - 1] : 0;
+        const dy = (y > 0 && y < h - 1) ? cur[i + w] - cur[i - w] : 0;
+        let light = (dx * 0.6 + dy * 0.9) * 0.06;
+        if (light > 1) light = 1; else if (light < -1) light = -1;
+        const t = (light + 1) / 2;
+        pixels[p++] = BASE[0] + (HI[0] - BASE[0]) * t;
+        pixels[p++] = BASE[1] + (HI[1] - BASE[1]) * t;
+        pixels[p++] = BASE[2] + (HI[2] - BASE[2]) * t;
+        pixels[p++] = 255;
+      }
+    }
+    offCtx.putImageData(imgData, 0, 0);
+    ctx.imageSmoothingEnabled = true;
+    ctx.clearRect(0, 0, cssW, cssH);
+    ctx.drawImage(offCanvas, 0, 0, SIM_W, simH, 0, 0, cssW, cssH);
+  }
+
+  function toGrid(clientX, clientY) {
+    const rect = canvas.getBoundingClientRect();
+    return [
+      Math.round(((clientX - rect.left) / rect.width) * SIM_W),
+      Math.round(((clientY - rect.top) / rect.height) * simH),
+    ];
+  }
+
+  function tryRipple(gx, gy, strength) {
+    const dGX = gx - lastRippleGX, dGY = gy - lastRippleGY;
+    if (dGX * dGX + dGY * dGY > 16) {
+      drop(gx, gy, strength);
+      lastRippleGX = gx; lastRippleGY = gy;
+    }
+  }
+
+  function animate() {
+    dropTimer -= 1;
+    if (dropTimer <= 0) {
+      // ambient "raindrop" so the surface stays alive without input
+      drop(Math.round(4 + Math.random() * (SIM_W - 8)), Math.round(4 + Math.random() * (simH - 8)), -140);
+      dropTimer = 40 + Math.random() * 70;
+    }
+    step();
+    render();
+    rafId = requestAnimationFrame(animate);
+  }
+
+  canvas.addEventListener('mousemove', (e) => {
+    const [gx, gy] = toGrid(e.clientX, e.clientY);
+    tryRipple(gx, gy, -170);
+  });
+  canvas.addEventListener('mouseleave', () => { lastRippleGX = -10; lastRippleGY = -10; });
+  canvas.addEventListener('click', (e) => {
+    const [gx, gy] = toGrid(e.clientX, e.clientY);
+    drop(gx, gy, -320);
+  });
+  canvas.addEventListener('touchmove', (e) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    const [gx, gy] = toGrid(touch.clientX, touch.clientY);
+    tryRipple(gx, gy, -170);
+  }, { passive: true });
+
+  resize();
+  if (!reduceMotion) {
+    animate();
+  }
+
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(resize, 150);
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    } else if (!reduceMotion && !rafId) {
+      animate();
+    }
+  });
+}());
