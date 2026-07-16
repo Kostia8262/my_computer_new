@@ -940,31 +940,58 @@ function showToast(msg, type = 'success') {
 }());
 
 /* ===================================================
-   WATER RIPPLE — cursor/touch leaves ripples on a simulated
+   BACKGROUND RIPPLE — cursor/touch leaves ripples on a simulated
    water surface (classic 2-buffer height-field wave equation,
    simulated at low resolution then upscaled with smoothing —
-   cheap enough to run at 60fps, no WebGL needed).
+   cheap enough to run at 60fps, no WebGL needed). The canvas sits
+   BEHIND all page content (z-index:-1); each section goes
+   transparent (.ripple-on, see CSS) once JS confirms the canvas is
+   live, so the canvas becomes the literal background layer and
+   real content (text/cards/images/buttons) simply paints over it,
+   untouched. Rows are colored per the section actually occupying
+   that screen Y at render time, light or dark, so the surface
+   reads correctly under both.
    =================================================== */
-(function waterRipple() {
-  const canvas = document.getElementById('waterCanvas');
+(function backgroundRipple() {
+  const canvas = document.getElementById('bgRippleCanvas');
   if (!canvas) return;
+  if (window.innerWidth < 1024) return;
   const ctx = canvas.getContext('2d');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return;
 
-  const SIM_W = 220;
-  let simH = 60;
+  const SIM_W = 200;
+  let simH = 120;
   let cur, prev, next;
   let cssW = 0, cssH = 0;
   let offCanvas, offCtx, imgData, pixels;
   let lastRippleGX = -10, lastRippleGY = -10;
-  let dropTimer = 40;
   let rafId = null;
   let resizeTimer = null;
+  let scrollTimer = null;
 
-  // Reuse the site's own tokens: --dark-bg as the resting surface,
-  // --color-primary-mid as the highlight where the ripple catches light.
-  const BASE = [13, 12, 26];
-  const HI    = [139, 111, 255];
+  const LIGHT_BASE = [248, 247, 255];
+  const DARK_BASE  = [13, 12, 26];
+  const DARK_SECTIONS = document.querySelectorAll('.courses, .stats, .articles, .footer');
+  // [top, bottom] viewport-relative CSS-px bands currently occupied by a dark section
+  let darkBands = [];
+
+  function updateDarkBands() {
+    darkBands = [];
+    DARK_SECTIONS.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < window.innerHeight) darkBands.push([r.top, r.bottom]);
+    });
+  }
+
+  function isDarkRow(cssY) {
+    for (let i = 0; i < darkBands.length; i++) {
+      if (cssY >= darkBands[i][0] && cssY <= darkBands[i][1]) return true;
+    }
+    return false;
+  }
+
+  document.body.classList.add('ripple-on');
 
   function buildBuffers() {
     const n = SIM_W * simH;
@@ -980,15 +1007,15 @@ function showToast(msg, type = 'success') {
   }
 
   function resize() {
-    const rect = canvas.getBoundingClientRect();
-    cssW = rect.width; cssH = rect.height;
+    cssW = window.innerWidth; cssH = window.innerHeight;
     if (!cssW || !cssH) return;
-    const DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const DPR = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width  = Math.round(cssW * DPR);
     canvas.height = Math.round(cssH * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     simH = Math.max(40, Math.round(SIM_W * (cssH / cssW)));
     buildBuffers();
+    updateDarkBands();
     render();
   }
 
@@ -1020,16 +1047,17 @@ function showToast(msg, type = 'success') {
     const w = SIM_W, h = simH;
     let p = 0;
     for (let y = 0; y < h; y++) {
+      const cssY = (y / h) * cssH;
+      const BASE = isDarkRow(cssY) ? DARK_BASE : LIGHT_BASE;
       for (let x = 0; x < w; x++) {
         const i = y * w + x;
         const dx = (x > 0 && x < w - 1) ? cur[i + 1] - cur[i - 1] : 0;
         const dy = (y > 0 && y < h - 1) ? cur[i + w] - cur[i - w] : 0;
         let light = (dx * 0.6 + dy * 0.9) * 0.06;
         if (light > 1) light = 1; else if (light < -1) light = -1;
-        const t = (light + 1) / 2;
-        pixels[p++] = BASE[0] + (HI[0] - BASE[0]) * t;
-        pixels[p++] = BASE[1] + (HI[1] - BASE[1]) * t;
-        pixels[p++] = BASE[2] + (HI[2] - BASE[2]) * t;
+        pixels[p++] = BASE[0] + light * 30;
+        pixels[p++] = BASE[1] + light * 30;
+        pixels[p++] = BASE[2] + light * 30;
         pixels[p++] = 255;
       }
     }
@@ -1056,48 +1084,45 @@ function showToast(msg, type = 'success') {
   }
 
   function animate() {
-    dropTimer -= 1;
-    if (dropTimer <= 0) {
-      // ambient "raindrop" so the surface stays alive without input
-      drop(Math.round(4 + Math.random() * (SIM_W - 8)), Math.round(4 + Math.random() * (simH - 8)), -140);
-      dropTimer = 40 + Math.random() * 70;
-    }
     step();
     render();
     rafId = requestAnimationFrame(animate);
   }
 
-  canvas.addEventListener('mousemove', (e) => {
+  window.addEventListener('mousemove', (e) => {
     const [gx, gy] = toGrid(e.clientX, e.clientY);
-    tryRipple(gx, gy, -170);
+    tryRipple(gx, gy, -57);
   });
-  canvas.addEventListener('mouseleave', () => { lastRippleGX = -10; lastRippleGY = -10; });
-  canvas.addEventListener('click', (e) => {
+  window.addEventListener('mouseleave', () => { lastRippleGX = -10; lastRippleGY = -10; });
+  window.addEventListener('click', (e) => {
     const [gx, gy] = toGrid(e.clientX, e.clientY);
-    drop(gx, gy, -320);
+    drop(gx, gy, -107);
   });
-  canvas.addEventListener('touchmove', (e) => {
+  window.addEventListener('touchmove', (e) => {
     const touch = e.touches[0];
     if (!touch) return;
     const [gx, gy] = toGrid(touch.clientX, touch.clientY);
-    tryRipple(gx, gy, -170);
+    tryRipple(gx, gy, -57);
   }, { passive: true });
 
   resize();
-  if (!reduceMotion) {
-    animate();
-  }
+  animate();
 
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(resize, 150);
   });
 
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(updateDarkBands, 100);
+  }, { passive: true });
+
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
       if (rafId) cancelAnimationFrame(rafId);
       rafId = null;
-    } else if (!reduceMotion && !rafId) {
+    } else if (!rafId) {
       animate();
     }
   });
