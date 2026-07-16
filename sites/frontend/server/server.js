@@ -61,7 +61,7 @@ const CONTENT_SEED = {
       badge:    { ua: 'ДЛЯ СТАРТУ',  ru: 'ДЛЯ СТАРТА' },
       title:    { ua: 'Одинарні дитячі групи', ru: 'Одинарные детские группы' },
       features: [
-        { ua: '9–18 місяців, один раз на тиждень, 90 хв', ru: '9–18 месяцев, один раз в неделю, 90 мин' },
+        { ua: '5 місяців, один раз на тиждень, 90 хв', ru: '5 месяцев, один раз в неделю, 90 мин' },
         { ua: 'Доступ до матеріалів назавжди',            ru: 'Доступ к материалам навсегда' },
         { ua: 'Мала група до 5 дітей',                    ru: 'Малая группа до 5 детей' },
       ],
@@ -73,7 +73,7 @@ const CONTENT_SEED = {
       badge:    { ua: 'ОПТИМАЛЬНИЙ', ru: 'ОПТИМАЛЬНЫЙ' },
       title:    { ua: 'Подвійні групи та інд. навчання', ru: 'Двойные группы и инд. обучение' },
       features: [
-        { ua: '9–18 місяців, два рази на тиждень, по 90 хв', ru: '9–18 месяцев, два раза в неделю, по 90 минут' },
+        { ua: '5 місяців, два рази на тиждень, по 90 хв', ru: '5 месяцев, два раза в неделю, по 90 минут' },
         { ua: 'Мала група до 5 дітей',                       ru: 'Малая группа до 5 детей' },
         { ua: 'Доступ до матеріалів назавжди',               ru: 'Доступ к материалам навсегда' },
       ],
@@ -109,7 +109,7 @@ const CONTENT_SEED = {
     { id:3, question:{ ua:'Як проходять онлайн-заняття?',       ru:'Как проходят онлайн-занятия?' },             answer:{ ua:'Заняття у Zoom або Google Meet. Викладач бачить екран дитини, допомагає в реальному часі. Групи до 5 осіб — кожен отримує увагу.', ru:'Занятия в Zoom или Google Meet. Преподаватель видит экран ребёнка, помогает в реальном времени. Группы до 5 человек — каждый получает внимание.' } },
     { id:4, question:{ ua:'Що якщо дитина пропустить заняття?', ru:'Что если ребёнок пропустит занятие?' },      answer:{ ua:'Всі заняття записуються. Пропущений урок можна відпрацювати у інший день, а викладач відповість на питання в чаті.', ru:'Все занятия записываются. Пропущенный урок можно отработать в другой день, а преподаватель ответит на вопросы в чате.' } },
     { id:5, question:{ ua:'Скільки коштують курси?',            ru:'Сколько стоят курсы?' },                     answer:{ ua:'Вартість залежить від курсу та формату. Залиш заявку — менеджер надішле прайс та розповість про знижки. Перший урок безкоштовно.', ru:'Стоимость зависит от курса и формата. Оставьте заявку — менеджер пришлёт прайс и расскажет о скидках. Первый урок бесплатно.' } },
-    { id:6, question:{ ua:'Скільки тривають курси?',            ru:'Сколько длятся курсы?' },                    answer:{ ua:'Дитячі курси тривають 9–18 місяців при 1–2 заняттях на тиждень. Конкретна тривалість залежить від напрямку та навантаження.', ru:'Детские курсы длятся 9–18 месяцев при 1–2 занятиях в неделю. Конкретная длительность зависит от направления и нагрузки.' } },
+    { id:6, question:{ ua:'Скільки тривають курси?',            ru:'Сколько длятся курсы?' },                    answer:{ ua:'Кожен курс триває 5 місяців при 1–2 заняттях на тиждень. Можна пройти обидва рівні послідовно — Frontend Старт, а потім Frontend Pro.', ru:'Каждый курс длится 5 месяцев при 1–2 занятиях в неделю. Можно пройти оба уровня последовательно — Frontend Старт, а потом Frontend Pro.' } },
     { id:7, question:{ ua:'Які є варіанти оплати?',             ru:'Какие есть варианты оплаты?' },              answer:{ ua:'Ви можете скористатись прямою оплатою на рахунок ФОП, оплатою через Google Pay, Apple Pay, переказом через платіжний шлюз. Якщо ви за кордоном — розрахуємо вартість у зручній валюті.', ru:'Вы можете воспользоваться прямой оплатой на счет ФЛП, оплатой через Google Pay, Apple Pay, переводом через платежный шлюз. Если вы за границей – рассчитаем стоимость в удобной валюте.' } },
   ],
   modules: {
@@ -373,6 +373,64 @@ app.get('/admin', (req, res) => {
 app.get('/admin.html', (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
   res.sendFile(path.join(__dirname, '..', 'admin.html'));
+});
+
+// Server-render the article grid too — previously #listingGrid shipped empty
+// and only populated after a client-side fetch('/data/articles.json'), so the
+// site's main internal-linking hub carried zero crawlable <a href="/articles/...">
+// links in the raw HTML (same architectural gap already found and fixed on
+// main — see project_seo_growth_audit memory). Registered before
+// express.static() so it takes precedence over the static handler, which
+// would otherwise match the real articles/index.html file first.
+const ARTICLES_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
+
+// Same category map as the client-side LABEL_MAP in articles/index.html/js/main.js —
+// keep in sync if new coverEmoji values are ever added.
+const ARTICLE_LABEL_MAP = {
+  '💰': { label: 'Кар\'єра',    cls: 'cat-tips' },
+  '🧱': { label: 'Вибір курсу', cls: 'cat-web' },
+  '📁': { label: 'Для батьків', cls: 'cat-parents' },
+};
+
+function pluralArticlesUa(n) {
+  const m = n % 10, m100 = n % 100;
+  if (n === 0) return 'статей не знайдено';
+  if (m === 1 && m100 !== 11) return n + ' стаття';
+  if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статті';
+  return n + ' статей';
+}
+
+app.get(['/articles', '/articles/'], (req, res) => {
+  const active = articlesDb.getActive();
+  const cardsHtml = active.map(a => {
+    const lbl = ARTICLE_LABEL_MAP[a.coverEmoji] || { label: escHtml(a.category || 'стаття'), cls: '' };
+    const dateStr = a.publishedAt
+      ? new Date(a.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+    return `<a class="article-card" href="/articles/${escHtml(a.slug)}" aria-label="${escHtml(a.title)}">
+      <div class="article-card__top">
+        <span class="article-card__emoji">${a.coverEmoji || '📄'}</span>
+        <span class="article-card__cat ${lbl.cls}">${lbl.label}</span>
+      </div>
+      <div class="article-card__body">
+        <h2 class="article-card__title">${escHtml(a.title)}</h2>
+        <p class="article-card__excerpt">${escHtml(a.excerpt)}</p>
+      </div>
+      <div class="article-card__footer">
+        <span class="article-card__date">${dateStr}</span>
+        <span class="article-card__read">Читати →</span>
+      </div>
+    </a>`;
+  }).join('');
+
+  const html = ARTICLES_INDEX_TPL
+    .replace('<div class="listing-grid" id="listingGrid"></div>',
+             `<div class="listing-grid" id="listingGrid">${cardsHtml}</div>`)
+    .replace('<span class="listing-count" id="listingCount"></span>',
+             `<span class="listing-count" id="listingCount">${pluralArticlesUa(active.length)}</span>`);
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
@@ -1450,6 +1508,89 @@ app.get('/articles/:slug', (req, res) => {
   const pageUrl   = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
 
+  const publishedIso = article.publishedAt
+    ? new Date(article.publishedAt).toISOString() : new Date().toISOString();
+  const dateStr = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+  const related = articlesDb.getActive().filter(a => a.id !== article.id).slice(0, 4);
+  const relatedHtml = related.length ? `
+          <div class="sidebar-card">
+            <h3>Читайте також</h3>
+            ${related.map(r => `<a class="sidebar-link" href="/articles/${escHtml(r.slug)}">${r.coverEmoji || '📄'} ${escHtml(r.title)}</a>`).join('')}
+          </div>` : '';
+  const bodyHtml = article.content || `<p>${escHtml(excerpt || '')}</p>`;
+
+  // Server-render the real article body, not just SEO meta — previously only
+  // meta tags were injected server-side while the body only appeared after a
+  // client-side fetch('/data/articles.json') populated #pageContent, so any
+  // crawler that doesn't execute JS saw an empty "Завантаження..." placeholder
+  // instead of the article text (same architectural gap already found and
+  // fixed on main — see project_seo_growth_audit memory).
+  const pageContentHtml = `<div id="pageContent">
+  <section class="article-hero">
+    <div class="container">
+      <nav class="article-breadcrumb" aria-label="Навігація">
+        <a href="/">Головна</a>
+        <span class="article-breadcrumb-sep">›</span>
+        <a href="/#articles">Статті</a>
+      </nav>
+      <div class="article-hero__badge">${article.coverEmoji || '📄'} ${escHtml(article.category || 'навчання')}</div>
+      <h1 class="article-hero__title">${escHtml(title)}</h1>
+      <div class="article-hero__meta">
+        <span>✍️ ${escHtml(article.author || 'My Computer Academy')}</span>
+        <span>📅 ${dateStr}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="article-body">
+    <div class="article-container">
+      <main class="article-content">
+        ${bodyHtml}
+      </main>
+      <aside class="article-sidebar">
+        <div class="sidebar-cta">
+          <h3>Запишіть дитину на курс</h3>
+          <p>Перший урок безкоштовно — спробуйте без зобов'язань!</p>
+          <button type="button" onclick="openArtModal()">Записатись зараз →</button>
+        </div>${relatedHtml}
+      </aside>
+    </div>
+  </section>
+</div>`;
+
+  const articleJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Article',
+        '@id': `${pageUrl}#article`,
+        headline: title,
+        description: excerpt,
+        image: `${siteUrl}/og-image.png`,
+        datePublished: publishedIso,
+        dateModified: publishedIso,
+        inLanguage: 'uk',
+        author: { '@type': 'Organization', '@id': `${siteUrl}/#organization`, name: article.author || 'My Computer Academy' },
+        publisher: {
+          '@type': 'Organization',
+          name: 'My Computer Academy',
+          logo: { '@type': 'ImageObject', url: `${siteUrl}/android-chrome-192x192.png`, width: 192, height: 192 },
+        },
+        mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Головна', item: `${siteUrl}/` },
+          { '@type': 'ListItem', position: 2, name: 'Статті', item: `${siteUrl}/#articles` },
+          { '@type': 'ListItem', position: 3, name: title, item: pageUrl },
+        ],
+      },
+    ],
+  });
+
   const html = ARTICLE_HTML_TPL
     .replace('<title id="pageTitle">Стаття — My Computer Academy</title>',
              `<title id="pageTitle">${escHtml(fullTitle)}</title>`)
@@ -1461,7 +1602,9 @@ app.get('/articles/:slug', (req, res) => {
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="article"/>
   <meta property="og:image" content="https://frontend.mycomputer.education/og-image.png?v=2"/>
-  <meta property="og:locale" content="uk_UA"/>`);
+  <meta property="og:locale" content="uk_UA"/>
+  <script type="application/ld+json">${articleJsonLd}</script>`)
+    .replace('<div id="pageContent">\n  <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>\n</div>', pageContentHtml);
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);

@@ -166,7 +166,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <span>Скільки тривають курси?</span>
             <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <div class="faq-item__answer"><p>Дитячі курси тривають 9–18 місяців при 1–2 заняттях на тиждень. Конкретна тривалість залежить від напрямку та навантаження.</p></div>
+          <div class="faq-item__answer"><p>Кожен курс триває 5 місяців при 1–2 заняттях на тиждень. Можна пройти обидва рівні послідовно — Frontend Старт, а потім Frontend Pro.</p></div>
         </div>
         <div class="faq-item">
           <button class="faq-item__question">
@@ -511,7 +511,9 @@ async function init() {
     const related = articles.filter(a => a.active !== false && a.id !== article.id).slice(0, 4);
     window.__lastArticle = article;
     window.__lastRelated = related;
-    injectArticleSchema(article); // once — renderArticle re-runs on language toggle, schema doesn't need to
+    // Article/BreadcrumbList JSON-LD is already server-rendered into <head>
+    // for this UA URL — skip re-injecting it client-side to avoid a duplicate
+    // schema block (still fine for the RU toggle: content updates, schema doesn't need to).
     renderArticle(article, related);
   } catch { showNotFound(); }
 }
@@ -521,55 +523,6 @@ async function init() {
 function tr(a, field) {
   if (currentLang === 'ru' && a[field + '_ru']) return a[field + '_ru'];
   return a[field] || '';
-}
-
-function injectArticleSchema(a) {
-  const schema = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Article",
-        "@id": "https://mycomputer.education/articles/" + a.slug + "#article",
-        "headline": a.title,
-        "description": a.excerpt || a.title,
-        "image": "https://mycomputer.education/og-image.png",
-        "datePublished": a.publishedAt,
-        "dateModified": a.publishedAt,
-        "inLanguage": "uk",
-        "author": {
-          "@type": "Organization",
-          "@id": "https://mycomputer.education/#organization",
-          "name": a.author || "My Computer Academy"
-        },
-        "publisher": {
-          "@type": "Organization",
-          "name": "My Computer Academy",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://mycomputer.education/android-chrome-192x192.png",
-            "width": 192,
-            "height": 192
-          }
-        },
-        "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": "https://mycomputer.education/articles/" + a.slug
-        }
-      },
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {"@type": "ListItem", "position": 1, "name": "Головна", "item": "https://mycomputer.education/"},
-          {"@type": "ListItem", "position": 2, "name": "Статті", "item": "https://mycomputer.education/#articles"},
-          {"@type": "ListItem", "position": 3, "name": a.title, "item": "https://mycomputer.education/articles/" + a.slug}
-        ]
-      }
-    ]
-  };
-  const el = document.createElement('script');
-  el.type = 'application/ld+json';
-  el.textContent = JSON.stringify(schema);
-  document.head.appendChild(el);
 }
 
 function renderArticle(a, related) {
