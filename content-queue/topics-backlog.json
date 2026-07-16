@@ -1,0 +1,63 @@
+[
+  {
+    "id": "minecraft-dedicated",
+    "course": "minecraft",
+    "topic_uk": "Курс Minecraft: програмування в грі — окрема стаття про сам курс (зараз тема лише в парі зі статтею про Python)",
+    "status": "pending"
+  },
+  {
+    "id": "web-second-article",
+    "course": "web",
+    "topic_uk": "Веб-розробка для дітей: другий кут — наприклад «Що таке frontend і backend простими словами для підлітка»",
+    "status": "pending"
+  },
+  {
+    "id": "construct-second-article",
+    "course": "construct",
+    "topic_uk": "Construct: другий кут — наприклад детальний розбір одного з навчальних проєктів курсу (платформер чи аркада)",
+    "status": "pending"
+  },
+  {
+    "id": "roblox-second-article",
+    "course": "roblox",
+    "topic_uk": "Roblox Studio: другий кут — наприклад «Скільки можна заробити на Roblox-іграх і чи це реально дитині»",
+    "status": "pending"
+  },
+  {
+    "id": "python-deeper-article",
+    "course": "python",
+    "topic_uk": "Python: що можна зробити за перший рік навчання — конкретні проєкти по темах курсу",
+    "status": "pending"
+  },
+  {
+    "id": "seasonal-avgust",
+    "course": null,
+    "topic_uk": "Підготовка до навчального року: як обрати курс програмування у серпні, щоб встигнути до 1 вересня",
+    "status": "pending",
+    "note": "сезонна тема — публікувати ближче до серпня, не раніше"
+  },
+  {
+    "id": "practice-time",
+    "course": null,
+    "topic_uk": "Скільки часу на тиждень варто приділяти домашній практиці, крім занять на курсі",
+    "status": "pending"
+  },
+  {
+    "id": "parenting-interest-signal",
+    "course": null,
+    "topic_uk": "Як зрозуміти, що дитині подобається курс, а не просто вона терпить заняття",
+    "status": "pending"
+  },
+  {
+    "id": "scratch-second-article",
+    "course": "scratch",
+    "topic_uk": "Scratch: другий кут — наприклад «5 типів проєктів, які дитина встигне зробити за перший місяць»",
+    "status": "pending"
+  },
+  {
+    "id": "graphic-tablet-vs-mouse",
+    "course": "graphic",
+    "topic_uk": "Графічний планшет для дитини: коли купувати і чи можна почати без нього (розвиток теми з уже опублікованої статті)",
+    "status": "pending"
+  }
+]

@@ -1,0 +1,88 @@
+name: Publish Queued Articles (mycomputer.education)
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'content-queue/pending/**'
+
+concurrency:
+  group: publish-queued-articles
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s' "${{ secrets.VPS_SSH_KEY }}" | base64 -d > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts || true
+
+      - name: Check for pending articles
+        id: check
+        run: |
+          count=$(ls content-queue/pending/*.json 2>/dev/null | wc -l)
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "Found $count pending article(s)"
+
+      - name: Upload pending articles + publish script to VPS
+        if: steps.check.outputs.count != '0'
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60"
+          ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p /tmp/content-queue-incoming"
+          scp $SSH_OPTS content-queue/pending/*.json ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/content-queue-incoming/
+          scp $SSH_OPTS content-queue/scripts/publish-from-queue.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/content-queue-incoming/
+
+      - name: Publish on VPS
+        if: steps.check.outputs.count != '0'
+        id: publish
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60"
+          ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            "cd /var/www/mycomputer-new/sites/main/server && node /tmp/content-queue-incoming/publish-from-queue.js /tmp/content-queue-incoming" \
+            | tee /tmp/publish-output.txt
+
+      - name: Move successfully published files to content-queue/published/
+        if: steps.check.outputs.count != '0'
+        run: |
+          mkdir -p content-queue/published
+          moved=0
+          while IFS= read -r line; do
+            if [[ "$line" == RESULT*CREATED* ]] || [[ "$line" == RESULT*SKIP_EXISTS* ]]; then
+              file=$(echo "$line" | awk '{print $2}')
+              if [ -f "content-queue/pending/$file" ]; then
+                git mv "content-queue/pending/$file" "content-queue/published/$file"
+                moved=$((moved+1))
+              fi
+            fi
+            if [[ "$line" == RESULT*CREATE_FAILED* ]] || [[ "$line" == RESULT*PARSE_ERROR* ]] || [[ "$line" == RESULT*MISSING_FIELDS* ]]; then
+              echo "::warning::Article publish failed, left in pending/ for investigation: $line"
+            fi
+          done < /tmp/publish-output.txt
+          echo "moved=$moved" >> "$GITHUB_ENV"
+
+      - name: Cleanup VPS temp files
+        if: steps.check.outputs.count != '0'
+        run: |
+          SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60"
+          ssh $SSH_OPTS ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "rm -rf /tmp/content-queue-incoming"
+
+      - name: Commit published-state update
+        if: steps.check.outputs.count != '0'
+        run: |
+          git config user.name "content-queue-bot"
+          git config user.email "actions@github.com"
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(content-queue): mark ${moved:-0} article(s) as published"
+            git push origin HEAD:master
+          else
+            echo "Nothing to commit (no files moved — check publish-output above for errors)"
+          fi
