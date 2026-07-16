@@ -1196,3 +1196,32 @@ body.modal-open{overflow:hidden}
   top:58px;left:12px;
   filter:drop-shadow(0 4px 12px rgba(var(--color-primary-rgb),.08));
 }
+
+/* ===================================================
+   BACKGROUND RIPPLE — the page's own white/dark backgrounds
+   react to the cursor like light on rippling water. A single
+   fixed full-viewport canvas painted with each section's own
+   base tone, sitting BEHIND all normal content (z-index:-1) —
+   text, cards, images and buttons keep their own opaque
+   backgrounds and simply paint over it, untouched.
+   Sections only go transparent once JS confirms the canvas is
+   live (.ripple-on on body); no-JS/mobile keep solid backgrounds.
+   =================================================== */
+#bgRippleCanvas{
+  position:fixed;inset:0;width:100vw;height:100vh;
+  pointer-events:none;z-index:-1;
+}
+@media(max-width:1023px){
+  #bgRippleCanvas{display:none}
+}
+body.ripple-on .hero,
+body.ripple-on .benefits,
+body.ripple-on .reviews,
+body.ripple-on .contact,
+body.ripple-on .pricing,
+body.ripple-on .courses,
+body.ripple-on .stats,
+body.ripple-on .articles,
+body.ripple-on .footer{
+  background:transparent;
+}
