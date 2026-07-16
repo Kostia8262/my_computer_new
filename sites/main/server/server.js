@@ -656,11 +656,26 @@ app.get('/docs/:id.html', (req, res, next) => {
   res.send(html);
 });
 
+// Courses that also have their own dedicated single-topic subdomain — main's own
+// /courses/:slug page for these targets the same query as the subdomain's homepage
+// (confirmed both were independently self-canonical, i.e. genuinely competing for
+// the same search intent). Cross-domain canonical consolidates ranking signal onto
+// the subdomain, which carries the deeper/more current content for that topic.
+const EXTERNAL_CANONICAL = {
+  python: 'https://python.mycomputer.education/',
+  roblox: 'https://roblox.mycomputer.education/',
+  minecraft: 'https://minecraft.mycomputer.education/',
+  web: 'https://frontend.mycomputer.education/',
+};
+
 // ── DYNAMIC SITEMAP ───────────────────────────────────────────────────────────
 app.get('/sitemap.xml', (req, res) => {
   const base  = 'https://mycomputer.education';
   const today = new Date().toISOString().slice(0, 10);
-  const courseUrls = coursesDb.getActive().map(c => {
+  // Courses with their own dedicated subdomain (see EXTERNAL_CANONICAL below) are
+  // deliberately left out of the sitemap — their /courses/:slug page canonicalizes
+  // to the subdomain, so listing both here would send a conflicting signal.
+  const courseUrls = coursesDb.getActive().filter(c => !EXTERNAL_CANONICAL[c.id]).map(c => {
     return `  <url>\n    <loc>${base}/courses/${c.id}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>monthly</changefreq>\n    <priority>0.9</priority>\n  </url>`;
   }).join('\n');
   const artUrls = articlesDb.getActive().map(a => {
@@ -2154,6 +2169,7 @@ app.get('/courses/:slug', (req, res) => {
   const siteUrl = 'https://mycomputer.education';
   const pageUrl = `${siteUrl}/courses/${slug}`;
   const hasRuCourse = !!(COURSES_RU[slug] || CURRICULA_RU[slug]);
+  const externalCanonical = EXTERNAL_CANONICAL[slug];
 
   const durationMonths = course && course.duration
     ? parseInt(course.duration) || null : null;
@@ -2244,10 +2260,13 @@ app.get('/courses/:slug', (req, res) => {
 
   const jsonLd = JSON.stringify({ '@context': 'https://schema.org', '@graph': graphItems });
 
-  const hreflangBlock = hasRuCourse ? `
+  // A page with a cross-domain canonical shouldn't also declare hreflang alternates
+  // for itself — those belong on the canonical (subdomain) page instead.
+  const hreflangBlock = (hasRuCourse && !externalCanonical) ? `
   <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
   <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
   <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
+  const canonicalUrl = externalCanonical || `${pageUrl}${isRu ? '?lang=ru' : ''}`;
 
   let html = COURSE_HTML_TPL
     .replace(
@@ -2257,7 +2276,7 @@ app.get('/courses/:slug', (req, res) => {
     .replace(
       '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
       `<meta name="description" content="${escHtml(desc)}"/>
-  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>${hreflangBlock}
+  <link rel="canonical" href="${canonicalUrl}"/>${hreflangBlock}
   <meta property="og:title" content="${escHtml(seoTitle)}"/>
   <meta property="og:description" content="${escHtml(desc)}"/>
   <meta property="og:url" content="${pageUrl}"/>
