@@ -950,10 +950,13 @@ function showToast(msg, type = 'success') {
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
   // Back → front: wider/dimmer/slower to narrower/brighter/faster+glow.
+  // All three stay in the Contact section's own dark family (--dark-bg and
+  // lighter tints of it) instead of the brand purple, so the waves read as
+  // part of the same surface as Contact, not a separate colored block.
   const LAYERS = [
-    { bumpW: 46, ampRatio: 0.22, baseRatio: 0.58, speed: 0.45, offset: 0,             fill: 'rgba(139,92,246,0.16)', glow: 0  },
-    { bumpW: 36, ampRatio: 0.30, baseRatio: 0.54, speed: 0.70, offset: 18,            fill: 'rgba(108,71,255,0.42)', glow: 0  },
-    { bumpW: 28, ampRatio: 0.38, baseRatio: 0.50, speed: 1.00, offset: 7,             fill: null,                     glow: 18 },
+    { bumpW: 46, ampRatio: 0.22, baseRatio: 0.58, speed: 0.45, offset: 0,             fill: '#0D0C1A', glow: 0  },
+    { bumpW: 36, ampRatio: 0.30, baseRatio: 0.54, speed: 0.70, offset: 18,            fill: '#171430',        glow: 0  },
+    { bumpW: 28, ampRatio: 0.38, baseRatio: 0.50, speed: 1.00, offset: 7,             fill: null,                     glow: 12 },
   ];
 
   let cssW = 0, cssH = 0;
@@ -1019,13 +1022,15 @@ function showToast(msg, type = 'success') {
     if (layer.fill) {
       ctx.fillStyle = layer.fill;
     } else {
+      // Peak: slightly lighter than --dark-bg. Base: --dark-bg itself,
+      // so the front layer melts into the exact same fill as Contact.
       const grad = ctx.createLinearGradient(0, topY - amp, 0, baseY);
-      grad.addColorStop(0, '#A78BFA');
-      grad.addColorStop(1, '#6C47FF');
+      grad.addColorStop(0, '#221E45');
+      grad.addColorStop(1, '#0D0C1A');
       ctx.fillStyle = grad;
     }
     ctx.shadowBlur  = layer.glow || 0;
-    ctx.shadowColor = 'rgba(108,71,255,0.55)';
+    ctx.shadowColor = 'rgba(34,30,69,0.6)';
 
     const r = layer.bumpW / 2;
     ctx.beginPath();
