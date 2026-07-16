@@ -34,8 +34,21 @@ def health_check(request):
     return JsonResponse({"status": "ok"})
 
 
+def sitemap_indexable(request, *args, **kwargs):
+    # Django's built-in sitemap view sets X-Robots-Tag: noindex on every
+    # response by default (it assumes the sitemap XML itself should never
+    # rank as a search result) — but Google Search Console treats that same
+    # header as a reason to reject the sitemap submission entirely, not just
+    # skip indexing the XML page. Overriding it here is what actually lets
+    # GSC accept this endpoint (reached externally as /api/sitemap.xml,
+    # per the LiteSpeed vhost's /api/ -> wsgi proxy rule).
+    response = sitemap(request, *args, **kwargs)
+    response['X-Robots-Tag'] = 'index, follow'
+    return response
+
+
 urlpatterns = [
-    path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='sitemap'),
+    path('sitemap.xml', sitemap_indexable, {'sitemaps': sitemaps}, name='sitemap'),
     path('health/', health_check),
     path('admin/', admin.site.urls),
     path('ckeditor5/', include('django_ckeditor_5.urls')),
