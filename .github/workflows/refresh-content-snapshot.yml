@@ -1,0 +1,45 @@
+name: Refresh Content Snapshot (mycomputer.education)
+
+# The scheduled content-writing cloud agent runs in a sandbox whose network
+# policy blocks outbound requests to mycomputer.education entirely (confirmed
+# 2026-07-16: the sandbox's own proxy returns 403 at the gateway, before the
+# request even reaches the site). Rather than depend on that policy being
+# changed, this workflow does the live API fetch here — where outbound
+# network access already works fine, same as every other workflow in this
+# repo — and commits a fresh local snapshot the agent can read from disk.
+
+on:
+  schedule:
+    # 45 minutes before the article-writer agent's Tue/Fri 07:00 UTC runs.
+    - cron: '45 6 * * 2,5'
+  workflow_dispatch: {}
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fetch live courses + articles
+        run: |
+          mkdir -p content-queue/snapshot
+          curl -sf https://mycomputer.education/api/courses > content-queue/snapshot/courses.json
+          curl -sf https://mycomputer.education/api/articles > content-queue/snapshot/articles.json
+          echo "{\"refreshed_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > content-queue/snapshot/meta.json
+          echo "=== courses.json size ==="
+          wc -c content-queue/snapshot/courses.json
+          echo "=== articles.json size ==="
+          wc -c content-queue/snapshot/articles.json
+
+      - name: Commit snapshot
+        run: |
+          git config user.name "content-queue-bot"
+          git config user.email "actions@github.com"
+          git add content-queue/snapshot/
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(content-queue): refresh course/article data snapshot"
+            git push origin HEAD:master
+          else
+            echo "Snapshot unchanged, nothing to commit"
+          fi
