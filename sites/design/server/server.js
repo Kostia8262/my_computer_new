@@ -880,6 +880,7 @@ app.get('/docs/:id.html', (req, res, next) => {
 const EXTERNAL_CANONICAL = {
   animation: 'https://animation.mycomputer.school/',
   '3d-blender': 'https://blender.mycomputer.school/',
+  '3d-interior': 'https://3dsmax.mycomputer.school/',
 };
 
 app.get('/sitemap.xml', (req, res) => {
