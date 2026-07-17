@@ -209,7 +209,7 @@ function apiToRender(c) {
   const forCards = [];
   if (c.age)        forCards.push({ title: c.age, desc: 'Оптимальний вік для цього курсу.' });
   forCards.push({ title: 'Початківцям',  desc: 'Починаємо з нуля — попередній досвід не потрібен.' });
-  forCards.push({ title: 'Практика',     desc: 'Кожне заняття — реальний проект, який одразу працює.' });
+  forCards.push({ title: 'Практика',     desc: 'Кожне заняття — реальний проєкт, який одразу працює.' });
   forCards.push({ title: 'Мала група',   desc: c.groupSize > 0
     ? `До ${c.groupSize} учнів — індивідуальна увага викладача.`
     : 'Індивідуальний підхід до кожного учня.' });
@@ -343,7 +343,7 @@ function renderCourse(c) {
       <div class="container">
         <div class="course-section-label">Програма курсу</div>
         <h2 class="course-section-title">Що вивчатиме дитина</h2>
-        <p class="course-section-sub">Кожен модуль — це практика та маленький проект. Ніяких нудних лекцій — тільки код, який одразу працює.</p>
+        <p class="course-section-sub">Кожен модуль — це практика та маленький проєкт. Ніяких нудних лекцій — тільки код, який одразу працює.</p>
         <div class="curriculum-grid">${currHtml}</div>
       </div>
     </section>
