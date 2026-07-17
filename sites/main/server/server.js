@@ -740,6 +740,55 @@ ${artUrls ? '\n' + artUrls + '\n' : ''}
   res.send(xml);
 });
 
+// ── LLMS.TXT ──────────────────────────────────────────────────────────────────
+// Experimental convention (not a ratified standard, unlike robots.txt/
+// sitemap.xml) — a plain-text/markdown digest for LLM crawlers (ChatGPT,
+// Claude, Perplexity) that don't want to parse full HTML for key facts.
+// Low-cost addition, not a substitute for real SSR content.
+app.get('/llms.txt', (req, res) => {
+  const base = 'https://mycomputer.education';
+  const courses = coursesDb.getActive();
+  const articles = articlesDb.getActive();
+
+  const coursesTxt = courses.map(c => {
+    const url = EXTERNAL_CANONICAL[c.id] || `${base}/courses/${c.id}`;
+    return `## ${c.name} (${c.age})
+- Посилання: ${url}
+- Тривалість: ${c.duration}, ${c.lessonsCount} занять
+- Формат: онлайн, групи до ${c.groupSize} осіб
+- Вартість: від ${c.price} ₴/міс, перший урок безкоштовно
+${c.description}`;
+  }).join('\n\n');
+
+  const articlesTxt = articles.map(a =>
+    `- [${a.title}](${base}/articles/${a.slug}): ${a.excerpt}`
+  ).join('\n');
+
+  const txt = `# My Computer Academy — школа програмування (mycomputer.education)
+
+> Онлайн-школа комп'ютерних курсів для дітей та підлітків від 6 до 18 років. Курси Python, Scratch, Roblox, Minecraft, веб-розробки та інших ІТ-напрямків. Деякі курси мають власний окремий сайт — посилання вказано біля кожного курсу.
+
+## Курси
+
+${coursesTxt}
+
+## Статті
+
+${articlesTxt || '(поки немає опублікованих статей)'}
+
+## Контакти
+
+Телефон: +38 (095) 462-46-72, +38 (068) 252-28-76
+Email: my.computer.academy25@gmail.com
+Місто: Дніпро, Україна
+Цей сайт: ${base}
+Мережа шкіл: ${base} (програмування), https://mycomputer.school (дизайн)
+`;
+
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.send(txt);
+});
+
 // ── SECURITY: never serve source code or raw data files as static assets ──────
 const STATIC_DATA_ALLOWLIST = new Set(['articles.json', 'content.json']); // only files client JS fetches directly
 app.use((req, res, next) => {
