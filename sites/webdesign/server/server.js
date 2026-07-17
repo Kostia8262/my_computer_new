@@ -429,6 +429,229 @@ app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'admin.html'));
 });
 
+// ── ARTICLE PAGES ─────────────────────────────────────────────────────────────
+// ── ARTICLES SSR ──────────────────────────────────────────────────────────────
+// Previously /articles and /articles/:slug just served the raw static files —
+// no SEO meta injection at all, and the article body / listing grid were only
+// ever filled in by client JS fetching /data/articles.json. A crawler that
+// doesn't execute JS (Google's non-JS pass, and most AI crawlers — GPTBot,
+// ClaudeBot, PerplexityBot, etc.) saw an empty "Завантаження..." placeholder
+// and zero real <a href="/articles/..."> links. Mirrors client-side LABEL_MAP
+// (js/main.js, articles/index.html) so server-rendered cards match what the
+// JS re-renders on top of them. Registered before express.static() so these
+// routes take precedence over the raw files on disk.
+const ARTICLE_LABEL_MAP = {
+  '🎨': {label:'Курси',         cls:'cat-design'},
+  '🖌️': {label:'Для батьків',   cls:'cat-parents'},
+  '🧭': {label:'UI/UX дизайн',  cls:'cat-design'},
+  '💡': {label:'Для батьків',   cls:'cat-parents'},
+  '🎯': {label:'Вибір курсу',   cls:'cat-tips'},
+  '💬': {label:'Гайди',         cls:'cat-guide'},
+  '📖': {label:'Словник',       cls:'cat-dict'},
+};
+function pluralArticlesWd(n, isRu) {
+  const m = n % 10, m100 = n % 100;
+  if (isRu) {
+    if (n === 0) return 'статей не найдено';
+    if (m === 1 && m100 !== 11) return n + ' статья';
+    if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статьи';
+    return n + ' статей';
+  }
+  if (n === 0) return 'статей не знайдено';
+  if (m === 1 && m100 !== 11) return n + ' стаття';
+  if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статті';
+  return n + ' статей';
+}
+function trWd(a, field, isRu) {
+  if (isRu && a[field + '_ru']) return a[field + '_ru'];
+  return a[field] || '';
+}
+// webdesign never had an HTML-escaping helper (its API routes only ever
+// returned JSON), so the SSR templates below need their own.
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+const ARTICLES_INDEX_TPL_WD = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
+function renderArticlesListing(req, res) {
+  const isRu = req.query.lang === 'ru';
+  const siteUrl = 'https://webdesign.mycomputer.education';
+  const activeArticles = articlesDb.getActive();
+
+  const cardsHtml = activeArticles.map(a => {
+    const lbl = ARTICLE_LABEL_MAP[a.coverEmoji] || { label: escHtml(a.category || 'стаття'), cls: '' };
+    const dateStr = a.publishedAt
+      ? new Date(a.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+    return `
+    <a class="article-card" href="/articles/${escHtml(a.slug)}${isRu ? '?lang=ru' : ''}" aria-label="${escHtml(trWd(a, 'title', isRu))}">
+      <div class="article-card__top">
+        <span class="article-card__emoji">${a.coverEmoji || '📄'}</span>
+        <span class="article-card__cat ${lbl.cls}">${lbl.label}</span>
+      </div>
+      <div class="article-card__body">
+        <h2 class="article-card__title">${escHtml(trWd(a, 'title', isRu))}</h2>
+        <p class="article-card__excerpt">${escHtml(trWd(a, 'excerpt', isRu))}</p>
+      </div>
+      <div class="article-card__footer">
+        <span class="article-card__date">${dateStr}</span>
+        <span class="article-card__read">${isRu ? 'Читать →' : 'Читати →'}</span>
+      </div>
+    </a>`;
+  }).join('');
+
+  let html = ARTICLES_INDEX_TPL_WD
+    .replace(
+      '<p class="listing-hero__sub" id="heroSub">Завантаження…</p>',
+      `<p class="listing-hero__sub" id="heroSub">${pluralArticlesWd(activeArticles.length, isRu)}</p>`
+    )
+    .replace(
+      '<span class="listing-count" id="listingCount"></span>',
+      `<span class="listing-count" id="listingCount">${pluralArticlesWd(activeArticles.length, isRu)}</span>`
+    )
+    .replace(
+      '<div class="listing-grid" id="listingGrid"></div>',
+      `<div class="listing-grid" id="listingGrid">${cardsHtml}</div>`
+    );
+
+  const canonicalTag = `<link rel="canonical" href="${siteUrl}/articles${isRu ? '?lang=ru' : ''}"/>
+  <link rel="alternate" hreflang="uk" href="${siteUrl}/articles"/>
+  <link rel="alternate" hreflang="ru" href="${siteUrl}/articles?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${siteUrl}/articles"/>`;
+  html = html.replace(/<link rel="canonical"[^>]*\/>/, canonicalTag);
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+}
+app.get('/articles', renderArticlesListing);
+app.get('/articles/', renderArticlesListing);
+
+const ARTICLE_HTML_TPL_WD = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
+app.get('/articles/:slug', (req, res) => {
+  const { slug } = req.params;
+  if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+
+  const article = articlesDb.getBySlug(slug);
+  if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
+
+  const isRu      = req.query.lang === 'ru';
+  const title     = trWd(article, 'title', isRu) || 'Стаття';
+  const excerpt   = trWd(article, 'excerpt', isRu).slice(0, 160);
+  const content   = trWd(article, 'content', isRu);
+  const siteUrl   = 'https://webdesign.mycomputer.education';
+  const pageUrl   = `${siteUrl}/articles/${slug}`;
+  const fullTitle = `${title} — My Computer Academy`;
+
+  const publishedIso = article.publishedAt
+    ? new Date(article.publishedAt).toISOString() : new Date().toISOString();
+
+  const dateStr = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+  const related = articlesDb.getActive().filter(a => a.id !== article.id).slice(0, 4);
+  const relatedHtml = related.length ? `
+          <div class="sidebar-card">
+            <h3>${isRu ? 'Читайте также' : 'Читайте також'}</h3>
+            ${related.map(r => `<a class="sidebar-link" href="/articles/${escHtml(r.slug)}${isRu ? '?lang=ru' : ''}">${r.coverEmoji || '📄'} ${escHtml(trWd(r, 'title', isRu))}</a>`).join('')}
+          </div>` : '';
+  const bodyHtml = content || `<p>${escHtml(excerpt || '')}</p>`;
+
+  const pageContentHtml = `<div id="pageContent">
+    <section class="article-hero">
+      <div class="container">
+        <nav class="article-breadcrumb" aria-label="Навігація">
+          <a href="/">${isRu ? 'Главная' : 'Головна'}</a>
+          <span class="article-breadcrumb-sep">›</span>
+          <a href="/articles">${isRu ? 'Статьи' : 'Статті'}</a>
+        </nav>
+        <div class="article-hero__badge">${article.coverEmoji || '📄'} ${escHtml(article.category || 'навчання')}</div>
+        <h1 class="article-hero__title">${escHtml(title)}</h1>
+        <div class="article-hero__meta">
+          <span>✍️ ${escHtml(article.author || 'My Computer Academy')}</span>
+          <span>📅 ${dateStr}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="article-body">
+      <div class="article-container">
+        <main class="article-content">
+          ${bodyHtml}
+        </main>
+        <aside class="article-sidebar">
+          <div class="sidebar-cta">
+            <h3>${isRu ? 'Запишите ребёнка на курс' : 'Запишіть дитину на курс'}</h3>
+            <p>${isRu ? 'Первый урок бесплатно — попробуйте без обязательств!' : "Перший урок безкоштовно — спробуйте без зобов'язань!"}</p>
+            <button type="button" onclick="openArtModal()">${isRu ? 'Записаться сейчас →' : 'Записатись зараз →'}</button>
+          </div>${relatedHtml}
+        </aside>
+      </div>
+    </section>
+  </div>`;
+
+  const articleJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Article',
+        '@id': `${pageUrl}#article`,
+        headline: title,
+        description: excerpt,
+        image: `${siteUrl}/og-image.png?v=2`,
+        datePublished: publishedIso,
+        dateModified: publishedIso,
+        inLanguage: isRu ? 'ru' : 'uk',
+        author: { '@type': 'Organization', '@id': `${siteUrl}/#organization`, name: article.author || 'My Computer Academy' },
+        publisher: {
+          '@type': 'Organization', name: 'My Computer Academy',
+          logo: { '@type': 'ImageObject', url: `${siteUrl}/android-chrome-192x192.png`, width: 192, height: 192 },
+        },
+        mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: isRu ? 'Главная' : 'Головна', item: `${siteUrl}/` },
+          { '@type': 'ListItem', position: 2, name: isRu ? 'Статьи' : 'Статті', item: `${siteUrl}/articles` },
+          { '@type': 'ListItem', position: 3, name: title, item: pageUrl },
+        ],
+      },
+    ],
+  });
+
+  const hreflangBlock = `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>`;
+
+  let html = ARTICLE_HTML_TPL_WD
+    .replace('<title id="pageTitle">Стаття — My Computer Academy</title>',
+             `<title id="pageTitle">${escHtml(fullTitle)}</title>`)
+    .replace('<meta name="description" id="pageDesc" content="Корисні статті про веб-дизайн для дітей від My Computer Academy"/>',
+             `<meta name="description" id="pageDesc" content="${escHtml(excerpt) || 'Корисні статті про веб-дизайн для дітей від My Computer Academy'}"/>
+  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>${hreflangBlock}
+  <meta property="og:title" content="${escHtml(fullTitle)}"/>
+  <meta property="og:description" content="${escHtml(excerpt)}"/>
+  <meta property="og:url" content="${pageUrl}"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:image" content="https://webdesign.mycomputer.education/og-image.png?v=2"/>
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
+  <script type="application/ld+json">${articleJsonLd}</script>`)
+    .replace(
+      `<div id="pageContent">
+  <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>
+</div>`,
+      pageContentHtml
+    );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: '1d',           // cache static assets 1 day
@@ -1480,223 +1703,6 @@ app.delete('/api/reviews/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   const ok = reviewsDb.delete(id);
   if (!ok) return res.status(404).json({ error: 'Not found' });
   res.json({ success: true });
-});
-
-// ── ARTICLE PAGES ─────────────────────────────────────────────────────────────
-// ── ARTICLES SSR ──────────────────────────────────────────────────────────────
-// Previously /articles and /articles/:slug just served the raw static files —
-// no SEO meta injection at all, and the article body / listing grid were only
-// ever filled in by client JS fetching /data/articles.json. A crawler that
-// doesn't execute JS (Google's non-JS pass, and most AI crawlers — GPTBot,
-// ClaudeBot, PerplexityBot, etc.) saw an empty "Завантаження..." placeholder
-// and zero real <a href="/articles/..."> links. Mirrors client-side LABEL_MAP
-// (js/main.js, articles/index.html) so server-rendered cards match what the
-// JS re-renders on top of them.
-const ARTICLE_LABEL_MAP = {
-  '🎨': {label:'Курси',         cls:'cat-design'},
-  '🖌️': {label:'Для батьків',   cls:'cat-parents'},
-  '🧭': {label:'UI/UX дизайн',  cls:'cat-design'},
-  '💡': {label:'Для батьків',   cls:'cat-parents'},
-  '🎯': {label:'Вибір курсу',   cls:'cat-tips'},
-  '💬': {label:'Гайди',         cls:'cat-guide'},
-  '📖': {label:'Словник',       cls:'cat-dict'},
-};
-function pluralArticlesWd(n, isRu) {
-  const m = n % 10, m100 = n % 100;
-  if (isRu) {
-    if (n === 0) return 'статей не найдено';
-    if (m === 1 && m100 !== 11) return n + ' статья';
-    if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статьи';
-    return n + ' статей';
-  }
-  if (n === 0) return 'статей не знайдено';
-  if (m === 1 && m100 !== 11) return n + ' стаття';
-  if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статті';
-  return n + ' статей';
-}
-function trWd(a, field, isRu) {
-  if (isRu && a[field + '_ru']) return a[field + '_ru'];
-  return a[field] || '';
-}
-
-const ARTICLES_INDEX_TPL_WD = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
-function renderArticlesListing(req, res) {
-  const isRu = req.query.lang === 'ru';
-  const siteUrl = 'https://webdesign.mycomputer.education';
-  const activeArticles = articlesDb.getActive();
-
-  const cardsHtml = activeArticles.map(a => {
-    const lbl = ARTICLE_LABEL_MAP[a.coverEmoji] || { label: escHtml(a.category || 'стаття'), cls: '' };
-    const dateStr = a.publishedAt
-      ? new Date(a.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
-      : '';
-    return `
-    <a class="article-card" href="/articles/${escHtml(a.slug)}${isRu ? '?lang=ru' : ''}" aria-label="${escHtml(trWd(a, 'title', isRu))}">
-      <div class="article-card__top">
-        <span class="article-card__emoji">${a.coverEmoji || '📄'}</span>
-        <span class="article-card__cat ${lbl.cls}">${lbl.label}</span>
-      </div>
-      <div class="article-card__body">
-        <h2 class="article-card__title">${escHtml(trWd(a, 'title', isRu))}</h2>
-        <p class="article-card__excerpt">${escHtml(trWd(a, 'excerpt', isRu))}</p>
-      </div>
-      <div class="article-card__footer">
-        <span class="article-card__date">${dateStr}</span>
-        <span class="article-card__read">${isRu ? 'Читать →' : 'Читати →'}</span>
-      </div>
-    </a>`;
-  }).join('');
-
-  let html = ARTICLES_INDEX_TPL_WD
-    .replace(
-      '<p class="listing-hero__sub" id="heroSub">Завантаження…</p>',
-      `<p class="listing-hero__sub" id="heroSub">${pluralArticlesWd(activeArticles.length, isRu)}</p>`
-    )
-    .replace(
-      '<span class="listing-count" id="listingCount"></span>',
-      `<span class="listing-count" id="listingCount">${pluralArticlesWd(activeArticles.length, isRu)}</span>`
-    )
-    .replace(
-      '<div class="listing-grid" id="listingGrid"></div>',
-      `<div class="listing-grid" id="listingGrid">${cardsHtml}</div>`
-    );
-
-  const canonicalTag = `<link rel="canonical" href="${siteUrl}/articles${isRu ? '?lang=ru' : ''}"/>
-  <link rel="alternate" hreflang="uk" href="${siteUrl}/articles"/>
-  <link rel="alternate" hreflang="ru" href="${siteUrl}/articles?lang=ru"/>
-  <link rel="alternate" hreflang="x-default" href="${siteUrl}/articles"/>`;
-  html = html.replace(/<link rel="canonical"[^>]*\/>/, canonicalTag);
-
-  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
-
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.send(html);
-}
-app.get('/articles', renderArticlesListing);
-app.get('/articles/', renderArticlesListing);
-
-const ARTICLE_HTML_TPL_WD = fs.readFileSync(path.join(__dirname, '..', 'article.html'), 'utf8');
-app.get('/articles/:slug', (req, res) => {
-  const { slug } = req.params;
-  if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-
-  const article = articlesDb.getBySlug(slug);
-  if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
-
-  const isRu      = req.query.lang === 'ru';
-  const title     = trWd(article, 'title', isRu) || 'Стаття';
-  const excerpt   = trWd(article, 'excerpt', isRu).slice(0, 160);
-  const content   = trWd(article, 'content', isRu);
-  const siteUrl   = 'https://webdesign.mycomputer.education';
-  const pageUrl   = `${siteUrl}/articles/${slug}`;
-  const fullTitle = `${title} — My Computer Academy`;
-
-  const publishedIso = article.publishedAt
-    ? new Date(article.publishedAt).toISOString() : new Date().toISOString();
-
-  const dateStr = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
-    : '';
-  const related = articlesDb.getActive().filter(a => a.id !== article.id).slice(0, 4);
-  const relatedHtml = related.length ? `
-          <div class="sidebar-card">
-            <h3>${isRu ? 'Читайте также' : 'Читайте також'}</h3>
-            ${related.map(r => `<a class="sidebar-link" href="/articles/${escHtml(r.slug)}${isRu ? '?lang=ru' : ''}">${r.coverEmoji || '📄'} ${escHtml(trWd(r, 'title', isRu))}</a>`).join('')}
-          </div>` : '';
-  const bodyHtml = content || `<p>${escHtml(excerpt || '')}</p>`;
-
-  const pageContentHtml = `<div id="pageContent">
-    <section class="article-hero">
-      <div class="container">
-        <nav class="article-breadcrumb" aria-label="Навігація">
-          <a href="/">${isRu ? 'Главная' : 'Головна'}</a>
-          <span class="article-breadcrumb-sep">›</span>
-          <a href="/articles">${isRu ? 'Статьи' : 'Статті'}</a>
-        </nav>
-        <div class="article-hero__badge">${article.coverEmoji || '📄'} ${escHtml(article.category || 'навчання')}</div>
-        <h1 class="article-hero__title">${escHtml(title)}</h1>
-        <div class="article-hero__meta">
-          <span>✍️ ${escHtml(article.author || 'My Computer Academy')}</span>
-          <span>📅 ${dateStr}</span>
-        </div>
-      </div>
-    </section>
-
-    <section class="article-body">
-      <div class="article-container">
-        <main class="article-content">
-          ${bodyHtml}
-        </main>
-        <aside class="article-sidebar">
-          <div class="sidebar-cta">
-            <h3>${isRu ? 'Запишите ребёнка на курс' : 'Запишіть дитину на курс'}</h3>
-            <p>${isRu ? 'Первый урок бесплатно — попробуйте без обязательств!' : "Перший урок безкоштовно — спробуйте без зобов'язань!"}</p>
-            <button type="button" onclick="openArtModal()">${isRu ? 'Записаться сейчас →' : 'Записатись зараз →'}</button>
-          </div>${relatedHtml}
-        </aside>
-      </div>
-    </section>
-  </div>`;
-
-  const articleJsonLd = JSON.stringify({
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'Article',
-        '@id': `${pageUrl}#article`,
-        headline: title,
-        description: excerpt,
-        image: `${siteUrl}/og-image.png?v=2`,
-        datePublished: publishedIso,
-        dateModified: publishedIso,
-        inLanguage: isRu ? 'ru' : 'uk',
-        author: { '@type': 'Organization', '@id': `${siteUrl}/#organization`, name: article.author || 'My Computer Academy' },
-        publisher: {
-          '@type': 'Organization', name: 'My Computer Academy',
-          logo: { '@type': 'ImageObject', url: `${siteUrl}/android-chrome-192x192.png`, width: 192, height: 192 },
-        },
-        mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
-      },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: isRu ? 'Главная' : 'Головна', item: `${siteUrl}/` },
-          { '@type': 'ListItem', position: 2, name: isRu ? 'Статьи' : 'Статті', item: `${siteUrl}/articles` },
-          { '@type': 'ListItem', position: 3, name: title, item: pageUrl },
-        ],
-      },
-    ],
-  });
-
-  const hreflangBlock = `
-  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
-  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
-  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>`;
-
-  let html = ARTICLE_HTML_TPL_WD
-    .replace('<title id="pageTitle">Стаття — My Computer Academy</title>',
-             `<title id="pageTitle">${escHtml(fullTitle)}</title>`)
-    .replace('<meta name="description" id="pageDesc" content="Корисні статті про програмування для дітей від My Computer Academy"/>',
-             `<meta name="description" id="pageDesc" content="${escHtml(excerpt) || 'Корисні статті про програмування для дітей від My Computer Academy'}"/>
-  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>${hreflangBlock}
-  <meta property="og:title" content="${escHtml(fullTitle)}"/>
-  <meta property="og:description" content="${escHtml(excerpt)}"/>
-  <meta property="og:url" content="${pageUrl}"/>
-  <meta property="og:type" content="article"/>
-  <meta property="og:image" content="https://webdesign.mycomputer.education/og-image.png?v=2"/>
-  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
-  <script type="application/ld+json">${articleJsonLd}</script>`)
-    .replace(
-      `<div id="pageContent">
-  <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>
-</div>`,
-      pageContentHtml
-    );
-
-  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
-
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.send(html);
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
