@@ -13,6 +13,8 @@ sites/main/Логотипи*/
 **/data/articles.json
 !sites/webdesign/data/articles.json
 !sites/frontend/data/articles.json
+!sites/construct/data/articles.json
+!sites/scratch/data/articles.json
 **/data/mono-invoices.json
 **/data/*.db
 **/data/*.db-wal

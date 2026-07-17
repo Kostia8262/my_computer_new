@@ -435,7 +435,7 @@ app.use(helmet({
       styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
       fontSrc:     ["'self'", "https://fonts.gstatic.com"],
       imgSrc:      ["'self'", "data:", "https:"],
-      connectSrc:  ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://stats.g.doubleclick.net", "https://*.contentsquare.net", "https://mycomputer.school", "https://webdesign.mycomputer.education", "https://python.mycomputer.education", "https://minecraft.mycomputer.education", "https://roblox.mycomputer.education", "https://frontend.mycomputer.education"],
+      connectSrc:  ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://stats.g.doubleclick.net", "https://*.contentsquare.net", "https://mycomputer.school", "https://webdesign.mycomputer.education", "https://python.mycomputer.education", "https://minecraft.mycomputer.education", "https://roblox.mycomputer.education", "https://frontend.mycomputer.education", "https://construct.mycomputer.education"],
       frameSrc:       ["'none'"],
       objectSrc:      ["'none'"],
       scriptSrcAttr:  ["'unsafe-inline'"], // allow onclick/onchange in admin panel
@@ -666,6 +666,7 @@ const EXTERNAL_CANONICAL = {
   roblox: 'https://roblox.mycomputer.education/',
   minecraft: 'https://minecraft.mycomputer.education/',
   web: 'https://frontend.mycomputer.education/',
+  construct: 'https://construct.mycomputer.education/',
 };
 
 // ── DYNAMIC SITEMAP ───────────────────────────────────────────────────────────
