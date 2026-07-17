@@ -16,6 +16,7 @@ sites/main/Логотипи*/
 !sites/construct/data/articles.json
 !sites/scratch/data/articles.json
 !sites/animation/data/articles.json
+!sites/blender/data/articles.json
 **/data/mono-invoices.json
 **/data/*.db
 **/data/*.db-wal

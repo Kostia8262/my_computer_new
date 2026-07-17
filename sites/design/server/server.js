@@ -879,6 +879,7 @@ app.get('/docs/:id.html', (req, res, next) => {
 // carries the deeper/more current content for that topic.
 const EXTERNAL_CANONICAL = {
   animation: 'https://animation.mycomputer.school/',
+  '3d-blender': 'https://blender.mycomputer.school/',
 };
 
 app.get('/sitemap.xml', (req, res) => {
