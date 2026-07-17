@@ -818,10 +818,76 @@ app.get(['/', '/index.html'], (req, res) => {
 
 // ── ARTICLES LISTING LANGUAGE SSR ─────────────────────────────────────────────
 const ARTICLES_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
+// Mirrors client-side LABEL_MAP (articles/index.html) so server-rendered
+// cards match what the JS re-renders on top of them.
+const ARTICLE_LABEL_MAP = {
+  '🤖': {label:'Тренди',              cls:'cat-trends'},
+  '🖼️': {label:"Кар'єра та професії", cls:'cat-career'},
+  '📱': {label:"Кар'єра та професії", cls:'cat-career'},
+  '💼': {label:"Кар'єра та професії", cls:'cat-career'},
+  '🌈': {label:'Розвиток дитини',     cls:'cat-guide'},
+  '✏️': {label:'Розвиток дитини',     cls:'cat-guide'},
+  '📁': {label:'Поради батькам',      cls:'cat-parents'},
+  '🎨': {label:'Поради батькам',      cls:'cat-parents'},
+  '🎬': {label:'Курси',               cls:'cat-dict'},
+  '🖌️': {label:'Вибір курсу',         cls:'cat-tips'},
+};
+function pluralArticles(n) {
+  if (n === 0) return 'статей не знайдено';
+  const m = n % 10, m100 = n % 100;
+  if (m === 1 && m100 !== 11) return n + ' стаття';
+  if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статті';
+  return n + ' статей';
+}
 app.get('/articles', (req, res) => {
   const isRu = req.query.lang === 'ru';
   const siteUrl = 'https://mycomputer.school';
-  let html = ARTICLES_INDEX_TPL.replace(
+
+  // Server-render the actual article cards — previously the grid shipped
+  // empty and only filled in after a client-side fetch('/api/articles'),
+  // so this hub page carried zero real <a href="/articles/..."> links for
+  // crawlers (Google, and non-JS-executing AI crawlers like GPTBot/
+  // ClaudeBot/PerplexityBot alike), weakening internal linking to every post.
+  const activeArticles = articlesDb.getActive();
+  const cardsHtml = activeArticles.map(a => {
+    const ru = ARTICLES_RU[a.slug];
+    const title = (isRu && (ru?.title || a.title_ru)) || a.title;
+    const excerpt = (isRu && (ru?.excerpt || a.excerpt_ru)) || a.excerpt;
+    const lbl = ARTICLE_LABEL_MAP[a.coverEmoji] || { label: escHtml(a.category || 'стаття'), cls: '' };
+    const dateStr = a.publishedAt
+      ? new Date(a.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+    return `
+    <a class="article-card" href="/articles/${escHtml(a.slug)}${isRu ? '?lang=ru' : ''}" aria-label="${escHtml(title)}">
+      <div class="article-card__top">
+        <span class="article-card__emoji">${a.coverEmoji || '📄'}</span>
+        <span class="article-card__cat ${lbl.cls}">${lbl.label}</span>
+      </div>
+      <div class="article-card__body">
+        <h2 class="article-card__title">${escHtml(title)}</h2>
+        <p class="article-card__excerpt">${escHtml(excerpt || '')}</p>
+      </div>
+      <div class="article-card__footer">
+        <span class="article-card__date">${dateStr}</span>
+        <span class="article-card__read">${isRu ? 'Читать →' : 'Читати →'}</span>
+      </div>
+    </a>`;
+  }).join('');
+
+  let html = ARTICLES_INDEX_TPL
+    .replace(
+      '<p class="listing-hero__sub" id="heroSub">Завантаження…</p>',
+      `<p class="listing-hero__sub" id="heroSub">${pluralArticles(activeArticles.length)}</p>`
+    )
+    .replace(
+      '<span class="listing-count" id="listingCount"></span>',
+      `<span class="listing-count" id="listingCount">${pluralArticles(activeArticles.length)}</span>`
+    )
+    .replace(
+      '<div class="listing-grid" id="listingGrid"></div>',
+      `<div class="listing-grid" id="listingGrid">${cardsHtml}</div>`
+    )
+    .replace(
     '<link rel="canonical" href="https://mycomputer.school/articles"/>',
     `<link rel="canonical" href="${siteUrl}/articles${isRu ? '?lang=ru' : ''}"/>
   <link rel="alternate" hreflang="uk" href="${siteUrl}/articles"/>
@@ -2120,6 +2186,62 @@ app.get('/articles/:slug', (req, res) => {
     ],
   });
 
+  // Server-render the real article body too — previously only SEO meta was
+  // injected server-side while the actual content only appeared after a
+  // client-side fetch('/api/articles') populated #pageContent, so crawlers
+  // that don't execute JS (Google's non-JS pass, and most AI crawlers —
+  // GPTBot, ClaudeBot, PerplexityBot, etc.) saw an empty "Завантаження..."
+  // placeholder instead of the article text.
+  const content = (isRu && (ru?.content || article.content_ru)) || article.content || '';
+  const dateStr = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+  const related = articlesDb.getActive().filter(a => a.id !== article.id).slice(0, 4);
+  const relatedHtml = related.length ? `
+          <div class="sidebar-card">
+            <h3>${isRu ? 'Читайте также' : 'Читайте також'}</h3>
+            ${related.map(r => {
+              const rRu = ARTICLES_RU[r.slug];
+              const rTitle = (isRu && (rRu?.title || r.title_ru)) || r.title;
+              return `<a class="sidebar-link" href="/articles/${escHtml(r.slug)}${isRu ? '?lang=ru' : ''}">${r.coverEmoji || '📄'} ${escHtml(rTitle)}</a>`;
+            }).join('')}
+          </div>` : '';
+  const bodyHtml = content || `<p>${escHtml(excerpt || '')}</p>`;
+
+  const pageContentHtml = `<div id="pageContent">
+  <section class="article-hero">
+    <div class="container">
+      <a href="/articles" class="article-back-btn">← ${isRu ? 'Назад к статьям' : 'Назад до статей'}</a>
+      <nav class="article-breadcrumb" aria-label="Навігація">
+        <a href="/">${isRu ? 'Главная' : 'Головна'}</a>
+        <span class="article-breadcrumb-sep">›</span>
+        <a href="/articles">${isRu ? 'Статьи' : 'Статті'}</a>
+      </nav>
+      <div class="article-hero__badge">${article.coverEmoji || '📄'} ${escHtml(article.category || 'навчання')}</div>
+      <h1 class="article-hero__title">${escHtml(title)}</h1>
+      <div class="article-hero__meta">
+        <span>${escHtml(article.author || 'My Computer Academy')}</span>
+        <span>${dateStr}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="article-body">
+    <div class="article-container">
+      <main class="article-content">
+        ${bodyHtml}
+      </main>
+      <aside class="article-sidebar">
+        <div class="sidebar-cta">
+          <h3>${isRu ? 'Запишите ребёнка на курс' : 'Запишіть дитину на курс'}</h3>
+          <p>${isRu ? 'Первый урок бесплатно — попробуйте без обязательств!' : "Перший урок безкоштовно — спробуйте без зобов'язань!"}</p>
+          <a href="/#contact">${isRu ? 'Записаться сейчас →' : 'Записатись зараз →'}</a>
+        </div>${relatedHtml}
+      </aside>
+    </div>
+  </section>
+</div>`;
+
   let html = ARTICLE_HTML_TPL
     .replace(
       '<title id="pageTitle">Стаття — My Computer Academy</title>',
@@ -2141,8 +2263,11 @@ app.get('/articles/:slug', (req, res) => {
   <script type="application/ld+json">${articleJsonLd}</script>`
     )
     .replace(
-      '>Стаття — My Computer Academy</h1>',
-      `>${escHtml(title)}</h1>`
+      `<div id="pageContent">
+  <h1 class="vh-seo">Стаття — My Computer Academy</h1>
+  <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>
+</div>`,
+      pageContentHtml
     );
 
   if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
