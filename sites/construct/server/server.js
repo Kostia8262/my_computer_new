@@ -345,6 +345,51 @@ ${artUrls ? '\n' + artUrls + '\n' : ''}
   res.send(xml);
 });
 
+// ── LLMS.TXT ──────────────────────────────────────────────────────────────────
+// Experimental convention (not a ratified standard, unlike robots.txt/
+// sitemap.xml) — a plain-text/markdown digest for LLM crawlers (ChatGPT,
+// Claude, Perplexity) that don't want to parse full HTML for key facts.
+// Low-cost addition, not a substitute for real SSR content.
+app.get('/llms.txt', (req, res) => {
+  const base = 'https://construct.mycomputer.education';
+  const courses = coursesDb.getActive();
+  const articles = articlesDb.getActive();
+
+  const coursesTxt = courses.map(c => `## ${c.name} (${c.age})
+- Тривалість: ${c.duration}, ${c.lessonsCount} занять
+- Формат: онлайн, групи до ${c.groupSize} осіб
+- Вартість: від ${c.price} ₴/міс, перший урок безкоштовно
+${c.description}`).join('\n\n');
+
+  const articlesTxt = articles.map(a =>
+    `- [${a.title}](${base}/articles/${a.slug}): ${a.excerpt}`
+  ).join('\n');
+
+  const txt = `# My Computer Academy — ${courses[0]?.name || 'курс'}
+
+> Онлайн-школа комп'ютерних курсів для дітей від 6 до 18 років. Цей сайт — окремий лендинг курсу під доменом ${base}, частина мережі My Computer Academy.
+
+## Курс
+
+${coursesTxt}
+
+## Статті
+
+${articlesTxt || '(поки немає опублікованих статей)'}
+
+## Контакти
+
+Телефон: +38 (095) 462-46-72, +38 (068) 252-28-76
+Email: my.computer.academy25@gmail.com
+Місто: Дніпро, Україна
+Цей сайт: ${base}
+Головний сайт мережі шкіл: https://mycomputer.education
+`;
+
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.send(txt);
+});
+
 // ── SECURITY: never serve source code or raw data files as static assets ──────
 const STATIC_DATA_ALLOWLIST = new Set(['articles.json', 'content.json']); // only files client JS fetches directly
 app.use((req, res, next) => {
