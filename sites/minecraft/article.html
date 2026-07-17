@@ -252,7 +252,7 @@ async function init() {
     const related = articles.filter(a => a.active !== false && a.id !== article.id).slice(0, 4);
     window.__lastArticle = article;
     window.__lastRelated = related;
-    if (typeof injectArticleSchema === 'function') injectArticleSchema(article);
+    // JSON-LD is now server-rendered (see server/server.js /articles/:slug route)
     renderArticle(article, related);
   } catch { showNotFound(); }
 }
