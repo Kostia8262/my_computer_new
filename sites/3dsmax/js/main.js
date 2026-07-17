@@ -564,6 +564,7 @@ loadReviews();
    ARTICLES — loads from /data/articles.json
    =================================================== */
 const ARTICLE_LABEL_MAP = {
+  '🏛️': {label:"3D-інтер'єри",      cls:'cat-python'},
   '🐍': {label:'Python',            cls:'cat-python'},
   '🧩': {label:'Scratch',           cls:'cat-scratch'},
   '🎮': {label:'Roblox',            cls:'cat-roblox'},

@@ -49,15 +49,16 @@ function run() {
       });
     }
 
-    // ── articles (single-language — no _ru fields on this landing) ────────────
+    // ── articles ────────────────────────────────────────────────────────────
     const articles = readJson('articles.json', []);
     const insArticle = db.prepare(`INSERT INTO articles
-      (slug, title, excerpt, content, category, cover_emoji, author, published_at, active, sort_order)
-      VALUES (@slug, @title, @excerpt, @content, @category, @cover_emoji, @author, @published_at, @active, @sort_order)`);
+      (slug, title, title_ru, excerpt, excerpt_ru, content, content_ru, category, cover_emoji, author, published_at, active, sort_order)
+      VALUES (@slug, @title, @title_ru, @excerpt, @excerpt_ru, @content, @content_ru, @category, @cover_emoji, @author, @published_at, @active, @sort_order)`);
     articles.forEach((a, i) => {
       insArticle.run({
-        slug: a.slug, title: a.title || '',
-        excerpt: a.excerpt || '', content: a.content || '',
+        slug: a.slug, title: a.title || '', title_ru: a.title_ru || '',
+        excerpt: a.excerpt || '', excerpt_ru: a.excerpt_ru || '',
+        content: a.content || '', content_ru: a.content_ru || '',
         category: a.category || 'навчання', cover_emoji: a.coverEmoji || '📄',
         author: a.author || 'My Computer Academy',
         published_at: a.publishedAt || new Date().toISOString().slice(0, 10),
