@@ -361,6 +361,110 @@ app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'admin.html'));
 });
 
+// ── ARTICLES SSR ──────────────────────────────────────────────────────────────
+// Mirrors client-side LABEL_MAP (js/main.js, articles/index.html) so
+// server-rendered cards match what the JS re-renders on top of them.
+const ARTICLE_LABEL_MAP = {
+  '🧊': {label:'3D у Blender',      cls:'cat-python'},
+  '🐍': {label:'Python',            cls:'cat-python'},
+  '🧩': {label:'Scratch',           cls:'cat-scratch'},
+  '🎮': {label:'Roblox',            cls:'cat-roblox'},
+  '🌐': {label:'Веб-розробка',      cls:'cat-web'},
+  '💡': {label:'Для батьків',       cls:'cat-parents'},
+  '🧮': {label:'Математика і код',  cls:'cat-parents'},
+  '🎯': {label:'Вибір курсу',       cls:'cat-tips'},
+  '🔀': {label:'Scratch vs Python', cls:'cat-tips'},
+  '💪': {label:'Мотивація',         cls:'cat-parents'},
+  '🖥': {label:'Формат навчання',   cls:'cat-tips'},
+  '💬': {label:'Гайди',             cls:'cat-guide'},
+  '📁': {label:'Гайди',             cls:'cat-guide'},
+  '💻': {label:'Гайди',             cls:'cat-guide'},
+  '🧹': {label:'Гайди',             cls:'cat-guide'},
+  '🔒': {label:'Гайди',             cls:'cat-guide'},
+  '📖': {label:'Словник',           cls:'cat-dict'},
+  '🎨': {label:'Дизайн',            cls:'cat-design'},
+  '🎭': {label:'Дизайн',            cls:'cat-design'},
+  '🧭': {label:'Дизайн',            cls:'cat-design'},
+  '🤖': {label:'Дизайн',            cls:'cat-design'},
+};
+function pluralArticles(n, isRu) {
+  const m = n % 10, m100 = n % 100;
+  if (isRu) {
+    if (n === 0) return 'статей не найдено';
+    if (m === 1 && m100 !== 11) return n + ' статья';
+    if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статьи';
+    return n + ' статей';
+  }
+  if (n === 0) return 'статей не знайдено';
+  if (m === 1 && m100 !== 11) return n + ' стаття';
+  if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return n + ' статті';
+  return n + ' статей';
+}
+function tr(a, field, isRu) {
+  if (isRu && a[field + '_ru']) return a[field + '_ru'];
+  return a[field] || '';
+}
+
+// Server-render the article listing grid — previously the grid shipped empty
+// and only filled in after a client-side fetch('/data/articles.json'), so
+// this hub page carried zero real <a href="/articles/..."> links for
+// crawlers (Google, and non-JS-executing AI crawlers like GPTBot/ClaudeBot/
+// PerplexityBot alike), weakening internal linking to every post. Registered
+// before express.static() so it takes precedence over the raw file on disk.
+const ARTICLES_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'articles', 'index.html'), 'utf8');
+app.get('/articles', (req, res) => {
+  const isRu = req.query.lang === 'ru';
+  const siteUrl = 'https://blender.mycomputer.school';
+  const activeArticles = articlesDb.getActive();
+
+  const cardsHtml = activeArticles.map(a => {
+    const lbl = ARTICLE_LABEL_MAP[a.coverEmoji] || { label: escHtml(a.category || 'стаття'), cls: '' };
+    const dateStr = a.publishedAt
+      ? new Date(a.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+      : '';
+    return `
+    <a class="article-card" href="/articles/${escHtml(a.slug)}${isRu ? '?lang=ru' : ''}" aria-label="${escHtml(tr(a, 'title', isRu))}">
+      <div class="article-card__top">
+        <span class="article-card__emoji">${a.coverEmoji || '📄'}</span>
+        <span class="article-card__cat ${lbl.cls}">${lbl.label}</span>
+      </div>
+      <div class="article-card__body">
+        <h2 class="article-card__title">${escHtml(tr(a, 'title', isRu))}</h2>
+        <p class="article-card__excerpt">${escHtml(tr(a, 'excerpt', isRu))}</p>
+      </div>
+      <div class="article-card__footer">
+        <span class="article-card__date">${dateStr}</span>
+        <span class="article-card__read">${isRu ? 'Читать →' : 'Читати →'}</span>
+      </div>
+    </a>`;
+  }).join('');
+
+  let html = ARTICLES_INDEX_TPL
+    .replace(
+      '<p class="listing-hero__sub" id="heroSub">Завантаження…</p>',
+      `<p class="listing-hero__sub" id="heroSub">${pluralArticles(activeArticles.length, isRu)}</p>`
+    )
+    .replace(
+      '<span class="listing-count" id="listingCount"></span>',
+      `<span class="listing-count" id="listingCount">${pluralArticles(activeArticles.length, isRu)}</span>`
+    )
+    .replace(
+      '<div class="listing-grid" id="listingGrid"></div>',
+      `<div class="listing-grid" id="listingGrid">${cardsHtml}</div>`
+    );
+
+  const canonicalTag = `<link rel="canonical" href="${siteUrl}/articles${isRu ? '?lang=ru' : ''}"/>
+  <link rel="alternate" hreflang="uk" href="${siteUrl}/articles"/>
+  <link rel="alternate" hreflang="ru" href="${siteUrl}/articles?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${siteUrl}/articles"/>`;
+  html = html.replace(/<link rel="canonical"[^>]*\/>/, canonicalTag);
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
+});
+
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: '1d',           // cache versioned assets (css?v=, js?v=) 1 day
@@ -1430,24 +1534,123 @@ app.get('/articles/:slug', (req, res) => {
   const article = articlesDb.getBySlug(slug);
   if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
 
-  const title     = article.title || 'Стаття';
-  const excerpt   = (article.excerpt || '').slice(0, 160);
+  const isRu      = req.query.lang === 'ru';
+  const title     = tr(article, 'title', isRu) || 'Стаття';
+  const excerpt   = tr(article, 'excerpt', isRu).slice(0, 160);
+  const content   = tr(article, 'content', isRu);
   const siteUrl   = 'https://blender.mycomputer.school';
   const pageUrl   = `${siteUrl}/articles/${slug}`;
   const fullTitle = `${title} — My Computer Academy`;
 
-  const html = ARTICLE_HTML_TPL
+  const publishedIso = article.publishedAt
+    ? new Date(article.publishedAt).toISOString() : new Date().toISOString();
+
+  // Server-render the real article body too — previously only SEO meta was
+  // injected server-side while the actual content only appeared after a
+  // client-side fetch('/data/articles.json') populated #pageContent, so
+  // crawlers that don't execute JS (Google's non-JS pass, and most AI
+  // crawlers — GPTBot, ClaudeBot, PerplexityBot, etc.) saw an empty
+  // "Завантаження..." placeholder instead of the article text.
+  const dateStr = article.publishedAt
+    ? new Date(article.publishedAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
+    : '';
+  const related = articlesDb.getActive().filter(a => a.id !== article.id).slice(0, 4);
+  const relatedHtml = related.length ? `
+          <div class="sidebar-card">
+            <h3>${isRu ? 'Читайте также' : 'Читайте також'}</h3>
+            ${related.map(r => `<a class="sidebar-link" href="/articles/${escHtml(r.slug)}${isRu ? '?lang=ru' : ''}">${r.coverEmoji || '📄'} ${escHtml(tr(r, 'title', isRu))}</a>`).join('')}
+          </div>` : '';
+  const bodyHtml = content || `<p>${escHtml(excerpt || '')}</p>`;
+
+  const pageContentHtml = `<div id="pageContent">
+    <section class="article-hero">
+      <div class="container">
+        <nav class="article-breadcrumb" aria-label="Навігація">
+          <a href="/">${isRu ? 'Главная' : 'Головна'}</a>
+          <span class="article-breadcrumb-sep">›</span>
+          <a href="/articles">${isRu ? 'Статьи' : 'Статті'}</a>
+        </nav>
+        <div class="article-hero__badge">${article.coverEmoji || '📄'} ${escHtml(article.category || 'навчання')}</div>
+        <h1 class="article-hero__title">${escHtml(title)}</h1>
+        <div class="article-hero__meta">
+          <span>✍️ ${escHtml(article.author || 'My Computer Academy')}</span>
+          <span>📅 ${dateStr}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="article-body">
+      <div class="article-container">
+        <main class="article-content">
+          ${bodyHtml}
+        </main>
+        <aside class="article-sidebar">
+          <div class="sidebar-cta">
+            <h3>${isRu ? 'Запишите ребёнка на курс' : 'Запишіть дитину на курс'}</h3>
+            <p>${isRu ? 'Первый урок бесплатно — попробуйте без обязательств!' : "Перший урок безкоштовно — спробуйте без зобов'язань!"}</p>
+            <button type="button" onclick="openArtModal()">${isRu ? 'Записаться сейчас →' : 'Записатись зараз →'}</button>
+          </div>${relatedHtml}
+        </aside>
+      </div>
+    </section>
+  </div>`;
+
+  const articleJsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Article',
+        '@id': `${pageUrl}#article`,
+        headline: title,
+        description: excerpt,
+        image: `${siteUrl}/og-image.png?v=2`,
+        datePublished: publishedIso,
+        dateModified: publishedIso,
+        inLanguage: isRu ? 'ru' : 'uk',
+        author: { '@type': 'Organization', '@id': `${siteUrl}/#organization`, name: article.author || 'My Computer Academy' },
+        publisher: {
+          '@type': 'Organization', name: 'My Computer Academy',
+          logo: { '@type': 'ImageObject', url: `${siteUrl}/android-chrome-192x192.png`, width: 192, height: 192 },
+        },
+        mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: isRu ? 'Главная' : 'Головна', item: `${siteUrl}/` },
+          { '@type': 'ListItem', position: 2, name: isRu ? 'Статьи' : 'Статті', item: `${siteUrl}/articles` },
+          { '@type': 'ListItem', position: 3, name: title, item: pageUrl },
+        ],
+      },
+    ],
+  });
+
+  const hreflangBlock = `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>`;
+
+  let html = ARTICLE_HTML_TPL
     .replace('<title id="pageTitle">Стаття — My Computer Academy</title>',
              `<title id="pageTitle">${escHtml(fullTitle)}</title>`)
     .replace('<meta name="description" id="pageDesc" content="Корисні статті про програмування для дітей від My Computer Academy"/>',
              `<meta name="description" id="pageDesc" content="${escHtml(excerpt) || 'Корисні статті про програмування для дітей від My Computer Academy'}"/>
-  <link rel="canonical" href="${pageUrl}"/>
+  <link rel="canonical" href="${pageUrl}${isRu ? '?lang=ru' : ''}"/>${hreflangBlock}
   <meta property="og:title" content="${escHtml(fullTitle)}"/>
   <meta property="og:description" content="${escHtml(excerpt)}"/>
   <meta property="og:url" content="${pageUrl}"/>
   <meta property="og:type" content="article"/>
   <meta property="og:image" content="https://blender.mycomputer.school/og-image.png?v=2"/>
-  <meta property="og:locale" content="uk_UA"/>`);
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
+  <script type="application/ld+json">${articleJsonLd}</script>`)
+    .replace(
+      `<div id="pageContent">
+  <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>
+</div>`,
+      pageContentHtml
+    );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.send(html);

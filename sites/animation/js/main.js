@@ -564,6 +564,9 @@ loadReviews();
    ARTICLES — loads from /data/articles.json
    =================================================== */
 const ARTICLE_LABEL_MAP = {
+  '🎬': {label:'Анімація',          cls:'cat-python'},
+  '✨': {label:'Анімація',          cls:'cat-python'},
+  '🚀': {label:'Для батьків',       cls:'cat-parents'},
   '🐍': {label:'Python',            cls:'cat-python'},
   '🧩': {label:'Scratch',           cls:'cat-scratch'},
   '🎮': {label:'Roblox',            cls:'cat-roblox'},

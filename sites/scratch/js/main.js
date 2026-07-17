@@ -566,6 +566,7 @@ loadReviews();
 const ARTICLE_LABEL_MAP = {
   '🐍': {label:'Python',            cls:'cat-python'},
   '🧩': {label:'Scratch',           cls:'cat-scratch'},
+  '🎂': {label:'Для батьків',       cls:'cat-parents'},
   '🎮': {label:'Roblox',            cls:'cat-roblox'},
   '🌐': {label:'Веб-розробка',      cls:'cat-web'},
   '💡': {label:'Для батьків',       cls:'cat-parents'},

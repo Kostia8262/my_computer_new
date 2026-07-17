@@ -514,7 +514,8 @@ async function init() {
     const related = articles.filter(a => a.active !== false && a.id !== article.id).slice(0, 4);
     window.__lastArticle = article;
     window.__lastRelated = related;
-    injectArticleSchema(article); // once — renderArticle re-runs on language toggle, schema doesn't need to
+    // JSON-LD is now server-rendered in <head> (see server/server.js), so no
+    // client-side injection here — that would create a duplicate <script> tag.
     renderArticle(article, related);
   } catch { showNotFound(); }
 }
