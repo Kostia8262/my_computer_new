@@ -2463,13 +2463,19 @@ app.get('/courses/:slug', (req, res) => {
         availability: 'https://schema.org/InStock',
         url: `${siteUrl}/#contact`,
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: '4.9',
-        bestRating: '5',
-        worstRating: '1',
-        reviewCount: '127',
-      },
+      aggregateRating: (() => {
+        const activeReviews = reviewsDb.getActive();
+        const avg = activeReviews.length
+          ? (activeReviews.reduce((s, r) => s + (r.rating || 0), 0) / activeReviews.length)
+          : 5;
+        return {
+          '@type': 'AggregateRating',
+          ratingValue: avg.toFixed(1),
+          bestRating: '5',
+          worstRating: '1',
+          reviewCount: String(activeReviews.length || 1),
+        };
+      })(),
     },
   ];
 
