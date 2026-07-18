@@ -15,6 +15,7 @@ function fromRow(row) {
   return {
     id: row.id,
     name: row.name,
+    name_ru: row.name_ru || '',
     emoji: row.emoji,
     age: row.age,
     duration: row.duration,
@@ -22,6 +23,7 @@ function fromRow(row) {
     groupSize: row.group_size,
     price: row.price,
     description: row.description,
+    description_ru: row.description_ru || '',
     color: row.color,
     active: !!row.active,
     curriculum: JSON.parse(row.curriculum || '[]'),
@@ -32,8 +34,8 @@ const selAll   = db.prepare('SELECT * FROM courses ORDER BY sort_order ASC, rowi
 const selById  = db.prepare('SELECT * FROM courses WHERE id = ?');
 const selMaxSort = db.prepare('SELECT MAX(sort_order) AS m FROM courses');
 const insCourse = db.prepare(`INSERT INTO courses
-  (id, name, emoji, age, duration, lessons_count, group_size, price, description, color, active, curriculum, sort_order)
-  VALUES (@id, @name, @emoji, @age, @duration, @lessons_count, @group_size, @price, @description, @color, @active, @curriculum, @sort_order)`);
+  (id, name, name_ru, emoji, age, duration, lessons_count, group_size, price, description, description_ru, color, active, curriculum, sort_order)
+  VALUES (@id, @name, @name_ru, @emoji, @age, @duration, @lessons_count, @group_size, @price, @description, @description_ru, @color, @active, @curriculum, @sort_order)`);
 const delCourse = db.prepare('DELETE FROM courses WHERE id = ?');
 
 module.exports = {
@@ -47,6 +49,7 @@ module.exports = {
     insCourse.run({
       id,
       name:            data.name        || '',
+      name_ru:         data.name_ru      || '',
       emoji:           data.emoji       || '📚',
       age:             data.age         || '',
       duration:        data.duration    || '',
@@ -54,6 +57,7 @@ module.exports = {
       group_size:      parseInt(data.groupSize)    || 0,
       price:           parseFloat(data.price)      || 0,
       description:     data.description || '',
+      description_ru:  data.description_ru || '',
       color:           data.color       || '#6C47FF',
       active:          data.active !== false ? 1 : 0,
       curriculum:      JSON.stringify(
@@ -68,9 +72,9 @@ module.exports = {
     const existing = selById.get(id);
     if (!existing) return null;
     const colMap = {
-      name: 'name', emoji: 'emoji', age: 'age', duration: 'duration',
+      name: 'name', name_ru: 'name_ru', emoji: 'emoji', age: 'age', duration: 'duration',
       lessonsCount: 'lessons_count', groupSize: 'group_size', price: 'price',
-      description: 'description', color: 'color', active: 'active', curriculum: 'curriculum',
+      description: 'description', description_ru: 'description_ru', color: 'color', active: 'active', curriculum: 'curriculum',
     };
     const sets = [];
     const params = { id };

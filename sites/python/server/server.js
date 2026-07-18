@@ -123,53 +123,53 @@ const CONTENT_SEED = {
 (function seedTestData() {
   try {
     if (!coursesDb.getAll().length) {
-      coursesDb.create({ id: 'python', name: 'Python: справжнє програмування', emoji: '🐍', age: '10–14 років', age_group: '10-14', duration: '4 місяці', lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.' });
+      coursesDb.create({ id: 'python', name: 'Python: справжнє програмування', name_ru: 'Python: настоящее программирование', emoji: '🐍', age: '10–14 років', age_group: '10-14', duration: '4 місяці', lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.', description_ru: 'Один из самых популярных языков в мире. Дети пишут реальный код: игры, боты, автоматизацию — и начинают думать как разработчики.' });
       console.log('✅  Seeded python course');
     }
     if (!coursesDb.getAll().some(c => c.id === 'python-7-10')) {
       const shared = { duration: '4 місяці', groupSize: 5, price: 3600, color: '#3b82f6', active: true };
-      coursesDb.create({ id: 'python-7-10', name: 'Python Старт', emoji: '🐢', age: '7–10 років', age_group: '7-10', description: 'Перші кроки в програмуванні через ігри та малюнки', lessonsCount: 10, ...shared, curriculum: [
-        { num: '01', title: 'Знайомство з Python', desc: 'Встановлення, IDLE, print(), перша програма "Hello, World!"' },
-        { num: '02', title: 'Змінні та типи даних', desc: 'Числа, рядки, True/False. Математика в коді.' },
-        { num: '03', title: 'Умови if / else', desc: 'Вчимо Python "думати": порівняння та розгалуження логіки.' },
-        { num: '04', title: 'Цикли for та while', desc: 'Автоматизація повторень. Будуємо патерни та лічильники.' },
-        { num: '05', title: 'Функції', desc: 'Пишемо власні команди: def, return, параметри.' },
-        { num: '06', title: 'Списки', desc: 'Зберігання наборів даних, індекси, len(), sorted().' },
-        { num: '07', title: 'Turtle: малюємо кодом', desc: 'Графіка, фігури, кольори, спіралі та зірки.' },
-        { num: '08', title: 'Minecraft + Python (mcpi)', desc: 'Підключення до Minecraft Education Edition, будуємо споруди та лабіринти кодом.' },
-        { num: '09', title: 'Знайомство зі штучним інтелектом', desc: 'Що таке ШІ та машинне навчання — пояснення на прикладах, гра "навчи комп\'ютер розрізняти котів та собак".' },
-        { num: '🚀', title: 'Фінальний проект', desc: 'Власна малюнкова програма, вікторина або Minecraft-будівля, створена кодом.' },
+      coursesDb.create({ id: 'python-7-10', name: 'Python Старт', name_ru: 'Python Старт', emoji: '🐢', age: '7–10 років', age_group: '7-10', description: 'Перші кроки в програмуванні через ігри та малюнки', description_ru: 'Первые шаги в программировании через игры и рисунки', lessonsCount: 10, ...shared, curriculum: [
+        { num: '01', title: 'Знайомство з Python', desc: 'Встановлення, IDLE, print(), перша програма "Hello, World!"', title_ru: 'Знакомство с Python', desc_ru: 'Установка, IDLE, print(), первая программа &quot;Hello, World!&quot;' },
+        { num: '02', title: 'Змінні та типи даних', desc: 'Числа, рядки, True/False. Математика в коді.', title_ru: 'Переменные и типы данных', desc_ru: 'Числа, строки, True/False. Математика в коде.' },
+        { num: '03', title: 'Умови if / else', desc: 'Вчимо Python "думати": порівняння та розгалуження логіки.', title_ru: 'Условия if / else', desc_ru: 'Учим Python &quot;думать&quot;: сравнение и разветвление логики.' },
+        { num: '04', title: 'Цикли for та while', desc: 'Автоматизація повторень. Будуємо патерни та лічильники.', title_ru: 'Циклы for и while', desc_ru: 'Автоматизация повторений. Строим паттерны и счётчики.' },
+        { num: '05', title: 'Функції', desc: 'Пишемо власні команди: def, return, параметри.', title_ru: 'Функции', desc_ru: 'Пишем собственные команды: def, return, параметры.' },
+        { num: '06', title: 'Списки', desc: 'Зберігання наборів даних, індекси, len(), sorted().', title_ru: 'Списки', desc_ru: 'Хранение наборов данных, индексы, len(), sorted().' },
+        { num: '07', title: 'Turtle: малюємо кодом', desc: 'Графіка, фігури, кольори, спіралі та зірки.', title_ru: 'Turtle: рисуем кодом', desc_ru: 'Графика, фигуры, цвета, спирали и звёзды.' },
+        { num: '08', title: 'Minecraft + Python (mcpi)', desc: 'Підключення до Minecraft Education Edition, будуємо споруди та лабіринти кодом.', title_ru: 'Minecraft + Python (mcpi)', desc_ru: 'Подключение к Minecraft Education Edition, строим сооружения и лабиринты кодом.' },
+        { num: '09', title: 'Знайомство зі штучним інтелектом', desc: 'Що таке ШІ та машинне навчання — пояснення на прикладах, гра "навчи комп\'ютер розрізняти котів та собак".', title_ru: 'Знакомство с искусственным интеллектом', desc_ru: 'Что такое ИИ и машинное обучение — объяснение на примерах, игра &quot;научи компьютер отличать кошек от собак&quot;.' },
+        { num: '🚀', title: 'Фінальний проект', desc: 'Власна малюнкова програма, вікторина або Minecraft-будівля, створена кодом.', title_ru: 'Финальный проект', desc_ru: 'Собственная рисовальная программа, викторина или Minecraft-постройка, созданная кодом.' },
       ]});
-      coursesDb.create({ id: 'python-10-14', name: 'Python: Ігри та боти', emoji: '🎮', age: '10–14 років', age_group: '10-14', description: 'Від синтаксису до власної гри та Telegram-бота', lessonsCount: 13, ...shared, curriculum: [
-        { num: '01', title: 'Основи та VS Code', desc: 'Середовище розробника, синтаксис, типи, умови, цикли.' },
-        { num: '02', title: 'Структури даних', desc: 'Списки, словники, кортежи, set. Коли що використовувати.' },
-        { num: '03', title: 'Функції та модулі', desc: 'Scope, рекурсія, import, власні модулі.' },
-        { num: '04', title: 'Файли та обробка помилок', desc: 'Читання/запис файлів, try/except, власні виключення.' },
-        { num: '05', title: 'Робота з API', desc: 'requests, JSON, отримання даних з відкритих API (погода, курси валют).' },
-        { num: '06', title: 'Pygame: основи', desc: 'Вікно, події, малювання фігур, таймер, FPS-контроль.' },
-        { num: '07', title: 'Pygame: спрайти та анімація', desc: 'Завантаження зображень, спрайт-листи, плавний рух, ефекти.' },
-        { num: '08', title: 'Pygame: повноцінна гра', desc: 'Колізії, рахунок, рівні, звуки, меню старту та кінця гри.' },
-        { num: '09', title: 'Telegram-бот: основи', desc: 'aiogram, команди, клавіатури, відповіді на повідомлення.' },
-        { num: '10', title: 'Telegram-бот: стани та логіка', desc: 'FSM (машина станів), сценарії діалогу, зберігання даних користувача.' },
-        { num: '11', title: 'ШІ у повсякденних задачах', desc: 'Підключення до OpenAI API, генерація тексту та зображень із Python-скрипту.' },
-        { num: '12', title: 'Git та GitHub', desc: 'Контроль версій, commit, push, pull request — публікуємо перший репозиторій.' },
-        { num: '🚀', title: 'Фінальний проект', desc: 'Гра на Pygame, бот з ШІ або автоматизований скрипт — публікація на GitHub.' },
+      coursesDb.create({ id: 'python-10-14', name: 'Python: Ігри та боти', name_ru: 'Python: игры и боты', emoji: '🎮', age: '10–14 років', age_group: '10-14', description: 'Від синтаксису до власної гри та Telegram-бота', description_ru: 'От синтаксиса до собственной игры и Telegram-бота', lessonsCount: 13, ...shared, curriculum: [
+        { num: '01', title: 'Основи та VS Code', desc: 'Середовище розробника, синтаксис, типи, умови, цикли.', title_ru: 'Основы и VS Code', desc_ru: 'Среда разработчика, синтаксис, типы, условия, циклы.' },
+        { num: '02', title: 'Структури даних', desc: 'Списки, словники, кортежи, set. Коли що використовувати.', title_ru: 'Структуры данных', desc_ru: 'Списки, словари, кортежи, set. Когда что использовать.' },
+        { num: '03', title: 'Функції та модулі', desc: 'Scope, рекурсія, import, власні модулі.', title_ru: 'Функции и модули', desc_ru: 'Scope, рекурсия, import, собственные модули.' },
+        { num: '04', title: 'Файли та обробка помилок', desc: 'Читання/запис файлів, try/except, власні виключення.', title_ru: 'Файлы и обработка ошибок', desc_ru: 'Чтение/запись файлов, try/except, собственные исключения.' },
+        { num: '05', title: 'Робота з API', desc: 'requests, JSON, отримання даних з відкритих API (погода, курси валют).', title_ru: 'Работа с API', desc_ru: 'requests, JSON, получение данных из открытых API (погода, курсы валют).' },
+        { num: '06', title: 'Pygame: основи', desc: 'Вікно, події, малювання фігур, таймер, FPS-контроль.', title_ru: 'Pygame: основы', desc_ru: 'Окно, события, рисование фигур, таймер, FPS-контроль.' },
+        { num: '07', title: 'Pygame: спрайти та анімація', desc: 'Завантаження зображень, спрайт-листи, плавний рух, ефекти.', title_ru: 'Pygame: спрайты и анимация', desc_ru: 'Загрузка изображений, спрайт-листы, плавное движение, эффекты.' },
+        { num: '08', title: 'Pygame: повноцінна гра', desc: 'Колізії, рахунок, рівні, звуки, меню старту та кінця гри.', title_ru: 'Pygame: полноценная игра', desc_ru: 'Коллизии, счёт, уровни, звуки, меню старта и конца игры.' },
+        { num: '09', title: 'Telegram-бот: основи', desc: 'aiogram, команди, клавіатури, відповіді на повідомлення.', title_ru: 'Telegram-бот: основы', desc_ru: 'aiogram, команды, клавиатуры, ответы на сообщения.' },
+        { num: '10', title: 'Telegram-бот: стани та логіка', desc: 'FSM (машина станів), сценарії діалогу, зберігання даних користувача.', title_ru: 'Telegram-бот: состояния и логика', desc_ru: 'FSM (машина состояний), сценарии диалога, хранение данных пользователя.' },
+        { num: '11', title: 'ШІ у повсякденних задачах', desc: 'Підключення до OpenAI API, генерація тексту та зображень із Python-скрипту.', title_ru: 'ИИ в повседневных задачах', desc_ru: 'Подключение к OpenAI API, генерация текста и изображений из Python-скрипта.' },
+        { num: '12', title: 'Git та GitHub', desc: 'Контроль версій, commit, push, pull request — публікуємо перший репозиторій.', title_ru: 'Git и GitHub', desc_ru: 'Контроль версий, commit, push, pull request — публикуем первый репозиторий.' },
+        { num: '🚀', title: 'Фінальний проект', desc: 'Гра на Pygame, бот з ШІ або автоматизований скрипт — публікація на GitHub.', title_ru: 'Финальный проект', desc_ru: 'Игра на Pygame, бот с ИИ или автоматизированный скрипт — публикация на GitHub.' },
       ]});
-      coursesDb.create({ id: 'python-14-18', name: 'Python Pro: до портфоліо', emoji: '💻', age: '14–18 років', age_group: '14-18', description: 'Глибокий Python, автоматизація та реальні продукти', lessonsCount: 14, ...shared, curriculum: [
-        { num: '01', title: 'Python Advanced: генератори та декоратори', desc: 'lambda, map/filter, генератори, декоратори — пишемо елегантний код.' },
-        { num: '02', title: 'ООП: класи та об\'єкти', desc: 'Класи, методи, наслідування, інкапсуляція, dunder-методи.' },
-        { num: '03', title: 'Бібліотеки та pip', desc: 'requests, json, datetime, virtual environment — робота з зовнішніми пакетами.' },
-        { num: '04', title: 'Парсинг даних', desc: 'BeautifulSoup, requests-html — автоматичний збір інформації з сайтів.' },
-        { num: '05', title: 'Бази даних: SQLite', desc: 'SQL: SELECT, INSERT, UPDATE, DELETE. Підключення через sqlite3 та SQLAlchemy.' },
-        { num: '06', title: 'Telegram-бот з БД', desc: 'aiogram + SQLite — реєстрація, профілі, адмін-панель, FSM-діалоги.' },
-        { num: '07', title: 'Веб-API на Flask', desc: 'Роутінг, GET/POST, шаблони Jinja2, JSON API, автентифікація.' },
-        { num: '08', title: 'Автоматизація та аналіз даних', desc: 'pandas, openpyxl — читання Excel, статистика, автогенерація звітів.' },
-        { num: '09', title: 'Основи Machine Learning', desc: 'scikit-learn, numpy, matplotlib — лінійна регресія, класифікатори, візуалізація.' },
-        { num: '10', title: 'Нейронні мережі на практиці', desc: 'TensorFlow/Keras — будуємо просту нейромережу, розпізнавання рукописних цифр (MNIST).' },
-        { num: '11', title: 'Робота з LLM та OpenAI API', desc: 'Підключення ChatGPT до власного додатку, prompt engineering, RAG-системи.' },
-        { num: '12', title: 'Git, GitHub та деплой', desc: 'Гілки, pull request, деплой Flask на Railway/Render, змінні оточення.' },
-        { num: '13', title: 'Тестування та якість коду', desc: 'pytest, unittest, mock, linting (flake8/black) — код як у реальному проекті.' },
-        { num: '🚀', title: 'Фінальний проект для портфоліо', desc: 'Повноцінний AI-продукт: бот, Flask-сервіс або ML-застосунок — деплой і GitHub.' },
+      coursesDb.create({ id: 'python-14-18', name: 'Python Pro: до портфоліо', name_ru: 'Python Pro: к портфолио', emoji: '💻', age: '14–18 років', age_group: '14-18', description: 'Глибокий Python, автоматизація та реальні продукти', description_ru: 'Глубокий Python, автоматизация и реальные продукты', lessonsCount: 14, ...shared, curriculum: [
+        { num: '01', title: 'Python Advanced: генератори та декоратори', desc: 'lambda, map/filter, генератори, декоратори — пишемо елегантний код.', title_ru: 'Python Advanced: генераторы и декораторы', desc_ru: 'lambda, map/filter, генераторы, декораторы — пишем элегантный код.' },
+        { num: '02', title: 'ООП: класи та об\'єкти', desc: 'Класи, методи, наслідування, інкапсуляція, dunder-методи.', title_ru: 'ООП: классы и объекты', desc_ru: 'Классы, методы, наследование, инкапсуляция, dunder-методы.' },
+        { num: '03', title: 'Бібліотеки та pip', desc: 'requests, json, datetime, virtual environment — робота з зовнішніми пакетами.', title_ru: 'Библиотеки и pip', desc_ru: 'requests, json, datetime, virtual environment — работа с внешними пакетами.' },
+        { num: '04', title: 'Парсинг даних', desc: 'BeautifulSoup, requests-html — автоматичний збір інформації з сайтів.', title_ru: 'Парсинг данных', desc_ru: 'BeautifulSoup, requests-html — автоматический сбор информации с сайтов.' },
+        { num: '05', title: 'Бази даних: SQLite', desc: 'SQL: SELECT, INSERT, UPDATE, DELETE. Підключення через sqlite3 та SQLAlchemy.', title_ru: 'Базы данных: SQLite', desc_ru: 'SQL: SELECT, INSERT, UPDATE, DELETE. Подключение через sqlite3 и SQLAlchemy.' },
+        { num: '06', title: 'Telegram-бот з БД', desc: 'aiogram + SQLite — реєстрація, профілі, адмін-панель, FSM-діалоги.', title_ru: 'Telegram-бот с БД', desc_ru: 'aiogram + SQLite — регистрация, профили, админ-панель, FSM-диалоги.' },
+        { num: '07', title: 'Веб-API на Flask', desc: 'Роутінг, GET/POST, шаблони Jinja2, JSON API, автентифікація.', title_ru: 'Веб-API на Flask', desc_ru: 'Роутинг, GET/POST, шаблоны Jinja2, JSON API, аутентификация.' },
+        { num: '08', title: 'Автоматизація та аналіз даних', desc: 'pandas, openpyxl — читання Excel, статистика, автогенерація звітів.', title_ru: 'Автоматизация и анализ данных', desc_ru: 'pandas, openpyxl — чтение Excel, статистика, автогенерация отчётов.' },
+        { num: '09', title: 'Основи Machine Learning', desc: 'scikit-learn, numpy, matplotlib — лінійна регресія, класифікатори, візуалізація.', title_ru: 'Основы Machine Learning', desc_ru: 'scikit-learn, numpy, matplotlib — линейная регрессия, классификаторы, визуализация.' },
+        { num: '10', title: 'Нейронні мережі на практиці', desc: 'TensorFlow/Keras — будуємо просту нейромережу, розпізнавання рукописних цифр (MNIST).', title_ru: 'Нейронные сети на практике', desc_ru: 'TensorFlow/Keras — строим простую нейросеть, распознавание рукописных цифр (MNIST).' },
+        { num: '11', title: 'Робота з LLM та OpenAI API', desc: 'Підключення ChatGPT до власного додатку, prompt engineering, RAG-системи.', title_ru: 'Работа с LLM и OpenAI API', desc_ru: 'Подключение ChatGPT к собственному приложению, prompt engineering, RAG-системы.' },
+        { num: '12', title: 'Git, GitHub та деплой', desc: 'Гілки, pull request, деплой Flask на Railway/Render, змінні оточення.', title_ru: 'Git, GitHub и деплой', desc_ru: 'Ветки, pull request, деплой Flask на Railway/Render, переменные окружения.' },
+        { num: '13', title: 'Тестування та якість коду', desc: 'pytest, unittest, mock, linting (flake8/black) — код як у реальному проекті.', title_ru: 'Тестирование и качество кода', desc_ru: 'pytest, unittest, mock, linting (flake8/black) — код как в реальном проекте.' },
+        { num: '🚀', title: 'Фінальний проект для портфоліо', desc: 'Повноцінний AI-продукт: бот, Flask-сервіс або ML-застосунок — деплой і GitHub.', title_ru: 'Финальный проект для портфолио', desc_ru: 'Полноценный AI-продукт: бот, Flask-сервис или ML-приложение — деплой и GitHub.' },
       ]});
       console.log('✅  Seeded python age-group courses (7-10, 10-14, 14-18)');
     }
@@ -1730,14 +1730,105 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// Serve the single course.html for all /courses/:slug SEO URLs
+// Server-render title/description/canonical/hreflang/OG/JSON-LD for
+// /courses/:slug — previously a bare static sendFile with everything set by
+// client JS only (renderCourse() in course.html), so crawlers that don't
+// execute JS saw the literal placeholder "Курс — My Computer Academy" for
+// every course. The visible curriculum/pricing/FAQ body is still rendered by
+// that same client JS — this only fixes the head + structured data, matching
+// the pattern already shipped on main/design's /courses/:slug route.
 const COURSE_SLUGS = ['scratch', 'python', 'roblox', 'web'];
+const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'), 'utf8');
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  const known = COURSE_SLUGS.includes(slug) || coursesDb.getAll().some(c => c.id === slug);
-  if (!known) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  res.sendFile(path.join(__dirname, '..', 'course.html'));
+  const course = coursesDb.getAll().find(c => c.id === slug);
+  if (!course && !COURSE_SLUGS.includes(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  if (!course) return res.sendFile(path.join(__dirname, '..', 'course.html'));
+
+  const isRu    = req.query.lang === 'ru';
+  const name    = (isRu && course.name_ru) ? course.name_ru : course.name;
+  const rawDesc = (isRu && course.description_ru) ? course.description_ru : (course.description || 'Детальна інформація про курс програмування для дітей у My Computer Academy');
+  const desc    = rawDesc.slice(0, 160);
+  const title   = `${name} — My Computer Academy`;
+  const siteUrl = 'https://python.mycomputer.education';
+  const pageUrl = `${siteUrl}/courses/${slug}`;
+
+  const activeReviews = reviewsDb.getActive();
+  const reviewCount = activeReviews.length;
+  const ratingValue = reviewCount
+    ? (activeReviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviewCount).toFixed(1)
+    : null;
+  const durationMonths = course.duration ? parseInt(course.duration) || null : null;
+  const isoPeriod = durationMonths ? `P${durationMonths}M` : null;
+  const hasRu = !!(course.name_ru || course.description_ru);
+
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}/#webpage`,
+        url: pageUrl,
+        name: title,
+        description: desc,
+        inLanguage: isRu ? 'ru' : 'uk',
+        isPartOf: { '@id': `${siteUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, item: { '@id': `${siteUrl}/`, name: isRu ? 'Главная' : 'Головна' } },
+          { '@type': 'ListItem', position: 2, item: { '@id': `${siteUrl}/#courses`, name: isRu ? 'Курсы' : 'Курси' } },
+          { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
+        ],
+      },
+      {
+        '@type': 'Course',
+        '@id': `${pageUrl}/#course`,
+        name,
+        description: rawDesc,
+        url: pageUrl,
+        inLanguage: isRu ? 'ru' : 'uk',
+        educationalLevel: 'Beginner',
+        ...(course.age ? { typicalAgeRange: course.age } : {}),
+        provider: { '@id': `${siteUrl}/#organization` },
+        ...(isoPeriod ? {
+          hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', duration: isoPeriod, inLanguage: isRu ? 'ru' : 'uk' },
+        } : {}),
+        offers: { '@type': 'Offer', priceCurrency: 'UAH', availability: 'https://schema.org/InStock', url: `${siteUrl}/#contact` },
+        ...(ratingValue ? {
+          aggregateRating: { '@type': 'AggregateRating', ratingValue, bestRating: '5', worstRating: '1', reviewCount: String(reviewCount) },
+        } : {}),
+      },
+    ],
+  });
+
+  const hreflangBlock = hasRu ? `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
+  const canonicalUrl = `${pageUrl}${isRu ? '?lang=ru' : ''}`;
+
+  let html = COURSE_HTML_TPL
+    .replace('<title>Курс — My Computer Academy</title>', `<title>${escHtml(title)}</title>`)
+    .replace(
+      '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
+      `<meta name="description" content="${escHtml(desc)}"/>
+  <link rel="canonical" href="${canonicalUrl}"/>${hreflangBlock}
+  <meta property="og:title" content="${escHtml(title)}"/>
+  <meta property="og:description" content="${escHtml(desc)}"/>
+  <meta property="og:url" content="${pageUrl}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="${siteUrl}/og-image.png?v=2"/>
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
+  <script type="application/ld+json">${jsonLd}</script>`
+    );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────

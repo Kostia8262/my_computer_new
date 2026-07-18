@@ -123,58 +123,58 @@ const CONTENT_SEED = {
 (function seedTestData() {
   try {
     if (!coursesDb.getAll().length) {
-      coursesDb.create({ id: 'minecraft', name: 'Minecraft: програмування в грі', emoji: '⛏️', age: '9–14 років', age_group: '10-14', duration: '3 місяці', lessonsCount: 24, groupSize: 5, price: 3600, color: '#22c55e', description: 'Любиш будувати в Minecraft? Навчись створювати моди та міні-ігри! Діти вивчають Python та логіку програмування через улюблену гру.' });
+      coursesDb.create({ id: 'minecraft', name: 'Minecraft: програмування в грі', name_ru: 'Minecraft: программирование в игре', emoji: '⛏️', age: '9–14 років', age_group: '10-14', duration: '3 місяці', lessonsCount: 24, groupSize: 5, price: 3600, color: '#22c55e', description: 'Любиш будувати в Minecraft? Навчись створювати моди та міні-ігри! Діти вивчають Python та логіку програмування через улюблену гру.', description_ru: 'Любишь строить в Minecraft? Научись создавать моды и мини-игры! Дети изучают Python и логику программирования через любимую игру.' });
       console.log('✅  Seeded minecraft course');
     }
     if (!coursesDb.getAll().some(c => c.id === 'minecraft-8-10')) {
       const shared = { duration: '3 місяці', groupSize: 5, price: 3600, color: '#22c55e', active: true };
-      coursesDb.create({ id: 'minecraft-8-10', name: 'Minecraft Старт', emoji: '⛏️', age: '8–10 років', age_group: '8-10', description: '20 занять · Education Edition: агент, Code Builder, Redstone, фінальний проект', lessonsCount: 20, ...shared, curriculum: [
-        { num: '01', title: 'Знайомство з Minecraft Education', desc: 'Встановлення, відмінності від звичайного Minecraft, перший вхід, знайомство з агентом.' },
-        { num: '02', title: 'Агент: базові команди', desc: 'forward(), turn(), place(), collect() — командуємо агентом вручну, крок за кроком.' },
-        { num: '03', title: 'Code Builder: перша програма', desc: 'Блоковий код у MakeCode — складаємо перший алгоритм без тексту, тільки блоки і логіка.' },
-        { num: '04', title: 'Цикли: будуємо стіни', desc: '«Повторити 10 разів: поставити блок, рухатись» — будівництво автоматично.' },
-        { num: '05', title: 'Змінні та лічильники', desc: 'Зберігаємо кількість кроків у змінній — агент будує стіни будь-якої висоти.' },
-        { num: '06', title: 'Умови: агент думає сам', desc: 'if-блоки: «якщо є блок попереду — повернись» — перша умовна логіка.' },
-        { num: '07', title: 'Лабіринт та алгоритм виходу', desc: 'Пишемо покроковий алгоритм для проходження лабіринту — «правило правої руки».' },
-        { num: '08', title: 'Міст через ущелину', desc: 'Агент будує міст автоматично: рухається, перевіряє глибину, ставить блоки.' },
-        { num: '09', title: 'Система координат у Minecraft', desc: 'X, Y, Z — що означає кожна вісь, як орієнтуватись і ставити блоки за координатами.' },
-        { num: '10', title: 'Будівництво за планом', desc: 'Малюємо blueprint на папері, потім реалізуємо кодом — від схеми до реальної будівлі.' },
-        { num: '11', title: 'Симетрія та дзеркальне будівництво', desc: 'Будуємо половину будівлі — агент автоматично дзеркалить другу половину.' },
-        { num: '12', title: 'Міні-проект: замок', desc: 'Вежа, стіни, ворота — перший великий проект із кількох частин, 2 заняття.' },
-        { num: '13', title: 'Redstone: схеми та сигнали', desc: 'Як працює Redstone, кнопки, важелі — перші електронні схеми у Minecraft.' },
-        { num: '14', title: 'Двері, пастки, таємні входи', desc: 'Двері на кнопку, прихований важіль, пастка з поршнем — практична Redstone-логіка.' },
-        { num: '15', title: 'Автоматична ферма', desc: 'Диспенсер + таймер + збір урожаю — повний цикл автоматики на Redstone.' },
-        { num: '16', title: 'Підземний бункер', desc: 'Таємний вхід через книжкову полицю, Redstone-освітлення, схованки — фан-проект.' },
-        { num: '17', title: 'Планування фінального проекту', desc: 'Кожен обирає тему: місто, замок, острів, парк — малюємо план і розбиваємо на частини.' },
-        { num: '18', title: 'Фінальний проект, частина 1', desc: 'Основа, каркас, головна споруда — реалізуємо перший блок плану.' },
-        { num: '19', title: 'Фінальний проект, частина 2', desc: 'Деталі, Redstone-механіки, оформлення — доводимо проект до завершення.' },
-        { num: '🚀', title: 'Захист і демонстрація', desc: 'Кожен учень презентує свій світ батькам — розповідає про рішення, отримує сертифікат.' },
+      coursesDb.create({ id: 'minecraft-8-10', name: 'Minecraft Старт', name_ru: 'Minecraft Старт', emoji: '⛏️', age: '8–10 років', age_group: '8-10', description: '20 занять · Education Edition: агент, Code Builder, Redstone, фінальний проект', description_ru: '20 занятий · Education Edition: агент, Code Builder, Redstone, финальный проект', lessonsCount: 20, ...shared, curriculum: [
+        { num: '01', title: 'Знайомство з Minecraft Education', desc: 'Встановлення, відмінності від звичайного Minecraft, перший вхід, знайомство з агентом.', title_ru: 'Знакомство с Minecraft Education', desc_ru: 'Установка, отличия от обычного Minecraft, первый вход, знакомство с агентом.' },
+        { num: '02', title: 'Агент: базові команди', desc: 'forward(), turn(), place(), collect() — командуємо агентом вручну, крок за кроком.', title_ru: 'Агент: базовые команды', desc_ru: 'forward(), turn(), place(), collect() — командуем агентом вручную, шаг за шагом.' },
+        { num: '03', title: 'Code Builder: перша програма', desc: 'Блоковий код у MakeCode — складаємо перший алгоритм без тексту, тільки блоки і логіка.', title_ru: 'Code Builder: первая программа', desc_ru: 'Блочный код в MakeCode — собираем первый алгоритм без текста, только блоки и логика.' },
+        { num: '04', title: 'Цикли: будуємо стіни', desc: '«Повторити 10 разів: поставити блок, рухатись» — будівництво автоматично.', title_ru: 'Циклы: строим стены', desc_ru: '«Повторить 10 раз: поставить блок, двигаться» — строительство автоматически.' },
+        { num: '05', title: 'Змінні та лічильники', desc: 'Зберігаємо кількість кроків у змінній — агент будує стіни будь-якої висоти.', title_ru: 'Переменные и счётчики', desc_ru: 'Храним количество шагов в переменной — агент строит стены любой высоты.' },
+        { num: '06', title: 'Умови: агент думає сам', desc: 'if-блоки: «якщо є блок попереду — повернись» — перша умовна логіка.', title_ru: 'Условия: агент думает сам', desc_ru: 'if-блоки: «если есть блок впереди — повернись» — первая условная логика.' },
+        { num: '07', title: 'Лабіринт та алгоритм виходу', desc: 'Пишемо покроковий алгоритм для проходження лабіринту — «правило правої руки».', title_ru: 'Лабиринт и алгоритм выхода', desc_ru: 'Пишем пошаговый алгоритм для прохождения лабиринта — «правило правой руки».' },
+        { num: '08', title: 'Міст через ущелину', desc: 'Агент будує міст автоматично: рухається, перевіряє глибину, ставить блоки.', title_ru: 'Мост через ущелье', desc_ru: 'Агент строит мост автоматически: движется, проверяет глубину, ставит блоки.' },
+        { num: '09', title: 'Система координат у Minecraft', desc: 'X, Y, Z — що означає кожна вісь, як орієнтуватись і ставити блоки за координатами.', title_ru: 'Система координат в Minecraft', desc_ru: 'X, Y, Z — что означает каждая ось, как ориентироваться и ставить блоки по координатам.' },
+        { num: '10', title: 'Будівництво за планом', desc: 'Малюємо blueprint на папері, потім реалізуємо кодом — від схеми до реальної будівлі.', title_ru: 'Строительство по плану', desc_ru: 'Рисуем blueprint на бумаге, потом реализуем кодом — от схемы к реальному зданию.' },
+        { num: '11', title: 'Симетрія та дзеркальне будівництво', desc: 'Будуємо половину будівлі — агент автоматично дзеркалить другу половину.', title_ru: 'Симметрия и зеркальное строительство', desc_ru: 'Строим половину здания — агент автоматически зеркалит вторую половину.' },
+        { num: '12', title: 'Міні-проект: замок', desc: 'Вежа, стіни, ворота — перший великий проект із кількох частин, 2 заняття.', title_ru: 'Мини-проект: замок', desc_ru: 'Башня, стены, ворота — первый большой проект из нескольких частей, 2 занятия.' },
+        { num: '13', title: 'Redstone: схеми та сигнали', desc: 'Як працює Redstone, кнопки, важелі — перші електронні схеми у Minecraft.', title_ru: 'Redstone: схемы и сигналы', desc_ru: 'Как работает Redstone, кнопки, рычаги — первые электронные схемы в Minecraft.' },
+        { num: '14', title: 'Двері, пастки, таємні входи', desc: 'Двері на кнопку, прихований важіль, пастка з поршнем — практична Redstone-логіка.', title_ru: 'Двери, ловушки, тайные входы', desc_ru: 'Дверь на кнопку, скрытый рычаг, ловушка с поршнем — практическая Redstone-логика.' },
+        { num: '15', title: 'Автоматична ферма', desc: 'Диспенсер + таймер + збір урожаю — повний цикл автоматики на Redstone.', title_ru: 'Автоматическая ферма', desc_ru: 'Диспенсер + таймер + сбор урожая — полный цикл автоматики на Redstone.' },
+        { num: '16', title: 'Підземний бункер', desc: 'Таємний вхід через книжкову полицю, Redstone-освітлення, схованки — фан-проект.', title_ru: 'Подземный бункер', desc_ru: 'Тайный вход через книжную полку, Redstone-освещение, тайники — фан-проект.' },
+        { num: '17', title: 'Планування фінального проекту', desc: 'Кожен обирає тему: місто, замок, острів, парк — малюємо план і розбиваємо на частини.', title_ru: 'Планирование финального проекта', desc_ru: 'Каждый выбирает тему: город, замок, остров, парк — рисуем план и разбиваем на части.' },
+        { num: '18', title: 'Фінальний проект, частина 1', desc: 'Основа, каркас, головна споруда — реалізуємо перший блок плану.', title_ru: 'Финальный проект, часть 1', desc_ru: 'Основа, каркас, главное сооружение — реализуем первый блок плана.' },
+        { num: '19', title: 'Фінальний проект, частина 2', desc: 'Деталі, Redstone-механіки, оформлення — доводимо проект до завершення.', title_ru: 'Финальный проект, часть 2', desc_ru: 'Детали, Redstone-механики, оформление — доводим проект до завершения.' },
+        { num: '🚀', title: 'Захист і демонстрація', desc: 'Кожен учень презентує свій світ батькам — розповідає про рішення, отримує сертифікат.', title_ru: 'Защита и демонстрация', desc_ru: 'Каждый ученик презентует свой мир родителям — рассказывает о решениях, получает сертификат.' },
       ]});
-      coursesDb.create({ id: 'minecraft-10-14', name: 'Minecraft + Python', emoji: '🐍', age: '10–14 років', age_group: '10-14', description: '24 заняття · mcpi API, функції, ООП, міні-гра та фінальний проект на GitHub', lessonsCount: 24, ...shared, curriculum: [
-        { num: '01', title: 'Python: середовище та основи', desc: 'VS Code, pip, змінні, типи даних, перша програма print() — базові інструменти.' },
-        { num: '02', title: 'Цикли for та while', desc: 'Повторення, лічильники, вкладені цикли — основа будь-якого алгоритму.' },
-        { num: '03', title: 'Умови if / elif / else', desc: 'Гілки коду, порівняння, вкладені умови — написання логіки прийняття рішень.' },
-        { num: '04', title: 'Функції та параметри', desc: 'def, return, аргументи — код без копіювання, перевикористання логіки.' },
-        { num: '05', title: 'Підключення mcpi до Minecraft', desc: 'Встановлення mcpi, mc = Minecraft.create(), перший setBlock() — блоки через Python.' },
-        { num: '06', title: 'Координати та позиція гравця', desc: 'mc.player.getPos(), mc.player.setPos() — отримуємо і змінюємо позицію у світі.' },
-        { num: '07', title: 'Будуємо стіну циклом', desc: 'for x in range(10): mc.setBlock() — перша автоматична споруда повністю кодом.' },
-        { num: '08', title: '3D-структури: вкладені цикли', desc: 'Поверхи, піраміди, куполи — три вкладених for-цикли, тривимірне будівництво.' },
-        { num: '09', title: 'Власна функція build_wall()', desc: 'def build_wall(x, y, z, width, height, block) — будуємо будь-яку стіну одним рядком.' },
-        { num: '10', title: 'Міні-проект: будинок кодом', desc: 'Підлога, стіни, дах, двері — перша повноцінна будівля, побудована функціями.' },
-        { num: '11', title: 'Секретні кімнати та пастки', desc: 'if/else реагує на позицію гравця — телепортація, приховані кімнати, пастки з TNT.' },
-        { num: '12', title: 'Списки та словники', desc: 'list, dict у Python — зберігаємо набори блоків, рецепти споруд, параметри рівнів.' },
-        { num: '13', title: 'Генерація лабіринту', desc: 'random, mc.setBlock у циклі — автоматична генерація унікальних лабіринтів щоразу.' },
-        { num: '14', title: 'Вибухи та ефекти', desc: 'TNT по координатах, спавн мобів, mc.postToChat() — ефекти і зворотній зв\'язок у грі.' },
-        { num: '15', title: 'Читання та запис файлів', desc: 'Зберігаємо налаштування гравця, рекорди, стан гри у .txt і JSON-файли.' },
-        { num: '16', title: 'Основи ООП: клас Builder', desc: 'class Builder — методи build(), clear(), teleport() — перший об\'єктно-орієнтований код.' },
-        { num: '17', title: 'Міні-гра: платформер або квест', desc: 'Рівні, умови перемоги, рахунок — повноцінна міні-гра всередині Minecraft на Python.' },
-        { num: '18', title: 'GitHub: перший репозиторій', desc: 'git init, commit, push — виставляємо код на GitHub, README, перше портфоліо.' },
-        { num: '19', title: 'Планування фінального проекту', desc: 'Ідея, архітектура, розбивка на файли та функції — план проекту на папері і в коді.' },
-        { num: '20', title: 'Фінальний проект, частина 1', desc: 'Основна механіка, ключові функції, перший робочий прототип.' },
-        { num: '21', title: 'Фінальний проект, частина 2', desc: 'Деталі, баланс, ефекти, фікс багів — доводимо до презентабельного стану.' },
-        { num: '22', title: 'Фінальний проект, частина 3', desc: 'Тестування, оптимізація, README на GitHub — готуємо до публічного показу.' },
-        { num: '23', title: 'Code review та рефакторинг', desc: 'Переглядаємо код одне одного, знаходимо покращення, вчимося читати чужий код.' },
-        { num: '🚀', title: 'Захист і демонстрація', desc: 'Кожен учень показує міні-гру або архітектурний об\'єкт, пояснює код — сертифікат і GitHub.' },
+      coursesDb.create({ id: 'minecraft-10-14', name: 'Minecraft + Python', name_ru: 'Minecraft + Python', emoji: '🐍', age: '10–14 років', age_group: '10-14', description: '24 заняття · mcpi API, функції, ООП, міні-гра та фінальний проект на GitHub', description_ru: '24 занятия · mcpi API, функции, ООП, мини-игра и финальный проект на GitHub', lessonsCount: 24, ...shared, curriculum: [
+        { num: '01', title: 'Python: середовище та основи', desc: 'VS Code, pip, змінні, типи даних, перша програма print() — базові інструменти.', title_ru: 'Python: среда и основы', desc_ru: 'VS Code, pip, переменные, типы данных, первая программа print() — базовые инструменты.' },
+        { num: '02', title: 'Цикли for та while', desc: 'Повторення, лічильники, вкладені цикли — основа будь-якого алгоритму.', title_ru: 'Циклы for и while', desc_ru: 'Повторение, счётчики, вложенные циклы — основа любого алгоритма.' },
+        { num: '03', title: 'Умови if / elif / else', desc: 'Гілки коду, порівняння, вкладені умови — написання логіки прийняття рішень.', title_ru: 'Условия if / elif / else', desc_ru: 'Ветки кода, сравнения, вложенные условия — написание логики принятия решений.' },
+        { num: '04', title: 'Функції та параметри', desc: 'def, return, аргументи — код без копіювання, перевикористання логіки.', title_ru: 'Функции и параметры', desc_ru: 'def, return, аргументы — код без копирования, повторное использование логики.' },
+        { num: '05', title: 'Підключення mcpi до Minecraft', desc: 'Встановлення mcpi, mc = Minecraft.create(), перший setBlock() — блоки через Python.', title_ru: 'Подключение mcpi к Minecraft', desc_ru: 'Установка mcpi, mc = Minecraft.create(), первый setBlock() — блоки через Python.' },
+        { num: '06', title: 'Координати та позиція гравця', desc: 'mc.player.getPos(), mc.player.setPos() — отримуємо і змінюємо позицію у світі.', title_ru: 'Координаты и позиция игрока', desc_ru: 'mc.player.getPos(), mc.player.setPos() — получаем и меняем позицию в мире.' },
+        { num: '07', title: 'Будуємо стіну циклом', desc: 'for x in range(10): mc.setBlock() — перша автоматична споруда повністю кодом.', title_ru: 'Строим стену циклом', desc_ru: 'for x in range(10): mc.setBlock() — первая автоматическая постройка полностью кодом.' },
+        { num: '08', title: '3D-структури: вкладені цикли', desc: 'Поверхи, піраміди, куполи — три вкладених for-цикли, тривимірне будівництво.', title_ru: '3D-структуры: вложенные циклы', desc_ru: 'Этажи, пирамиды, купола — три вложенных for-цикла, трёхмерное строительство.' },
+        { num: '09', title: 'Власна функція build_wall()', desc: 'def build_wall(x, y, z, width, height, block) — будуємо будь-яку стіну одним рядком.', title_ru: 'Собственная функция build_wall()', desc_ru: 'def build_wall(x, y, z, width, height, block) — строим любую стену одной строкой.' },
+        { num: '10', title: 'Міні-проект: будинок кодом', desc: 'Підлога, стіни, дах, двері — перша повноцінна будівля, побудована функціями.', title_ru: 'Мини-проект: дом кодом', desc_ru: 'Пол, стены, крыша, двери — первое полноценное здание, построенное функциями.' },
+        { num: '11', title: 'Секретні кімнати та пастки', desc: 'if/else реагує на позицію гравця — телепортація, приховані кімнати, пастки з TNT.', title_ru: 'Секретные комнаты и ловушки', desc_ru: 'if/else реагирует на позицию игрока — телепортация, скрытые комнаты, ловушки с TNT.' },
+        { num: '12', title: 'Списки та словники', desc: 'list, dict у Python — зберігаємо набори блоків, рецепти споруд, параметри рівнів.', title_ru: 'Списки и словари', desc_ru: 'list, dict в Python — храним наборы блоков, рецепты построек, параметры уровней.' },
+        { num: '13', title: 'Генерація лабіринту', desc: 'random, mc.setBlock у циклі — автоматична генерація унікальних лабіринтів щоразу.', title_ru: 'Генерация лабиринта', desc_ru: 'random, mc.setBlock в цикле — автоматическая генерация уникальных лабиринтов каждый раз.' },
+        { num: '14', title: 'Вибухи та ефекти', desc: 'TNT по координатах, спавн мобів, mc.postToChat() — ефекти і зворотній зв\'язок у грі.', title_ru: 'Взрывы и эффекты', desc_ru: 'TNT по координатам, спавн мобов, mc.postToChat() — эффекты и обратная связь в игре.' },
+        { num: '15', title: 'Читання та запис файлів', desc: 'Зберігаємо налаштування гравця, рекорди, стан гри у .txt і JSON-файли.', title_ru: 'Чтение и запись файлов', desc_ru: 'Сохраняем настройки игрока, рекорды, состояние игры в .txt и JSON-файлы.' },
+        { num: '16', title: 'Основи ООП: клас Builder', desc: 'class Builder — методи build(), clear(), teleport() — перший об\'єктно-орієнтований код.', title_ru: 'Основы ООП: класс Builder', desc_ru: 'class Builder — методы build(), clear(), teleport() — первый объектно-ориентированный код.' },
+        { num: '17', title: 'Міні-гра: платформер або квест', desc: 'Рівні, умови перемоги, рахунок — повноцінна міні-гра всередині Minecraft на Python.', title_ru: 'Мини-игра: платформер или квест', desc_ru: 'Уровни, условия победы, счёт — полноценная мини-игра внутри Minecraft на Python.' },
+        { num: '18', title: 'GitHub: перший репозиторій', desc: 'git init, commit, push — виставляємо код на GitHub, README, перше портфоліо.', title_ru: 'GitHub: первый репозиторий', desc_ru: 'git init, commit, push — выкладываем код на GitHub, README, первое портфолио.' },
+        { num: '19', title: 'Планування фінального проекту', desc: 'Ідея, архітектура, розбивка на файли та функції — план проекту на папері і в коді.', title_ru: 'Планирование финального проекта', desc_ru: 'Идея, архитектура, разбивка на файлы и функции — план проекта на бумаге и в коде.' },
+        { num: '20', title: 'Фінальний проект, частина 1', desc: 'Основна механіка, ключові функції, перший робочий прототип.', title_ru: 'Финальный проект, часть 1', desc_ru: 'Основная механика, ключевые функции, первый рабочий прототип.' },
+        { num: '21', title: 'Фінальний проект, частина 2', desc: 'Деталі, баланс, ефекти, фікс багів — доводимо до презентабельного стану.', title_ru: 'Финальный проект, часть 2', desc_ru: 'Детали, баланс, эффекты, фикс багов — доводим до презентабельного состояния.' },
+        { num: '22', title: 'Фінальний проект, частина 3', desc: 'Тестування, оптимізація, README на GitHub — готуємо до публічного показу.', title_ru: 'Финальный проект, часть 3', desc_ru: 'Тестирование, оптимизация, README на GitHub — готовим к публичному показу.' },
+        { num: '23', title: 'Code review та рефакторинг', desc: 'Переглядаємо код одне одного, знаходимо покращення, вчимося читати чужий код.', title_ru: 'Code review и рефакторинг', desc_ru: 'Просматриваем код друг друга, находим улучшения, учимся читать чужой код.' },
+        { num: '🚀', title: 'Захист і демонстрація', desc: 'Кожен учень показує міні-гру або архітектурний об\'єкт, пояснює код — сертифікат і GitHub.', title_ru: 'Защита и демонстрация', desc_ru: 'Каждый ученик показывает мини-игру или архитектурный объект, объясняет код — сертификат и GitHub.' },
       ]});
       console.log('✅  Seeded minecraft age-group courses (8-10, 10-14)');
     }
@@ -1720,14 +1720,105 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// Serve the single course.html for all /courses/:slug SEO URLs
+// Server-render title/description/canonical/hreflang/OG/JSON-LD for
+// /courses/:slug — previously a bare static sendFile with everything set by
+// client JS only (renderCourse() in course.html), so crawlers that don't
+// execute JS saw the literal placeholder "Курс — My Computer Academy" for
+// every course. The visible curriculum/pricing/FAQ body is still rendered by
+// that same client JS — this only fixes the head + structured data, matching
+// the pattern already shipped on main/design's /courses/:slug route.
 const COURSE_SLUGS = ['scratch', 'python', 'roblox', 'web'];
+const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'), 'utf8');
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  const known = COURSE_SLUGS.includes(slug) || coursesDb.getAll().some(c => c.id === slug);
-  if (!known) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  res.sendFile(path.join(__dirname, '..', 'course.html'));
+  const course = coursesDb.getAll().find(c => c.id === slug);
+  if (!course && !COURSE_SLUGS.includes(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  if (!course) return res.sendFile(path.join(__dirname, '..', 'course.html'));
+
+  const isRu    = req.query.lang === 'ru';
+  const name    = (isRu && course.name_ru) ? course.name_ru : course.name;
+  const rawDesc = (isRu && course.description_ru) ? course.description_ru : (course.description || 'Детальна інформація про курс програмування для дітей у My Computer Academy');
+  const desc    = rawDesc.slice(0, 160);
+  const title   = `${name} — My Computer Academy`;
+  const siteUrl = 'https://minecraft.mycomputer.education';
+  const pageUrl = `${siteUrl}/courses/${slug}`;
+
+  const activeReviews = reviewsDb.getActive();
+  const reviewCount = activeReviews.length;
+  const ratingValue = reviewCount
+    ? (activeReviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviewCount).toFixed(1)
+    : null;
+  const durationMonths = course.duration ? parseInt(course.duration) || null : null;
+  const isoPeriod = durationMonths ? `P${durationMonths}M` : null;
+  const hasRu = !!(course.name_ru || course.description_ru);
+
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}/#webpage`,
+        url: pageUrl,
+        name: title,
+        description: desc,
+        inLanguage: isRu ? 'ru' : 'uk',
+        isPartOf: { '@id': `${siteUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, item: { '@id': `${siteUrl}/`, name: isRu ? 'Главная' : 'Головна' } },
+          { '@type': 'ListItem', position: 2, item: { '@id': `${siteUrl}/#courses`, name: isRu ? 'Курсы' : 'Курси' } },
+          { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
+        ],
+      },
+      {
+        '@type': 'Course',
+        '@id': `${pageUrl}/#course`,
+        name,
+        description: rawDesc,
+        url: pageUrl,
+        inLanguage: isRu ? 'ru' : 'uk',
+        educationalLevel: 'Beginner',
+        ...(course.age ? { typicalAgeRange: course.age } : {}),
+        provider: { '@id': `${siteUrl}/#organization` },
+        ...(isoPeriod ? {
+          hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', duration: isoPeriod, inLanguage: isRu ? 'ru' : 'uk' },
+        } : {}),
+        offers: { '@type': 'Offer', priceCurrency: 'UAH', availability: 'https://schema.org/InStock', url: `${siteUrl}/#contact` },
+        ...(ratingValue ? {
+          aggregateRating: { '@type': 'AggregateRating', ratingValue, bestRating: '5', worstRating: '1', reviewCount: String(reviewCount) },
+        } : {}),
+      },
+    ],
+  });
+
+  const hreflangBlock = hasRu ? `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
+  const canonicalUrl = `${pageUrl}${isRu ? '?lang=ru' : ''}`;
+
+  let html = COURSE_HTML_TPL
+    .replace('<title>Курс — My Computer Academy</title>', `<title>${escHtml(title)}</title>`)
+    .replace(
+      '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
+      `<meta name="description" content="${escHtml(desc)}"/>
+  <link rel="canonical" href="${canonicalUrl}"/>${hreflangBlock}
+  <meta property="og:title" content="${escHtml(title)}"/>
+  <meta property="og:description" content="${escHtml(desc)}"/>
+  <meta property="og:url" content="${pageUrl}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="${siteUrl}/og-image.png?v=2"/>
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
+  <script type="application/ld+json">${jsonLd}</script>`
+    );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────

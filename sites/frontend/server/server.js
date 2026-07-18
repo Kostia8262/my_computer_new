@@ -123,38 +123,38 @@ const CONTENT_SEED = {
 (function seedTestData() {
   try {
     if (!coursesDb.getAll().length) {
-      coursesDb.create({ id: 'web', name: 'Веб-розробка: HTML, CSS, JavaScript', emoji: '🌐', age: '10–18 років', age_group: '10-14,14-18', duration: '5 місяців', lessonsCount: 40, groupSize: 5, price: 3600, color: '#8b5cf6', description: 'Від першої сторінки до повноцінного адаптивного сайту. Реальні задачі, сучасні інструменти та портфоліо на GitHub Pages, яке вже можна показати роботодавцю.' });
+      coursesDb.create({ id: 'web', name: 'Веб-розробка: HTML, CSS, JavaScript', name_ru: 'Веб-разработка: HTML, CSS, JavaScript', emoji: '🌐', age: '10–18 років', age_group: '10-14,14-18', duration: '5 місяців', lessonsCount: 40, groupSize: 5, price: 3600, color: '#8b5cf6', description: 'Від першої сторінки до повноцінного адаптивного сайту. Реальні задачі, сучасні інструменти та портфоліо на GitHub Pages, яке вже можна показати роботодавцю.', description_ru: 'От первой страницы до полноценного адаптивного сайта. Реальные задачи, современные инструменты и портфолио на GitHub Pages, которое уже можно показать работодателю.' });
       console.log('✅  Seeded web course');
     }
     if (!coursesDb.getAll().some(c => c.id === 'frontend-10-14')) {
       const shared = { duration: '5 місяців', groupSize: 5, price: 3600, color: '#8b5cf6', active: true };
-      coursesDb.create({ id: 'frontend-10-14', name: 'Frontend Старт: перший сайт', emoji: '🧱', age: '10–14 років', age_group: '10-14', description: 'Перший крок у веб-розробку: власна сторінка з нуля до публікації', lessonsCount: 11, ...shared, curriculum: [
-        { num: '01', title: 'Як влаштований інтернет', desc: 'Що таке браузер, сервер, HTML/CSS/JS — три ролі веб-сторінки. Знайомство з DevTools.' },
-        { num: '02', title: 'HTML5: структура сторінки', desc: 'Теги, семантика, заголовки, списки, посилання. Перша сторінка — від шапки до підвалу.' },
-        { num: '03', title: 'CSS3: кольори та шрифти', desc: 'Box model, відступи, рамки, типографіка. Сторінка починає виглядати як сайт.' },
-        { num: '04', title: 'Flexbox', desc: 'Сучасне вирівнювання блоків без таблиць — картки, меню, центрування.' },
-        { num: '05', title: 'CSS Grid', desc: 'Сітки для складних макетів: галереї, розкладки в кілька колонок.' },
-        { num: '06', title: 'Адаптивність', desc: 'Media queries, mobile-first — сайт виглядає добре і на телефоні, і на моніторі.' },
-        { num: '07', title: 'JavaScript: змінні та логіка', desc: 'Змінні, умови, цикли — вчимо сторінку "думати".' },
-        { num: '08', title: 'DOM та події', desc: 'Клік, ховер, введення в поле. Перший інтерактив: кнопки, що реагують.' },
-        { num: '09', title: 'Міні-проекти', desc: 'Перемикач теми (світла/темна), фотогалерея, простий калькулятор.' },
-        { num: '10', title: 'Git та GitHub Pages', desc: 'Контроль версій, публікація сайту — справжня адреса в інтернеті.' },
-        { num: '🚀', title: 'Фінальний проект', desc: 'Особиста сторінка-портфоліо, опублікована на GitHub Pages.' },
+      coursesDb.create({ id: 'frontend-10-14', name: 'Frontend Старт: перший сайт', name_ru: 'Frontend Старт: первый сайт', emoji: '🧱', age: '10–14 років', age_group: '10-14', description: 'Перший крок у веб-розробку: власна сторінка з нуля до публікації', description_ru: 'Первый шаг в веб-разработку: собственная страница с нуля до публикации', lessonsCount: 11, ...shared, curriculum: [
+        { num: '01', title: 'Як влаштований інтернет', desc: 'Що таке браузер, сервер, HTML/CSS/JS — три ролі веб-сторінки. Знайомство з DevTools.', title_ru: 'Как устроен интернет', desc_ru: 'Что такое браузер, сервер, HTML/CSS/JS — три роли веб-страницы. Знакомство с DevTools.' },
+        { num: '02', title: 'HTML5: структура сторінки', desc: 'Теги, семантика, заголовки, списки, посилання. Перша сторінка — від шапки до підвалу.', title_ru: 'HTML5: структура страницы', desc_ru: 'Теги, семантика, заголовки, списки, ссылки. Первая страница — от шапки до подвала.' },
+        { num: '03', title: 'CSS3: кольори та шрифти', desc: 'Box model, відступи, рамки, типографіка. Сторінка починає виглядати як сайт.', title_ru: 'CSS3: цвета и шрифты', desc_ru: 'Box model, отступы, рамки, типографика. Страница начинает выглядеть как сайт.' },
+        { num: '04', title: 'Flexbox', desc: 'Сучасне вирівнювання блоків без таблиць — картки, меню, центрування.', title_ru: 'Flexbox', desc_ru: 'Современное выравнивание блоков без таблиц — карточки, меню, центрирование.' },
+        { num: '05', title: 'CSS Grid', desc: 'Сітки для складних макетів: галереї, розкладки в кілька колонок.', title_ru: 'CSS Grid', desc_ru: 'Сетки для сложных макетов: галереи, раскладки в несколько колонок.' },
+        { num: '06', title: 'Адаптивність', desc: 'Media queries, mobile-first — сайт виглядає добре і на телефоні, і на моніторі.', title_ru: 'Адаптивность', desc_ru: 'Media queries, mobile-first — сайт хорошо выглядит и на телефоне, и на мониторе.' },
+        { num: '07', title: 'JavaScript: змінні та логіка', desc: 'Змінні, умови, цикли — вчимо сторінку "думати".', title_ru: 'JavaScript: переменные и логика', desc_ru: 'Переменные, условия, циклы — учим страницу &quot;думать&quot;.' },
+        { num: '08', title: 'DOM та події', desc: 'Клік, ховер, введення в поле. Перший інтерактив: кнопки, що реагують.', title_ru: 'DOM и события', desc_ru: 'Клик, ховер, ввод в поле. Первый интерактив: кнопки, которые реагируют.' },
+        { num: '09', title: 'Міні-проекти', desc: 'Перемикач теми (світла/темна), фотогалерея, простий калькулятор.', title_ru: 'Мини-проекты', desc_ru: 'Переключатель темы (светлая/тёмная), фотогалерея, простой калькулятор.' },
+        { num: '10', title: 'Git та GitHub Pages', desc: 'Контроль версій, публікація сайту — справжня адреса в інтернеті.', title_ru: 'Git и GitHub Pages', desc_ru: 'Контроль версий, публикация сайта — настоящий адрес в интернете.' },
+        { num: '🚀', title: 'Фінальний проект', desc: 'Особиста сторінка-портфоліо, опублікована на GitHub Pages.', title_ru: 'Финальный проект', desc_ru: 'Личная страница-портфолио, опубликованная на GitHub Pages.' },
       ]});
-      coursesDb.create({ id: 'frontend-14-18', name: 'Frontend Pro: сучасна веб-розробка', emoji: '⚛️', age: '14–18 років', age_group: '14-18', description: 'Сучасний JS, React та деплой — портфоліо-проект як у реального розробника', lessonsCount: 13, ...shared, curriculum: [
-        { num: '01', title: 'Сучасний JavaScript (ES6+)', desc: 'let/const, стрілкові функції, деструктуризація, модулі — код у сучасному стилі.' },
-        { num: '02', title: 'Асинхронність', desc: 'Promise, async/await, fetch API — робота з даними, що приходять не одразу.' },
-        { num: '03', title: 'Робота з API', desc: 'Підключення реальних відкритих API, JSON, обробка помилок запитів.' },
-        { num: '04', title: 'CSS-архітектура', desc: 'БЕМ-методологія, CSS-змінні, основи Sass — стилі, які легко підтримувати.' },
-        { num: '05', title: 'Доступна вёрстка', desc: 'Семантика, основи a11y — сайт, зручний для всіх користувачів.' },
-        { num: '06', title: 'Інструменти розробника', desc: 'npm, Vite — збірка проекту як у реальній команді.' },
-        { num: '07', title: 'Вступ до React', desc: 'Компоненти, props, JSX — перший інтерфейс на React.' },
-        { num: '08', title: 'React: хуки', desc: 'useState, useEffect, списки та форми — інтерактивний застосунок.' },
-        { num: '09', title: 'Git у команді', desc: 'Branches, pull request, злиття змін — робота як у справжній розробницькій команді.' },
-        { num: '10', title: 'Деплой проекту', desc: 'Публікація на Netlify/Vercel, власний домен.' },
-        { num: '11', title: 'Основи SEO та швидкості', desc: 'Чому сайт вантажиться швидко і його знаходить Google — базові принципи.' },
-        { num: '12', title: 'Командний проект', desc: 'Розробка сайту в парі: розподіл задач, код-рев\'ю.' },
-        { num: '🚀', title: 'Фінальний проект для портфоліо', desc: 'Повноцінний SPA-застосунок на React, задеплоєний у продакшн.' },
+      coursesDb.create({ id: 'frontend-14-18', name: 'Frontend Pro: сучасна веб-розробка', name_ru: 'Frontend Pro: современная веб-разработка', emoji: '⚛️', age: '14–18 років', age_group: '14-18', description: 'Сучасний JS, React та деплой — портфоліо-проект як у реального розробника', description_ru: 'Современный JS, React и деплой — портфолио-проект как у настоящего разработчика', lessonsCount: 13, ...shared, curriculum: [
+        { num: '01', title: 'Сучасний JavaScript (ES6+)', desc: 'let/const, стрілкові функції, деструктуризація, модулі — код у сучасному стилі.', title_ru: 'Современный JavaScript (ES6+)', desc_ru: 'let/const, стрелочные функции, деструктуризация, модули — код в современном стиле.' },
+        { num: '02', title: 'Асинхронність', desc: 'Promise, async/await, fetch API — робота з даними, що приходять не одразу.', title_ru: 'Асинхронность', desc_ru: 'Promise, async/await, fetch API — работа с данными, которые приходят не сразу.' },
+        { num: '03', title: 'Робота з API', desc: 'Підключення реальних відкритих API, JSON, обробка помилок запитів.', title_ru: 'Работа с API', desc_ru: 'Подключение реальных открытых API, JSON, обработка ошибок запросов.' },
+        { num: '04', title: 'CSS-архітектура', desc: 'БЕМ-методологія, CSS-змінні, основи Sass — стилі, які легко підтримувати.', title_ru: 'CSS-архитектура', desc_ru: 'БЭМ-методология, CSS-переменные, основы Sass — стили, которые легко поддерживать.' },
+        { num: '05', title: 'Доступна вёрстка', desc: 'Семантика, основи a11y — сайт, зручний для всіх користувачів.', title_ru: 'Доступная вёрстка', desc_ru: 'Семантика, основы a11y — сайт, удобный для всех пользователей.' },
+        { num: '06', title: 'Інструменти розробника', desc: 'npm, Vite — збірка проекту як у реальній команді.', title_ru: 'Инструменты разработчика', desc_ru: 'npm, Vite — сборка проекта как в настоящей команде.' },
+        { num: '07', title: 'Вступ до React', desc: 'Компоненти, props, JSX — перший інтерфейс на React.', title_ru: 'Введение в React', desc_ru: 'Компоненты, props, JSX — первый интерфейс на React.' },
+        { num: '08', title: 'React: хуки', desc: 'useState, useEffect, списки та форми — інтерактивний застосунок.', title_ru: 'React: хуки', desc_ru: 'useState, useEffect, списки и формы — интерактивное приложение.' },
+        { num: '09', title: 'Git у команді', desc: 'Branches, pull request, злиття змін — робота як у справжній розробницькій команді.', title_ru: 'Git в команде', desc_ru: 'Branches, pull request, слияние изменений — работа как в настоящей команде разработки.' },
+        { num: '10', title: 'Деплой проекту', desc: 'Публікація на Netlify/Vercel, власний домен.', title_ru: 'Деплой проекта', desc_ru: 'Публикация на Netlify/Vercel, собственный домен.' },
+        { num: '11', title: 'Основи SEO та швидкості', desc: 'Чому сайт вантажиться швидко і його знаходить Google — базові принципи.', title_ru: 'Основы SEO и скорости', desc_ru: 'Почему сайт загружается быстро и его находит Google — базовые принципы.' },
+        { num: '12', title: 'Командний проект', desc: 'Розробка сайту в парі: розподіл задач, код-рев\'ю.', title_ru: 'Командный проект', desc_ru: 'Разработка сайта в паре: распределение задач, код-ревью.' },
+        { num: '🚀', title: 'Фінальний проект для портфоліо', desc: 'Повноцінний SPA-застосунок на React, задеплоєний у продакшн.', title_ru: 'Финальный проект для портфолио', desc_ru: 'Полноценное SPA-приложение на React, задеплоенное в продакшн.' },
       ]});
       console.log('✅  Seeded frontend age-group courses (10-14, 14-18)');
     }
@@ -1656,14 +1656,105 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// Serve the single course.html for all /courses/:slug SEO URLs
+// Server-render title/description/canonical/hreflang/OG/JSON-LD for
+// /courses/:slug — previously a bare static sendFile with everything set by
+// client JS only (renderCourse() in course.html), so crawlers that don't
+// execute JS saw the literal placeholder "Курс — My Computer Academy" for
+// every course. The visible curriculum/pricing/FAQ body is still rendered by
+// that same client JS — this only fixes the head + structured data, matching
+// the pattern already shipped on main/design's /courses/:slug route.
 const COURSE_SLUGS = ['web', 'frontend-10-14', 'frontend-14-18'];
+const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'), 'utf8');
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  const known = COURSE_SLUGS.includes(slug) || coursesDb.getAll().some(c => c.id === slug);
-  if (!known) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  res.sendFile(path.join(__dirname, '..', 'course.html'));
+  const course = coursesDb.getAll().find(c => c.id === slug);
+  if (!course && !COURSE_SLUGS.includes(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  if (!course) return res.sendFile(path.join(__dirname, '..', 'course.html'));
+
+  const isRu    = req.query.lang === 'ru';
+  const name    = (isRu && course.name_ru) ? course.name_ru : course.name;
+  const rawDesc = (isRu && course.description_ru) ? course.description_ru : (course.description || 'Детальна інформація про курс веб-розробки для дітей у My Computer Academy');
+  const desc    = rawDesc.slice(0, 160);
+  const title   = `${name} — My Computer Academy`;
+  const siteUrl = 'https://frontend.mycomputer.education';
+  const pageUrl = `${siteUrl}/courses/${slug}`;
+
+  const activeReviews = reviewsDb.getActive();
+  const reviewCount = activeReviews.length;
+  const ratingValue = reviewCount
+    ? (activeReviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviewCount).toFixed(1)
+    : null;
+  const durationMonths = course.duration ? parseInt(course.duration) || null : null;
+  const isoPeriod = durationMonths ? `P${durationMonths}M` : null;
+  const hasRu = !!(course.name_ru || course.description_ru);
+
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}/#webpage`,
+        url: pageUrl,
+        name: title,
+        description: desc,
+        inLanguage: isRu ? 'ru' : 'uk',
+        isPartOf: { '@id': `${siteUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, item: { '@id': `${siteUrl}/`, name: isRu ? 'Главная' : 'Головна' } },
+          { '@type': 'ListItem', position: 2, item: { '@id': `${siteUrl}/#courses`, name: isRu ? 'Курсы' : 'Курси' } },
+          { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
+        ],
+      },
+      {
+        '@type': 'Course',
+        '@id': `${pageUrl}/#course`,
+        name,
+        description: rawDesc,
+        url: pageUrl,
+        inLanguage: isRu ? 'ru' : 'uk',
+        educationalLevel: 'Beginner',
+        ...(course.age ? { typicalAgeRange: course.age } : {}),
+        provider: { '@id': `${siteUrl}/#organization` },
+        ...(isoPeriod ? {
+          hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', duration: isoPeriod, inLanguage: isRu ? 'ru' : 'uk' },
+        } : {}),
+        offers: { '@type': 'Offer', priceCurrency: 'UAH', availability: 'https://schema.org/InStock', url: `${siteUrl}/#contact` },
+        ...(ratingValue ? {
+          aggregateRating: { '@type': 'AggregateRating', ratingValue, bestRating: '5', worstRating: '1', reviewCount: String(reviewCount) },
+        } : {}),
+      },
+    ],
+  });
+
+  const hreflangBlock = hasRu ? `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
+  const canonicalUrl = `${pageUrl}${isRu ? '?lang=ru' : ''}`;
+
+  let html = COURSE_HTML_TPL
+    .replace('<title>Курс — My Computer Academy</title>', `<title>${escHtml(title)}</title>`)
+    .replace(
+      '<meta name="description" content="Детальна інформація про курс веб-розробки для дітей у My Computer Academy"/>',
+      `<meta name="description" content="${escHtml(desc)}"/>
+  <link rel="canonical" href="${canonicalUrl}"/>${hreflangBlock}
+  <meta property="og:title" content="${escHtml(title)}"/>
+  <meta property="og:description" content="${escHtml(desc)}"/>
+  <meta property="og:url" content="${pageUrl}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="${siteUrl}/og-image.png?v=2"/>
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
+  <script type="application/ld+json">${jsonLd}</script>`
+    );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────

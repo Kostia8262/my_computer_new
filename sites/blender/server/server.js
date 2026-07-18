@@ -124,11 +124,12 @@ const CONTENT_SEED = {
   try {
     if (!coursesDb.getAll().length) {
       coursesDb.create({
-        id: '3d-blender', name: "3D-моделювання у Blender", emoji: "🧊",
+        id: '3d-blender', name: "3D-моделювання у Blender", name_ru: "3D-моделирование в Blender", emoji: "🧊",
         age: "10–16 років", age_group: "10-16",
         duration: "10 місяців", lessonsCount: 80,
         groupSize: 5, price: 3600, color: "#C94B37",
         description: "Безкоштовний і потужний Blender: моделювання, матеріали, освітлення та рендер власних 3D-об'єктів.",
+        description_ru: "Бесплатный и мощный Blender: моделирование, материалы, освещение и рендер собственных 3D-объектов.",
         curriculum: [
         {"num":"Тема 1","title":"Знайомство з Blender","desc":"Інтерфейс, навігація, основні інструменти виділення та трансформації.","title_ru":"Знакомство с Blender","desc_ru":"Интерфейс, навигация, основные инструменты выделения и трансформации."},
         {"num":"Тема 2","title":"Моделювання від примітивів","desc":"Extrude, Loop Cut, Bevel — створення об'єктів з базових форм.","title_ru":"Моделирование от примитивов","desc_ru":"Extrude, Loop Cut, Bevel — создание объектов из базовых форм."},
@@ -1702,14 +1703,105 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// Serve the single course.html for all /courses/:slug SEO URLs
+// Server-render title/description/canonical/hreflang/OG/JSON-LD for
+// /courses/:slug — previously a bare static sendFile with everything set by
+// client JS only (renderCourse() in course.html), so crawlers that don't
+// execute JS saw the literal placeholder "Курс — My Computer Academy" for
+// every course. The visible curriculum/pricing/FAQ body is still rendered by
+// that same client JS — this only fixes the head + structured data, matching
+// the pattern already shipped on main/design's /courses/:slug route.
 const COURSE_SLUGS = ['3d-blender'];
+const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'), 'utf8');
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  const known = COURSE_SLUGS.includes(slug) || coursesDb.getAll().some(c => c.id === slug);
-  if (!known) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  res.sendFile(path.join(__dirname, '..', 'course.html'));
+  const course = coursesDb.getAll().find(c => c.id === slug);
+  if (!course && !COURSE_SLUGS.includes(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  if (!course) return res.sendFile(path.join(__dirname, '..', 'course.html'));
+
+  const isRu    = req.query.lang === 'ru';
+  const name    = (isRu && course.name_ru) ? course.name_ru : course.name;
+  const rawDesc = (isRu && course.description_ru) ? course.description_ru : (course.description || 'Детальна інформація про курс програмування для дітей у My Computer Academy');
+  const desc    = rawDesc.slice(0, 160);
+  const title   = `${name} — My Computer Academy`;
+  const siteUrl = 'https://blender.mycomputer.school';
+  const pageUrl = `${siteUrl}/courses/${slug}`;
+
+  const activeReviews = reviewsDb.getActive();
+  const reviewCount = activeReviews.length;
+  const ratingValue = reviewCount
+    ? (activeReviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviewCount).toFixed(1)
+    : null;
+  const durationMonths = course.duration ? parseInt(course.duration) || null : null;
+  const isoPeriod = durationMonths ? `P${durationMonths}M` : null;
+  const hasRu = !!(course.name_ru || course.description_ru);
+
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}/#webpage`,
+        url: pageUrl,
+        name: title,
+        description: desc,
+        inLanguage: isRu ? 'ru' : 'uk',
+        isPartOf: { '@id': `${siteUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, item: { '@id': `${siteUrl}/`, name: isRu ? 'Главная' : 'Головна' } },
+          { '@type': 'ListItem', position: 2, item: { '@id': `${siteUrl}/#courses`, name: isRu ? 'Курсы' : 'Курси' } },
+          { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
+        ],
+      },
+      {
+        '@type': 'Course',
+        '@id': `${pageUrl}/#course`,
+        name,
+        description: rawDesc,
+        url: pageUrl,
+        inLanguage: isRu ? 'ru' : 'uk',
+        educationalLevel: 'Beginner',
+        ...(course.age ? { typicalAgeRange: course.age } : {}),
+        provider: { '@id': `${siteUrl}/#organization` },
+        ...(isoPeriod ? {
+          hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', duration: isoPeriod, inLanguage: isRu ? 'ru' : 'uk' },
+        } : {}),
+        offers: { '@type': 'Offer', priceCurrency: 'UAH', availability: 'https://schema.org/InStock', url: `${siteUrl}/#contact` },
+        ...(ratingValue ? {
+          aggregateRating: { '@type': 'AggregateRating', ratingValue, bestRating: '5', worstRating: '1', reviewCount: String(reviewCount) },
+        } : {}),
+      },
+    ],
+  });
+
+  const hreflangBlock = hasRu ? `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
+  const canonicalUrl = `${pageUrl}${isRu ? '?lang=ru' : ''}`;
+
+  let html = COURSE_HTML_TPL
+    .replace('<title>Курс — My Computer Academy</title>', `<title>${escHtml(title)}</title>`)
+    .replace(
+      '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
+      `<meta name="description" content="${escHtml(desc)}"/>
+  <link rel="canonical" href="${canonicalUrl}"/>${hreflangBlock}
+  <meta property="og:title" content="${escHtml(title)}"/>
+  <meta property="og:description" content="${escHtml(desc)}"/>
+  <meta property="og:url" content="${pageUrl}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="${siteUrl}/og-image.png?v=2"/>
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
+  <script type="application/ld+json">${jsonLd}</script>`
+    );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────

@@ -123,77 +123,77 @@ const CONTENT_SEED = {
 (function seedTestData() {
   try {
     if (!coursesDb.getAll().length) {
-      coursesDb.create({ id: 'roblox', name: 'Roblox: розробка ігор', emoji: '🎮', age: '9–14 років', age_group: '10-14', duration: '3 місяці', lessonsCount: 24, groupSize: 5, price: 3600, color: '#ef4444', description: 'Мова Lua, 3D-дизайн власних світів та публікація гри для мільйонів гравців платформи.' });
+      coursesDb.create({ id: 'roblox', name: 'Roblox: розробка ігор', name_ru: 'Roblox: разработка игр', emoji: '🎮', age: '9–14 років', age_group: '10-14', duration: '3 місяці', lessonsCount: 24, groupSize: 5, price: 3600, color: '#ef4444', description: 'Мова Lua, 3D-дизайн власних світів та публікація гри для мільйонів гравців платформи.', description_ru: 'Язык Lua, 3D-дизайн собственных миров и публикация игры для миллионов игроков платформы.' });
       console.log('✅  Seeded roblox course');
     }
     if (!coursesDb.getAll().some(c => c.id === 'roblox-9-11')) {
       const shared = { duration: '3 місяці', groupSize: 5, price: 3600, color: '#ef4444', active: true };
-      coursesDb.create({ id: 'roblox-9-11', name: 'Roblox Старт → Будівник', emoji: '🌍', age: '9–11 років', age_group: '9-11', description: 'Від першого об\'єкта до власної публічної гри з механіками', lessonsCount: 31, ...shared, curriculum: [
-        { num: '01', title: 'Знайомство з Roblox Studio', desc: 'Інтерфейс, BaseParts, матеріали, освітлення, перший об\'єкт.' },
-        { num: '02', title: 'Будуємо ігровий світ', desc: 'Terrain, вода, ліс, острів — перша власна карта у Roblox.' },
-        { num: '03', title: 'Деталі та декор', desc: 'Grouping, Union, Negate — складні форми. Кольорові теми та стилізація.' },
-        { num: '04', title: 'Перший скрипт у Lua', desc: 'Script vs LocalScript, print(), змінні, перший автоматичний об\'єкт.' },
-        { num: '05', title: 'Умови та цикли в Lua', desc: 'if/then/else, for, while — логіка для ігрових механік.' },
-        { num: '06', title: 'Взаємодія гравця з об\'єктами', desc: 'Торкнутися частини → подія. Кнопки, двері, пастки з ефектами.' },
-        { num: '07', title: 'Звук та ParticleEmitter', desc: 'Додаємо звуки подій, вогонь, дощ, іскри — атмосфера гри.' },
-        { num: '08', title: 'GUI: інтерфейс гравця', desc: 'ScreenGui, TextLabel, ImageLabel — перший ігровий HUD.' },
-        { num: '09', title: 'Очки та лідерборд', desc: 'IntValue, leaderboard, збереження очок під час сесії.' },
-        { num: '10', title: 'Функції та модульність', desc: 'Пишемо власні функції, ділимо код на частини, уникаємо повторень.' },
-        { num: '11', title: 'Checkpoint та SpawnLocation', desc: 'Контрольні точки, збереження позиції, старт-зони на карті.' },
-        { num: '12', title: 'NPC та анімації', desc: 'Humanoid, простий NPC-охоронець, патрулювання без плагінів.' },
-        { num: '13', title: 'Зброя та шкода', desc: 'Tool, нанесення Humanoid.Health, ефекти удару та смерті.' },
-        { num: '14', title: 'Збирання предметів', desc: 'Pickup-механіка, інвентар у таблиці, відображення у GUI.' },
-        { num: '15', title: 'Таймер та раунди', desc: 'Countdown у GUI, переможець раунду, перезапуск карти.' },
-        { num: '16', title: 'Телепортація та зони', desc: 'TeleportService, перехід між регіонами, секретні кімнати.' },
-        { num: '17', title: 'Команди та кольори гравців', desc: 'Teams, BrickColor по команді, підрахунок очок команд.' },
-        { num: '18', title: 'Погода та день/ніч', desc: 'Lighting, ClockTime, динамічна зміна атмосфери за скриптом.' },
-        { num: '19', title: 'Магазин за очки', desc: 'Внутрішня валюта, GUI-магазин, купівля предметів без DevProducts.' },
-        { num: '20', title: 'Таблиці лідерів (багатокористувацька)', desc: 'Sync очок між гравцями, топ-5 на екрані, оновлення в реальному часі.' },
-        { num: '21', title: 'Карта пригод: планування', desc: 'Ескіз власної гри: жанр, механіки, персонажі. Структура проекту.' },
-        { num: '22', title: 'Карта пригод: світ та рівні', desc: 'Будуємо три зони карти, розставляємо NPC та предмети.' },
-        { num: '23', title: 'Карта пригод: ігрова логіка', desc: 'Скрипти завдань, прогрес гравця, кінцева умова перемоги.' },
-        { num: '24', title: 'Карта пригод: GUI та атмосфера', desc: 'Екран завантаження, HUD, звуки, ефекти частинок.' },
-        { num: '25', title: 'Тестування та виправлення', desc: 'Playtest у Studio, пошук багів, рефакторинг скриптів.' },
-        { num: '26', title: 'Оптимізація', desc: 'Anchored, стримінг, видалення зайвих об\'єктів — гра без лагів.' },
-        { num: '27', title: 'Опис та іконка гри', desc: 'Game Page: назва, опис, thumbnail, жанр, вікові обмеження.' },
-        { num: '28', title: 'Соціальні механіки', desc: 'Подяки, значки (Badges), запрошення друзів, Share-посилання.' },
-        { num: '29', title: 'Резервний та кодревʼю', desc: 'Розбираємо помилки, чистимо код, питання від учнів.' },
-        { num: '30', title: 'Захист фінального проекту', desc: 'Презентація гри однокласникам, відповіді на питання, фідбек.' },
-        { num: '🚀', title: 'Публікація та старт', desc: 'Гра виходить у публічний доступ. Ділимось посиланням, запускаємо гравців.' },
+      coursesDb.create({ id: 'roblox-9-11', name: 'Roblox Старт → Будівник', name_ru: 'Roblox Старт → Строитель', emoji: '🌍', age: '9–11 років', age_group: '9-11', description: 'Від першого об\'єкта до власної публічної гри з механіками', description_ru: 'От первого объекта до собственной публичной игры с механиками', lessonsCount: 31, ...shared, curriculum: [
+        { num: '01', title: 'Знайомство з Roblox Studio', desc: 'Інтерфейс, BaseParts, матеріали, освітлення, перший об\'єкт.', title_ru: 'Знакомство с Roblox Studio', desc_ru: 'Интерфейс, BaseParts, материалы, освещение, первый объект.' },
+        { num: '02', title: 'Будуємо ігровий світ', desc: 'Terrain, вода, ліс, острів — перша власна карта у Roblox.', title_ru: 'Строим игровой мир', desc_ru: 'Terrain, вода, лес, остров — первая собственная карта в Roblox.' },
+        { num: '03', title: 'Деталі та декор', desc: 'Grouping, Union, Negate — складні форми. Кольорові теми та стилізація.', title_ru: 'Детали и декор', desc_ru: 'Grouping, Union, Negate — сложные формы. Цветовые темы и стилизация.' },
+        { num: '04', title: 'Перший скрипт у Lua', desc: 'Script vs LocalScript, print(), змінні, перший автоматичний об\'єкт.', title_ru: 'Первый скрипт на Lua', desc_ru: 'Script vs LocalScript, print(), переменные, первый автоматический объект.' },
+        { num: '05', title: 'Умови та цикли в Lua', desc: 'if/then/else, for, while — логіка для ігрових механік.', title_ru: 'Условия и циклы в Lua', desc_ru: 'if/then/else, for, while — логика для игровых механик.' },
+        { num: '06', title: 'Взаємодія гравця з об\'єктами', desc: 'Торкнутися частини → подія. Кнопки, двері, пастки з ефектами.', title_ru: 'Взаимодействие игрока с объектами', desc_ru: 'Прикоснуться к части → событие. Кнопки, двери, ловушки с эффектами.' },
+        { num: '07', title: 'Звук та ParticleEmitter', desc: 'Додаємо звуки подій, вогонь, дощ, іскри — атмосфера гри.', title_ru: 'Звук и ParticleEmitter', desc_ru: 'Добавляем звуки событий, огонь, дождь, искры — атмосфера игры.' },
+        { num: '08', title: 'GUI: інтерфейс гравця', desc: 'ScreenGui, TextLabel, ImageLabel — перший ігровий HUD.', title_ru: 'GUI: интерфейс игрока', desc_ru: 'ScreenGui, TextLabel, ImageLabel — первый игровой HUD.' },
+        { num: '09', title: 'Очки та лідерборд', desc: 'IntValue, leaderboard, збереження очок під час сесії.', title_ru: 'Очки и лидерборд', desc_ru: 'IntValue, leaderboard, сохранение очков во время сессии.' },
+        { num: '10', title: 'Функції та модульність', desc: 'Пишемо власні функції, ділимо код на частини, уникаємо повторень.', title_ru: 'Функции и модульность', desc_ru: 'Пишем собственные функции, делим код на части, избегаем повторений.' },
+        { num: '11', title: 'Checkpoint та SpawnLocation', desc: 'Контрольні точки, збереження позиції, старт-зони на карті.', title_ru: 'Checkpoint и SpawnLocation', desc_ru: 'Контрольные точки, сохранение позиции, старт-зоны на карте.' },
+        { num: '12', title: 'NPC та анімації', desc: 'Humanoid, простий NPC-охоронець, патрулювання без плагінів.', title_ru: 'NPC и анимации', desc_ru: 'Humanoid, простой NPC-охранник, патрулирование без плагинов.' },
+        { num: '13', title: 'Зброя та шкода', desc: 'Tool, нанесення Humanoid.Health, ефекти удару та смерті.', title_ru: 'Оружие и урон', desc_ru: 'Tool, нанесение Humanoid.Health, эффекты удара и смерти.' },
+        { num: '14', title: 'Збирання предметів', desc: 'Pickup-механіка, інвентар у таблиці, відображення у GUI.', title_ru: 'Сбор предметов', desc_ru: 'Pickup-механика, инвентарь в таблице, отображение в GUI.' },
+        { num: '15', title: 'Таймер та раунди', desc: 'Countdown у GUI, переможець раунду, перезапуск карти.', title_ru: 'Таймер и раунды', desc_ru: 'Countdown в GUI, победитель раунда, перезапуск карты.' },
+        { num: '16', title: 'Телепортація та зони', desc: 'TeleportService, перехід між регіонами, секретні кімнати.', title_ru: 'Телепортация и зоны', desc_ru: 'TeleportService, переход между регионами, секретные комнаты.' },
+        { num: '17', title: 'Команди та кольори гравців', desc: 'Teams, BrickColor по команді, підрахунок очок команд.', title_ru: 'Команды и цвета игроков', desc_ru: 'Teams, BrickColor по команде, подсчёт очков команд.' },
+        { num: '18', title: 'Погода та день/ніч', desc: 'Lighting, ClockTime, динамічна зміна атмосфери за скриптом.', title_ru: 'Погода и день/ночь', desc_ru: 'Lighting, ClockTime, динамическая смена атмосферы по скрипту.' },
+        { num: '19', title: 'Магазин за очки', desc: 'Внутрішня валюта, GUI-магазин, купівля предметів без DevProducts.', title_ru: 'Магазин за очки', desc_ru: 'Внутренняя валюта, GUI-магазин, покупка предметов без DevProducts.' },
+        { num: '20', title: 'Таблиці лідерів (багатокористувацька)', desc: 'Sync очок між гравцями, топ-5 на екрані, оновлення в реальному часі.', title_ru: 'Таблицы лидеров (многопользовательская)', desc_ru: 'Sync очков между игроками, топ-5 на экране, обновление в реальном времени.' },
+        { num: '21', title: 'Карта пригод: планування', desc: 'Ескіз власної гри: жанр, механіки, персонажі. Структура проекту.', title_ru: 'Карта приключений: планирование', desc_ru: 'Эскиз собственной игры: жанр, механики, персонажи. Структура проекта.' },
+        { num: '22', title: 'Карта пригод: світ та рівні', desc: 'Будуємо три зони карти, розставляємо NPC та предмети.', title_ru: 'Карта приключений: мир и уровни', desc_ru: 'Строим три зоны карты, расставляем NPC и предметы.' },
+        { num: '23', title: 'Карта пригод: ігрова логіка', desc: 'Скрипти завдань, прогрес гравця, кінцева умова перемоги.', title_ru: 'Карта приключений: игровая логика', desc_ru: 'Скрипты заданий, прогресс игрока, конечное условие победы.' },
+        { num: '24', title: 'Карта пригод: GUI та атмосфера', desc: 'Екран завантаження, HUD, звуки, ефекти частинок.', title_ru: 'Карта приключений: GUI и атмосфера', desc_ru: 'Экран загрузки, HUD, звуки, эффекты частиц.' },
+        { num: '25', title: 'Тестування та виправлення', desc: 'Playtest у Studio, пошук багів, рефакторинг скриптів.', title_ru: 'Тестирование и исправление', desc_ru: 'Playtest в Studio, поиск багов, рефакторинг скриптов.' },
+        { num: '26', title: 'Оптимізація', desc: 'Anchored, стримінг, видалення зайвих об\'єктів — гра без лагів.', title_ru: 'Оптимизация', desc_ru: 'Anchored, стриминг, удаление лишних объектов — игра без лагов.' },
+        { num: '27', title: 'Опис та іконка гри', desc: 'Game Page: назва, опис, thumbnail, жанр, вікові обмеження.', title_ru: 'Описание и иконка игры', desc_ru: 'Game Page: название, описание, thumbnail, жанр, возрастные ограничения.' },
+        { num: '28', title: 'Соціальні механіки', desc: 'Подяки, значки (Badges), запрошення друзів, Share-посилання.', title_ru: 'Социальные механики', desc_ru: 'Благодарности, значки (Badges), приглашение друзей, Share-ссылки.' },
+        { num: '29', title: 'Резервний та кодревʼю', desc: 'Розбираємо помилки, чистимо код, питання від учнів.', title_ru: 'Резервный и код-ревью', desc_ru: 'Разбираем ошибки, чистим код, вопросы от учеников.' },
+        { num: '30', title: 'Захист фінального проекту', desc: 'Презентація гри однокласникам, відповіді на питання, фідбек.', title_ru: 'Защита финального проекта', desc_ru: 'Презентация игры одноклассникам, ответы на вопросы, фидбек.' },
+        { num: '🚀', title: 'Публікація та старт', desc: 'Гра виходить у публічний доступ. Ділимось посиланням, запускаємо гравців.', title_ru: 'Публикация и старт', desc_ru: 'Игра выходит в публичный доступ. Делимся ссылкой, запускаем игроков.' },
       ]});
-      coursesDb.create({ id: 'roblox-11-14', name: 'Roblox Studio: Pro Developer', emoji: '⚙️', age: '11–14 років', age_group: '11-14', description: 'Lua глибше, клієнт-сервер, DataStore, монетизація та портфоліо', lessonsCount: 32, ...shared, curriculum: [
-        { num: '01', title: 'Lua: функції, замикання, рекурсія', desc: 'Вищий порядок функцій, анонімні колбеки, рекурсивні алгоритми.' },
-        { num: '02', title: 'Таблиці та ООП у Lua', desc: 'Метатаблиці, __index, __newindex — ООП без класів та зі своїм класом.' },
-        { num: '03', title: 'ModuleScript: архітектура проекту', desc: 'Розбиваємо гру на модулі, require(), спільний стан між скриптами.' },
-        { num: '04', title: 'Клієнт-сервер архітектура', desc: 'RemoteEvent, RemoteFunction, FireServer / FireClient — безпечний обмін.' },
-        { num: '05', title: 'DataStore: збереження прогресу', desc: 'DataStoreService, збереження монет, рівня та інвентарю між сесіями.' },
-        { num: '06', title: 'DataStore: захист від втрат', desc: 'pcall, retry-логіка, обробка помилок при save/load без втрати даних.' },
-        { num: '07', title: 'TweenService: анімації', desc: 'EasingStyle, EasingDirection, ланцюжки Tween — плавні двері, ліфти, атаки.' },
-        { num: '08', title: 'Фізика та Constraints', desc: 'SpringConstraint, HingeConstraint, транспорт, VerlocityConstraint.' },
-        { num: '09', title: 'Система раундів', desc: 'MatchService, таймер, вибір випадкової карти, ServerStorage між раундами.' },
-        { num: '10', title: 'Spawner та хвилі ворогів', desc: 'Процедурний spawn NPC, зростання складності, boss-хвиля.' },
-        { num: '11', title: 'Pathfinding: розумний NPC', desc: 'PathfindingService, NPC переслідує гравця по карті, обхід перешкод.' },
-        { num: '12', title: 'Ігровий магазин: UI', desc: 'ScrollingFrame, товари з іконками та цінами, кнопки купівлі з підтвердженням.' },
-        { num: '13', title: 'Ігровий магазин: логіка', desc: 'Перевірка балансу на сервері, видача предмета, захист від читів.' },
-        { num: '14', title: 'Система рівнів та XP', desc: 'XP-формула, підвищення рівня, розблокування нового контенту по рівню.' },
-        { num: '15', title: 'Глобальний лідерборд', desc: 'OrderedDataStore, топ-100 гравців, оновлення раз на хвилину.' },
-        { num: '16', title: 'Бейджі та досягнення', desc: 'BadgeService, видача бейджа за умовою, achievement-система.' },
-        { num: '17', title: 'Game Passes: монетизація', desc: 'MarketplaceService, перевірка Pass, вічні бонуси для власників.' },
-        { num: '18', title: 'Developer Products: донат', desc: 'ProcessReceipt, поповнення монет, захист від подвійних нарахувань.' },
-        { num: '19', title: 'Приватні сервери', desc: 'ReservedServer, PrivateServerId, продаж доступу до власного сервера.' },
-        { num: '20', title: 'Анти-чит та безпека', desc: 'Валідація на сервері, sanity-check швидкості, захист RemoteEvent.' },
-        { num: '21', title: 'Портфоліо-гра: концепт', desc: 'Жанр, core loop, монетизаційна модель. Game Design Document (GDD).' },
-        { num: '22', title: 'Портфоліо-гра: архітектура', desc: 'Структура папок, ModuleScript-схема, клієнт-серверний план.' },
-        { num: '23', title: 'Портфоліо-гра: core mechanics', desc: 'Основна ігрова механіка — прогрес, ресурси, взаємодія гравців.' },
-        { num: '24', title: 'Портфоліо-гра: DataStore + магазин', desc: 'Повна система збереження, магазин з Game Pass та Developer Products.' },
-        { num: '25', title: 'Портфоліо-гра: UI/UX', desc: 'Головне меню, налаштування, адаптивний HUD для мобільних пристроїв.' },
-        { num: '26', title: 'Портфоліо-гра: тестування', desc: 'Playtest-сесія з іншими учнями, таблиця багів, пріоритет фіксів.' },
-        { num: '27', title: 'Оптимізація та LOD', desc: 'Streaming Enabled, Level of Detail, union vs mesh, FPS-профайлер.' },
-        { num: '28', title: 'Маркетинг гри', desc: 'SEO у Roblox (назва, теги), thumbnail-стратегія, опис для пошуку.' },
-        { num: '29', title: 'Аналітика та монетизаційна статистика', desc: 'Developer Stats, Revenue Dashboard, A/B-тест цін на Game Pass.' },
-        { num: '30', title: 'Резерв та кодревʼю', desc: 'Розбір складних місць, питання від учнів, рефакторинг архітектури.' },
-        { num: '31', title: 'Захист проекту', desc: 'Презентація гри: core loop, монетизація, складнощі — відповіді на питання.' },
-        { num: '🚀', title: 'Публікація та перший заробіток', desc: 'Гра у публічному доступі з монетизацією. Перший Robux від гравців.' },
+      coursesDb.create({ id: 'roblox-11-14', name: 'Roblox Studio: Pro Developer', name_ru: 'Roblox Studio: Pro Developer', emoji: '⚙️', age: '11–14 років', age_group: '11-14', description: 'Lua глибше, клієнт-сервер, DataStore, монетизація та портфоліо', description_ru: 'Lua глубже, клиент-сервер, DataStore, монетизация и портфолио', lessonsCount: 32, ...shared, curriculum: [
+        { num: '01', title: 'Lua: функції, замикання, рекурсія', desc: 'Вищий порядок функцій, анонімні колбеки, рекурсивні алгоритми.', title_ru: 'Lua: функции, замыкания, рекурсия', desc_ru: 'Функции высшего порядка, анонимные колбеки, рекурсивные алгоритмы.' },
+        { num: '02', title: 'Таблиці та ООП у Lua', desc: 'Метатаблиці, __index, __newindex — ООП без класів та зі своїм класом.', title_ru: 'Таблицы и ООП в Lua', desc_ru: 'Метатаблицы, __index, __newindex — ООП без классов и со своим классом.' },
+        { num: '03', title: 'ModuleScript: архітектура проекту', desc: 'Розбиваємо гру на модулі, require(), спільний стан між скриптами.', title_ru: 'ModuleScript: архитектура проекта', desc_ru: 'Разбиваем игру на модули, require(), общее состояние между скриптами.' },
+        { num: '04', title: 'Клієнт-сервер архітектура', desc: 'RemoteEvent, RemoteFunction, FireServer / FireClient — безпечний обмін.', title_ru: 'Клиент-сервер архитектура', desc_ru: 'RemoteEvent, RemoteFunction, FireServer / FireClient — безопасный обмен.' },
+        { num: '05', title: 'DataStore: збереження прогресу', desc: 'DataStoreService, збереження монет, рівня та інвентарю між сесіями.', title_ru: 'DataStore: сохранение прогресса', desc_ru: 'DataStoreService, сохранение монет, уровня и инвентаря между сессиями.' },
+        { num: '06', title: 'DataStore: захист від втрат', desc: 'pcall, retry-логіка, обробка помилок при save/load без втрати даних.', title_ru: 'DataStore: защита от потерь', desc_ru: 'pcall, retry-логика, обработка ошибок при save/load без потери данных.' },
+        { num: '07', title: 'TweenService: анімації', desc: 'EasingStyle, EasingDirection, ланцюжки Tween — плавні двері, ліфти, атаки.', title_ru: 'TweenService: анимации', desc_ru: 'EasingStyle, EasingDirection, цепочки Tween — плавные двери, лифты, атаки.' },
+        { num: '08', title: 'Фізика та Constraints', desc: 'SpringConstraint, HingeConstraint, транспорт, VerlocityConstraint.', title_ru: 'Физика и Constraints', desc_ru: 'SpringConstraint, HingeConstraint, транспорт, VerlocityConstraint.' },
+        { num: '09', title: 'Система раундів', desc: 'MatchService, таймер, вибір випадкової карти, ServerStorage між раундами.', title_ru: 'Система раундов', desc_ru: 'MatchService, таймер, выбор случайной карты, ServerStorage между раундами.' },
+        { num: '10', title: 'Spawner та хвилі ворогів', desc: 'Процедурний spawn NPC, зростання складності, boss-хвиля.', title_ru: 'Spawner и волны врагов', desc_ru: 'Процедурный spawn NPC, рост сложности, boss-волна.' },
+        { num: '11', title: 'Pathfinding: розумний NPC', desc: 'PathfindingService, NPC переслідує гравця по карті, обхід перешкод.', title_ru: 'Pathfinding: умный NPC', desc_ru: 'PathfindingService, NPC преследует игрока по карте, обход препятствий.' },
+        { num: '12', title: 'Ігровий магазин: UI', desc: 'ScrollingFrame, товари з іконками та цінами, кнопки купівлі з підтвердженням.', title_ru: 'Игровой магазин: UI', desc_ru: 'ScrollingFrame, товары с иконками и ценами, кнопки покупки с подтверждением.' },
+        { num: '13', title: 'Ігровий магазин: логіка', desc: 'Перевірка балансу на сервері, видача предмета, захист від читів.', title_ru: 'Игровой магазин: логика', desc_ru: 'Проверка баланса на сервере, выдача предмета, защита от читов.' },
+        { num: '14', title: 'Система рівнів та XP', desc: 'XP-формула, підвищення рівня, розблокування нового контенту по рівню.', title_ru: 'Система уровней и XP', desc_ru: 'XP-формула, повышение уровня, разблокировка нового контента по уровню.' },
+        { num: '15', title: 'Глобальний лідерборд', desc: 'OrderedDataStore, топ-100 гравців, оновлення раз на хвилину.', title_ru: 'Глобальный лидерборд', desc_ru: 'OrderedDataStore, топ-100 игроков, обновление раз в минуту.' },
+        { num: '16', title: 'Бейджі та досягнення', desc: 'BadgeService, видача бейджа за умовою, achievement-система.', title_ru: 'Бейджи и достижения', desc_ru: 'BadgeService, выдача бейджа по условию, achievement-система.' },
+        { num: '17', title: 'Game Passes: монетизація', desc: 'MarketplaceService, перевірка Pass, вічні бонуси для власників.', title_ru: 'Game Passes: монетизация', desc_ru: 'MarketplaceService, проверка Pass, вечные бонусы для владельцев.' },
+        { num: '18', title: 'Developer Products: донат', desc: 'ProcessReceipt, поповнення монет, захист від подвійних нарахувань.', title_ru: 'Developer Products: донат', desc_ru: 'ProcessReceipt, пополнение монет, защита от двойных начислений.' },
+        { num: '19', title: 'Приватні сервери', desc: 'ReservedServer, PrivateServerId, продаж доступу до власного сервера.', title_ru: 'Приватные серверы', desc_ru: 'ReservedServer, PrivateServerId, продажа доступа к собственному серверу.' },
+        { num: '20', title: 'Анти-чит та безпека', desc: 'Валідація на сервері, sanity-check швидкості, захист RemoteEvent.', title_ru: 'Анти-чит и безопасность', desc_ru: 'Валидация на сервере, sanity-check скорости, защита RemoteEvent.' },
+        { num: '21', title: 'Портфоліо-гра: концепт', desc: 'Жанр, core loop, монетизаційна модель. Game Design Document (GDD).', title_ru: 'Портфолио-игра: концепт', desc_ru: 'Жанр, core loop, монетизационная модель. Game Design Document (GDD).' },
+        { num: '22', title: 'Портфоліо-гра: архітектура', desc: 'Структура папок, ModuleScript-схема, клієнт-серверний план.', title_ru: 'Портфолио-игра: архитектура', desc_ru: 'Структура папок, ModuleScript-схема, клиент-серверный план.' },
+        { num: '23', title: 'Портфоліо-гра: core mechanics', desc: 'Основна ігрова механіка — прогрес, ресурси, взаємодія гравців.', title_ru: 'Портфолио-игра: core mechanics', desc_ru: 'Основная игровая механика — прогресс, ресурсы, взаимодействие игроков.' },
+        { num: '24', title: 'Портфоліо-гра: DataStore + магазин', desc: 'Повна система збереження, магазин з Game Pass та Developer Products.', title_ru: 'Портфолио-игра: DataStore + магазин', desc_ru: 'Полная система сохранения, магазин с Game Pass и Developer Products.' },
+        { num: '25', title: 'Портфоліо-гра: UI/UX', desc: 'Головне меню, налаштування, адаптивний HUD для мобільних пристроїв.', title_ru: 'Портфолио-игра: UI/UX', desc_ru: 'Главное меню, настройки, адаптивный HUD для мобильных устройств.' },
+        { num: '26', title: 'Портфоліо-гра: тестування', desc: 'Playtest-сесія з іншими учнями, таблиця багів, пріоритет фіксів.', title_ru: 'Портфолио-игра: тестирование', desc_ru: 'Playtest-сессия с другими учениками, таблица багов, приоритет фиксов.' },
+        { num: '27', title: 'Оптимізація та LOD', desc: 'Streaming Enabled, Level of Detail, union vs mesh, FPS-профайлер.', title_ru: 'Оптимизация и LOD', desc_ru: 'Streaming Enabled, Level of Detail, union vs mesh, FPS-профайлер.' },
+        { num: '28', title: 'Маркетинг гри', desc: 'SEO у Roblox (назва, теги), thumbnail-стратегія, опис для пошуку.', title_ru: 'Маркетинг игры', desc_ru: 'SEO в Roblox (название, теги), thumbnail-стратегия, описание для поиска.' },
+        { num: '29', title: 'Аналітика та монетизаційна статистика', desc: 'Developer Stats, Revenue Dashboard, A/B-тест цін на Game Pass.', title_ru: 'Аналитика и монетизационная статистика', desc_ru: 'Developer Stats, Revenue Dashboard, A/B-тест цен на Game Pass.' },
+        { num: '30', title: 'Резерв та кодревʼю', desc: 'Розбір складних місць, питання від учнів, рефакторинг архітектури.', title_ru: 'Резерв и код-ревью', desc_ru: 'Разбор сложных мест, вопросы от учеников, рефакторинг архитектуры.' },
+        { num: '31', title: 'Захист проекту', desc: 'Презентація гри: core loop, монетизація, складнощі — відповіді на питання.', title_ru: 'Защита проекта', desc_ru: 'Презентация игры: core loop, монетизация, сложности — ответы на вопросы.' },
+        { num: '🚀', title: 'Публікація та перший заробіток', desc: 'Гра у публічному доступі з монетизацією. Перший Robux від гравців.', title_ru: 'Публикация и первый заработок', desc_ru: 'Игра в публичном доступе с монетизацией. Первый Robux от игроков.' },
       ]});
       console.log('✅  Seeded roblox age-group courses (9-11, 11-14)');
     }
@@ -1735,14 +1735,105 @@ app.get('/articles/:slug', (req, res) => {
 });
 
 // ── COURSE PAGES ──────────────────────────────────────────────────────────────
-// Serve the single course.html for all /courses/:slug SEO URLs
+// Server-render title/description/canonical/hreflang/OG/JSON-LD for
+// /courses/:slug — previously a bare static sendFile with everything set by
+// client JS only (renderCourse() in course.html), so crawlers that don't
+// execute JS saw the literal placeholder "Курс — My Computer Academy" for
+// every course. The visible curriculum/pricing/FAQ body is still rendered by
+// that same client JS — this only fixes the head + structured data, matching
+// the pattern already shipped on main/design's /courses/:slug route.
 const COURSE_SLUGS = ['scratch', 'python', 'roblox', 'web'];
+const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'), 'utf8');
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  const known = COURSE_SLUGS.includes(slug) || coursesDb.getAll().some(c => c.id === slug);
-  if (!known) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  res.sendFile(path.join(__dirname, '..', 'course.html'));
+  const course = coursesDb.getAll().find(c => c.id === slug);
+  if (!course && !COURSE_SLUGS.includes(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
+  if (!course) return res.sendFile(path.join(__dirname, '..', 'course.html'));
+
+  const isRu    = req.query.lang === 'ru';
+  const name    = (isRu && course.name_ru) ? course.name_ru : course.name;
+  const rawDesc = (isRu && course.description_ru) ? course.description_ru : (course.description || 'Детальна інформація про курс програмування для дітей у My Computer Academy');
+  const desc    = rawDesc.slice(0, 160);
+  const title   = `${name} — My Computer Academy`;
+  const siteUrl = 'https://roblox.mycomputer.education';
+  const pageUrl = `${siteUrl}/courses/${slug}`;
+
+  const activeReviews = reviewsDb.getActive();
+  const reviewCount = activeReviews.length;
+  const ratingValue = reviewCount
+    ? (activeReviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviewCount).toFixed(1)
+    : null;
+  const durationMonths = course.duration ? parseInt(course.duration) || null : null;
+  const isoPeriod = durationMonths ? `P${durationMonths}M` : null;
+  const hasRu = !!(course.name_ru || course.description_ru);
+
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${pageUrl}/#webpage`,
+        url: pageUrl,
+        name: title,
+        description: desc,
+        inLanguage: isRu ? 'ru' : 'uk',
+        isPartOf: { '@id': `${siteUrl}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, item: { '@id': `${siteUrl}/`, name: isRu ? 'Главная' : 'Головна' } },
+          { '@type': 'ListItem', position: 2, item: { '@id': `${siteUrl}/#courses`, name: isRu ? 'Курсы' : 'Курси' } },
+          { '@type': 'ListItem', position: 3, item: { '@id': pageUrl, name } },
+        ],
+      },
+      {
+        '@type': 'Course',
+        '@id': `${pageUrl}/#course`,
+        name,
+        description: rawDesc,
+        url: pageUrl,
+        inLanguage: isRu ? 'ru' : 'uk',
+        educationalLevel: 'Beginner',
+        ...(course.age ? { typicalAgeRange: course.age } : {}),
+        provider: { '@id': `${siteUrl}/#organization` },
+        ...(isoPeriod ? {
+          hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', duration: isoPeriod, inLanguage: isRu ? 'ru' : 'uk' },
+        } : {}),
+        offers: { '@type': 'Offer', priceCurrency: 'UAH', availability: 'https://schema.org/InStock', url: `${siteUrl}/#contact` },
+        ...(ratingValue ? {
+          aggregateRating: { '@type': 'AggregateRating', ratingValue, bestRating: '5', worstRating: '1', reviewCount: String(reviewCount) },
+        } : {}),
+      },
+    ],
+  });
+
+  const hreflangBlock = hasRu ? `
+  <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
+  <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
+  <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
+  const canonicalUrl = `${pageUrl}${isRu ? '?lang=ru' : ''}`;
+
+  let html = COURSE_HTML_TPL
+    .replace('<title>Курс — My Computer Academy</title>', `<title>${escHtml(title)}</title>`)
+    .replace(
+      '<meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>',
+      `<meta name="description" content="${escHtml(desc)}"/>
+  <link rel="canonical" href="${canonicalUrl}"/>${hreflangBlock}
+  <meta property="og:title" content="${escHtml(title)}"/>
+  <meta property="og:description" content="${escHtml(desc)}"/>
+  <meta property="og:url" content="${pageUrl}"/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="${siteUrl}/og-image.png?v=2"/>
+  <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
+  <script type="application/ld+json">${jsonLd}</script>`
+    );
+
+  if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');
+
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(html);
 });
 
 // ── TEST / DEBUG ROUTES ───────────────────────────────────────────────────────

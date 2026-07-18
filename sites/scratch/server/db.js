@@ -259,4 +259,15 @@ for (const col of ['title_ru', 'excerpt_ru', 'content_ru']) {
   }
 }
 
+// Same RU-translation retrofit for courses — name/description only; each
+// curriculum item carries its own title_ru/desc_ru inside the JSON blob
+// already stored in the `curriculum` column, so no extra columns needed there.
+for (const col of ['name_ru', 'description_ru']) {
+  try {
+    db.exec(`ALTER TABLE courses ADD COLUMN ${col} TEXT NOT NULL DEFAULT ''`);
+  } catch (e) {
+    if (!/duplicate column/i.test(e.message)) throw e;
+  }
+}
+
 module.exports = db;
