@@ -1595,7 +1595,7 @@ app.get('/articles/:slug', (req, res) => {
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
 
   const article = articlesDb.getBySlug(slug);
-  if (!article) return res.sendFile(path.join(__dirname, '..', 'article.html'));
+  if (!article) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
 
   const isRu      = req.query.lang === 'ru';
   const title     = tr(article, 'title', isRu) || 'Стаття';
