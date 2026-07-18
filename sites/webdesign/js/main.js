@@ -16,7 +16,6 @@
 /* ===================================================
    CONFIGURATION
    =================================================== */
-const GOOGLE_SHEETS_URL  = 'https://script.google.com/macros/s/AKfycbyiXop44yUyrE1EwWLvr3jzAg41VmRxN20raHe0NRo3uZWdk28mUck0EGVzVOG10OeJVw/exec';
 const TELEGRAM_BOT_TOKEN = ''; // Отримати у @BotFather у Telegram
 const TELEGRAM_CHAT_ID   = ''; // ID вашого чату (наприклад: '123456789')
 
@@ -352,50 +351,6 @@ async function submitLeadForm(formEl, submitBtnEl) {
       email:      data.email,
     });
     navigator.sendBeacon('/api/leads', params);
-
-    if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL.includes('script.google.com')) {
-      try {
-        // Hidden iframe form submit — follows all GAS redirects, no CORS issues
-        await new Promise(resolve => {
-          const frameName = '_gas_' + Date.now();
-          const iframe = document.createElement('iframe');
-          iframe.name = frameName;
-          iframe.style.display = 'none';
-          document.body.appendChild(iframe);
-
-          const form = document.createElement('form');
-          form.method = 'GET';
-          form.action = GOOGLE_SHEETS_URL;
-          form.target = frameName;
-
-          [
-            ['token',      'mca_lead_2026'],
-            ['child_name', data.child_name],
-            ['age',        data.age],
-            ['course',     data.course],
-            ['phone',      data.phone],
-            ['email',      data.email],
-          ].forEach(([name, value]) => {
-            const inp = document.createElement('input');
-            inp.type = 'hidden'; inp.name = name; inp.value = value;
-            form.appendChild(inp);
-          });
-
-          document.body.appendChild(form);
-
-          const cleanup = () => {
-            try { document.body.removeChild(form); } catch(_) {}
-            try { document.body.removeChild(iframe); } catch(_) {}
-            resolve();
-          };
-
-          iframe.addEventListener('load', cleanup, { once: true });
-          setTimeout(cleanup, 5000);
-
-          form.submit();
-        });
-      } catch (gsErr) { console.warn('Google Sheets error:', gsErr); }
-    }
 
     if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
       const msg = `🎓 Нова заявка!\n👤 ${data.child_name}\n📱 ${data.phone}` +

@@ -16,7 +16,6 @@
 /* ===================================================
    CONFIGURATION
    =================================================== */
-const GOOGLE_SHEETS_URL  = 'https://script.google.com/macros/s/AKfycbyiXop44yUyrE1EwWLvr3jzAg41VmRxN20raHe0NRo3uZWdk28mUck0EGVzVOG10OeJVw/exec';
 const TELEGRAM_BOT_TOKEN = ''; // Отримати у @BotFather у Telegram
 const TELEGRAM_CHAT_ID   = ''; // ID вашого чату (наприклад: '123456789')
 
@@ -344,24 +343,6 @@ function submitLeadForm(formEl, submitBtnEl) {
   // Same-origin POST — no CORS; lander server forwards to main admin server-side
   const params = new URLSearchParams(data);
   navigator.sendBeacon('/api/leads', params);
-
-  // Also send to Google Sheets (non-blocking side effect)
-  if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL.includes('script.google.com')) {
-    const gasFrame = document.createElement('iframe');
-    gasFrame.name = '_gas_' + Date.now();
-    gasFrame.style.display = 'none';
-    const gasForm = document.createElement('form');
-    gasForm.method = 'GET';
-    gasForm.action = GOOGLE_SHEETS_URL;
-    gasForm.target = gasFrame.name;
-    [['token','mca_lead_2026'],['child_name',data.child_name],['age',data.age],['course',data.course],['phone',data.phone]].forEach(([n,v]) => {
-      const inp = document.createElement('input'); inp.type = 'hidden'; inp.name = n; inp.value = v; gasForm.appendChild(inp);
-    });
-    document.body.appendChild(gasFrame);
-    document.body.appendChild(gasForm);
-    gasForm.submit();
-    setTimeout(() => { try { document.body.removeChild(gasFrame); document.body.removeChild(gasForm); } catch(_) {} }, 6000);
-  }
 
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event: 'lead_submitted', lead_course: data.course || 'not_specified' });
