@@ -202,15 +202,65 @@ a{color:inherit;text-decoration:none}
 .stat-value{font-size:var(--fs-22);font-weight:var(--fw-extrabold);line-height:var(--lh-none)}
 .stat-label{font-size:var(--fs-12);color:var(--color-text-2);margin-top:2px}
 
-/* Desktop hero illustration (replaces code mockup at 1024px+, mobile/tablet unaffected) */
-.hero__illustration{display:none}
-@media(min-width:1024px){
-  .hero__mockup{display:none}
-  .hero__illustration{display:block}
+/* ═══════════════════════════════════════════════════════
+   HERO STUDENT PHOTO  — desktop 1024px+ only
+   ═══════════════════════════════════════════════════════ */
+.hero__photo-wrap{
+  display:none;
+  position:relative;
+  width:470px;
+  height:470px;
+  flex-shrink:0;
+  align-self:center;
 }
-.illustration-panel{position:relative;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--sh-xl);aspect-ratio:4/3.3;background:linear-gradient(160deg,var(--color-primary-light) 0%,var(--color-white) 75%)}
-.illustration-panel svg{display:block;width:100%;height:100%}
-.hero__illustration .mockup-stats{margin-top:16px}
+@media(min-width:1024px){
+  .hero__photo-wrap{display:block}
+  .hero__mockup{display:none}
+}
+.hero__photo-student{
+  display:block;
+  width:440px;
+  height:440px;
+  object-fit:cover;
+  object-position:center 8%;
+  border-radius:50%;
+  border:2px solid rgba(var(--color-primary-rgb),.3);
+  box-shadow:0 16px 56px rgba(var(--color-primary-rgb),.16),0 4px 16px rgba(var(--color-black-rgb),.08);
+  margin:15px auto 0;
+}
+
+.h-deco{position:absolute;pointer-events:none;will-change:transform}
+.h-deco--ring{
+  width:500px;height:500px;border-radius:50%;
+  border:1.5px solid rgba(var(--color-primary-rgb),.18);
+  top:50%;left:50%;
+  margin-top:-250px;margin-left:-250px;
+}
+.h-deco--dot-tr{
+  width:16px;height:16px;border-radius:50%;
+  background:var(--color-primary);opacity:.75;
+  top:10px;right:10px;
+}
+.h-deco--code{bottom:80px;left:-4px;color:#1a1a2e}
+.h-deco--star{top:36px;left:42px}
+.h-deco--wave{bottom:28px;right:2px}
+.h-deco--dot-bl{
+  width:10px;height:10px;border-radius:50%;
+  background:#1a1a2e;opacity:.55;
+  bottom:36px;left:42px;
+}
+.h-deco--browser{
+  top:-8px;right:-28px;
+  filter:drop-shadow(0 6px 18px rgba(var(--color-primary-rgb),.07));
+}
+.h-deco--code-card{
+  bottom:48px;left:-30px;
+  filter:drop-shadow(0 6px 18px rgba(var(--color-primary-rgb),.07));
+}
+.h-deco--score-card{
+  top:58px;left:12px;
+  filter:drop-shadow(0 4px 12px rgba(var(--color-primary-rgb),.08));
+}
 
 .hero__bg-shapes{position:absolute;inset:0;pointer-events:none;z-index:var(--z-back)}
 .hero__content,.hero__visual{position:relative;z-index:var(--z-base)}

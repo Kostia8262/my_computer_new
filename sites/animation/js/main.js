@@ -931,3 +931,46 @@ function showToast(msg, type = 'success') {
     });
   }, { passive: true });
 })();
+
+/* ═══════════════════════════════════════════════════════
+   HERO PHOTO PARALLAX  — mouse-move tilt on 1024px+
+   ═══════════════════════════════════════════════════════ */
+(function heroParallax() {
+  if (window.innerWidth < 1024) return;
+  const wrap = document.getElementById('heroPhotoWrap');
+  if (!wrap) return;
+
+  const decos = Array.from(wrap.querySelectorAll('.h-deco[data-depth]'));
+  const MAX_PX = 36; // max displacement in pixels
+  const LERP   = 0.07; // smoothing (lower = smoother/slower)
+
+  let targetX = 0, targetY = 0;
+  let curX    = 0, curY    = 0;
+  let rafId   = null;
+
+  document.addEventListener('mousemove', e => {
+    targetX = (e.clientX - window.innerWidth  / 2) / (window.innerWidth  / 2);
+    targetY = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
+    if (!rafId) rafId = requestAnimationFrame(tick);
+  });
+
+  function tick() {
+    rafId = null;
+    curX += (targetX - curX) * LERP;
+    curY += (targetY - curY) * LERP;
+
+    decos.forEach(el => {
+      const d = parseFloat(el.dataset.depth) * MAX_PX;
+      el.style.transform = `translate(${(curX * d).toFixed(2)}px,${(curY * d).toFixed(2)}px)`;
+    });
+
+    const settled = Math.abs(curX - targetX) < 0.001 && Math.abs(curY - targetY) < 0.001;
+    if (!settled) rafId = requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 1024) {
+      decos.forEach(el => { el.style.transform = ''; });
+    }
+  });
+}());
