@@ -948,6 +948,7 @@ const EXTERNAL_CANONICAL = {
   '3d-blender': 'https://blender.mycomputer.school/',
   '3d-interior': 'https://3dsmax.mycomputer.school/',
   drawing: 'https://digitalart.mycomputer.school/',
+  'ai-design': 'https://ai-design.mycomputer.school/',
 };
 
 app.get('/sitemap.xml', (req, res) => {
