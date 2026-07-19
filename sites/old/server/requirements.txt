@@ -1,7 +1,11 @@
-Django==4.2.30
+Django==5.2.16
 djangorestframework==3.14.0
 django-jazzmin==3.0.1
 django-ckeditor-5==0.2.20
+# django-ckeditor (v4) is NOT in INSTALLED_APPS (migrated to django-ckeditor-5 above)
+# but blog/migrations/0001_initial.py still imports ckeditor.fields directly -
+# any command that loads migrations (migrate, makemigrations) crashes without it.
+django-ckeditor==6.7.3
 django-recurrence==1.11.1
 django-import-export==4.3.7
 django-nested-admin==4.1.1
