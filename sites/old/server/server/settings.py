@@ -22,7 +22,12 @@ except ImportError:
     pass
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-ey=&bou-n$qc6-s456mjn6*olp88cb_sfn%yxp!k4%7hf_gag=')
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise RuntimeError(
+        "SECRET_KEY environment variable is not set. Refusing to start with an "
+        "insecure hardcoded default — set SECRET_KEY in the .env file."
+    )
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -31,17 +36,20 @@ ALLOWED_HOSTS = ['old.mycomputer.education', 'mycomputer.education', '62.72.21.7
 
 CSRF_TRUSTED_ORIGINS = ['https://old.mycomputer.education', 'https://mycomputer.education']
 
-# CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_ALL_ORIGINS = True
-# CORS_ALLOWED_ORIGINS = [
-#     "http://127.0.0.1",
-#     "http://127.0.0.1:3000",
-#     "http://localhost",
-#     "http://localhost:3000",
-#     "http://test.sos-computer.site",
-
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "https://old.mycomputer.education",
+    "https://mycomputer.education",
+]
 CORS_ALLOW_CREDENTIALS = True
+
+# SSL/cookie hardening — LiteSpeed already terminates TLS and force-redirects
+# HTTP->HTTPS at the vhost level, so SECURE_SSL_REDIRECT is intentionally
+# omitted here (redundant, and risky without a confirmed proxy-header setup).
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
 
 # Application definition
 
