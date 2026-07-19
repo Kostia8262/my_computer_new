@@ -74,7 +74,7 @@ jobs:
         run: |
           SSH_OPTS="-i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=60 -o ServerAliveInterval=30 -o ServerAliveCountMax=5"
           for attempt in 1 2 3; do
-            rsync -avz --delete \
+            rsync -avz --delete --exclude='prerender/' \
               -e "ssh $SSH_OPTS" \
               sites/old/client/build/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/usr/local/lsws/old.mycomputer.education/html/client/ \
               && break
