@@ -22,17 +22,17 @@ console.log('MY COMPUTER ACADEMY');
 
 window.addEventListener('load', () => {
   const preload = document.querySelector('.preloader');
-  const hasSeenPreloader = sessionStorage.getItem('preload');
-  const fadeDelay = hasSeenPreloader ? 500 : 1000;
-  const removeDelay = 1000;
+  if (!preload) return;
 
-  setTimeout(() => {
-    preload.classList.add('preloader--hidden');
-    document.body.classList.remove('preloader_body');
-  }, fadeDelay);
+  // Fade starts the instant the page is ready — matches the 0.5s
+  // transition already defined in preloader.css, no artificial padding.
+  const removeDelay = 500;
+
+  preload.classList.add('preloader--hidden');
+  document.body.classList.remove('preloader_body');
 
   setTimeout(() => {
     preload.remove();
     sessionStorage.setItem('preload', true);
-  }, fadeDelay + removeDelay);
+  }, removeDelay);
 });
