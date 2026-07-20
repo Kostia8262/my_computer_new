@@ -121,4 +121,17 @@ module.exports = {
   delete(id) {
     return delCourse.run(id).changes > 0;
   },
+
+  move(id, direction) {
+    const all = selAll.all();
+    const idx = all.findIndex(r => r.id === id);
+    if (idx === -1) return null;
+    const swapIdx = direction === 'up' ? idx - 1 : idx + 1;
+    if (swapIdx < 0 || swapIdx >= all.length) return fromRow(all[idx]);
+    const reordered = all.slice();
+    [reordered[idx], reordered[swapIdx]] = [reordered[swapIdx], reordered[idx]];
+    const updSort = db.prepare('UPDATE courses SET sort_order = ? WHERE id = ?');
+    reordered.forEach((row, i) => updSort.run(i, row.id));
+    return fromRow(selById.get(id));
+  },
 };

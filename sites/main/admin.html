@@ -3579,9 +3579,13 @@ function renderCoursesGrid() {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px">Курсів поки немає</div>';
     return;
   }
-  grid.innerHTML = _allCourses.map(c => `
+  grid.innerHTML = _allCourses.map((c, i) => `
     <div style="background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-xl);padding:20px;position:relative">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <button class="btn btn-ghost btn-sm" style="padding:2px 8px" title="Підняти вище" ${i===0?'disabled':''} onclick="reorderCourse('${c.id}','up')">▲</button>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 8px" title="Опустити нижче" ${i===_allCourses.length-1?'disabled':''} onclick="reorderCourse('${c.id}','down')">▼</button>
+        </div>
         <div style="width:48px;height:48px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:26px;background:${c.color}22;border:1px solid ${c.color}44">${c.emoji}</div>
         <div style="flex:1">
           <div style="font-size:15px;font-weight:800;color:var(--c-ink)">${esc(c.name)}</div>
@@ -3675,6 +3679,18 @@ async function deleteCourse(id) {
     const res = await fetch(apiUrl(`/api/courses/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
     showToast('Курс видалено ✓', 'success');
+    await loadCoursesTab();
+  } catch { showToast('Помилка', 'error'); }
+}
+
+async function reorderCourse(id, direction) {
+  try {
+    const res = await fetch(apiUrl(`/api/courses/${id}/reorder`), {
+      method: 'POST',
+      headers: authHeaders({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ direction }),
+    });
+    if (!res.ok) { showToast('Помилка', 'error'); return; }
     await loadCoursesTab();
   } catch { showToast('Помилка', 'error'); }
 }

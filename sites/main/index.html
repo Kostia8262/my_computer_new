@@ -1540,6 +1540,21 @@
   function grid() { return document.getElementById('coursesGrid'); }
   function cards() { return Array.from(document.querySelectorAll('#coursesGrid .course-card')); }
 
+  // Card content/copy stays hardcoded in this file; only the display order
+  // comes from the DB (courses.sort_order), so admins can reorder via arrows
+  // in admin.html without duplicating course data into the API response.
+  function reorderFromApi() {
+    fetch('/api/courses').then(function(r) { return r.json(); }).then(function(data) {
+      var order = (data.courses || []).map(function(c) { return c.id; });
+      var g = grid();
+      order.forEach(function(id) {
+        var card = g.querySelector('.course-card[data-url="/courses/' + id + '"]');
+        if (card) g.appendChild(card);
+      });
+      applyFilter();
+    }).catch(function() {});
+  }
+
   function applyFilter() {
     cards().forEach(function(c) {
       var ages = (c.dataset.age || '').split(',').map(function(a) { return a.trim(); });
@@ -1591,6 +1606,7 @@
   document.addEventListener('DOMContentLoaded', function() {
     var g = grid();
     applyFilter();
+    reorderFromApi();
 
     // Tabs
     document.querySelectorAll('.courses__tab').forEach(function(tab) {

@@ -1804,6 +1804,15 @@ app.patch('/api/courses/:id', adminLimiter, requireAdmin, requireNotTeacher, (re
   res.json({ success: true, course });
 });
 
+app.post('/api/courses/:id/reorder', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
+  if (!SAFE_ID_RE.test(req.params.id)) return res.status(400).json({ error: 'Invalid course ID' });
+  const direction = req.body && req.body.direction;
+  if (direction !== 'up' && direction !== 'down') return res.status(400).json({ error: 'Invalid direction' });
+  const course = coursesDb.move(req.params.id, direction);
+  if (!course) return res.status(404).json({ error: 'Курс не знайдено' });
+  res.json({ success: true, course });
+});
+
 app.delete('/api/courses/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   if (!SAFE_ID_RE.test(req.params.id)) return res.status(400).json({ error: 'Invalid course ID' });
   const ok = coursesDb.delete(req.params.id);
