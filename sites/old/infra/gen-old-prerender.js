@@ -100,6 +100,26 @@ async function snapshotPage(page, url, waitSelector) {
   return html;
 }
 
+// vhconf.conf rewrites requests for `url` straight to `outPath` whenever
+// that snapshot file already exists — so navigating puppeteer to the live
+// URL while a prior snapshot sits at outPath doesn't render the current
+// app at all, it just re-serves (and re-captures) that same stale file
+// forever. Move it out of the way first so the navigation actually hits
+// the real SPA, then restore it on failure so a bad run still can't take
+// the page down (writeSnapshot's own tmp+rename handles the success path).
+async function regenerate(outPath, generate) {
+  const stalePath = outPath + '.stale';
+  const hadExisting = fs.existsSync(outPath);
+  if (hadExisting) fs.renameSync(outPath, stalePath);
+  try {
+    await generate();
+  } catch (e) {
+    if (hadExisting) fs.renameSync(stalePath, outPath);
+    throw e;
+  }
+  if (hadExisting && fs.existsSync(stalePath)) fs.unlinkSync(stalePath);
+}
+
 async function run() {
   if (!fs.existsSync(templatePath)) {
     console.error('FATAL: template not found at', templatePath);
@@ -120,10 +140,13 @@ async function run() {
     await page.setViewport({ width: 1440, height: 900 });
 
     // --- Homepage ---
+    const homePath = path.join(clientDir, 'prerender', 'home.html');
     try {
-      const html = await snapshotPage(page, BASE + '/', '#root .header__text h1');
-      const bytes = writeSnapshot(path.join(clientDir, 'prerender', 'home.html'), html, template);
-      console.log(`home: wrote ${bytes} bytes`);
+      await regenerate(homePath, async () => {
+        const html = await snapshotPage(page, BASE + '/', '#root .header__text h1');
+        const bytes = writeSnapshot(homePath, html, template);
+        console.log(`home: wrote ${bytes} bytes`);
+      });
       homeOk = true;
     } catch (e) {
       console.error('home: FAILED —', e.message);
@@ -138,14 +161,13 @@ async function run() {
       for (const c of list) {
         if (!c.id) continue;
         const url = `${BASE}/course/${c.id}/`;
+        const coursePath = path.join(clientDir, 'prerender', 'course', `${c.id}.html`);
         try {
-          const html = await snapshotPage(page, url, '#root .header__text h1');
-          const bytes = writeSnapshot(
-            path.join(clientDir, 'prerender', 'course', `${c.id}.html`),
-            html,
-            template
-          );
-          console.log(`course/${c.id}: wrote ${bytes} bytes`);
+          await regenerate(coursePath, async () => {
+            const html = await snapshotPage(page, url, '#root .header__text h1');
+            const bytes = writeSnapshot(coursePath, html, template);
+            console.log(`course/${c.id}: wrote ${bytes} bytes`);
+          });
           written++;
         } catch (e) {
           console.error(`course/${c.id}: FAILED —`, e.message);
