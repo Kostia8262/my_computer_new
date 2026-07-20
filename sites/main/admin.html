@@ -771,6 +771,11 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
         <h2 class="page-title">📰 Статті / Блог</h2>
         <button class="btn btn-primary btn-sm" onclick="openArticleModal(null)">+ Нова стаття</button>
       </div>
+      <div class="toolbar">
+        <select class="filter-select" id="articleCategoryFilter" onchange="renderArticlesTable()">
+          <option value="">Всі категорії</option>
+        </select>
+      </div>
       <div class="table-wrap">
         <table style="min-width:700px">
           <thead><tr>
@@ -3911,18 +3916,31 @@ async function loadArticlesTab() {
     const res = await fetch(apiUrl('/api/articles?all=1'), { headers: authHeaders() });
     const data = await res.json();
     _articles = data.articles || [];
+    populateArticleCategoryFilter();
     renderArticlesTable();
   } catch { showToast('Помилка завантаження статей', 'error'); }
+}
+
+function populateArticleCategoryFilter() {
+  const sel = document.getElementById('articleCategoryFilter');
+  if (!sel) return;
+  const prev = sel.value;
+  const categories = [...new Set(_articles.map(a => a.category).filter(Boolean))].sort();
+  sel.innerHTML = `<option value="">Всі категорії</option>` +
+    categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  if (categories.includes(prev)) sel.value = prev;
 }
 
 function renderArticlesTable() {
   const tbody = document.getElementById('articlesBody');
   if (!tbody) return;
-  if (!_articles.length) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty">Статей ще немає. Натисніть "+ Нова стаття"</td></tr>`;
+  const categoryFilter = document.getElementById('articleCategoryFilter')?.value || '';
+  const articles = categoryFilter ? _articles.filter(a => a.category === categoryFilter) : _articles;
+  if (!articles.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">${_articles.length ? 'Немає статей у цій категорії' : 'Статей ще немає. Натисніть "+ Нова стаття"'}</td></tr>`;
     return;
   }
-  tbody.innerHTML = _articles.map((a, i) => `
+  tbody.innerHTML = articles.map((a, i) => `
     <tr>
       <td style="color:var(--c-gray-500);font-size:12px">${i+1}</td>
       <td>
