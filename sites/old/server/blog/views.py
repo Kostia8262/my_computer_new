@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Post
-from .serializers import PostSerializer
+from .serializers import PostSerializer, PostListSerializer
 from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 
@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 def posts(request):
     if request.method == 'GET':
         posts = Post.objects.filter(is_published=True)
-        serializer = PostSerializer(posts, many=True, context={
+        serializer = PostListSerializer(posts, many=True, context={
                                     'request': request})
         return Response(serializer.data)
     elif request.method == 'POST':

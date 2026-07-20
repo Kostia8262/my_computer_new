@@ -3,13 +3,15 @@ import { BlogPostCard, BlogPostCardDescription, BlogPostCardHeader, BlogPostCard
 import { PostMeta } from '../../../shared/ui/PostMeta/PostMeta';
 import next_chev from '../../../shared/assets/icons/interface/next_chev.svg'
 
+const DEFAULT_IMAGE = 'https://old.mycomputer.education/og-image.png';
+
 export const BlogPost = ({ id, title, description, image, date, time }) => {
     return (
         <BlogPostCard>
             <BlogPostCardHeader>
                     <BlogPostCardMedia
                         component="img"
-                        image={image}
+                        image={image || DEFAULT_IMAGE}
                         alt={title}
                     />
                 <BlogPostCardTitleWrapper>

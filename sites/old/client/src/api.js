@@ -65,7 +65,9 @@ export const getPosts = async () => {
 }
 
 export const getPostById = async (id) => {
-    return await get(`posts/${id}/`)
+    const response = await fetch(BASE_URL + `posts/${id}/`);
+    if (!response.ok) return null;
+    return await response.json();
 }
 
 export const getDiscounts = async () => {

@@ -9,9 +9,10 @@ import { mapServerPost } from '../../utlis/postValidator';
 import { NavigateBackButton } from '../../shared/ui/NavigateButton';
 
 export const Blog = () => {
-    const posts = useContext(DataContext).posts || [];
+    const posts = useContext(DataContext).posts;
 
-    const showSkeletons = posts.length === 0;
+    const isLoading = posts === null || posts === undefined;
+    const isEmpty = !isLoading && posts.length === 0;
 
 
     return (
@@ -34,19 +35,27 @@ export const Blog = () => {
                     </Typography>
                 </Box>
 
-                <Grid container spacing={2}>
-                    {showSkeletons
-                        ? [...Array(4)].map((_, i) => (
-                            <Grid item xs={12} sm={6} key={i}>
-                                <BlogPostSkeleton />
-                            </Grid>
-                        ))
-                        : posts.map((post) => (
-                            <Grid item xs={12} sm={6} key={post.id}>
-                                <BlogPost {...mapServerPost(post)} />
-                            </Grid>
-                        ))}
-                </Grid>
+                {isEmpty ? (
+                    <Box textAlign="center" py={8}>
+                        <Typography variant="h6" color="text.secondary">
+                            Статей поки немає. Зазирайте пізніше!
+                        </Typography>
+                    </Box>
+                ) : (
+                    <Grid container spacing={2}>
+                        {isLoading
+                            ? [...Array(4)].map((_, i) => (
+                                <Grid item xs={12} sm={6} key={i}>
+                                    <BlogPostSkeleton />
+                                </Grid>
+                            ))
+                            : posts.map((post) => (
+                                <Grid item xs={12} sm={6} key={post.id}>
+                                    <BlogPost {...mapServerPost(post)} />
+                                </Grid>
+                            ))}
+                    </Grid>
+                )}
             </Container>
         </BlogWrapper>
     );

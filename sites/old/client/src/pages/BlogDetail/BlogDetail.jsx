@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Helmet } from 'react-helmet-async';
 import { Container, Typography, Box } from "@mui/material";
+import DOMPurify from "dompurify";
 import { BlogDetailContent, BlogDetailHeader, BlogDetailImage, BlogDetailWrapper } from "./BlogDetail.styles";
 import { getPostById } from "../../api";
 import { mapServerPostDetail } from "../../utlis/postValidator";
@@ -11,46 +12,84 @@ import { BlogDetailSkeleton } from "./BlogDetailSkeleton";
 import { BlogSlider } from "../../widgets/BlogSlider";
 import { DataContext } from "../../app/providers/DataProvider";
 
+const DEFAULT_IMAGE = 'https://old.mycomputer.education/og-image.png';
 
 export const BlogDetail = () => {
     const { id } = useParams();
     const [post, setPost] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [notFound, setNotFound] = useState(false);
 
     const { posts } = useContext(DataContext) || [];
 
     useEffect(() => {
         if (!id) return;
-        getPostById(Number(id)).then((data) => {
-            setPost(mapServerPostDetail(data));
-            setLoading(false);
-        });
+        setLoading(true);
+        setNotFound(false);
+        getPostById(Number(id))
+            .then((data) => {
+                if (!data) {
+                    setNotFound(true);
+                    setPost(null);
+                } else {
+                    setPost(mapServerPostDetail(data));
+                }
+                setLoading(false);
+            })
+            .catch(() => {
+                setNotFound(true);
+                setPost(null);
+                setLoading(false);
+            });
     }, [id]);
 
     if (loading) return <BlogDetailSkeleton />;
 
-    if (!post) return null;
+    if (notFound || !post) {
+        return (
+            <BlogDetailWrapper>
+                <Container>
+                    <Box display="flex" alignItems={'center'} sx={{ mb: { xs: 3, md: 5 } }}>
+                        <NavigateBackButton />
+                        <Typography variant="h5" component="h2" sx={{ marginLeft: { xs: '12px', md: '20px' }, fontSize: { xs: '22px', md: '28px' }, letterSpacing: 3, fontWeight: 900, textTransform: 'capitalize' }}>
+                            Статті
+                        </Typography>
+                    </Box>
+                    <Box textAlign="center" py={8}>
+                        <Typography variant="h5" component="h1" mb={2}>
+                            Статтю не знайдено
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                            Можливо, її ще не опублікували або вона була видалена.
+                        </Typography>
+                    </Box>
+                </Container>
+            </BlogDetailWrapper>
+        );
+    }
+
+    const postImage = post.image || DEFAULT_IMAGE;
 
     const articleSchema = {
         '@context': 'https://schema.org',
         '@type': 'BlogPosting',
         headline: post.title,
         description: post.description,
-        image: post.image || 'https://mycomputer.education/og-image.png',
+        image: postImage,
         datePublished: post.isoDate,
         dateModified: post.isoDate,
-        url: `https://mycomputer.education/posts/${id}/`,
+        url: `https://old.mycomputer.education/posts/${id}/`,
         author: {
             '@type': 'Organization',
             name: "Академія Мій Комп'ютер",
-            url: 'https://mycomputer.education',
+            url: 'https://old.mycomputer.education',
         },
         publisher: {
             '@type': 'Organization',
             name: "Академія Мій Комп'ютер",
             logo: {
                 '@type': 'ImageObject',
-                url: 'https://mycomputer.education/og-image.png',
+                url: DEFAULT_IMAGE,
             },
         },
     };
@@ -66,13 +105,8 @@ export const BlogDetail = () => {
                 <meta property="og:url" content={`https://old.mycomputer.education/posts/${id}/`} />
                 <meta property="og:title" content={post.title} />
                 <meta property="og:description" content={post.description} />
-                {post.image && <meta property="og:image" content={post.image} />}
-                <script type="application/ld+json">{JSON.stringify({
-                    ...articleSchema,
-                    url: `https://old.mycomputer.education/posts/${id}/`,
-                    author: { '@type': 'Organization', name: "Академія Мій Комп'ютер", url: 'https://old.mycomputer.education' },
-                    publisher: { '@type': 'Organization', name: "Академія Мій Комп'ютер", logo: { '@type': 'ImageObject', url: 'https://old.mycomputer.education/og-image.png' } },
-                })}</script>
+                <meta property="og:image" content={postImage} />
+                <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
             </Helmet>
             <Container>
                 <Box display="flex" alignItems={'center'} sx={{mb: {xs: 3, md: 5 }}}>
@@ -83,7 +117,7 @@ export const BlogDetail = () => {
                 </Box>
                 <BlogDetailHeader>
                     <BlogDetailImage
-                        src={post.image}
+                        src={postImage}
                         alt={post.title}
                     />
                     <Box flexGrow={1} ml={2}>
@@ -97,7 +131,7 @@ export const BlogDetail = () => {
                     </Box>
                 </BlogDetailHeader>
 
-                <BlogDetailContent dangerouslySetInnerHTML={{ __html: post.content }} />
+                <BlogDetailContent dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || '') }} />
                 {posts?.length ? <BlogSlider posts={posts} title={'Статті'}/> : ''}
             </Container>
         </BlogDetailWrapper>
