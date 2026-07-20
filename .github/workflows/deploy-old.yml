@@ -128,7 +128,12 @@ jobs:
           # Kill old's workers explicitly first so every request after this
           # deploy hits freshly-spawned processes running the new code.
           pkill -9 -f 'lswsgi.*old.mycomputer' || true
-          /usr/local/lsws/bin/lswsctrl restart
+          # Plain `restart` (graceful, SIGUSR1) was also seen NOT reloading
+          # this vhost's rewrite rules after a vhconf.conf change — the new
+          # file was on disk but the running process kept serving the old
+          # rule set until a hard stop+start. fullrestart guarantees a clean
+          # process picking up the current config every deploy.
+          /usr/local/lsws/bin/lswsctrl fullrestart
           echo "Deploy complete: $(date)"
           ENDSSH
             echo "Attempt $attempt failed, retrying in 20s..."
