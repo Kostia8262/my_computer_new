@@ -33,13 +33,13 @@ export const Course = () => {
     return (
         <div>
             <Helmet>
-                <title>{course?.name ? `${course.name} — курс у Дніпрі | Академія Мій Комп'ютер` : "Академія Мій Комп'ютер Дніпро | Курси"}</title>
-                <meta name="description" content={course?.name ? `Курс ${course.name} в Академії Мій Комп'ютер Дніпро. ${course.description ? course.description.slice(0, 110) + '.' : 'Навчання для дітей і дорослих онлайн та офлайн. Досвідчені викладачі, малі групи, сертифікат.'}` : "Курси програмування для дітей і дорослих у Дніпрі."} />
-                <meta name="keywords" content={course?.name ? `${course.name}, курс ${course.name} Дніпро, ${course.name} онлайн, навчання ${course.name}, Академія Мій Комп'ютер, курси програмування Дніпро, IT курси для дітей` : "курси програмування Дніпро, IT курси для дітей, Академія Мій Комп'ютер"} />
+                <title>{course?.name ? `${course.name} — курс онлайн | Академія Мій Комп'ютер` : "Академія Мій Комп'ютер | Курси програмування та дизайну"}</title>
+                <meta name="description" content={course?.name ? `Курс ${course.name} в Академії Мій Комп'ютер. ${course.description ? course.description.slice(0, 110) + '.' : 'Навчання для дітей і дорослих онлайн та офлайн. Досвідчені викладачі, малі групи, сертифікат.'}` : "Курси програмування для дітей і дорослих по всій Україні."} />
+                <meta name="keywords" content={course?.name ? `${course.name}, курс ${course.name} онлайн, навчання ${course.name}, Академія Мій Комп'ютер, курси програмування онлайн, IT курси для дітей` : "курси програмування онлайн, IT курси для дітей, Академія Мій Комп'ютер"} />
                 <link rel="canonical" href={`https://old.mycomputer.education/course/${params.id}/`} />
                 <meta property="og:url" content={`https://old.mycomputer.education/course/${params.id}/`} />
-                <meta property="og:title" content={course?.name ? `${course.name} — курс у Дніпрі | Академія Мій Комп'ютер` : "Академія Мій Комп'ютер Дніпро"} />
-                <meta property="og:description" content={course?.name ? `Курс ${course.name} в Академії Мій Комп'ютер Дніпро. Навчання онлайн та офлайн, малі групи, сертифікат.` : ''} />
+                <meta property="og:title" content={course?.name ? `${course.name} — курс онлайн | Академія Мій Комп'ютер` : "Академія Мій Комп'ютер"} />
+                <meta property="og:description" content={course?.name ? `Курс ${course.name} в Академії Мій Комп'ютер. Навчання онлайн по всій Україні, малі групи, сертифікат.` : ''} />
                 <meta property="og:image" content="https://old.mycomputer.education/og-image.png" />
                 {course && <script type="application/ld+json">{JSON.stringify({
                     '@context': 'https://schema.org',

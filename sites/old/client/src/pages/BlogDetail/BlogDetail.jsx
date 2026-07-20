@@ -58,9 +58,9 @@ export const BlogDetail = () => {
     return (
         <BlogDetailWrapper>
             <Helmet>
-                <title>{post.title} | Академія Мій Комп'ютер Дніпро</title>
+                <title>{post.title} | Академія Мій Комп'ютер</title>
                 <meta name="description" content={post.description} />
-                <meta name="keywords" content={`${post.title}, програмування Дніпро, IT навчання, Академія Мій Комп'ютер, курси для дітей`} />
+                <meta name="keywords" content={`${post.title}, програмування онлайн, IT навчання, Академія Мій Комп'ютер, курси для дітей`} />
                 <link rel="canonical" href={`https://old.mycomputer.education/posts/${id}/`} />
                 <meta property="og:type" content="article" />
                 <meta property="og:url" content={`https://old.mycomputer.education/posts/${id}/`} />

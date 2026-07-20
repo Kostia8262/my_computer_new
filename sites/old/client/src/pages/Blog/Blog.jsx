@@ -17,12 +17,12 @@ export const Blog = () => {
     return (
         <BlogWrapper>
             <Helmet>
-                <title>Блог про програмування та IT | Академія Мій Комп'ютер Дніпро</title>
-                <meta name="description" content="Статті про програмування, веб-дизайн та IT від викладачів Академії Мій Комп'ютер у Дніпрі. Корисні поради для дітей, батьків та початківців." />
-                <meta name="keywords" content="блог програмування, статті про IT, програмування для дітей, веб-дизайн навчання, Академія Мій Комп'ютер, IT поради Дніпро" />
+                <title>Блог про програмування та IT | Академія Мій Комп'ютер</title>
+                <meta name="description" content="Статті про програмування, веб-дизайн та IT від викладачів Академії Мій Комп'ютер. Корисні поради для дітей, батьків та початківців." />
+                <meta name="keywords" content="блог програмування, статті про IT, програмування для дітей, веб-дизайн навчання, Академія Мій Комп'ютер, IT поради" />
                 <link rel="canonical" href="https://old.mycomputer.education/posts/" />
                 <meta property="og:url" content="https://old.mycomputer.education/posts/" />
-                <meta property="og:title" content="Блог про програмування та IT | Академія Мій Комп'ютер Дніпро" />
+                <meta property="og:title" content="Блог про програмування та IT | Академія Мій Комп'ютер" />
                 <meta property="og:description" content="Статті про програмування, веб-дизайн та IT від викладачів Академії Мій Комп'ютер." />
                 <meta property="og:image" content="https://old.mycomputer.education/og-image.png" />
             </Helmet>
