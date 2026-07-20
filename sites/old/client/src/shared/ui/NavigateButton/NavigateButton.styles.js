@@ -13,4 +13,7 @@ export const NavigateButtonRoot = styled(Button)(({theme})=>({
     '& .MuiButton-startIcon': {
         margin: 0,
     },
+    '& .MuiButton-startIcon svg': {
+        fontSize: '14px',
+    },
 }))
