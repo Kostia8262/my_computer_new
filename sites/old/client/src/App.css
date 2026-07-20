@@ -564,6 +564,19 @@ header {
     z-index: -1;
 }
 
+/* Between the mobile breakpoint (567px, where these are already hidden) and
+   ~900px, the illustration group (header__img) is pushed off the visible
+   area by its fixed negative offsets while header__blop's left edge still
+   pokes into view — an orphaned, misaligned yellow/navy shape with no
+   illustration next to it. Hide both together in that range instead of
+   letting the shape render alone. */
+@media screen and (max-width: 900px) {
+    .header__blop,
+    .header__img {
+        display: none;
+    }
+}
+
 .cross {
     position: absolute;
 }
