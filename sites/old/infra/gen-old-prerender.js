@@ -47,11 +47,39 @@ function fetchJson(url) {
   });
 }
 
+function stripPreloaderDiv(html) {
+  const openTag = '<div class="preloader">';
+  const start = html.indexOf(openTag);
+  if (start === -1) return html;
+
+  // The preloader div nests two child divs (icon A / icon B), so a
+  // non-greedy `[\s\S]*?<\/div>` regex stops at the FIRST closing tag
+  // (icon A's) and leaves icon B's div plus the outer closing </div>
+  // behind as orphaned markup — that stray, unstyled "ACADEMY" text is
+  // exactly what real visitors were seeing on every page. Track nesting
+  // depth instead so the whole block, however it's nested, is removed.
+  const tagRe = /<div\b[^>]*>|<\/div>/g;
+  tagRe.lastIndex = start;
+  let depth = 0;
+  let match;
+  while ((match = tagRe.exec(html))) {
+    if (match[0] === '</div>') {
+      depth--;
+    } else {
+      depth++;
+    }
+    if (depth === 0) {
+      return html.slice(0, start) + html.slice(tagRe.lastIndex);
+    }
+  }
+  return html; // unbalanced markup — leave untouched rather than corrupt it
+}
+
 function writeSnapshot(outPath, rootHtml, template) {
   let doc = template;
   // Drop the preloader — the snapshot already has real content, a loading
   // spinner would only hide it behind an unnecessary extra step.
-  doc = doc.replace(/<div class="preloader">[\s\S]*?<\/div>/, '');
+  doc = stripPreloaderDiv(doc);
   doc = doc.replace(/<script src="\/js\/preloader\.js"><\/script>/, '');
   doc = doc.replace('<div id="root"></div>', `<div id="root">${rootHtml}</div>`);
 
