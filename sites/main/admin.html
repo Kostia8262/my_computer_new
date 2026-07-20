@@ -2240,12 +2240,14 @@ function renderClientStats(stats) {
   const el = document.getElementById('clientStatsRow');
   if (!el) return;
   const newThisMonth = (_allClients || []).filter(c => c.status === 'new' && _isCurrentMonth(c.createdAt)).length;
+  const alive = (stats.total || 0) - (stats.completed || 0) - (stats.churned || 0);
   el.innerHTML = [
-    ['Всього', stats.total || 0, 'var(--c-brand-500)'],
+    ['Активних в базі', alive, 'var(--c-brand-500)'],
     ['Нові', newThisMonth, 'var(--c-info-text)'],
     ['Активні', stats.active || 0, 'var(--c-success-text)'],
     ['Пауза', stats.paused || 0, 'var(--c-warning-text)'],
     ['Завершили', stats.completed || 0, 'var(--c-done-text)'],
+    ['Відмовились', stats.churned || 0, 'var(--c-danger-text)'],
   ].map(([label, num, color]) => `
     <div class="stat"><div class="stat-num" style="color:${color}">${num}</div><div class="stat-label">${label}</div></div>
   `).join('');
