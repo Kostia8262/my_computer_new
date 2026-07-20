@@ -778,7 +778,15 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
   .partners__logos{gap:20px}
   .benefits__grid{grid-template-columns:1fr}
   /* Courses phone — peek slider 1.5 cards: card = (vw-32px)/1.5 - 16px ≈ 57vw */
-  .course-card{flex:0 0 57vw;height:426px}
+  /* Height budget: header(64) + body padding(14+16) + title capped at
+     2 lines(36+8 margin) + features capped at 3 items x 2 lines(120) +
+     footer(86) = 344, +2px rounding buffer. Was 426px — most cards only
+     need 1-line features/title, leaving ~90-190px of dead space below
+     the checklist that this now trims instead of stretching every card
+     to match the tallest one. */
+  .course-card{flex:0 0 57vw;height:346px}
+  .course-card__title{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .course-card__features li{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 }
 
 /* ===================================================
