@@ -71,13 +71,13 @@ export const ModalDiscount = ({
 
           {has_discount && discount_percent && Number(discount_percent) > 0 && (
             <Bonus>
-              <span>Бонус:</span> <strong>{Math.floor(Number(discount_percent))}%</strong>
+              <span>Р‘РѕРЅСѓСЃ:</span> <strong>{Math.floor(Number(discount_percent))}%</strong>
             </Bonus>
           )}
 
           {has_promo && promo && (
             <BonusCode>
-              <span>Промокод:</span> <strong>{promo}</strong>
+              <span>РџСЂРѕРјРѕРєРѕРґ:</span> <strong>{promo}</strong>
             </BonusCode>
           )}
 
@@ -88,7 +88,7 @@ export const ModalDiscount = ({
 
           <ModalActions>
             <ModalButton onClick={handleGetBonus}>
-              Получить бонус
+              РћС‚СЂРёРјР°С‚Рё Р±РѕРЅСѓСЃ
             </ModalButton>
           </ModalActions>
       </ContentWrapper>

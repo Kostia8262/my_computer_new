@@ -15,7 +15,7 @@ const ModalSuccess = () => {
     return (
         <div className='modal__wrapper modal--success' onClick={(e) => { wrapperHandler(e) }}>
             <div className="modal__content">
-                <h2>Дякуемо за заявку</h2>
+                <h2>Дякуємо за заявку</h2>
                 <p>{modalStates['success'].content}</p>
                 <ul>
                     <li><a href="https://www.instagram.com/my_computer_academy_/" aria-label="Instagram"><img src={inst} alt="Instagram" /></a></li>

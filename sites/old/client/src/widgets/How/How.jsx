@@ -45,7 +45,7 @@ const How = () => {
                     </div>
                     <div className="how__card">
                         <img className='how__card_icon' src={palett} alt="" />
-                        <p>Оформлюєм портфоліо</p>
+                        <p>Оформлюємо портфоліо</p>
                         <img className='how__card_pop' src={howto_boy_pop} alt="" loading="lazy" />
                     </div>
                     <div className="how__card">

@@ -51,7 +51,7 @@ const CourseCards = ({ courses }) => {
                 <div slot="container-start" className="ways__buttons">
                     <div className="ways__categories">
                         <button className={tag == '' ? 'active' : ''} onClick={() => { setTag('') }}>Всі</button>
-                        <button className={tag == 'design' ? 'active' : ''} onClick={() => { setTag('design') }}>Дизайн та 3д</button>
+                        <button className={tag == 'design' ? 'active' : ''} onClick={() => { setTag('design') }}>Дизайн та 3D</button>
                         <button className={tag == 'dev' ? 'active' : ''} onClick={() => { setTag('dev') }}>Програмування</button>
                         <button className={tag == 'child' ? 'active' : ''} onClick={() => { setTag('child') }}>Курси для дітей</button>
                         <button className={tag == 'office' ? 'active' : ''} onClick={() => { setTag('office') }}>Офісні та SEO SMM</button>

@@ -12,7 +12,7 @@ const Program = ({ themes }) => {
                     <div className="heading__icon">
                         <img src={scroll} alt="" />
                     </div>
-                    <h2>Програма курса</h2>
+                    <h2>Програма курсу</h2>
                 </div>
                 <div className="program__cards">
                     {themes ? themes.map((theme, id) =>

@@ -10,7 +10,7 @@ export const Banner = () => {
             <Container>
                 <BannerContent>
                     <BannerIcon>!</BannerIcon>
-                    <BannerText>Ми уважно стежимо за актуальністю курсу і технологій, щоб ваші навички максимально відповідали реальній роботі в iT сфері.</BannerText>
+                    <BannerText>Ми уважно стежимо за актуальністю курсу і технологій, щоб ваші навички максимально відповідали реальній роботі в IT сфері.</BannerText>
                 </BannerContent>
             </Container>
         </BannerWrapper>

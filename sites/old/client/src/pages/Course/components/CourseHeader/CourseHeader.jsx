@@ -19,7 +19,7 @@ export const CourseHeader = ({ course }) => {
                                     <li className="header__item" key={id}>{spec.text}</li>
                                 ) : ''}
                             </ul>
-                            <button onClick={() => { downloadFile(course.id) }}>Завантажити программу</button>
+                            <button onClick={() => { downloadFile(course.id) }}>Завантажити програму</button>
                         </div>
                     ) : (
                         <div className="header__text">

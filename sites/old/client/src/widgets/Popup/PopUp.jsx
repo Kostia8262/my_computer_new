@@ -36,7 +36,7 @@ const PopUp = ({ isPopup, closePopup }) => {
                 <div className="popup__body">
                     <div className="popup__categories">
                         <button className={`popup__category ${tag == '' ? 'active' : ''}`} onClick={() => { setTag('') }}>Всі</button>
-                        <button className={`popup__category ${tag == 'design' ? 'active' : ''}`} onClick={() => { setTag('design') }}>Дизайн та 3д</button>
+                        <button className={`popup__category ${tag == 'design' ? 'active' : ''}`} onClick={() => { setTag('design') }}>Дизайн та 3D</button>
                         <button className={`popup__category ${tag == 'dev' ? 'active' : ''}`} onClick={() => { setTag('dev') }}>Програмування</button>
                         <button className={`popup__category ${tag == 'child' ? 'active' : ''}`} onClick={() => { setTag('child') }}>Курси для дітей</button>
                         <button className={`popup__category ${tag == 'office' ? 'active' : ''}`} onClick={() => { setTag('office') }}>Офісні та SEO SMM</button>

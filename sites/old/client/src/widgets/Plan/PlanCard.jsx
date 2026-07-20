@@ -1,11 +1,11 @@
 import { useContext } from 'react'
 import { ModalContext } from '../../app/providers/ModalProvider/ModalProvider';
 
-const PlanCard = ({ name, level = 'начальный', specs = [], link, price, discount, tag }) => {
+const PlanCard = ({ name, level = 'base', specs = [], link, price, discount, tag }) => {
     const { openModal } = useContext(ModalContext);
 
     if (!specs.length) {
-        specs = [{ text: 'описание' }, { text: 'описание' }, { text: 'описание' }]
+        specs = [{ text: 'опис' }, { text: 'опис' }, { text: 'опис' }]
     }
     let pricePeriod = tag == 'child' ? 'міс' : 'курс'
     let levelTag = { 'base': 'початковий', 'advanced': 'середній', 'expert': 'поглиблений' }[level]

@@ -15,7 +15,7 @@ export const HomeHeader = () => {
             <div className="container">
                 <div className="header">
                     <div className="header__text">
-                        <h1>ШКОЛА ПРОГРАМУВАННЯ <span>МІЙ&nbsp;КОМПЬЮТЕР</span> ДЛЯ ДІТЕЙ ТА ДОРОСЛИХ У ДНІПРІ</h1>
+                        <h1>ШКОЛА ПРОГРАМУВАННЯ <span>МІЙ&nbsp;КОМП'ЮТЕР</span> ДЛЯ ДІТЕЙ ТА ДОРОСЛИХ У ДНІПРІ</h1>
                         <p>Вивчайте курси з програмування, веб дизайну, 3Д моделювання, маркетингу, SEO, SMM, з нуля, займаючись зі своїм викладачем онлайн або в мережі наших офісів.</p>
                         <ul className="header__list">
                             <li className="header__item">Підходить для початківців</li>
