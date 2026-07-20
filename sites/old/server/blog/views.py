@@ -16,7 +16,7 @@ def posts(request):
                                     'request': request})
         return Response(serializer.data)
     elif request.method == 'POST':
-        if not request.user.is_authenticated:
+        if not request.user.is_staff:
             return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
@@ -37,7 +37,7 @@ def post_detail(request, post_id):
                                     'request': request})
         return Response(serializer.data)
     elif request.method == 'PUT':
-        if not request.user.is_authenticated:
+        if not request.user.is_staff:
             return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
         serializer = PostSerializer(post, data=request.data)
         if serializer.is_valid():
@@ -45,7 +45,7 @@ def post_detail(request, post_id):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'DELETE':
-        if not request.user.is_authenticated:
+        if not request.user.is_staff:
             return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

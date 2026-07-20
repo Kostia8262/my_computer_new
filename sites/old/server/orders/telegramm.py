@@ -9,4 +9,7 @@ def send_message(text):
         print('Telegram not configured: TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID missing')
         return
     bot = telepot.Bot(token)
-    bot.sendMessage(chat_id, text, parse_mode='Markdown')
+    # Plain text, not Markdown: lead names/messages routinely contain *, _, `
+    # or [ (e.g. "Іван_Петров"), which Telegram's Markdown parser rejects
+    # outright — that used to silently drop the notification entirely.
+    bot.sendMessage(chat_id, text)

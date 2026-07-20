@@ -7,6 +7,12 @@ const BASE_URL = process.env.REACT_APP_API_URL
 
 async function get(endpoint = '') {
     const response = await fetch(BASE_URL + endpoint);
+    // A 404 body ({"detail":"..."}) is still valid JSON, so without this
+    // check callers like getCourse() would treat the error object as real
+    // data — Course.jsx's `data?.name` guard then never becomes truthy for
+    // a deleted/invalid id, and the page is stuck on its loading skeleton
+    // forever instead of showing anything.
+    if (!response.ok) return null;
     return response.json();
 }
 

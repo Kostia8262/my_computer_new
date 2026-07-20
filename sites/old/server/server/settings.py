@@ -181,3 +181,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 3000
 
+# Only /order/ is throttled (see orders/views.py) — it's the one
+# unauthenticated endpoint that fans out to slow external services
+# (Telegram, CRM webhook, SMTP) per request, making it an easy target
+# for a handful of concurrent submissions to tie up worker processes.
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_RATES': {
+        'orders': '10/hour',
+    },
+}
+

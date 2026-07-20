@@ -1,8 +1,10 @@
 import os
 import smtplib
+from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
+from html import escape
 
 
 def send_lead_notification(order):
@@ -23,6 +25,14 @@ def send_lead_notification(order):
 
     time_str = datetime.now().strftime('%d.%m.%Y %H:%M')
 
+    # Escape before interpolating into HTML — order.name/message are raw
+    # user input and were previously inserted unescaped, so a lead message
+    # containing HTML/script tags rendered live in whoever's mail client
+    # opened the notification.
+    safe_name = escape(order.name)
+    safe_phone = escape(order.phone)
+    safe_message = escape(order.message)
+
     html = f"""\
 <!DOCTYPE html>
 <html lang="uk">
@@ -34,9 +44,9 @@ def send_lead_notification(order):
     </div>
     <div style="padding:24px 28px">
       <table style="width:100%;border-collapse:collapse">
-        <tr><td style="padding:8px 0;color:#888;width:140px">Ім'я</td><td style="padding:8px 0;font-weight:600">{order.name}</td></tr>
-        <tr><td style="padding:8px 0;color:#888">Телефон</td><td style="padding:8px 0"><strong><a href="tel:{order.phone}" style="color:#242538;text-decoration:none">{order.phone}</a></strong></td></tr>
-        <tr><td style="padding:8px 0;color:#888">Повідомлення</td><td style="padding:8px 0">{order.message}</td></tr>
+        <tr><td style="padding:8px 0;color:#888;width:140px">Ім'я</td><td style="padding:8px 0;font-weight:600">{safe_name}</td></tr>
+        <tr><td style="padding:8px 0;color:#888">Телефон</td><td style="padding:8px 0"><strong><a href="tel:{safe_phone}" style="color:#242538;text-decoration:none">{safe_phone}</a></strong></td></tr>
+        <tr><td style="padding:8px 0;color:#888">Повідомлення</td><td style="padding:8px 0">{safe_message}</td></tr>
         <tr><td style="padding:8px 0;color:#888">Заявка №</td><td style="padding:8px 0">#{order.id}</td></tr>
         <tr><td style="padding:8px 0;color:#888">Час</td><td style="padding:8px 0">{time_str}</td></tr>
       </table>
@@ -59,7 +69,9 @@ def send_lead_notification(order):
     msg = MIMEMultipart('alternative')
     msg['From'] = f'My Computer Academy <{smtp_user}>'
     msg['To'] = to_addr
-    msg['Subject'] = f'Нова заявка (old): {order.name}'
+    # Header() strips/encodes anything that could inject extra headers via
+    # CR/LF in a lead's name — raw f-string interpolation didn't.
+    msg['Subject'] = Header(f'Нова заявка (old): {order.name}'.replace('\r', ' ').replace('\n', ' '), 'utf-8')
     msg.attach(MIMEText(text, 'plain', 'utf-8'))
     msg.attach(MIMEText(html, 'html', 'utf-8'))
 

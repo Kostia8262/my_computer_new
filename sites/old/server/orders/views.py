@@ -1,10 +1,12 @@
+import logging
+
 from django.http import JsonResponse
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from .serializers import OrderSerializer
-import json
 
 from .models import Order
 from .telegramm import send_message
@@ -12,14 +14,21 @@ from .crm_forward import forward_to_main_crm
 from .mailer import send_lead_notification
 from localization.models import SiteSettings
 
+logger = logging.getLogger(__name__)
+
 
 @ensure_csrf_cookie
 def get_csrf_token(request):
     return JsonResponse({'csrf_token': get_token(request)})
 
 
+class OrderThrottle(ScopedRateThrottle):
+    scope = 'orders'
+
+
 @csrf_protect
 @api_view(['POST'])
+@throttle_classes([OrderThrottle])
 def post_order(request):
     site_settings = SiteSettings.objects.first()
     serializer = OrderSerializer(data=request.data)
@@ -30,19 +39,18 @@ def post_order(request):
         try:
             mailTextFormatted = f'{site_settings.tag}\nНовая заявка №{order.id}:\n{mailText}'
             send_message(mailTextFormatted)
-        except Exception as e:
-            print(e)
-            print(site_settings.tag)
+        except Exception:
+            logger.exception('Telegram notification failed for order %s', order.id)
 
         try:
             forward_to_main_crm(order)
-        except Exception as e:
-            print(f'CRM forward error: {e}')
+        except Exception:
+            logger.exception('CRM forward failed for order %s', order.id)
 
         try:
             send_lead_notification(order)
-        except Exception as e:
-            print(f'Email notification error: {e}')
+        except Exception:
+            logger.exception('Email notification failed for order %s', order.id)
 
         return Response({'message': 'Заявка успешно отправлена', 'order': order.id})
     else:

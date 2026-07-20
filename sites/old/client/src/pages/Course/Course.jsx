@@ -19,16 +19,36 @@ import { BlogSlider } from '../../widgets/BlogSlider'
 export const Course = () => {
     const params = useParams()
 
-    const [data, setData] = useState(null)
+    // undefined = not fetched yet (show the loading skeleton), null = the
+    // fetch resolved but the course doesn't exist (show a not-found
+    // message) — both used to collapse into the same falsy `data`, so an
+    // invalid/deleted course id got stuck on the skeleton forever.
+    const [data, setData] = useState(undefined)
 
     const { posts } = useContext(DataContext)
     const relatedPosts = posts ? posts.filter(post => post.courses.includes(data?.id)) : [];
 
     useEffect(() => {
+        setData(undefined)
         getCourse(params.id)
             .then(data => setData(data))
     }, [params]);
     const course = data?.name ? data : null
+    const notFound = data === null
+
+    if (notFound) {
+        return (
+            <div className="container" style={{ padding: '80px 0', textAlign: 'center' }}>
+                <Helmet>
+                    <title>Курс не знайдено | Академія Мій Комп'ютер</title>
+                    <meta name="robots" content="noindex" />
+                </Helmet>
+                <h1>Курс не знайдено</h1>
+                <p>Можливо, цей курс більше не пропонується. Перегляньте актуальні курси на головній сторінці.</p>
+                <a href="/">На головну</a>
+            </div>
+        )
+    }
 
     return (
         <div>
