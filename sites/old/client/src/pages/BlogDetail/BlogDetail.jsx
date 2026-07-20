@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom";
 import { Helmet } from 'react-helmet-async';
 import { Container, Typography, Box } from "@mui/material";
 import DOMPurify from "dompurify";
-import { BlogDetailContent, BlogDetailHeader, BlogDetailImage, BlogDetailWrapper } from "./BlogDetail.styles";
+import { BlogDetailContent, BlogDetailDescription, BlogDetailHero, BlogDetailImage, BlogDetailTitle, BlogDetailWrapper } from "./BlogDetail.styles";
 import { getPostById } from "../../api";
 import { mapServerPostDetail } from "../../utlis/postValidator";
-import { NavigateBackButton } from "../../shared/ui/NavigateButton";
+import { BlogPageHeader } from "../../shared/ui/BlogPageHeader";
 import { PostMeta } from "../../shared/ui/PostMeta/PostMeta";
 import { BlogDetailSkeleton } from "./BlogDetailSkeleton";
 import { BlogSlider } from "../../widgets/BlogSlider";
@@ -49,12 +49,7 @@ export const BlogDetail = () => {
         return (
             <BlogDetailWrapper>
                 <Container>
-                    <Box display="flex" alignItems={'center'} sx={{ mb: { xs: 3, md: 5 } }}>
-                        <NavigateBackButton />
-                        <Typography variant="h5" component="h2" sx={{ marginLeft: { xs: '12px', md: '20px' }, fontSize: { xs: '22px', md: '28px' }, letterSpacing: 3, fontWeight: 900, textTransform: 'capitalize' }}>
-                            Статті
-                        </Typography>
-                    </Box>
+                    <BlogPageHeader />
                     <Box textAlign="center" py={8}>
                         <Typography variant="h5" component="h1" mb={2}>
                             Статтю не знайдено
@@ -109,27 +104,22 @@ export const BlogDetail = () => {
                 <script type="application/ld+json">{JSON.stringify(articleSchema)}</script>
             </Helmet>
             <Container>
-                <Box display="flex" alignItems={'center'} sx={{mb: {xs: 3, md: 5 }}}>
-                    <NavigateBackButton />
-                    <Typography variant="h5" component="h2" sx={{ marginLeft: { xs:'12px',md:'20px'}, fontSize: { xs:'22px',md:'28px'}, letterSpacing:3, fontWeight: 900, textTransform:'capitalize' }}>
-                        Статті
-                    </Typography>
-                </Box>
-                <BlogDetailHeader>
+                <BlogPageHeader />
+                <BlogDetailHero>
                     <BlogDetailImage
                         src={postImage}
                         alt={post.title}
                     />
-                    <Box flexGrow={1} ml={2}>
-                        <PostMeta date={post.date} time={post.time} />
-                        <Typography component="h1" mb={2}>
+                    <Box flexGrow={1} display="flex" flexDirection="column" justifyContent="center">
+                        <PostMeta date={post.date} time={post.time} fontSize="14px" />
+                        <BlogDetailTitle component="h1">
                             {post.title}
-                        </Typography>
-                        <Typography variant="body1" mb={2}>
+                        </BlogDetailTitle>
+                        <BlogDetailDescription>
                             {post.description}
-                        </Typography>
+                        </BlogDetailDescription>
                     </Box>
-                </BlogDetailHeader>
+                </BlogDetailHero>
 
                 <BlogDetailContent dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(post.content || '') }} />
                 {posts?.length ? <BlogSlider posts={posts} title={'Статті'}/> : ''}

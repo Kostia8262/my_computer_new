@@ -31,7 +31,7 @@ export const BlogSlider = ({ posts, title, showAllBtn = true }) => {
                     {showAllBtn ? <NavigateButton sx={{minWidth:'50px',marginLeft:1}} onClick={() => navigate('/posts')}>Всі</NavigateButton>:''}
                 </Box>
             </Box>
-            <Box sx={{ overflow: 'hidden' }}>
+            <Box sx={{ overflowX: 'hidden', overflowY: 'visible', pt: 1, pb: 1, mt: -1, mb: -1 }}>
                 <Swiper
                     modules={[Navigation]}
                     navigation={{
