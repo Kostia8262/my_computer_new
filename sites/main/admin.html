@@ -782,7 +782,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
             <th style="width:50px">#</th>
             <th>Заголовок</th>
             <th>Категорія</th>
-            <th>Дата</th>
+            <th style="cursor:pointer;user-select:none" onclick="toggleArticleDateSort()">Дата <span id="articleDateSortIcon">↓</span></th>
             <th>Статус</th>
             <th></th>
           </tr></thead>
@@ -3910,6 +3910,14 @@ async function saveModuleVisibility() {
 // ── ARTICLES TAB ─────────────────────────────────────────────────────────────
 let _articles = [];
 let _articleEditId = null;
+let _articleDateSort = 'desc';
+
+function toggleArticleDateSort() {
+  _articleDateSort = _articleDateSort === 'desc' ? 'asc' : 'desc';
+  const icon = document.getElementById('articleDateSortIcon');
+  if (icon) icon.textContent = _articleDateSort === 'desc' ? '↓' : '↑';
+  renderArticlesTable();
+}
 
 async function loadArticlesTab() {
   try {
@@ -3935,7 +3943,11 @@ function renderArticlesTable() {
   const tbody = document.getElementById('articlesBody');
   if (!tbody) return;
   const categoryFilter = document.getElementById('articleCategoryFilter')?.value || '';
-  const articles = categoryFilter ? _articles.filter(a => a.category === categoryFilter) : _articles;
+  let articles = categoryFilter ? _articles.filter(a => a.category === categoryFilter) : _articles.slice();
+  articles.sort((a, b) => {
+    const cmp = (a.publishedAt || '').localeCompare(b.publishedAt || '');
+    return _articleDateSort === 'desc' ? -cmp : cmp;
+  });
   if (!articles.length) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty">${_articles.length ? 'Немає статей у цій категорії' : 'Статей ще немає. Натисніть "+ Нова стаття"'}</td></tr>`;
     return;
