@@ -8,6 +8,8 @@ import json
 
 from .models import Order
 from .telegramm import send_message
+from .crm_forward import forward_to_main_crm
+from .mailer import send_lead_notification
 from localization.models import SiteSettings
 
 
@@ -31,6 +33,16 @@ def post_order(request):
         except Exception as e:
             print(e)
             print(site_settings.tag)
+
+        try:
+            forward_to_main_crm(order)
+        except Exception as e:
+            print(f'CRM forward error: {e}')
+
+        try:
+            send_lead_notification(order)
+        except Exception as e:
+            print(f'Email notification error: {e}')
 
         return Response({'message': 'Заявка успешно отправлена', 'order': order.id})
     else:
