@@ -420,6 +420,15 @@ async function loadSiteContent() {
   } catch(e) { /* keep static fallback */ }
 }
 
+const AGE_BUCKETS = { '6-10': [6, 10], '10-14': [10, 14], '14-18': [14, 18] };
+function ageGroupLabel(ageGroup) {
+  const buckets = (ageGroup || '').split(',').map(a => a.trim()).map(a => AGE_BUCKETS[a]).filter(Boolean);
+  if (!buckets.length) return '';
+  const min = Math.min(...buckets.map(b => b[0]));
+  const max = Math.max(...buckets.map(b => b[1]));
+  return `${min}–${max} років`;
+}
+
 async function loadCourses() {
   try {
     const res = await fetch('/api/courses');
@@ -444,6 +453,7 @@ async function loadCourses() {
       const hClass   = COLOR_CLASS[c.id] || '';
       const hStyle   = hClass ? '' : `style="background:${esc(c.color || '#E2604A')}"`;
       const ageGroup = esc(c.age_group || '');
+      const ageLabel = esc(ageGroupLabel(c.age_group) || c.age || '');
       const popular  = c.popular ? ' course-card--popular' : '';
       const feats    = (c.features || []).map(f => {
         const text = typeof f === 'string' ? f : (currentLang === 'ru' ? (f.ru || f.ua || '') : (f.ua || ''));
@@ -453,7 +463,7 @@ async function loadCourses() {
       return `<div class="course-card${popular}" data-age="${ageGroup}" data-url="/courses/${esc(c.id)}">
         <div class="course-card__header ${hClass}" ${hStyle}>
           <div class="course-card__emoji">${esc(c.emoji || '')}</div>
-          <div class="course-card__age-badge">${esc(c.age)}</div>
+          <div class="course-card__age-badge">${ageLabel}</div>
         </div>
         <div class="course-card__body">
           <h3 class="course-card__title">${esc(c.name)}</h3>
@@ -480,14 +490,18 @@ async function loadCourses() {
     // Update nav dropdown
     const navDrop = document.querySelector('#coursesNavItem .nav__dropdown');
     if (navDrop) {
-      navDrop.innerHTML = active.map(c =>
-        `<a href="/courses/${esc(c.id)}"><span class="nav__dropdown-emoji">${c.emoji || ''}</span>${esc(c.name)}${c.age ? ` (${esc(c.age)})` : ''}</a>`
-      ).join('');
+      navDrop.innerHTML = active.map(c => {
+        const age = ageGroupLabel(c.age_group) || c.age || '';
+        return `<a href="/courses/${esc(c.id)}"><span class="nav__dropdown-emoji">${c.emoji || ''}</span>${esc(c.name)}${age ? ` (${esc(age)})` : ''}</a>`;
+      }).join('');
     }
 
     // Update all course selects in forms (lead forms + modal)
     const courseOpts = `<option value="" disabled selected>${currentLang === 'ru' ? 'Какой курс интересует?' : 'Який курс цікавить?'}</option>` +
-      active.map(c => `<option value="${esc(c.id)}">${c.emoji || ''} ${esc(c.name)}${c.age ? ` (${esc(c.age)})` : ''}</option>`).join('') +
+      active.map(c => {
+        const age = ageGroupLabel(c.age_group) || c.age || '';
+        return `<option value="${esc(c.id)}">${c.emoji || ''} ${esc(c.name)}${age ? ` (${esc(age)})` : ''}</option>`;
+      }).join('') +
       `<option value="help">${currentLang === 'ru' ? 'Помогите выбрать' : 'Допоможіть обрати'}</option>`;
     document.querySelectorAll('select[name="course"]').forEach(sel => {
       const cur = sel.value;
