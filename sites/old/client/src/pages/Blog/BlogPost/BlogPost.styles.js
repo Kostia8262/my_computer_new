@@ -8,12 +8,18 @@ export const BlogPostCard = styled(Card)(({ theme }) => ({
     boxShadow: theme.shadows[3],
     maxWidth: 580,
     height: 300,
-    borderRadius: '12px',
+    borderRadius: '14px',
+    borderTop: `3px solid ${theme.palette.success.main}`,
+    transition: '0.3s',
+    '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: `0px 0px 24px 0px rgba(255, 181, 6, 0.25)`,
+    },
 }));
 
 export const BlogPostCardHeader = styled(Box)({
     display: 'flex',
-    marginBottom: '20px',
+    marginBottom: '16px',
 });
 
 export const BlogPostCardMedia = styled(CardMedia)(({ theme }) => ({
@@ -31,18 +37,28 @@ export const BlogPostCardTitleWrapper = styled(Box)({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    height:'115px',
+    height: '110px',
 });
 
 export const BlogPostCardDescription = styled(Typography)({
-    height: 70,
-    marginBottom: '20px',
+    height: 62,
+    marginBottom: '16px',
+    fontSize: '14px',
+    lineHeight: '1.5em',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
 });
 
 export const BlogPostCardLink = styled(Link)(({ theme }) => ({
-    color: theme.palette.warning.main,
+    display: 'inline-flex',
+    alignItems: 'center',
+    fontSize: '14px',
+    fontWeight: 600,
+    color: theme.palette.success.main,
     textDecoration: 'none',
     cursor: 'pointer',
+    transition: '0.3s',
+    '&:hover': {
+        color: theme.palette.warning.main,
+    },
 }));

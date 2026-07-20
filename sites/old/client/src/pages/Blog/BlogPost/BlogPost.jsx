@@ -15,8 +15,8 @@ export const BlogPost = ({ id, title, description, image, date, time }) => {
                         alt={title}
                     />
                 <BlogPostCardTitleWrapper>
-                    <PostMeta date={date} time={time} color='text.secondary' />
-                    <Typography variant="h5" style={{ fontWeight: 'bold', marginBottom: '5px', fontSize: '20px' }}>
+                    <PostMeta date={date} time={time} color='text.secondary' fontSize='13px' />
+                    <Typography variant="h5" style={{ fontWeight: 'bold', marginBottom: '5px', fontSize: '17px', lineHeight: '1.3em' }}>
                         {title}
                     </Typography>
                 </BlogPostCardTitleWrapper>
