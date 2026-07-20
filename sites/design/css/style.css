@@ -280,7 +280,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .courses__slider-wrap.is-scrolled .courses__fade--l{opacity:1}
 
 /* ── COMPACT CARD ── */
-.course-card{background:rgba(var(--color-white-rgb),.05);border:1px solid rgba(var(--color-white-rgb),.1);border-radius:var(--r-xl);overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s;display:flex;flex-direction:column;flex:0 0 260px;height:322px;cursor:pointer}
+.course-card{background:rgba(var(--color-white-rgb),.05);border:1px solid rgba(var(--color-white-rgb),.1);border-radius:var(--r-xl);overflow:hidden;transition:transform .3s,box-shadow .3s,border-color .3s;display:flex;flex-direction:column;flex:0 0 260px;height:342px;cursor:pointer}
 .course-card:hover{box-shadow:0 12px 40px rgba(var(--color-black-rgb),.4);transform:translateY(-3px);border-color:rgba(var(--color-primary-rgb),.4)}
 .course-card--popular{border-color:rgba(var(--color-primary-rgb),.5);box-shadow:0 0 0 2px rgba(var(--color-primary-rgb),.15)}
 
@@ -699,7 +699,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
   .benefit-card--featured .benefit-card__number{font-size:var(--fs-52)}
 
   /* Courses — tablet: 2–3 cards, equal height */
-  .course-card{flex:0 0 230px;height:358px}
+  .course-card{flex:0 0 230px;height:378px}
 
   /* Steps */
   .steps{flex-direction:column;align-items:flex-start;gap:0}
@@ -778,7 +778,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
   .partners__logos{gap:20px}
   .benefits__grid{grid-template-columns:1fr}
   /* Courses phone — peek slider 1.5 cards: card = (vw-32px)/1.5 - 16px ≈ 57vw */
-  .course-card{flex:0 0 57vw;height:406px}
+  .course-card{flex:0 0 57vw;height:426px}
 }
 
 /* ===================================================
