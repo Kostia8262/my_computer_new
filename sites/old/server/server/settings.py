@@ -47,6 +47,9 @@ CORS_ALLOW_CREDENTIALS = True
 # omitted here (redundant, and risky without a confirmed proxy-header setup).
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+# Safe to lock down — the React app fetches the CSRF token from a dedicated
+# endpoint (GET /order/csrf/), it never reads the cookie via document.cookie.
+CSRF_COOKIE_HTTPONLY = True
 SECURE_HSTS_SECONDS = 3600
 SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_HSTS_PRELOAD = False

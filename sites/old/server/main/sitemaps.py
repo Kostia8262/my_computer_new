@@ -35,7 +35,7 @@ class CourseSitemap(Sitemap):
     protocol = 'https'
 
     def items(self):
-        return Course.objects.filter(is_active=True)
+        return Course.objects.filter(is_active=True, demo=False)
 
     def location(self, course):
         return f'/course/{course.id}/'
