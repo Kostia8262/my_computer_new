@@ -950,6 +950,7 @@ const EXTERNAL_CANONICAL = {
   drawing: 'https://digitalart.mycomputer.school/',
   'ai-design': 'https://ai-design.mycomputer.school/',
   branding: 'https://branding.mycomputer.school/',
+  blog: 'https://blog.mycomputer.school/',
 };
 
 app.get('/sitemap.xml', (req, res) => {

@@ -20,6 +20,7 @@ sites/main/Логотипи*/
 !sites/3dsmax/data/articles.json
 !sites/ai-design/data/articles.json
 !sites/branding/data/articles.json
+!sites/blog/data/articles.json
 **/data/mono-invoices.json
 **/data/*.db
 **/data/*.db-wal
