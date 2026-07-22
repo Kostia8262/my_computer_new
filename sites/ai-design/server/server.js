@@ -182,6 +182,17 @@ if (!SUPERADMIN_TOKEN) {
   console.warn('⚠️  WARNING: SUPERADMIN_TOKEN / ADMIN_TOKEN is not set in .env!');
 }
 
+// ── CANONICAL PATH REDIRECT ──────────────────────────────────────────────────
+// /index.html served the same 200 content as / with no redirect — same
+// duplicate-content crawl-budget waste found and fixed on main/design.
+app.use((req, res, next) => {
+  if (req.path === '/index.html') {
+    const query = req.originalUrl.split('?')[1];
+    return res.redirect(301, '/' + (query ? `?${query}` : ''));
+  }
+  next();
+});
+
 // ── SECURITY HEADERS (helmet) ────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
