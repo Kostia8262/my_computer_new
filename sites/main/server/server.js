@@ -685,6 +685,11 @@ const EXTERNAL_CANONICAL = {
   web: 'https://frontend.mycomputer.education/',
   construct: 'https://construct.mycomputer.education/',
   scratch: 'https://scratch.mycomputer.education/',
+  // 'blog' is inactive (active=0) in main's own courses table — hidden from the
+  // grid/sitemap/API — but /courses/blog stayed reachable and self-canonical with
+  // zero EXTERNAL_CANONICAL entry, directly duplicating blog.mycomputer.school
+  // (the dedicated landing built for this exact course on the .school network).
+  blog: 'https://blog.mycomputer.school/',
 };
 
 // ── DYNAMIC SITEMAP ───────────────────────────────────────────────────────────
