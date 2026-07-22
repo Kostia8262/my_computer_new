@@ -164,9 +164,13 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
   });
 
   // ── Static app bundles ───────────────────────────────────────────────────
+  // maxAge: these bundles (largest ~1.3MB, the full curriculum for one age
+  // tier) had no cache headers at all — every lesson click re-validated with
+  // the server. A day is enough to skip that during a session without
+  // needing any invalidation scheme for content that changes rarely.
   Object.entries(COURSES).forEach(([id, c]) => {
     c.ages.forEach(a => {
-      app.use(`/lessons/${id}/${a.id}`, express.static(path.join(__dirname, '..', 'lessons', id, a.id)));
+      app.use(`/lessons/${id}/${a.id}`, express.static(path.join(__dirname, '..', 'lessons', id, a.id), { maxAge: '1d' }));
     });
   });
 
