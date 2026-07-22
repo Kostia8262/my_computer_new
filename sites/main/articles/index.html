@@ -114,6 +114,10 @@
     </ul>
     <div class="nav__actions">
       <a href="tel:+380954624672" class="nav__phone">+38 (095) 462-46-72</a>
+      <div class="lessons-widget">
+        <button type="button" class="lessons-widget-btn" id="lessonsWidgetBtn" aria-label="Уроки для учнів">🎓</button>
+        <div class="lessons-widget-panel" id="lessonsWidgetPanel" hidden></div>
+      </div>
       <button type="button" class="btn btn--primary btn--sm nav__cta" onclick="openModal()">Записатись</button>
     </div>
     <button class="nav__burger" id="navBurger" aria-label="Меню" aria-expanded="false">
@@ -588,5 +592,6 @@ if (modalForm) {
   modalForm.addEventListener('submit', e => { e.preventDefault(); submitForm(modalForm, modalSubmit, modalSuccess); });
 }
 </script>
+<script src="/js/lessons-widget.js" defer></script>
 </body>
 </html>

@@ -124,7 +124,37 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
     next();
   });
 
-  // ── Direction / age pickers ──────────────────────────────────────────────
+  // ── Public JSON API for the header widget (AJAX, no full-page nav) ──────
+  app.get('/api/lessons/config', (req, res) => {
+    res.json({
+      courses: Object.entries(COURSES).map(([id, c]) => ({
+        id, name: c.name, icon: c.icon, enabled: c.ages.length > 0, ages: c.ages,
+      })),
+    });
+  });
+
+  app.get('/api/lessons/session', (req, res) => {
+    const cookieToken = parseCookies(req)[COOKIE_NAME];
+    const rec = cookieToken ? lessonTokensDb.getByToken(cookieToken) : null;
+    const ok = !!(rec && rec.active);
+    res.json({ authenticated: ok, studentName: ok ? rec.studentName : null });
+  });
+
+  app.post('/api/lessons/login', (req, res) => {
+    const tokenVal = String((req.body || {}).token || '').trim();
+    const rec = tokenVal ? lessonTokensDb.getByToken(tokenVal) : null;
+    if (!rec || !rec.active) return res.status(401).json({ success: false, error: 'invalid_token' });
+    lessonTokensDb.touch(tokenVal);
+    res.cookie(COOKIE_NAME, tokenVal, { httpOnly: true, secure: true, sameSite: 'lax', maxAge: COOKIE_MAX_AGE_MS });
+    res.json({ success: true });
+  });
+
+  app.post('/api/lessons/logout', (req, res) => {
+    res.clearCookie(COOKIE_NAME);
+    res.json({ success: true });
+  });
+
+  // ── Direction / age pickers (full-page, still reachable via a direct/emailed link) ──
   app.get('/lessons', (req, res) => res.send(directionsPage()));
 
   app.get('/lessons/:course', (req, res) => {

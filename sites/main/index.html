@@ -99,6 +99,10 @@
         <span class="lang-divider"></span>
         <button class="lang-btn" data-lang="ru">RU</button>
       </div>
+      <div class="lessons-widget">
+        <button type="button" class="lessons-widget-btn" id="lessonsWidgetBtn" aria-label="Уроки для учнів">🎓</button>
+        <div class="lessons-widget-panel" id="lessonsWidgetPanel" hidden></div>
+      </div>
       <a href="#" class="btn btn--primary btn--sm nav__cta open-modal" data-ru="Записаться">Записатись</a>
     </div>
 
@@ -1537,6 +1541,7 @@
 </div>
 
 <script src="js/main.js?v=8" defer></script>
+<script src="/js/lessons-widget.js" defer></script>
 <script>
 (function() {
   var CARD_STEP = 276; // 260px card + 16px gap

@@ -1196,3 +1196,26 @@ body.modal-open{overflow:hidden}
   top:58px;left:12px;
   filter:drop-shadow(0 4px 12px rgba(var(--color-primary-rgb),.08));
 }
+
+/* ── Lessons header widget (icon + inline dropdown for student login) ─── */
+.lessons-widget{position:relative}
+.lessons-widget-btn{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r-full);border:1px solid var(--color-border);background:var(--color-bg);color:var(--color-text-2);font-size:17px;cursor:pointer;transition:all var(--t)}
+.lessons-widget-btn:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.lessons-widget-panel{position:absolute;top:calc(100% + 10px);right:0;width:300px;max-height:420px;overflow-y:auto;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--r-lg);box-shadow:var(--sh-lg);padding:18px;z-index:var(--z-nav-elevated)}
+.lw-loading{font-size:var(--fs-13);color:var(--color-text-2);text-align:center;padding:20px 0}
+.lw-login h4,.lw-subtitle{font-size:var(--fs-15);font-weight:var(--fw-bold);margin:0 0 4px}
+.lw-login p{font-size:var(--fs-13);color:var(--color-text-2);margin:0 0 12px}
+.lw-err{font-size:var(--fs-13);color:#e53e3e;margin-bottom:10px}
+.lw-login input{width:100%;padding:10px 12px;border-radius:var(--r-md);border:1px solid var(--color-border);font-size:var(--fs-14);margin-bottom:10px;font-family:var(--font)}
+.lw-login button{width:100%;padding:10px;border:none;border-radius:var(--r-md);background:var(--color-primary);color:var(--color-white);font-weight:var(--fw-semibold);font-size:var(--fs-14);cursor:pointer}
+.lw-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.lw-head h4{margin:0;font-size:var(--fs-15);font-weight:var(--fw-bold)}
+.lw-logout,.lw-back{background:none;border:none;color:var(--color-text-2);font-size:var(--fs-13);cursor:pointer;padding:0}
+.lw-logout:hover,.lw-back:hover{color:var(--color-primary)}
+.lw-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lw-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;border:1px solid var(--color-border);border-radius:var(--r-md);background:var(--color-bg);text-decoration:none;color:var(--color-text-2);cursor:pointer;font-family:var(--font);transition:all var(--t)}
+.lw-tile:hover{border-color:var(--color-primary);color:var(--color-primary)}
+.lw-tile.lw-disabled{opacity:.4;cursor:default}
+.lw-ic{font-size:26px}
+.lw-lb{font-size:var(--fs-13);font-weight:var(--fw-semibold)}
+.lw-sub{font-size:11px}

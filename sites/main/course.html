@@ -179,6 +179,10 @@
         <span class="lang-divider"></span>
         <button class="lang-btn" data-lang="ru">RU</button>
       </div>
+      <div class="lessons-widget">
+        <button type="button" class="lessons-widget-btn" id="lessonsWidgetBtn" aria-label="Уроки для учнів">🎓</button>
+        <div class="lessons-widget-panel" id="lessonsWidgetPanel" hidden></div>
+      </div>
       <a href="#course-contact" class="btn btn--primary btn--sm nav__cta">Записатись</a>
     </div>
     <button class="nav__burger" id="navBurger" aria-label="Меню" aria-expanded="false">
@@ -1316,5 +1320,6 @@ document.getElementById('modalForm').addEventListener('submit', async (e) => {
   });
 })();
 </script>
+<script src="/js/lessons-widget.js" defer></script>
 </body>
 </html>
