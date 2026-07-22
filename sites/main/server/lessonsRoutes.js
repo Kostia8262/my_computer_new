@@ -20,8 +20,25 @@ const COURSES = {
       { id: '14-18', label: '14–18 років' },
     ],
   },
-  minecraft: { name: 'Minecraft', icon: '⛏️', ages: [] },   // coming soon — no app yet
-  webdev:    { name: 'Веб-розробка', icon: '🌐', ages: [] }, // coming soon — no app yet
+  // Minecraft's app has its own internal 8-10/10-14 track switcher built in
+  // (one build covers both), so there's a single "all" tier here rather than
+  // separate folders per age like the other two directions.
+  minecraft: {
+    name: 'Minecraft',
+    icon: '⛏️',
+    ages: [
+      { id: 'all', label: '8–14 років' },
+    ],
+  },
+  webdev: {
+    name: 'Веб-розробка',
+    icon: '🌐',
+    ages: [
+      { id: '8-11', label: '8–11 років — Веб-Старт' },
+      { id: '10-14', label: '10–14 років — Веб-Розробник' },
+      { id: '14-18', label: '14–18 років — Фулстек-Про' },
+    ],
+  },
 };
 
 function parseCookies(req) {
@@ -181,8 +198,9 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
 
   app.post('/api/lesson-tokens', requireAdmin, (req, res) => {
     const { clientId, studentName, course, ageTier } = req.body || {};
-    if (!COURSES[course]) return res.status(400).json({ error: 'Unknown course' });
-    if (!course || !ageTier) return res.status(400).json({ error: 'course and ageTier are required' });
+    const courseDef = COURSES[course];
+    if (!courseDef) return res.status(400).json({ error: 'Unknown course' });
+    if (!courseDef.ages.some(a => a.id === ageTier)) return res.status(400).json({ error: 'Unknown age tier for this course' });
     const rec = lessonTokensDb.create({ clientId, studentName: escHtml(studentName || ''), course, ageTier });
     res.json({ success: true, token: rec, link: `${req.protocol}://${req.get('host')}/lessons?token=${rec.token}` });
   });

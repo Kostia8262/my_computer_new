@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Веб-Розробник 10–14 | My Computer Academy</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/one-dark.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-icon">🌐</span>
+      <div class="brand-text">
+        <span class="brand-name">Web Academy</span>
+        <span class="brand-sub">My Computer Academy</span>
+      </div>
+    </div>
+    <div class="course-badge">
+      <span class="age-pill">10–14</span>
+      <span class="course-title">Веб-Розробник</span>
+    </div>
+    <div class="header-right">
+      <div class="lang-switch">
+        <button class="lang-btn active" data-lang="uk">UA</button>
+        <button class="lang-btn" data-lang="ru">RU</button>
+      </div>
+      <span class="lesson-counter" id="lesson-counter">Урок 1 / 170</span>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-track-name" id="sidebar-track-name">Веб-Розробник · 10–14</div>
+      <nav class="lesson-nav" id="lesson-nav"></nav>
+    </aside>
+
+    <section class="content-panel">
+      <div class="content-header">
+        <div class="lesson-meta">
+          <div class="lesson-num-badge" id="lesson-num-badge">01</div>
+          <div class="lesson-meta-text">
+            <div class="lesson-module-label" id="lesson-module-label">Модуль 01</div>
+            <h1 class="lesson-title" id="lesson-title">Урок</h1>
+          </div>
+        </div>
+        <div class="content-tabs">
+          <button class="content-tab active" data-panel="theory">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            Теорія
+          </button>
+          <button class="content-tab" data-panel="tasks">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            Завдання
+          </button>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="panel-inner active" id="panel-theory"></div>
+        <div class="panel-inner" id="panel-tasks"></div>
+      </div>
+      <div class="content-footer">
+        <button class="nav-btn" id="prev-btn" onclick="goLesson(-1)">← Попередній</button>
+        <button class="nav-btn primary" id="next-btn" onclick="goLesson(1)">Наступний →</button>
+      </div>
+    </section>
+
+    <section class="editor-panel">
+      <div class="editor-section">
+        <div class="editor-toolbar">
+          <div class="file-tabs" id="file-tabs">
+            <button class="file-tab active" data-file="html"><span class="dot dot-html"></span>index.html</button>
+            <button class="file-tab" data-file="css"><span class="dot dot-css"></span>style.css</button>
+            <button class="file-tab" data-file="js"><span class="dot dot-js"></span>script.js</button>
+            <button class="file-tab hidden" data-file="python"><span class="dot dot-py"></span>main.py</button>
+          </div>
+          <div class="editor-actions">
+            <button class="act-btn run" onclick="runCode()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+              Запустити
+            </button>
+            <button class="act-btn reset" onclick="resetCode()">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/></svg>
+              Скинути
+            </button>
+          </div>
+        </div>
+        <div class="editors-wrap">
+          <div class="editor-pane active" id="pane-html"><textarea id="cm-html"></textarea></div>
+          <div class="editor-pane" id="pane-css"><textarea id="cm-css"></textarea></div>
+          <div class="editor-pane" id="pane-js"><textarea id="cm-js"></textarea></div>
+          <div class="editor-pane" id="pane-python"><textarea id="cm-python"></textarea></div>
+        </div>
+      </div>
+      <div class="preview-section">
+        <div class="preview-bar">
+          <span class="preview-label">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            Попередній перегляд
+          </span>
+          <div class="preview-acts">
+            <button class="preview-btn" onclick="refreshPreview()" title="Оновити">⟳</button>
+            <button class="preview-btn" onclick="openNewTab()" title="Відкрити у новій вкладці">⤢</button>
+          </div>
+        </div>
+        <iframe id="preview-frame" sandbox="allow-scripts allow-modals allow-forms" title="Попередній перегляд"></iframe>
+        <div class="terminal-mock hidden" id="terminal-mock">
+          <div class="terminal-bar">
+            <span class="t-dot td-red"></span><span class="t-dot td-yellow"></span><span class="t-dot td-green"></span>
+            <span class="terminal-title">🐍 Python / Server Output</span>
+          </div>
+          <pre class="terminal-out" id="terminal-out">$ python main.py
+ * Running on http://127.0.0.1:5000/</pre>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="assets/lessons.js"></script>
+  <script src="assets/content-m00.js"></script>
+  <script src="assets/content-m01.js"></script>
+  <script src="assets/content-m02.js"></script>
+  <script src="assets/content-m03.js"></script>
+  <script src="assets/content-m04.js"></script>
+  <script src="assets/content-m05.js"></script>
+  <script src="assets/content-m06.js"></script>
+  <script src="assets/content-m07.js"></script>
+  <script src="assets/content-m08.js"></script>
+  <script src="assets/content-m09.js"></script>
+  <script src="assets/content-m10.js"></script>
+  <script src="assets/content-m11.js"></script>
+  <script src="assets/content-m12.js"></script>
+  <script src="assets/content-m13.js"></script>
+  <script src="assets/content-m14.js"></script>
+  <script src="assets/tasks-m01.js"></script>
+  <script src="assets/tasks-m02.js"></script>
+  <script src="assets/tasks-m03.js"></script>
+  <script src="assets/tasks-m04.js"></script>
+  <script src="assets/tasks-m05.js"></script>
+  <script src="assets/tasks-m06.js"></script>
+  <script src="assets/tasks-m07.js"></script>
+  <script src="assets/tasks-m09.js"></script>
+  <script src="assets/tasks-m10.js"></script>
+  <script src="assets/tasks-m11.js"></script>
+  <script src="assets/tasks-m12.js"></script>
+  <script src="assets/tasks-m13.js"></script>
+  <script src="assets/tasks-m14.js"></script>
+  <script src="assets/quiz-m01.js"></script>
+  <script src="assets/quiz-m02.js"></script>
+  <script src="assets/quiz-m03.js"></script>
+  <script src="assets/quiz-m04.js"></script>
+  <script src="assets/quiz-m05.js"></script>
+  <script src="assets/quiz-m06.js"></script>
+  <script src="assets/quiz-m07.js"></script>
+  <script src="assets/quiz-m08.js"></script>
+  <script src="assets/quiz-m09.js"></script>
+  <script src="assets/quiz-m10.js"></script>
+  <script src="assets/quiz-m11.js"></script>
+  <script src="assets/quiz-m12.js"></script>
+  <script src="assets/quiz-m13.js"></script>
+  <script src="assets/quiz-m14.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

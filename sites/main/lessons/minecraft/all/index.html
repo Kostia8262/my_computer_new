@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⛏ Minecraft Academy — Web Shell</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/theme/dracula.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <!-- ══ HEADER ══════════════════════════════════════════ -->
+  <header>
+    <div class="header-logo">
+      <span class="logo-icon">⛏</span>
+      <div>
+        <div class="logo-text">Minecraft Academy</div>
+        <div class="logo-sub">My Computer Academy</div>
+      </div>
+    </div>
+
+    <div class="header-lesson">
+      <div id="header-lesson-title">Урок 1</div>
+      <div id="header-lesson-sub"></div>
+    </div>
+
+    <div class="track-switcher" style="margin-right:12px">
+      <button class="track-btn" data-track="8-10"  onclick="setTrack('8-10')">🟩 8–10</button>
+      <button class="track-btn active" data-track="10-14" onclick="setTrack('10-14')">🐍 10–14</button>
+    </div>
+
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="uk" onclick="setLanguage('uk')">🇺🇦 UA</button>
+      <button class="lang-btn"        data-lang="ru" onclick="setLanguage('ru')">🇷🇺 RU</button>
+    </div>
+  </header>
+
+  <!-- ══ LAYOUT ═══════════════════════════════════════════ -->
+  <div class="app-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div id="lesson-nav"></div>
+    </aside>
+
+    <!-- Theory / Tasks -->
+    <div class="content-panel">
+      <div class="panel-tabs">
+        <button class="tab-btn active" data-tab="theory">📖 Теорія</button>
+        <button class="tab-btn"        data-tab="tasks" >🎯 Завдання</button>
+      </div>
+      <div id="theory-content" class="tab-content active"></div>
+      <div id="tasks-content"  class="tab-content"></div>
+    </div>
+
+    <!-- Editor + 3D World -->
+    <div class="editor-panel">
+
+      <div class="editor-toolbar">
+        <span class="toolbar-label">⌨ Код Python</span>
+        <button id="reset-btn" class="btn btn-reset" onclick="resetCode()">↺ Скинути</button>
+        <button id="run-btn"   class="btn btn-run"   onclick="runCode()">▶ Запустити</button>
+      </div>
+
+      <div id="editor-wrapper">
+        <textarea id="code-editor"></textarea>
+      </div>
+
+      <!-- 3D Minecraft World -->
+      <div class="world-section">
+        <div class="world-toolbar">
+          <span class="world-label">🌍 Minecraft World (симулятор)</span>
+          <button class="btn btn-cam" onclick="resetCamera()">⟳ Камера</button>
+          <button class="btn btn-reset" onclick="clearWorld()" style="font-size:11px">🗑 Очистити</button>
+        </div>
+        <canvas id="voxel-canvas"></canvas>
+      </div>
+
+      <!-- Text output -->
+      <div class="output-bar">
+        <span class="output-label">▶ Вивід / Чат</span>
+        <button id="clear-btn" onclick="clearOutput()">✕ Очистити</button>
+      </div>
+      <div id="text-output"></div>
+
+    </div>
+  </div>
+
+  <!-- ══ SCRIPTS ═══════════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/python/python.min.js"></script>
+  <script src="assets/voxel3d.js"></script>
+  <script src="assets/mcpi_mock.js"></script>
+  <script src="assets/lessons_data_mc.js"></script>
+  <script src="assets/app.js"></script>
+
+  <script>
+    function clearWorld() {
+      if (window.voxelWorld) window.voxelWorld.clear();
+    }
+  </script>
+</body>
+</html>
