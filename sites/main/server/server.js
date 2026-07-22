@@ -497,8 +497,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:  ["'self'"],
-      scriptSrc:   ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://t.contentsquare.net"],
-      styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com"],
+      // 'unsafe-eval' + cdnjs/skulpt.org are needed by the /lessons Python
+      // apps: Skulpt compiles Python to JS at runtime via Function/eval, and
+      // CodeMirror + (for the 10-14/14-18 tiers) Skulpt itself load from
+      // cdnjs/skulpt.org rather than being bundled locally.
+      scriptSrc:   ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://fonts.googleapis.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://t.contentsquare.net", "https://cdnjs.cloudflare.com", "https://skulpt.org"],
+      styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       fontSrc:     ["'self'", "https://fonts.gstatic.com"],
       imgSrc:      ["'self'", "data:", "https:"],
       connectSrc:  ["'self'", "https://www.google-analytics.com", "https://analytics.google.com", "https://stats.g.doubleclick.net", "https://*.contentsquare.net", "https://mycomputer.school", "https://webdesign.mycomputer.education", "https://python.mycomputer.education", "https://minecraft.mycomputer.education", "https://roblox.mycomputer.education", "https://frontend.mycomputer.education", "https://construct.mycomputer.education", "https://scratch.mycomputer.education"],
