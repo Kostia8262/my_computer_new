@@ -437,11 +437,20 @@ if (IS_DEV) {
     res.type('text/plain').send('User-agent: *\nDisallow: /\n');
   });
 
-  const DEV_BANNER = '<div style="position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#f59e0b;color:#111;text-align:center;font:700 13px/30px system-ui,sans-serif;">⚠️ DEV-СЕРЕДОВИЩЕ — dev.mycomputer.education, не для відвідувачів</div>';
+  const DEV_BANNER_HEIGHT = 30; // px — kept in sync with the banner's own line-height below
+  const DEV_BANNER = `<div style="position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#f59e0b;color:#111;text-align:center;font:700 13px/${DEV_BANNER_HEIGHT}px system-ui,sans-serif;">⚠️ DEV-СЕРЕДОВИЩЕ — dev.mycomputer.education, не для відвідувачів</div>`;
+  // Site headers are typically position:fixed;top:0 — the banner sits on the
+  // same layer above them, so any fixed-position element anchored to the
+  // viewport top needs pushing down by the banner's own height or it hides
+  // underneath it. Scoped to elements that actually use `top:0` fixed
+  // positioning (nav headers, sticky bars) rather than shifting the whole
+  // page, since most page content already has the right spacing for the
+  // header's original position.
+  const DEV_STYLE_FIX = `<style>body{margin-top:${DEV_BANNER_HEIGHT}px!important}.header,header,[class*="header"][style*="fixed"],.header--fixed{top:${DEV_BANNER_HEIGHT}px!important}</style>`;
 
   const injectDevMarkers = (html) => {
     if (typeof html !== 'string') return html;
-    if (html.includes('<head>')) html = html.replace('<head>', '<head>\n<meta name="robots" content="noindex, nofollow"/>');
+    if (html.includes('<head>')) html = html.replace('<head>', `<head>\n<meta name="robots" content="noindex, nofollow"/>\n${DEV_STYLE_FIX}`);
     if (/<body[^>]*>/.test(html)) html = html.replace(/<body([^>]*)>/, `<body$1>${DEV_BANNER}`);
     return html;
   };
