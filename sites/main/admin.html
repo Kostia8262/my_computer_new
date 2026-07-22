@@ -599,6 +599,20 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       </div>
     </div>
 
+    <!-- LESSON TOKEN MODAL -->
+    <div class="modal-overlay" id="ltModal" style="display:none" onclick="if(event.target===this)closeLtModal()">
+      <div class="modal-box" style="max-width:380px">
+        <h3><span>Новий токен</span><button class="btn btn-ghost btn-sm" onclick="closeLtModal()">✕</button></h3>
+        <div class="modal-body">
+          <div class="modal-group"><label class="modal-label">Ім'я учня *</label><input class="modal-input" id="ltModalName" placeholder="Ім'я учня" onkeydown="if(event.key==='Enter')submitLtModal()"/></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="closeLtModal()">Скасувати</button>
+          <button class="btn btn-primary" onclick="submitLtModal()">Додати токен</button>
+        </div>
+      </div>
+    </div>
+
     <!-- CLIENT MODAL -->
     <div class="modal-overlay" id="clientModal" style="display:none" onclick="if(event.target===this)closeClientModal()">
       <div class="modal-box">
@@ -1187,8 +1201,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
     <div id="lessonsTab" style="display:none">
       <div class="toolbar" style="margin-bottom:16px">
-        <input class="search" id="ltStudentName" placeholder="Ім'я учня" style="max-width:260px"/>
-        <button class="btn btn-primary" onclick="createLessonToken()">➕ Додати токен</button>
+        <button class="btn btn-primary" onclick="openLtModal()">➕ Додати токен</button>
       </div>
       <div class="table-wrap">
         <table id="lessonsTable" style="min-width:720px">
@@ -2324,11 +2337,21 @@ async function issueLessonToken(studentName, clientId) {
   } catch { showToast('Помилка створення доступу', 'error'); }
 }
 
-async function createLessonToken() {
-  const studentName = document.getElementById('ltStudentName').value.trim();
+function openLtModal() {
+  document.getElementById('ltModalName').value = '';
+  document.getElementById('ltModal').style.display = 'flex';
+  document.getElementById('ltModalName').focus();
+}
+
+function closeLtModal() {
+  document.getElementById('ltModal').style.display = 'none';
+}
+
+async function submitLtModal() {
+  const studentName = document.getElementById('ltModalName').value.trim();
   if (!studentName) { showToast('Введи ім\'я учня', 'error'); return; }
+  closeLtModal();
   await issueLessonToken(studentName, null);
-  document.getElementById('ltStudentName').value = '';
 }
 
 async function createLessonTokenForClient(clientId, clientName) {
