@@ -75,8 +75,35 @@ function stripPreloaderDiv(html) {
   return html; // unbalanced markup — leave untouched rather than corrupt it
 }
 
-function writeSnapshot(outPath, rootHtml, template) {
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function truncate(s, max) {
+  if (s.length <= max) return s;
+  return s.slice(0, max - 1).replace(/\s+\S*$/, '') + '…';
+}
+
+// The template's <head> ships home's own title/description/canonical baked
+// in. Without this, every course snapshot silently inherited those same
+// home-page tags — including <link rel="canonical"> pointing at "/" — which
+// tells Google every course page is a duplicate of the homepage and should
+// be dropped from the index in its favor. Each page needs its own values.
+function applyHead(doc, { title, description, canonicalUrl }) {
+  const t = escapeHtml(title);
+  const d = escapeHtml(description);
+  doc = doc.replace(/<title>[\s\S]*?<\/title>/, `<title>${t}</title>`);
+  doc = doc.replace(/(<meta name="description" content=")[^"]*(")/, `$1${d}$2`);
+  doc = doc.replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${t}$2`);
+  doc = doc.replace(/(<meta property="og:description" content=")[^"]*(")/, `$1${d}$2`);
+  doc = doc.replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${canonicalUrl}$2`);
+  doc = doc.replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${canonicalUrl}$2`);
+  return doc;
+}
+
+function writeSnapshot(outPath, rootHtml, template, head) {
   let doc = template;
+  if (head) doc = applyHead(doc, head);
   // Drop the preloader — the snapshot already has real content, a loading
   // spinner would only hide it behind an unnecessary extra step.
   doc = stripPreloaderDiv(doc);
@@ -165,7 +192,12 @@ async function run() {
         try {
           await regenerate(coursePath, async () => {
             const html = await snapshotPage(page, url, '#root .header__text h1');
-            const bytes = writeSnapshot(coursePath, html, template);
+            const head = {
+              title: `Курс "${c.name}" — Академія Мій Комп'ютер`,
+              description: truncate(c.description || `Курс "${c.name}" в Академії Мій Комп'ютер. Онлайн та офлайн навчання в Дніпрі.`, 160),
+              canonicalUrl: url,
+            };
+            const bytes = writeSnapshot(coursePath, html, template, head);
             console.log(`course/${c.id}: wrote ${bytes} bytes`);
           });
           written++;
