@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🖥️ Академія Мій комп'ютер</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/theme/dracula.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <!-- ══ ЗАВАНТАЖЕННЯ ═══════════════════════════════════════ -->
+  <div id="skulpt-loader">
+    <div class="loader-icon">🐢</div>
+    <div class="loader-text">Академія Мій комп'ютер</div>
+    <div id="loader-text" class="loader-sub">завантажується...</div>
+    <div class="loader-bar-bg"><div class="loader-bar"></div></div>
+  </div>
+
+  <!-- ══ ШАПКА ══════════════════════════════════════════════ -->
+  <header>
+    <div class="header-logo">
+      <span class="logo-icon">🐢</span>
+      <h1>Академія<br>Мій комп'ютер</h1>
+    </div>
+
+    <div class="header-center">
+      <div id="header-lesson-title">Урок 1</div>
+      <div id="header-lesson-sub" class="header-sub"></div>
+    </div>
+
+    <!-- Перемикач мови -->
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="uk" onclick="setLanguage('uk')">🇺🇦 UA</button>
+      <button class="lang-btn" data-lang="ru" onclick="setLanguage('ru')">🇷🇺 RU</button>
+    </div>
+  </header>
+
+  <!-- ══ ОСНОВНИЙ МАКЕТ ═════════════════════════════════════ -->
+  <div class="app-layout">
+
+    <!-- Ліва панель: навігація -->
+    <aside class="sidebar">
+      <div id="lesson-nav"></div>
+    </aside>
+
+    <!-- Центральна панель: теорія і завдання -->
+    <div class="content-panel">
+      <div class="panel-tabs">
+        <button id="theory-tab" class="tab-btn active" data-tab="theory">📖 Теорія</button>
+        <button id="tasks-tab"  class="tab-btn"        data-tab="tasks" >🎯 Завдання</button>
+      </div>
+      <div id="theory-content" class="tab-content active"></div>
+      <div id="tasks-content"  class="tab-content"></div>
+    </div>
+
+    <!-- Права панель: редактор + черепашка -->
+    <div class="editor-panel">
+
+      <div class="editor-toolbar">
+        <span id="editor-label" class="toolbar-label">⌨ Твій код</span>
+        <button id="reset-btn" class="btn btn-reset"
+                onclick="editor && editor.setValue(currentLesson.lesson.starterCode)">
+          ↺ Скинути
+        </button>
+        <button id="clear-btn" class="btn btn-reset" onclick="clearCanvas()">
+          🗑 Очистити
+        </button>
+        <button id="run-btn" class="btn btn-run" onclick="runCode()">
+          ✅ Перевірити код
+        </button>
+      </div>
+
+      <div id="editor-wrapper" style="height:340px;">
+        <textarea id="code-editor"></textarea>
+      </div>
+
+      <div id="splitter" class="splitter"></div>
+
+      <div id="canvas-panel" class="canvas-panel" style="height:260px;">
+        <div class="canvas-toolbar">
+          <span id="canvas-label-text" class="canvas-label">💻 Візуалізація коду</span>
+          <span id="canvas-status" class="canvas-status">натисни ✅ Перевірити код</span>
+        </div>
+
+        <div id="turtle-output-container">
+          <div id="turtle-placeholder">
+            <div class="ph-icon">🐢</div>
+            <p id="ph-title">Тут з'явиться результат</p>
+            <p id="ph-sub">коли ти натиснеш <strong>✅ Перевірити код</strong></p>
+          </div>
+        </div>
+
+        <div id="text-output"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ СКРИПТИ ════════════════════════════════════════════ -->
+  <script src="assets/lib/skulpt.min.js"></script>
+  <script src="assets/lib/skulpt-stdlib.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/python/python.min.js"></script>
+  <script src="assets/lessons_data.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

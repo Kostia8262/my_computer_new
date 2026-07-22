@@ -897,6 +897,14 @@ app.get('/admin.html', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'admin.html'));
 });
 
+// ── INTERACTIVE LESSONS (student-only, token-gated) ────────────────────────────
+// Registered before the root static mount below so /lessons/<course>/<age>/...
+// always passes through the auth gate first — the static mount would
+// otherwise happily serve those same files straight from disk to anyone.
+// requireAdmin/escHtml are `function` declarations further down this file,
+// safe to reference here due to hoisting.
+require('./lessonsRoutes')(app, { requireAdmin, escHtml });
+
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,

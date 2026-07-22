@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💻 Академія Мій комп'ютер — 14-18</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/theme/dracula.min.css">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+  <!-- ══ ШАПКА ══════════════════════════════════════════════ -->
+  <header>
+    <div class="header-logo">
+      <span class="logo-icon">💻</span>
+      <h1>Академія<br>14–18 років</h1>
+    </div>
+
+    <div class="header-center">
+      <div id="header-lesson-title">Урок 1</div>
+      <div id="header-lesson-sub" class="header-sub"></div>
+    </div>
+
+    <div class="lang-switcher">
+      <button class="lang-btn active" data-lang="uk" onclick="setLanguage('uk')">🇺🇦 UA</button>
+      <button class="lang-btn" data-lang="ru" onclick="setLanguage('ru')">🇷🇺 RU</button>
+    </div>
+  </header>
+
+  <!-- ══ ОСНОВНИЙ МАКЕТ ═════════════════════════════════════ -->
+  <div class="app-layout">
+
+    <!-- Ліва панель: навігація -->
+    <aside class="sidebar">
+      <div id="lesson-nav"></div>
+    </aside>
+
+    <!-- Центральна панель: теорія і завдання -->
+    <div class="content-panel">
+      <div class="panel-tabs">
+        <button id="theory-tab" class="tab-btn active" data-tab="theory">📖 Теорія</button>
+        <button id="tasks-tab"  class="tab-btn"        data-tab="tasks" >🎯 Завдання</button>
+      </div>
+      <div id="theory-content" class="tab-content active"></div>
+      <div id="tasks-content"  class="tab-content"></div>
+    </div>
+
+    <!-- Права панель: редактор + вивід -->
+    <div class="editor-panel">
+
+      <div class="editor-toolbar">
+        <span id="editor-label" class="toolbar-label">⌨ Твій код</span>
+        <button id="reset-btn" class="btn btn-reset" onclick="resetCode()">
+          ↺ Скинути
+        </button>
+        <button id="run-btn" class="btn btn-run" onclick="runCode()">
+          ▶ Запустити
+        </button>
+      </div>
+
+      <div id="editor-wrapper">
+        <textarea id="code-editor"></textarea>
+      </div>
+
+      <!-- Вивід (завжди видимий) -->
+      <div id="output-panel">
+        <div class="output-toolbar">
+          <span class="output-label" id="output-label">▶ Вивід</span>
+          <span id="output-status" class="output-status">натисни ▶ Запустити</span>
+          <button id="clear-output-btn" class="btn-clear-output" onclick="clearOutput()">✕ Очистити</button>
+        </div>
+        <div id="text-output"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ СКРИПТИ ════════════════════════════════════════════ -->
+  <script src="https://skulpt.org/js/skulpt.min.js"></script>
+  <script src="https://skulpt.org/js/skulpt-stdlib.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.17/mode/python/python.min.js"></script>
+  <script src="assets/lessons_data_1418.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

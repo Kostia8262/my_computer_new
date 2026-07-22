@@ -473,6 +473,9 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       <button class="sidebar-item" id="sideNav-clients" onclick="showTab('clients')">
         <span class="sidebar-icon">🗂</span><span>База клієнтів</span>
       </button>
+      <button class="sidebar-item" id="sideNav-lessons" onclick="showTab('lessons')">
+        <span class="sidebar-icon">🎓</span><span>Уроки учнів</span>
+      </button>
       <button class="sidebar-item management-visible" id="sideNav-dashboard" onclick="showTab('dashboard')" style="display:none">
         <span class="sidebar-icon">📊</span><span>Дашборд</span>
       </button>
@@ -1182,6 +1185,29 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
     </div><!-- /clientsTab -->
 
+    <div id="lessonsTab" style="display:none">
+      <div class="toolbar" style="margin-bottom:16px">
+        <select class="filter-select" id="ltCourseSelect" onchange="onLtCourseChange()">
+          <option value="python">🐍 Python</option>
+          <option value="minecraft" disabled>⛏️ Minecraft (незабаром)</option>
+          <option value="webdev" disabled>🌐 Веб-розробка (незабаром)</option>
+        </select>
+        <select class="filter-select" id="ltAgeSelect">
+          <option value="6-10">6–10 років</option>
+          <option value="10-14">10–14 років</option>
+          <option value="14-18">14–18 років</option>
+        </select>
+        <input class="search" id="ltStudentName" placeholder="Ім'я учня (необов'язково)" style="max-width:220px"/>
+        <button class="btn btn-primary" onclick="createLessonToken()">➕ Видати доступ</button>
+      </div>
+      <div class="table-wrap">
+        <table id="lessonsTable" style="min-width:820px">
+          <thead><tr><th>Учень</th><th>Напрямок</th><th>Вік</th><th>Посилання</th><th>Активний</th><th>Востаннє заходив</th><th></th></tr></thead>
+          <tbody id="lessonsTableBody"></tbody>
+        </table>
+      </div>
+    </div><!-- /lessonsTab -->
+
     <!-- TEACHER PROFILE MODAL (superadmin only) -->
     <div id="staffProfileTab" style="display:none">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
@@ -1642,12 +1668,12 @@ function showTab(tab) {
   // underneath/alongside whatever tab is being switched to.
   const staffProfileEl = document.getElementById('staffProfileTab');
   if (staffProfileEl) staffProfileEl.style.display = 'none';
-  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
+  ['leads','admins','content','clients','lessons','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
     const el = document.getElementById(t + 'Tab');
     if (el) el.style.display = t === tab ? '' : 'none';
   });
   // Sidebar active state
-  ['leads','admins','content','clients','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
+  ['leads','admins','content','clients','lessons','courses','curriculum','modules','articles','reviews','seo','dashboard'].forEach(t => {
     const btn = document.getElementById('sideNav-' + t);
     if (btn) btn.classList.toggle('active', t === tab);
   });
@@ -1664,6 +1690,7 @@ function showTab(tab) {
   if (tab === 'admins')     renderAdmins();
   if (tab === 'content' && !_cmsData) loadContentData();
   if (tab === 'clients' && !_allClients) loadClients();
+  if (tab === 'lessons')   loadLessonsTab();
   if (tab === 'courses')    loadCoursesTab();
   if (tab === 'curriculum') loadCurriculumTab();
   if (tab === 'modules')    loadModulesTab();
@@ -2224,6 +2251,88 @@ const SOURCE_LABELS = {
   website: '🌐 Сайт', referral: '👥 Рекомендація', social: '📱 Соцмережі',
   phone: '📞 Телефон', 'walk-in': '🚶 Прийшов', other: 'Інше',
 };
+
+// ── LESSONS (student web-app access tokens) ──────────────────────────────────
+function onLtCourseChange() {
+  const ageSel = document.getElementById('ltAgeSelect');
+  const course = document.getElementById('ltCourseSelect').value;
+  ageSel.disabled = course !== 'python'; // only python has real age tiers so far
+}
+
+async function loadLessonsTab() {
+  try {
+    const res = await fetch('/api/lesson-tokens', { headers: { 'x-admin-token': token } });
+    if (res.status === 401) { doLogout(); return; }
+    const data = await res.json();
+    renderLessonsTable(data.tokens || []);
+  } catch { showToast('Помилка завантаження списку доступів', 'error'); }
+}
+
+const LT_COURSE_NAMES = { python: '🐍 Python', minecraft: '⛏️ Minecraft', webdev: '🌐 Веб-розробка' };
+
+function renderLessonsTable(rows) {
+  const body = document.getElementById('lessonsTableBody');
+  if (!body) return;
+  if (!rows.length) { body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--c-muted)">Ще немає виданих доступів</td></tr>'; return; }
+  body.innerHTML = rows.map(r => {
+    const link = `${location.origin}/lessons?token=${r.token}`;
+    return `<tr>
+      <td>${escHtmlAdmin(r.studentName || '—')}</td>
+      <td>${LT_COURSE_NAMES[r.course] || r.course}</td>
+      <td>${escHtmlAdmin(r.ageTier)}</td>
+      <td><a href="#" onclick="copyLtLink('${link}');return false" style="font-size:12px">🔗 Копіювати посилання</a></td>
+      <td><input type="checkbox" ${r.active ? 'checked' : ''} onchange="toggleLessonToken(${r.id}, this.checked)"/></td>
+      <td style="font-size:12px;color:var(--c-muted)">${r.lastUsedAt ? new Date(r.lastUsedAt).toLocaleString('uk-UA') : 'ще не заходив'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteLessonToken(${r.id})">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function escHtmlAdmin(s) {
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function copyLtLink(link) {
+  navigator.clipboard.writeText(link).then(() => showToast('Посилання скопійовано', 'success'));
+}
+
+async function createLessonToken() {
+  const course = document.getElementById('ltCourseSelect').value;
+  const ageTier = document.getElementById('ltAgeSelect').value;
+  const studentName = document.getElementById('ltStudentName').value.trim();
+  try {
+    const res = await fetch('/api/lesson-tokens', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ course, ageTier, studentName }),
+    });
+    if (res.status === 401) { doLogout(); return; }
+    const data = await res.json();
+    if (!data.success) { showToast('Помилка створення доступу', 'error'); return; }
+    document.getElementById('ltStudentName').value = '';
+    await loadLessonsTab();
+    copyLtLink(data.link);
+    showToast('Доступ видано, посилання скопійовано', 'success');
+  } catch { showToast('Помилка створення доступу', 'error'); }
+}
+
+async function toggleLessonToken(id, active) {
+  try {
+    await fetch(`/api/lesson-tokens/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ active }),
+    });
+  } catch { showToast('Помилка оновлення доступу', 'error'); }
+}
+
+async function deleteLessonToken(id) {
+  if (!confirm('Видалити цей доступ до уроків?')) return;
+  try {
+    await fetch(`/api/lesson-tokens/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+    loadLessonsTab();
+  } catch { showToast('Помилка видалення доступу', 'error'); }
+}
 
 async function loadClients() {
   try {

@@ -259,6 +259,22 @@ CREATE TABLE IF NOT EXISTS migration_meta (
   key   TEXT PRIMARY KEY,
   value TEXT
 );
+
+-- Per-student access tokens for the interactive lesson web-apps (/lessons/*).
+-- One row per issued link; client_id is optional (a token can be issued
+-- without linking it to an existing CRM client record, e.g. for a trial).
+CREATE TABLE IF NOT EXISTS lesson_tokens (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  token       TEXT UNIQUE NOT NULL,
+  client_id   INTEGER,
+  student_name TEXT NOT NULL DEFAULT '',
+  course      TEXT NOT NULL,
+  age_tier    TEXT NOT NULL,
+  active      INTEGER NOT NULL DEFAULT 1,
+  created_at  TEXT NOT NULL,
+  last_used_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_lesson_tokens_token ON lesson_tokens(token);
 `);
 
 module.exports = db;
