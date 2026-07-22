@@ -96,7 +96,15 @@
     e.stopPropagation();
     if (panel.hidden) openPanel(); else panel.hidden = true;
   });
-  document.addEventListener('click', (e) => {
-    if (!panel.hidden && !panel.contains(e.target) && e.target !== btn) panel.hidden = true;
+  // Any click inside the panel must never reach the document-level listener
+  // below — re-rendering the panel's innerHTML (e.g. on a tile click)
+  // detaches the original clicked element from the DOM before the event
+  // finishes bubbling, so a later `panel.contains(e.target)` check on that
+  // now-detached node incorrectly reports "outside" and closes the panel
+  // mid-navigation. Stopping propagation here at the source sidesteps that
+  // entirely instead of relying on containment checks after the fact.
+  panel.addEventListener('click', (e) => e.stopPropagation());
+  document.addEventListener('click', () => {
+    if (!panel.hidden) panel.hidden = true;
   });
 })();
