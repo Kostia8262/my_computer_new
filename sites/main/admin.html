@@ -1187,14 +1187,12 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
     <div id="lessonsTab" style="display:none">
       <div class="toolbar" style="margin-bottom:16px">
-        <select class="filter-select" id="ltCourseSelect" onchange="onLtCourseChange()"></select>
-        <select class="filter-select" id="ltAgeSelect"></select>
-        <input class="search" id="ltStudentName" placeholder="Ім'я учня (необов'язково)" style="max-width:220px"/>
-        <button class="btn btn-primary" onclick="createLessonToken()">➕ Видати доступ</button>
+        <input class="search" id="ltStudentName" placeholder="Ім'я учня" style="max-width:260px"/>
+        <button class="btn btn-primary" onclick="createLessonToken()">➕ Додати токен</button>
       </div>
       <div class="table-wrap">
-        <table id="lessonsTable" style="min-width:820px">
-          <thead><tr><th>Учень</th><th>Напрямок</th><th>Вік</th><th>Посилання</th><th>Активний</th><th>Востаннє заходив</th><th></th></tr></thead>
+        <table id="lessonsTable" style="min-width:720px">
+          <thead><tr><th>№</th><th>Ім'я</th><th>Посилання</th><th>Активний</th><th>Востаннє заходив</th><th></th></tr></thead>
           <tbody id="lessonsTableBody"></tbody>
         </table>
       </div>
@@ -2245,57 +2243,61 @@ const SOURCE_LABELS = {
 };
 
 // ── LESSONS (student web-app access tokens) ──────────────────────────────────
-let _ltConfig = null; // { courses: [{id,name,icon,enabled,ages:[{id,label}]}] }
 
-function onLtCourseChange() {
-  const ageSel = document.getElementById('ltAgeSelect');
-  const courseId = document.getElementById('ltCourseSelect').value;
-  const course = _ltConfig && _ltConfig.courses.find(c => c.id === courseId);
-  ageSel.innerHTML = (course ? course.ages : []).map(a => `<option value="${a.id}">${a.label}</option>`).join('');
-}
-
-async function loadLtConfig() {
-  if (_ltConfig) return;
-  const res = await fetch('/api/lessons/config');
-  _ltConfig = await res.json();
-  const courseSel = document.getElementById('ltCourseSelect');
-  courseSel.innerHTML = _ltConfig.courses.map(c =>
-    `<option value="${c.id}" ${c.enabled ? '' : 'disabled'}>${c.icon} ${c.name}${c.enabled ? '' : ' (незабаром)'}</option>`
-  ).join('');
-  onLtCourseChange();
-}
-
+// Mirrors the active-clients list — one row per client with status:'active',
+// plus any standalone tokens not linked to a client (added by name only via
+// the toolbar). Token issuance no longer asks for course/age: the token
+// itself never restricted access to a specific one, so that choice was just
+// friction — every valid token opens the full direction/age picker.
 async function loadLessonsTab() {
   try {
-    await loadLtConfig();
-    const res = await fetch('/api/lesson-tokens', { headers: { 'x-admin-token': token } });
-    if (res.status === 401) { doLogout(); return; }
-    const data = await res.json();
-    renderLessonsTable(data.tokens || []);
+    const [clientsRes, tokensRes] = await Promise.all([
+      fetch('/api/clients', { headers: { 'x-admin-token': token } }),
+      fetch('/api/lesson-tokens', { headers: { 'x-admin-token': token } }),
+    ]);
+    if (clientsRes.status === 401 || tokensRes.status === 401) { doLogout(); return; }
+    const clientsData = await clientsRes.json();
+    const tokensData  = await tokensRes.json();
+    const activeClients = (clientsData.clients || []).filter(c => c.status === 'active');
+    const tokens = tokensData.tokens || [];
+    const tokenByClientId = new Map(tokens.filter(t => t.clientId != null).map(t => [t.clientId, t]));
+    const standaloneTokens = tokens.filter(t => t.clientId == null);
+    renderLessonsTable(activeClients, tokenByClientId, standaloneTokens);
   } catch { showToast('Помилка завантаження списку доступів', 'error'); }
 }
 
-function ltCourseLabel(courseId) {
-  const c = _ltConfig && _ltConfig.courses.find(x => x.id === courseId);
-  return c ? `${c.icon} ${c.name}` : courseId;
+function ltTokenCellsHtml(t, clientId, clientName) {
+  if (!t) {
+    return clientId != null
+      ? `<td colspan="4"><button class="btn btn-primary btn-sm" onclick="createLessonTokenForClient(${clientId}, '${escHtmlAdmin(clientName).replace(/'/g, "\\'")}')">➕ Видати доступ</button></td>`
+      : '<td colspan="4" style="color:var(--c-muted)">токен не видано</td>';
+  }
+  const link = `${location.origin}/lessons?token=${t.token}`;
+  return `
+    <td><a href="#" onclick="copyLtLink('${link}');return false" style="font-size:12px">🔗 Копіювати посилання</a></td>
+    <td><input type="checkbox" ${t.active ? 'checked' : ''} onchange="toggleLessonToken(${t.id}, this.checked)"/></td>
+    <td style="font-size:12px;color:var(--c-muted)">${t.lastUsedAt ? new Date(t.lastUsedAt).toLocaleString('uk-UA') : 'ще не заходив'}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteLessonToken(${t.id})">✕</button></td>`;
 }
 
-function renderLessonsTable(rows) {
+function renderLessonsTable(activeClients, tokenByClientId, standaloneTokens) {
   const body = document.getElementById('lessonsTableBody');
   if (!body) return;
-  if (!rows.length) { body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--c-muted)">Ще немає виданих доступів</td></tr>'; return; }
-  body.innerHTML = rows.map(r => {
-    const link = `${location.origin}/lessons?token=${r.token}`;
-    return `<tr>
-      <td>${escHtmlAdmin(r.studentName || '—')}</td>
-      <td>${ltCourseLabel(r.course)}</td>
-      <td>${escHtmlAdmin(r.ageTier)}</td>
-      <td><a href="#" onclick="copyLtLink('${link}');return false" style="font-size:12px">🔗 Копіювати посилання</a></td>
-      <td><input type="checkbox" ${r.active ? 'checked' : ''} onchange="toggleLessonToken(${r.id}, this.checked)"/></td>
-      <td style="font-size:12px;color:var(--c-muted)">${r.lastUsedAt ? new Date(r.lastUsedAt).toLocaleString('uk-UA') : 'ще не заходив'}</td>
-      <td><button class="btn btn-danger btn-sm" onclick="deleteLessonToken(${r.id})">✕</button></td>
-    </tr>`;
-  }).join('');
+  if (!activeClients.length && !standaloneTokens.length) {
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--c-muted)">Немає активних учнів</td></tr>';
+    return;
+  }
+  let n = 0;
+  const clientRows = activeClients.map(c => {
+    n++;
+    const t = tokenByClientId.get(c.id);
+    return `<tr><td>${n}</td><td>${escHtmlAdmin(c.name || '—')}</td>${ltTokenCellsHtml(t, c.id, c.name || '')}</tr>`;
+  });
+  const standaloneRows = standaloneTokens.map(t => {
+    n++;
+    return `<tr><td>${n}</td><td>${escHtmlAdmin(t.studentName || '—')}</td>${ltTokenCellsHtml(t, null, '')}</tr>`;
+  });
+  body.innerHTML = clientRows.concat(standaloneRows).join('');
 }
 
 function escHtmlAdmin(s) {
@@ -2306,24 +2308,31 @@ function copyLtLink(link) {
   navigator.clipboard.writeText(link).then(() => showToast('Посилання скопійовано', 'success'));
 }
 
-async function createLessonToken() {
-  const course = document.getElementById('ltCourseSelect').value;
-  const ageTier = document.getElementById('ltAgeSelect').value;
-  const studentName = document.getElementById('ltStudentName').value.trim();
+async function issueLessonToken(studentName, clientId) {
   try {
     const res = await fetch('/api/lesson-tokens', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
-      body: JSON.stringify({ course, ageTier, studentName }),
+      body: JSON.stringify({ studentName, clientId }),
     });
     if (res.status === 401) { doLogout(); return; }
     const data = await res.json();
     if (!data.success) { showToast('Помилка створення доступу', 'error'); return; }
-    document.getElementById('ltStudentName').value = '';
     await loadLessonsTab();
     copyLtLink(data.link);
     showToast('Доступ видано, посилання скопійовано', 'success');
   } catch { showToast('Помилка створення доступу', 'error'); }
+}
+
+async function createLessonToken() {
+  const studentName = document.getElementById('ltStudentName').value.trim();
+  if (!studentName) { showToast('Введи ім\'я учня', 'error'); return; }
+  await issueLessonToken(studentName, null);
+  document.getElementById('ltStudentName').value = '';
+}
+
+async function createLessonTokenForClient(clientId, clientName) {
+  await issueLessonToken(clientName, clientId);
 }
 
 async function toggleLessonToken(id, active) {

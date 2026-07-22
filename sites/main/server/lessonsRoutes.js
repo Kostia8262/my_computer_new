@@ -196,12 +196,18 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
     res.json({ success: true, tokens: lessonTokensDb.getAll() });
   });
 
+  // course/ageTier are no longer asked for at issue time — the token itself
+  // never restricted access to a specific one (the gate only checks
+  // active/valid, the picker always shows every enabled direction), so
+  // requiring an upfront choice was just friction. Kept as internal
+  // bookkeeping defaults only, not shown or asked in the admin UI anymore.
   app.post('/api/lesson-tokens', requireAdmin, (req, res) => {
-    const { clientId, studentName, course, ageTier } = req.body || {};
-    const courseDef = COURSES[course];
-    if (!courseDef) return res.status(400).json({ error: 'Unknown course' });
-    if (!courseDef.ages.some(a => a.id === ageTier)) return res.status(400).json({ error: 'Unknown age tier for this course' });
-    const rec = lessonTokensDb.create({ clientId, studentName: escHtml(studentName || ''), course, ageTier });
+    const { clientId, studentName } = req.body || {};
+    if (!studentName || !String(studentName).trim()) return res.status(400).json({ error: 'studentName is required' });
+    const rec = lessonTokensDb.create({
+      clientId, studentName: escHtml(studentName.trim()),
+      course: 'python', ageTier: 'all',
+    });
     res.json({ success: true, token: rec, link: `${req.protocol}://${req.get('host')}/lessons?token=${rec.token}` });
   });
 
