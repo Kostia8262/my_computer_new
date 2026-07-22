@@ -426,6 +426,46 @@ if (!SUPERADMIN_TOKEN) {
   console.warn('⚠️  WARNING: SUPERADMIN_TOKEN / ADMIN_TOKEN is not set in .env!');
 }
 
+// ── DEV ENVIRONMENT GUARDS ────────────────────────────────────────────────────
+// Gated on SITE_ENV=dev (set only in dev.mycomputer.education's own .env, never
+// committed) so this exact code is safe to merge into master untouched — prod's
+// .env has no SITE_ENV, so none of this runs there.
+const IS_DEV = process.env.SITE_ENV === 'dev';
+
+if (IS_DEV) {
+  app.get('/robots.txt', (req, res) => {
+    res.type('text/plain').send('User-agent: *\nDisallow: /\n');
+  });
+
+  const DEV_BANNER = '<div style="position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#f59e0b;color:#111;text-align:center;font:700 13px/30px system-ui,sans-serif;">⚠️ DEV-СЕРЕДОВИЩЕ — dev.mycomputer.education, не для відвідувачів</div>';
+
+  const injectDevMarkers = (html) => {
+    if (typeof html !== 'string') return html;
+    if (html.includes('<head>')) html = html.replace('<head>', '<head>\n<meta name="robots" content="noindex, nofollow"/>');
+    if (/<body[^>]*>/.test(html)) html = html.replace(/<body([^>]*)>/, `<body$1>${DEV_BANNER}`);
+    return html;
+  };
+
+  app.use((req, res, next) => {
+    res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+
+    const originalSend = res.send.bind(res);
+    res.send = (body) => originalSend(injectDevMarkers(body));
+
+    const originalSendFile = res.sendFile.bind(res);
+    res.sendFile = (filePath, ...rest) => {
+      if (String(filePath).endsWith('.html')) {
+        try {
+          return res.send(injectDevMarkers(fs.readFileSync(filePath, 'utf8')));
+        } catch (e) { /* fall through to normal sendFile on read error */ }
+      }
+      return originalSendFile(filePath, ...rest);
+    };
+
+    next();
+  });
+}
+
 // ── CANONICAL HOST/PATH REDIRECTS ────────────────────────────────────────────
 // www. and /index.html both served the exact same content as the bare "/"
 // with no redirect, just a <link rel="canonical"> pointing elsewhere — Google
