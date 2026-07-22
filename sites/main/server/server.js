@@ -426,6 +426,23 @@ if (!SUPERADMIN_TOKEN) {
   console.warn('⚠️  WARNING: SUPERADMIN_TOKEN / ADMIN_TOKEN is not set in .env!');
 }
 
+// ── CANONICAL HOST/PATH REDIRECTS ────────────────────────────────────────────
+// www. and /index.html both served the exact same content as the bare "/"
+// with no redirect, just a <link rel="canonical"> pointing elsewhere — Google
+// still has to crawl each duplicate to discover that, burning crawl budget
+// that a young, low-authority domain can't spare. A real 301 stops Google
+// from ever fetching the duplicate again.
+app.use((req, res, next) => {
+  if (req.hostname === 'www.mycomputer.education') {
+    return res.redirect(301, `https://mycomputer.education${req.originalUrl}`);
+  }
+  if (req.path === '/index.html') {
+    const query = req.originalUrl.split('?')[1];
+    return res.redirect(301, '/' + (query ? `?${query}` : ''));
+  }
+  next();
+});
+
 // ── SECURITY HEADERS (helmet) ────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
