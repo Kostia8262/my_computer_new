@@ -144,7 +144,7 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
     if (!COURSES[course]) return res.status(400).json({ error: 'Unknown course' });
     if (!course || !ageTier) return res.status(400).json({ error: 'course and ageTier are required' });
     const rec = lessonTokensDb.create({ clientId, studentName: escHtml(studentName || ''), course, ageTier });
-    res.json({ success: true, token: rec, link: `https://mycomputer.education/lessons?token=${rec.token}` });
+    res.json({ success: true, token: rec, link: `${req.protocol}://${req.get('host')}/lessons?token=${rec.token}` });
   });
 
   app.patch('/api/lesson-tokens/:id', requireAdmin, (req, res) => {
