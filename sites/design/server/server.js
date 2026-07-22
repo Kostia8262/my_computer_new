@@ -715,6 +715,22 @@ if (!SUPERADMIN_TOKEN) {
   console.warn('⚠️  WARNING: SUPERADMIN_TOKEN / ADMIN_TOKEN is not set in .env!');
 }
 
+// ── CANONICAL HOST/PATH REDIRECTS ────────────────────────────────────────────
+// Same www./index.html duplicate-serving issue found and fixed on main
+// (sites/main/server/server.js) — www. and /index.html both served 200 with
+// identical content and no redirect, wasting crawl budget on this equally
+// young, low-authority domain.
+app.use((req, res, next) => {
+  if (req.hostname === 'www.mycomputer.school') {
+    return res.redirect(301, `https://mycomputer.school${req.originalUrl}`);
+  }
+  if (req.path === '/index.html') {
+    const query = req.originalUrl.split('?')[1];
+    return res.redirect(301, '/' + (query ? `?${query}` : ''));
+  }
+  next();
+});
+
 // ── SECURITY HEADERS (helmet) ────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
