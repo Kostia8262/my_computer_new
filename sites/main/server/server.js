@@ -497,11 +497,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:  ["'self'"],
-      // 'unsafe-eval' + cdnjs/skulpt.org are needed by the /lessons Python
+      // 'unsafe-eval' + cdnjs/skulpt.org/jsdelivr are needed by the /lessons
       // apps: Skulpt compiles Python to JS at runtime via Function/eval, and
-      // CodeMirror + (for the 10-14/14-18 tiers) Skulpt itself load from
-      // cdnjs/skulpt.org rather than being bundled locally.
-      scriptSrc:   ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://fonts.googleapis.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://t.contentsquare.net", "https://cdnjs.cloudflare.com", "https://skulpt.org"],
+      // CodeMirror + Skulpt itself load from these CDNs rather than being
+      // bundled locally (cdnjs/skulpt.org for Python, jsdelivr for the
+      // Minecraft app's own Skulpt build).
+      scriptSrc:   ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://fonts.googleapis.com", "https://www.googletagmanager.com", "https://www.google-analytics.com", "https://t.contentsquare.net", "https://cdnjs.cloudflare.com", "https://skulpt.org", "https://cdn.jsdelivr.net"],
       styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
       fontSrc:     ["'self'", "https://fonts.gstatic.com"],
       imgSrc:      ["'self'", "data:", "https:"],
