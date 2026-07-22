@@ -1,4 +1,4 @@
-﻿# robots.txt — My Computer Academy
+# robots.txt — My Computer Academy
 # https://construct.mycomputer.education
 
 # ── Allow all compliant crawlers ──────────────────────────────────────────────
