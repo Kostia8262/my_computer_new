@@ -105,7 +105,13 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
         res.cookie(COOKIE_NAME, queryToken, {
           httpOnly: true, secure: true, sameSite: 'lax', maxAge: COOKIE_MAX_AGE_MS,
         });
-        return res.redirect(302, req.path); // drop ?token= from the URL
+        // req.path is relative to the /lessons mount point (Express strips
+        // the mount prefix inside app.use('/lessons', ...)) — req.originalUrl
+        // is not, so it's the only reliable source for "the real path the
+        // browser asked for" here. Using req.path by mistake redirects to
+        // the SITE ROOT instead of back to /lessons — caught via live testing
+        // on dev, not by reading the code.
+        return res.redirect(302, req.originalUrl.split('?')[0]);
       }
       return res.status(401).send(gatePage(true));
     }
