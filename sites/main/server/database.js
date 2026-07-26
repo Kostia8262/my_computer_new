@@ -25,7 +25,7 @@ const selAll   = db.prepare('SELECT * FROM leads ORDER BY id DESC');
 const selById  = db.prepare('SELECT * FROM leads WHERE id = ?');
 const selByPhone = db.prepare('SELECT * FROM leads WHERE phone = ?');
 const insLead  = db.prepare(`INSERT INTO leads (child_name, age, course, source, phone, email, status, notes, created_at, updated_at)
-  VALUES (@child_name, @age, @course, @source, @phone, @email, 'new', NULL, @created_at, @updated_at)`);
+  VALUES (@child_name, @age, @course, @source, @phone, @email, 'new', @notes, @created_at, @updated_at)`);
 const delLead  = db.prepare('DELETE FROM leads WHERE id = ?');
 
 module.exports = {
@@ -38,6 +38,7 @@ module.exports = {
       source:     data.source ?? null,
       phone:      data.phone,
       email:      data.email ?? null,
+      notes:      data.notes ?? null,
       created_at: t,
       updated_at: t,
     });
