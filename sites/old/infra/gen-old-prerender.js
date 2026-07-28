@@ -166,6 +166,19 @@ async function run() {
     const page = await browser.newPage();
     await page.setViewport({ width: 1440, height: 900 });
 
+    // This is a bot capturing markup, not a real visitor — letting GTM/GA/
+    // Contentsquare fire here would report every scheduled prerender run as
+    // a fake pageview from the server's own IP, inflating traffic stats and
+    // skewing analytics with non-human sessions on every course page, every
+    // minute. Block them at the network layer so nothing ever reports.
+    const BLOCKED_HOSTS = ['contentsquare.net', 'google-analytics.com', 'googletagmanager.com', 'doubleclick.net'];
+    await page.setRequestInterception(true);
+    page.on('request', req => {
+      const url = req.url();
+      if (BLOCKED_HOSTS.some(h => url.includes(h))) return req.abort();
+      req.continue();
+    });
+
     // --- Homepage ---
     const homePath = path.join(clientDir, 'prerender', 'home.html');
     try {
