@@ -1713,14 +1713,18 @@ app.delete('/api/reviews/:id', adminLimiter, requireSuperAdmin, (req, res) => {
 // every course. The visible curriculum/pricing/FAQ body is still rendered by
 // that same client JS — this only fixes the head + structured data, matching
 // the pattern already shipped on main/design's /courses/:slug route.
-const COURSE_SLUGS = ['scratch', 'python', 'roblox', 'web'];
+// This landing has no umbrella course — every /courses/:slug page is a distinct
+// age-specific programme, so each stays self-canonical.
+const PRIMARY_COURSE_ID = null;
 const COURSE_HTML_TPL = fs.readFileSync(path.join(__dirname, '..', 'course.html'), 'utf8');
 app.get('/courses/:slug', (req, res) => {
   const { slug } = req.params;
   if (!SAFE_ID_RE.test(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
   const course = coursesDb.getAll().find(c => c.id === slug);
-  if (!course && !COURSE_SLUGS.includes(slug)) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
-  if (!course) return res.sendFile(path.join(__dirname, '..', 'course.html'));
+  // No row in this landing's own DB => the course does not exist here. Previously
+  // a COURSE_SLUGS allowlist (copy-pasted identically across landings) let foreign
+  // slugs through to a bare course.html: HTTP 200, placeholder <title>, no canonical.
+  if (!course) return res.status(404).sendFile(path.join(__dirname, '..', '404.html'));
 
   const isRu    = req.query.lang === 'ru';
   const name    = (isRu && course.name_ru) ? course.name_ru : course.name;
@@ -1784,7 +1788,8 @@ app.get('/courses/:slug', (req, res) => {
   <link rel="alternate" hreflang="uk" href="${pageUrl}"/>
   <link rel="alternate" hreflang="ru" href="${pageUrl}?lang=ru"/>
   <link rel="alternate" hreflang="x-default" href="${pageUrl}"/>` : '';
-  const canonicalUrl = `${pageUrl}${isRu ? '?lang=ru' : ''}`;
+  const canonicalTarget = (PRIMARY_COURSE_ID && slug === PRIMARY_COURSE_ID) ? `${siteUrl}/` : pageUrl;
+  const canonicalUrl = `${canonicalTarget}${isRu ? '?lang=ru' : ''}`;
 
   let html = COURSE_HTML_TPL
     .replace('<title>Курс — My Computer Academy</title>', `<title>${escHtml(title)}</title>`)
