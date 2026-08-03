@@ -1724,11 +1724,13 @@ app.get('/articles/:slug', (req, res) => {
   <meta property="og:image" content="https://3dsmax.mycomputer.school/og-image.png?v=2"/>
   <meta property="og:locale" content="${isRu ? 'ru_RU' : 'uk_UA'}"/>
   <script type="application/ld+json">${articleJsonLd}</script>`)
+    // Match the loading stub structurally, not by an exact literal: the stub in
+    // article.html gained a data-ru attribute at some point, which silently broke
+    // this .replace() and left every article page serving an empty body to crawlers
+    // (Google's renderer recovered via JS, GPTBot/ClaudeBot did not).
     .replace(
-      `<div id="pageContent">
-  <div style="text-align:center;padding:100px 20px;color:#888">Завантаження...</div>
-</div>`,
-      pageContentHtml
+      /<div id="pageContent">[\s\S]*?<\/div>\s*<\/div>/,
+      () => pageContentHtml
     );
 
   if (isRu) html = html.replace('<html lang="uk">', '<html lang="ru">');

@@ -34,6 +34,14 @@
     .article-content strong{color:#1a1a2e;font-weight:700}
     .article-content a{color:#E2604A;text-decoration:underline}
     .article-content code{background:#f0eeff;color:#E2604A;padding:2px 7px;border-radius:5px;font-size:14px;font-family:monospace}
+    /* Comparison tables in article bodies. Own scroll container so a wide table
+       never forces the whole page to scroll sideways on a phone. */
+    .article-content table{display:block;overflow-x:auto;width:100%;border-collapse:collapse;margin-bottom:22px;font-size:15px}
+    .article-content th,
+    .article-content td{border:1px solid #e6e3f5;padding:11px 14px;text-align:left;vertical-align:top;line-height:1.55}
+    .article-content th{background:#f0eeff;color:#1a1a2e;font-weight:700;white-space:nowrap}
+    .article-content td{color:#444}
+    .article-content tbody tr:nth-child(even) td{background:#faf9ff}
     .article-callout{background:#FDECE8;border-left:4px solid #E2604A;border-radius:0 12px 12px 0;padding:18px 22px;margin:24px 0;font-size:15px;color:#444;line-height:1.65}
     .article-callout strong{display:block;color:#C94B37;font-size:13px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
     .article-table{width:100%;border-collapse:collapse;margin:24px 0;font-size:14px}
