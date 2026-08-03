@@ -14,17 +14,23 @@
   --c-brand-500:#6C47FF; --c-brand-600:#5533EE; --c-brand-700:#7c3aed;
   /* Neutral */
   --c-ink:#1a1a2e; --c-ink-soft:#333;
-  --c-gray-500:#888; --c-gray-400:#aaa; --c-gray-300:#bbb;
+  /* Secondary greys carry real information (dates, counters, empty states), so
+     they must clear WCAG AA 4.5:1 on every surface they land on — including the
+     darkest one, --c-canvas #f0eeff. The old #888/#aaa gave only 3.54/2.32.
+     --c-gray-300 stays light on purpose: its single use is the weekend day
+     numbers in the attendance calendar, where the grid position repeats the
+     same information. */
+  --c-gray-500:#5f5f6b; --c-gray-400:#6b6b78; --c-gray-300:#bbb;
   --c-border:#e8e4ff; --c-border-soft:#f0eeff; --c-border-faint:#f8f7ff;
   --c-surface:#fff; --c-canvas:#f0eeff; --c-row-hover:#faf9ff;
   /* Semantic (bg/border/text/solid per status family) */
   --c-info-bg:#e8f4ff; --c-info-border:#bfdbfe; --c-info-text:#2563eb; --c-info-solid:#3b82f6;
-  --c-success-bg:#e8f5e9; --c-success-border:#a7f3d0; --c-success-text:#15803d; --c-success-solid:#22c55e;
+  --c-success-bg:#e8f5e9; --c-success-border:#a7f3d0; --c-success-text:#106830; --c-success-solid:#22c55e;
   --c-warning-bg:#fef9e7; --c-warning-border:#fde68a; --c-warning-text:#b45309; --c-warning-solid:#eab308;
-  --c-danger-bg:#fff0f0; --c-danger-border:#fecaca; --c-danger-text:#dc2626; --c-danger-solid:#ef4444;
+  --c-danger-bg:#fff0f0; --c-danger-border:#fecaca; --c-danger-text:#c62020; --c-danger-solid:#ef4444;
   --c-trial-bg:#f0e8ff; --c-trial-border:#c4b5fd; --c-trial-text:#7c3aed; --c-trial-solid:#a855f7;
   --c-done-bg:#f0fdf4; --c-done-border:#bbf7d0; --c-done-text:#166534; --c-done-solid:#16a34a;
-  --c-neutral-bg:#f5f5f5; --c-neutral-border:#e0e0e0; --c-neutral-text:#888; --c-neutral-solid:#9ca3af;
+  --c-neutral-bg:#f5f5f5; --c-neutral-border:#e0e0e0; --c-neutral-text:#5f5f6b; --c-neutral-solid:#9ca3af;
   /* Dark shell (sidebar + topbar chrome) — same dark motif already used by
      .client-subtabs/.cms-subtabs, extended to the app's primary navigation. */
   --c-shell-bg:#181527; --c-shell-bg-alt:#211c33; --c-shell-border:rgba(255,255,255,.08);
@@ -77,8 +83,11 @@ a{color:var(--c-brand-500);text-decoration:none}
 .btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
 .btn:active{transform:scale(.97)}
 .btn-primary{background:linear-gradient(135deg,#8465ff,#6C47FF);color:#fff;box-shadow:0 2px 8px rgba(108,71,255,.28)}.btn-primary:hover{background:linear-gradient(135deg,#9078ff,#5533EE);box-shadow:0 4px 14px rgba(108,71,255,.4)}
-.btn-ghost{background:var(--c-brand-50);color:var(--c-brand-500);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
-.btn-danger{background:#fff0f0;color:#e53e3e;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
+/* Ghost and danger labels use the darker step of their family: on hover the
+   background steps up to --c-brand-100 / --c-danger-border, and the lighter
+   500-step text dropped to 3.9:1 / 4.0:1 there. */
+.btn-ghost{background:var(--c-brand-50);color:var(--c-brand-600);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
+.btn-danger{background:var(--c-danger-bg);color:#991b1b;border:1.5px solid var(--c-danger-border)}.btn-danger:hover{background:var(--c-danger-border)}
 .btn-sm{padding:5px 10px;font-size:12px}
 /* Modal close button. As a plain .btn-sm the ✕ rendered 31x23 — narrow, not
    square, and an awkward pointer target. Square it off at 36px. */
@@ -330,10 +339,12 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .att-cell{width:24px;height:24px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;transition:transform .1s;user-select:none;border:1px solid transparent;margin:1px}
 .att-cell:hover{transform:scale(1.25);z-index:1;position:relative}
 .att-none{background:#f0f0f0;color:var(--c-gray-300)}
-.att-present{background:#86efac;color:#15803d;border-color:#4ade80}
-.att-absent{background:#fca5a5;color:#dc2626;border-color:#f87171}
+/* Backgrounds keep the saturated set above; only the glyph colors are darkened
+   so the ✓/✗/↻ still reads on them (was 3.57 / 2.54 / 3.28 against AA 4.5). */
+.att-present{background:#86efac;color:#106830;border-color:#4ade80}
+.att-absent{background:#fca5a5;color:#8f1a1a;border-color:#f87171}
 .att-makeup{background:#fde68a;color:#92400e;border-color:#fbbf24}
-.att-cancelled{background:#d1d5db;color:#6b7280;border-color:#9ca3af}
+.att-cancelled{background:#d1d5db;color:#545a66;border-color:#9ca3af}
 .att-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;align-items:center;color:#666}
 .att-legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 .att-legend-item{display:flex;align-items:center;gap:5px}
@@ -450,7 +461,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 /* BULK ACTIONS BAR */
 .bulk-bar{display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--c-trial-bg);border-radius:var(--r-md);margin-bottom:10px;flex-wrap:wrap;border:1.5px solid var(--c-trial-border)}
 .bulk-bar.show{display:flex}
-.bulk-count{font-weight:700;color:var(--c-brand-500);font-size:13px}
+.bulk-count{font-weight:700;color:var(--c-brand-600);font-size:13px}
 /* SCHEDULE VIEW */
 .sched-wrap{overflow-x:auto}
 .sched-tbl{border-collapse:collapse;min-width:600px;width:100%}
@@ -4467,7 +4478,7 @@ function renderReviewsTable() {
       </td>
       <td style="font-size:13px;color:#777">${esc(r.role||'—')}</td>
       <td style="font-size:13px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.text||'')}</td>
-      <td style="color:#f59e0b;font-size:14px">${stars(r.rating)}</td>
+      <td style="color:var(--c-warning-text);font-size:14px">${stars(r.rating)}</td>
       <td><span class="badge ${r.active!==false?'badge-enrolled':'badge-rejected'}">${r.active!==false?'Активний':'Архів'}</span></td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" onclick="openReviewModal(${r.id})">✏️</button>
