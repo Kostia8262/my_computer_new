@@ -80,6 +80,15 @@ a{color:var(--c-brand-500);text-decoration:none}
 .btn-ghost{background:var(--c-brand-50);color:var(--c-brand-500);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
 .btn-danger{background:#fff0f0;color:#e53e3e;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
 .btn-sm{padding:5px 10px;font-size:12px}
+/* Disabled buttons used to be visually identical to active ones — same fill,
+   same border, even cursor:pointer — so there was no way to tell that the
+   reorder arrows on the first/last course, or the login button mid-request,
+   were inert. Mute them and suppress the hover/press feedback. */
+.btn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+.btn:disabled:active{transform:none}
+.btn-primary:disabled:hover{background:linear-gradient(135deg,#8465ff,#6C47FF);box-shadow:none}
+.btn-ghost:disabled:hover{background:var(--c-brand-50)}
+.btn-danger:disabled:hover{background:#fff0f0}
 
 .main{padding:24px;overflow-y:auto;flex:1;min-width:0;height:calc(100vh - 56px)}
 
@@ -422,6 +431,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .gs-wrap{position:relative;display:flex;align-items:center}
 .gs-input{padding:6px 12px;border:1.5px solid rgba(255,255,255,.14);border-radius:8px;font-size:13px;outline:none;width:190px;background:rgba(255,255,255,.08);color:#fff;transition:width .2s,border-color .2s,background .2s}
 .gs-input::placeholder{color:var(--c-shell-text)}
+/* The search field sits on the dark shell and had no hover feedback at all —
+   it only reacted on focus. Lift the fill and border one step so it reads as
+   interactive before you click it. */
+.gs-input:hover:not(:focus){background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.24)}
 .gs-input:focus{border-color:var(--c-brand-500);background:#fff;color:var(--c-ink);width:250px}
 .gs-dropdown{position:absolute;top:calc(100% + 4px);left:0;min-width:320px;background:#fff;color:var(--c-ink);border-radius:var(--r-lg);border:1px solid #e8e4ff;box-shadow:0 8px 30px rgba(0,0,0,.18);z-index:5000;max-height:380px;overflow-y:auto}
 .gs-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 3px;color:#aaa;background:#fafafa}
