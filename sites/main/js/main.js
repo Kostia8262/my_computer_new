@@ -429,6 +429,23 @@ function ageGroupLabel(ageGroup) {
   return `${min}–${max} років`;
 }
 
+// Courses that have their own dedicated landing canonicalize to it (EXTERNAL_CANONICAL
+// in server.js). Link straight to that canonical address instead of routing internal
+// link equity through /courses/:slug, which itself points elsewhere.
+const EXTERNAL_COURSE_URL = {
+  python:    'https://python.mycomputer.education/',
+  roblox:    'https://roblox.mycomputer.education/',
+  minecraft: 'https://minecraft.mycomputer.education/',
+  web:       'https://frontend.mycomputer.education/',
+  construct: 'https://construct.mycomputer.education/',
+  scratch:   'https://scratch.mycomputer.education/',
+  blog:      'https://blog.mycomputer.school/',
+};
+
+function courseUrl(id) {
+  return EXTERNAL_COURSE_URL[id] || `/courses/${id}`;
+}
+
 async function loadCourses() {
   try {
     const res = await fetch('/api/courses');
@@ -450,6 +467,7 @@ async function loadCourses() {
       minecraft:'course-card__header--minecraft', 'ui-ux':   'course-card__header--ui-ux',
     };
     el.innerHTML = active.map(c => {
+      const url = courseUrl(c.id);
       const hClass   = COLOR_CLASS[c.id] || '';
       const hStyle   = hClass ? '' : `style="background:${esc(c.color || '#6C47FF')}"`;
       const ageGroup = esc(c.age_group || '');
@@ -460,13 +478,13 @@ async function loadCourses() {
         return `<li>${esc(text)}</li>`;
       }).join('');
       const btnLabel = currentLang === 'ru' ? 'Бесплатный пробный' : 'Безкоштовне пробне';
-      return `<div class="course-card${popular}" data-age="${ageGroup}" data-url="/courses/${esc(c.id)}">
+      return `<div class="course-card${popular}" data-age="${ageGroup}" data-url="${esc(url)}">
         <div class="course-card__header ${hClass}" ${hStyle}>
           <div class="course-card__emoji">${esc(c.emoji || '')}</div>
           <div class="course-card__age-badge">${ageLabel}</div>
         </div>
         <div class="course-card__body">
-          <h3 class="course-card__title">${esc(c.name)}</h3>
+          <h3 class="course-card__title"><a href="${esc(url)}" class="course-card__title-link">${esc(c.name)}</a></h3>
           <p class="course-card__desc">${esc(c.description || '')}</p>
           <ul class="course-card__features">${feats}</ul>
           <div class="course-card__footer">
@@ -490,10 +508,13 @@ async function loadCourses() {
     // Update nav dropdown
     const navDrop = document.querySelector('#coursesNavItem .nav__dropdown');
     if (navDrop) {
+      // Веб-дизайн has a dedicated landing but no course row in main's own table,
+      // so it is appended manually — otherwise this re-render would drop it.
+      const webdesignItem = `<a href="https://webdesign.mycomputer.education/"><span class="nav__dropdown-emoji">🖌️</span>${currentLang === 'ru' ? 'Веб-дизайн' : 'Веб-дизайн'} (12–18 ${currentLang === 'ru' ? 'лет' : 'років'})</a>`;
       navDrop.innerHTML = active.map(c => {
         const age = ageGroupLabel(c.age_group) || c.age || '';
-        return `<a href="/courses/${esc(c.id)}"><span class="nav__dropdown-emoji">${c.emoji || ''}</span>${esc(c.name)}${age ? ` (${esc(age)})` : ''}</a>`;
-      }).join('');
+        return `<a href="${esc(courseUrl(c.id))}"><span class="nav__dropdown-emoji">${c.emoji || ''}</span>${esc(c.name)}${age ? ` (${esc(age)})` : ''}</a>`;
+      }).join('') + webdesignItem;
     }
 
     // Update all course selects in forms (lead forms + modal)
