@@ -80,6 +80,15 @@ a{color:var(--c-brand-500);text-decoration:none}
 .btn-ghost{background:var(--c-brand-50);color:var(--c-brand-500);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
 .btn-danger{background:#fff0f0;color:#e53e3e;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
 .btn-sm{padding:5px 10px;font-size:12px}
+/* Disabled buttons used to be visually identical to active ones — same fill,
+   same border, even cursor:pointer — so there was no way to tell that the
+   reorder arrows on the first/last course, or the login button mid-request,
+   were inert. Mute them and suppress the hover/press feedback. */
+.btn:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+.btn:disabled:active{transform:none}
+.btn-primary:disabled:hover{background:linear-gradient(135deg,#8465ff,#6C47FF);box-shadow:none}
+.btn-ghost:disabled:hover{background:var(--c-brand-50)}
+.btn-danger:disabled:hover{background:#fff0f0}
 
 .main{padding:24px;overflow-y:auto;flex:1;min-width:0;height:calc(100vh - 56px)}
 
@@ -252,6 +261,12 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 @media(max-width:600px){.modal-grid{grid-template-columns:1fr}}
 
+/* CONFIRM / PROMPT DIALOG */
+.confirm-box{max-width:420px}
+.confirm-box h3{margin-bottom:12px}
+.confirm-text{font-size:14px;color:var(--c-gray-500);line-height:1.5}
+.confirm-box .modal-footer{margin-top:20px}
+
 /* SIDEBAR LAYOUT */
 .app-body{display:flex;flex:1;min-height:0;overflow:hidden}
 .sidebar{width:218px;background:linear-gradient(180deg,#1c1830,#15121f 60%,#120f1c);border-right:1px solid var(--c-shell-border);color:var(--c-shell-text);position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
@@ -416,6 +431,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .gs-wrap{position:relative;display:flex;align-items:center}
 .gs-input{padding:6px 12px;border:1.5px solid rgba(255,255,255,.14);border-radius:8px;font-size:13px;outline:none;width:190px;background:rgba(255,255,255,.08);color:#fff;transition:width .2s,border-color .2s,background .2s}
 .gs-input::placeholder{color:var(--c-shell-text)}
+/* The search field sits on the dark shell and had no hover feedback at all —
+   it only reacted on focus. Lift the fill and border one step so it reads as
+   interactive before you click it. */
+.gs-input:hover:not(:focus){background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.24)}
 .gs-input:focus{border-color:var(--c-brand-500);background:#fff;color:var(--c-ink);width:250px}
 .gs-dropdown{position:absolute;top:calc(100% + 4px);left:0;min-width:320px;background:#fff;color:var(--c-ink);border-radius:var(--r-lg);border:1px solid #e8e4ff;box-shadow:0 8px 30px rgba(0,0,0,.18);z-index:5000;max-height:380px;overflow-y:auto}
 .gs-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 3px;color:#aaa;background:#fafafa}
@@ -485,7 +504,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
           onkeydown="if(event.key==='Escape'){closeGsDropdown();this.value=''}"/>
         <div id="gsDropdown" class="gs-dropdown" style="display:none"></div>
       </div>
-      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Вийти</button>
+      <button class="btn btn-ghost btn-sm" onclick="confirmLogout()">Вийти</button>
     </div>
   </div>
 
@@ -1474,12 +1493,91 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 <div class="toast" id="toast"></div>
 
+<!-- CONFIRM DIALOG (замінює нативний confirm) -->
+<div class="modal-overlay" id="confirmModal" style="display:none" onclick="if(event.target===this)_uiConfirmClose(false)">
+  <div class="modal-box confirm-box">
+    <h3><span id="confirmTitle">Підтвердіть дію</span><button class="btn btn-ghost btn-sm" onclick="_uiConfirmClose(false)">✕</button></h3>
+    <div class="confirm-text" id="confirmText"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="confirmCancelBtn" onclick="_uiConfirmClose(false)">Скасувати</button>
+      <button class="btn btn-danger" id="confirmOkBtn" onclick="_uiConfirmClose(true)">Видалити</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROMPT DIALOG (замінює нативний prompt) -->
+<div class="modal-overlay" id="promptModal" style="display:none" onclick="if(event.target===this)_uiPromptClose(null)">
+  <div class="modal-box confirm-box">
+    <h3><span id="promptTitle">Введіть значення</span><button class="btn btn-ghost btn-sm" onclick="_uiPromptClose(null)">✕</button></h3>
+    <div class="modal-group">
+      <label class="modal-label" id="promptLabel">Значення</label>
+      <input class="modal-input" id="promptInput" onkeydown="if(event.key==='Enter')_uiPromptClose(document.getElementById('promptInput').value)"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="_uiPromptClose(null)">Скасувати</button>
+      <button class="btn btn-primary" id="promptOkBtn" onclick="_uiPromptClose(document.getElementById('promptInput').value)">Зберегти</button>
+    </div>
+  </div>
+</div>
+
 <script>
 'use strict';
 
 const STORAGE_KEY        = 'mca_admin_token';
 const STORAGE_TAB_KEY    = 'mca_admin_tab';
 const STORAGE_SUBTAB_KEY = 'mca_admin_subtab';
+
+// ── UI DIALOGS ────────────────────────────────────────────────────────────────
+// Замінюють нативні confirm()/prompt(): ті не стилізуються, виглядають як
+// системне вікно браузера і на мобільних показують домен замість назви дії.
+let _uiConfirmResolve = null;
+let _uiPromptResolve  = null;
+
+function uiConfirm(opts) {
+  const o = (typeof opts === 'string') ? { text: opts } : (opts || {});
+  document.getElementById('confirmTitle').textContent = o.title || 'Підтвердіть дію';
+  document.getElementById('confirmText').textContent  = o.text  || '';
+  const ok = document.getElementById('confirmOkBtn');
+  ok.textContent = o.confirmLabel || 'Видалити';
+  ok.className   = 'btn ' + (o.danger === false ? 'btn-primary' : 'btn-danger');
+  document.getElementById('confirmModal').style.display = 'flex';
+  setTimeout(() => ok.focus(), 0);
+  return new Promise(resolve => { _uiConfirmResolve = resolve; });
+}
+
+function _uiConfirmClose(result) {
+  document.getElementById('confirmModal').style.display = 'none';
+  const resolve = _uiConfirmResolve;
+  _uiConfirmResolve = null;
+  if (resolve) resolve(result);
+}
+
+function uiPrompt(opts) {
+  const o = opts || {};
+  document.getElementById('promptTitle').textContent = o.title || 'Введіть значення';
+  document.getElementById('promptLabel').textContent = o.label || 'Значення';
+  const inp = document.getElementById('promptInput');
+  inp.type        = o.type || 'text';
+  inp.placeholder = o.placeholder || '';
+  inp.value       = o.value != null ? o.value : '';
+  document.getElementById('promptOkBtn').textContent = o.confirmLabel || 'Зберегти';
+  document.getElementById('promptModal').style.display = 'flex';
+  setTimeout(() => { inp.focus(); inp.select(); }, 0);
+  return new Promise(resolve => { _uiPromptResolve = resolve; });
+}
+
+function _uiPromptClose(value) {
+  document.getElementById('promptModal').style.display = 'none';
+  const resolve = _uiPromptResolve;
+  _uiPromptResolve = null;
+  if (resolve) resolve(value);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (_uiConfirmResolve)     _uiConfirmClose(false);
+  else if (_uiPromptResolve) _uiPromptClose(null);
+});
 
 let allLeads      = [];
 let filtered      = [];
@@ -1559,6 +1657,18 @@ async function doLogin() {
   }
 }
 
+// Кнопка «Вийти» — з підтвердженням.
+async function confirmLogout() {
+  if (!await uiConfirm({
+    title       : 'Вийти з панелі?',
+    text        : 'Поточну сесію буде завершено. Щоб повернутися, знадобиться знову ввести токен.',
+    confirmLabel: 'Вийти',
+    danger      : false
+  })) return;
+  doLogout();
+}
+
+// Примусовий вихід (протермінований або відкликаний токен) — без діалогу.
 function doLogout() {
   localStorage.removeItem(STORAGE_KEY);
   token = '';
@@ -1883,7 +1993,10 @@ function clearLeadSelection() {
 async function bulkDeleteLeads() {
   if (!_selectedLeads.size) return;
   const ids = [..._selectedLeads];
-  if (!confirm(`Видалити ${ids.length} заявок? Цю дію не можна скасувати.`)) return;
+  if (!await uiConfirm({
+    title: `Видалити ${ids.length} заявок?`,
+    text : 'Заявки буде видалено назавжди. Цю дію не можна скасувати.'
+  })) return;
   let deleted = 0;
   for (const id of ids) {
     try {
@@ -2059,7 +2172,10 @@ async function saveLeadFields(id, fields) {
 }
 
 async function deleteLead(id) {
-  if (!confirm('Видалити заявку #' + id + '?')) return;
+  if (!await uiConfirm({
+    title: 'Видалити заявку #' + id + '?',
+    text : 'Заявку буде видалено назавжди. Цю дію не можна скасувати.'
+  })) return;
   try {
     const res = await fetch(`/api/leads/${id}`, {
       method:  'DELETE',
@@ -2173,7 +2289,11 @@ async function renderAdmins() {
 }
 
 async function revokeAdmin(id) {
-  if (!confirm('Відкликати токен цього адміна? Він більше не зможе увійти.')) return;
+  if (!await uiConfirm({
+    title       : 'Відкликати токен?',
+    text        : 'Адмін вийде з панелі й не зможе увійти, доки ви не згенеруєте новий токен.',
+    confirmLabel: 'Відкликати'
+  })) return;
   try {
     const res = await fetch(`/api/admins/${id}/revoke`, {
       method:  'PATCH',
@@ -2186,7 +2306,10 @@ async function revokeAdmin(id) {
 }
 
 async function deleteAdminUser(id) {
-  if (!confirm('Видалити адміна назавжди? Цю дію не можна скасувати.')) return;
+  if (!await uiConfirm({
+    title: 'Видалити адміна назавжди?',
+    text : 'Обліковий запис і його токен буде видалено. Цю дію не можна скасувати.'
+  })) return;
   try {
     const res = await fetch(`/api/admins/${id}`, {
       method:  'DELETE',
@@ -2396,7 +2519,10 @@ async function toggleLessonToken(id, active) {
 }
 
 async function deleteLessonToken(id) {
-  if (!confirm('Видалити цей доступ до уроків?')) return;
+  if (!await uiConfirm({
+    title: 'Видалити цей доступ до уроків?',
+    text : 'Учень більше не зможе відкрити свої уроки за цим посиланням.'
+  })) return;
   try {
     await fetch(`/api/lesson-tokens/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
     loadLessonsTab();
@@ -2584,7 +2710,10 @@ function clearClientSelection() {
 async function bulkDeleteClients() {
   if (!_selectedClients.size) return;
   const ids = [..._selectedClients];
-  if (!confirm(`Видалити ${ids.length} клієнтів? Цю дію не можна скасувати.`)) return;
+  if (!await uiConfirm({
+    title: `Видалити ${ids.length} клієнтів?`,
+    text : 'Усі дані цих клієнтів разом з історією оплат буде видалено. Цю дію не можна скасувати.'
+  })) return;
   let deleted = 0;
   for (const id of ids) {
     try {
@@ -2756,7 +2885,10 @@ async function saveClientField(id, field, value) {
 }
 
 async function deleteClient(id) {
-  if (!confirm('Видалити клієнта #' + id + '?')) return;
+  if (!await uiConfirm({
+    title: 'Видалити клієнта #' + id + '?',
+    text : 'Усі дані клієнта разом з історією оплат буде видалено. Цю дію не можна скасувати.'
+  })) return;
   try {
     const res = await fetch(`/api/clients/${id}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
     if (!res.ok) { showToast('Помилка видалення', 'error'); return; }
@@ -2917,7 +3049,12 @@ function jumpToPayMonth(ym) {
 
 async function createNewPayMonth() {
   const ym = _mpYM();
-  if (!confirm(`Створити місяць ${_mpFormatLabel(_mpYear, _mpMonth)}?`)) return;
+  if (!await uiConfirm({
+    title       : `Створити місяць ${_mpFormatLabel(_mpYear, _mpMonth)}?`,
+    text        : 'До списку буде додано всіх активних учнів із їхніми місячними внесками.',
+    confirmLabel: 'Створити',
+    danger      : false
+  })) return;
 
   // Build records from last month or active clients
   let records = [];
@@ -3088,7 +3225,10 @@ async function updateMpRecord(clientId, field, value) {
 }
 
 async function removeMpRecord(clientId, silent) {
-  if (!silent && !confirm('Видалити учня з цього місяця?')) return;
+  if (!silent && !await uiConfirm({
+    title: 'Видалити учня з цього місяця?',
+    text : 'Запис про оплату за цей місяць буде видалено.'
+  })) return;
   const rec = _mpData.find(r => r.clientId === clientId);
   if (rec?._virtual) {
     _mpData = _mpData.filter(r => r.clientId !== clientId);
@@ -3714,8 +3854,11 @@ function addFaqItem() {
   showToast('Додано нове питання', 'success');
 }
 
-function deleteFaqItem(idx) {
-  if (!confirm(`Видалити питання ${idx+1}?`)) return;
+async function deleteFaqItem(idx) {
+  if (!await uiConfirm({
+    title: `Видалити питання ${idx + 1}?`,
+    text : 'Питання зникне з блоку FAQ на сайті.'
+  })) return;
   _cmsData.faq = collectFaqFromForm();
   _cmsData.faq.splice(idx, 1);
   renderFaqEditor(_cmsData.faq);
@@ -3852,7 +3995,10 @@ async function saveCourse() {
 }
 
 async function deleteCourse(id) {
-  if (!confirm(`Видалити курс "${id}"?`)) return;
+  if (!await uiConfirm({
+    title: `Видалити курс «${id}»?`,
+    text : 'Курс зникне із сайту та з усіх фільтрів. Цю дію не можна скасувати.'
+  })) return;
   try {
     const res = await fetch(apiUrl(`/api/courses/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -3875,7 +4021,14 @@ async function reorderCourse(id, direction) {
 
 async function hideCourse(id, currentlyActive) {
   const label = currentlyActive ? 'приховати' : 'показати';
-  if (!confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} курс "${id}"?`)) return;
+  if (!await uiConfirm({
+    title       : `${label.charAt(0).toUpperCase() + label.slice(1)} курс «${id}»?`,
+    text        : currentlyActive
+      ? 'Курс зникне із сайту, але залишиться в адмінці — його можна буде показати назад.'
+      : 'Курс знову зʼявиться на сайті та у фільтрах.',
+    confirmLabel: label.charAt(0).toUpperCase() + label.slice(1),
+    danger      : false
+  })) return;
   try {
     const res = await fetch(apiUrl(`/api/courses/${id}`), {
       method: 'PATCH',
@@ -4028,7 +4181,10 @@ async function saveModule() {
 }
 
 async function deleteModule(idx) {
-  if (!confirm('Видалити модуль?')) return;
+  if (!await uiConfirm({
+    title: 'Видалити модуль?',
+    text : 'Модуль і його опис буде видалено з програми курсу.'
+  })) return;
   const course = _allCourses?.find(c => c.id === _curriculumCourseId);
   if (!course) return;
   const curriculum = [...(course.curriculum || [])];
@@ -4239,7 +4395,11 @@ async function saveArticle() {
 
 async function deleteArticle(id) {
   const a = _articles.find(x => x.id === id);
-  if (!a || !confirm(`Видалити статтю "${a.title}"?`)) return;
+  if (!a) return;
+  if (!await uiConfirm({
+    title: `Видалити статтю «${a.title}»?`,
+    text : 'Стаття зникне з блогу та з мапи сайту. Цю дію не можна скасувати.'
+  })) return;
   try {
     const res = await fetch(apiUrl(`/api/articles/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка видалення', 'error'); return; }
@@ -4251,7 +4411,15 @@ async function deleteArticle(id) {
 async function hideArticle(id, currentlyActive) {
   const a = _articles.find(x => x.id === id);
   const label = currentlyActive ? 'сховати' : 'показати';
-  if (!a || !confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} статтю "${a.title}"?`)) return;
+  if (!a) return;
+  if (!await uiConfirm({
+    title       : `${label.charAt(0).toUpperCase() + label.slice(1)} статтю «${a.title}»?`,
+    text        : currentlyActive
+      ? 'Стаття зникне з блогу, але залишиться в адмінці — її можна буде показати назад.'
+      : 'Стаття знову зʼявиться в блозі.',
+    confirmLabel: label.charAt(0).toUpperCase() + label.slice(1),
+    danger      : false
+  })) return;
   try {
     const res = await fetch(apiUrl(`/api/articles/${id}`), {
       method: 'PATCH',
@@ -4366,7 +4534,11 @@ async function saveReview() {
 
 async function deleteReview(id) {
   const r = _reviews.find(x => x.id === id);
-  if (!r || !confirm(`Видалити відгук від "${r.name}"?`)) return;
+  if (!r) return;
+  if (!await uiConfirm({
+    title: `Видалити відгук від «${r.name}»?`,
+    text : 'Відгук зникне з головної сторінки сайту. Цю дію не можна скасувати.'
+  })) return;
   try {
     const res = await fetch(apiUrl(`/api/reviews/${id}`), { method: 'DELETE', headers: authHeaders() });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -4378,7 +4550,15 @@ async function deleteReview(id) {
 async function hideReview(id, currentlyActive) {
   const r = _reviews.find(x => x.id === id);
   const label = currentlyActive ? 'сховати' : 'показати';
-  if (!r || !confirm(`${label.charAt(0).toUpperCase()+label.slice(1)} відгук від "${r.name}"?`)) return;
+  if (!r) return;
+  if (!await uiConfirm({
+    title       : `${label.charAt(0).toUpperCase() + label.slice(1)} відгук від «${r.name}»?`,
+    text        : currentlyActive
+      ? 'Відгук зникне з головної сторінки, але залишиться в адмінці.'
+      : 'Відгук знову зʼявиться на головній сторінці.',
+    confirmLabel: label.charAt(0).toUpperCase() + label.slice(1),
+    danger      : false
+  })) return;
   try {
     const res = await fetch(apiUrl(`/api/reviews/${id}`), {
       method: 'PATCH',
@@ -4810,7 +4990,10 @@ async function bulkPayAction(action) {
   const ids = [..._selectedPayments];
 
   if (action === 'delete') {
-    if (!confirm(`Видалити ${ids.length} записів з цього місяця?`)) return;
+    if (!await uiConfirm({
+      title: `Видалити ${ids.length} записів з цього місяця?`,
+      text : 'Записи про оплату буде видалено. Цю дію не можна скасувати.'
+    })) return;
     for (const cId of ids) await removeMpRecord(cId, true);
     _selectedPayments.clear();
     renderMonthPayments();
@@ -4819,7 +5002,13 @@ async function bulkPayAction(action) {
   }
 
   if (action === 'amount') {
-    const amtStr = prompt('Введіть суму оплати (₴) для всіх вибраних:');
+    const amtStr = await uiPrompt({
+      title       : 'Сума оплати',
+      label       : `Сума (₴) для ${ids.length} вибраних`,
+      placeholder : '3800',
+      type        : 'number',
+      confirmLabel: 'Застосувати'
+    });
     const amt = parseFloat(amtStr);
     if (!amtStr || isNaN(amt)) return;
     for (const cId of ids) await _bulkPatch(cId, { expectedAmount: amt });
@@ -5258,7 +5447,10 @@ async function addStaffLeave() {
 
 async function deleteStaffLeave(leaveId) {
   if (!_currentTeacherId) return;
-  if (!confirm('Видалити цей запис?')) return;
+  if (!await uiConfirm({
+    title: 'Видалити цей запис?',
+    text : 'Запис зникне з графіка відпусток і лікарняних.'
+  })) return;
   try {
     const res = await fetch(`/api/admins/${_currentTeacherId}/leave/${leaveId}`, {
       method: 'DELETE', headers: { 'x-admin-token': token },
@@ -5441,7 +5633,11 @@ async function refreshStaffProfileAccess() {
 
 async function revokeStaffTokenFromProfile() {
   if (!_currentTeacherId) return;
-  if (!confirm('Відкликати токен цього співробітника? Він більше не зможе увійти.')) return;
+  if (!await uiConfirm({
+    title       : 'Відкликати токен?',
+    text        : 'Співробітник вийде з панелі й не зможе увійти, доки ви не згенеруєте новий токен.',
+    confirmLabel: 'Відкликати'
+  })) return;
   try {
     const res = await fetch(`/api/admins/${_currentTeacherId}/revoke`, { method: 'PATCH', headers: { 'x-admin-token': token } });
     if (!res.ok) { showToast('Помилка', 'error'); return; }
@@ -5453,7 +5649,12 @@ async function revokeStaffTokenFromProfile() {
 
 async function regenerateStaffTokenFromProfile() {
   if (!_currentTeacherId) return;
-  if (!confirm('Згенерувати новий токен для цього співробітника? Старий токен перестане працювати.')) return;
+  if (!await uiConfirm({
+    title       : 'Згенерувати новий токен?',
+    text        : 'Старий токен одразу перестане працювати — не забудьте передати співробітнику новий.',
+    confirmLabel: 'Згенерувати',
+    danger      : false
+  })) return;
   try {
     const res = await fetch(`/api/admins/${_currentTeacherId}/regenerate-token`, { method: 'POST', headers: { 'x-admin-token': token } });
     const data = await res.json();
@@ -5514,7 +5715,12 @@ function updateBirthdayDisplay() {
 }
 
 async function regenerateAdminToken(id) {
-  if (!confirm('Згенерувати новий токен для цього співробітника? Старий токен перестане працювати.')) return;
+  if (!await uiConfirm({
+    title       : 'Згенерувати новий токен?',
+    text        : 'Старий токен одразу перестане працювати — не забудьте передати співробітнику новий.',
+    confirmLabel: 'Згенерувати',
+    danger      : false
+  })) return;
   try {
     const res = await fetch(`/api/admins/${id}/regenerate-token`, {
       method: 'POST',
@@ -5581,7 +5787,10 @@ async function uploadStaffDoc() {
 }
 
 async function deleteStaffDoc(adminId, filename) {
-  if (!confirm(`Видалити "${filename}"?`)) return;
+  if (!await uiConfirm({
+    title: `Видалити «${filename}»?`,
+    text : 'Файл буде видалено з сервера, посилання на нього перестануть працювати.'
+  })) return;
   try {
     const res = await fetch(`/api/admins/${adminId}/docs/${encodeURIComponent(filename)}`, {
       method: 'DELETE',
