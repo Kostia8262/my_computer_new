@@ -80,6 +80,9 @@ a{color:var(--c-brand-500);text-decoration:none}
 .btn-ghost{background:var(--c-brand-50);color:var(--c-brand-500);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
 .btn-danger{background:#fff0f0;color:#e53e3e;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
 .btn-sm{padding:5px 10px;font-size:12px}
+/* Modal close button. As a plain .btn-sm the ✕ rendered 31x23 — narrow, not
+   square, and an awkward pointer target. Square it off at 36px. */
+.btn-close{width:36px;height:36px;padding:0;justify-content:center;flex-shrink:0;font-size:14px}
 /* Disabled buttons used to be visually identical to active ones — same fill,
    same border, even cursor:pointer — so there was no way to tell that the
    reorder arrows on the first/last course, or the login button mid-request,
@@ -620,7 +623,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- NEW LEAD MODAL -->
     <div class="modal-overlay" id="newLeadModal" style="display:none" onclick="if(event.target===this)closeNewLeadModal()">
       <div class="modal-box" style="max-width:480px">
-        <h3>Нова заявка<button class="btn btn-ghost btn-sm" onclick="closeNewLeadModal()">✕</button></h3>
+        <h3>Нова заявка<button class="btn btn-ghost btn-sm btn-close" onclick="closeNewLeadModal()">✕</button></h3>
         <div class="modal-body">
           <div class="modal-group"><label class="modal-label">Ім'я дитини *</label><input class="modal-input" id="nl_name" placeholder="Ім'я дитини"/></div>
           <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="nl_age" type="number" placeholder="7"/></div>
@@ -648,7 +651,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- LESSON TOKEN MODAL -->
     <div class="modal-overlay" id="ltModal" style="display:none" onclick="if(event.target===this)closeLtModal()">
       <div class="modal-box" style="max-width:380px">
-        <h3><span>Новий токен</span><button class="btn btn-ghost btn-sm" onclick="closeLtModal()">✕</button></h3>
+        <h3><span>Новий токен</span><button class="btn btn-ghost btn-sm btn-close" onclick="closeLtModal()">✕</button></h3>
         <div class="modal-body">
           <div class="modal-group"><label class="modal-label">Ім'я учня *</label><input class="modal-input" id="ltModalName" placeholder="Ім'я учня" onkeydown="if(event.key==='Enter')submitLtModal()"/></div>
         </div>
@@ -662,7 +665,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- CLIENT MODAL -->
     <div class="modal-overlay" id="clientModal" style="display:none" onclick="if(event.target===this)closeClientModal()">
       <div class="modal-box">
-        <h3><span id="clientModalTitle">Новий клієнт</span><button class="btn btn-ghost btn-sm" onclick="closeClientModal()">✕</button></h3>
+        <h3><span id="clientModalTitle">Новий клієнт</span><button class="btn btn-ghost btn-sm btn-close" onclick="closeClientModal()">✕</button></h3>
         <div class="modal-grid">
           <div class="modal-group"><label class="modal-label">Ім'я *</label><input class="modal-input" id="cf_name" placeholder="Артем"/></div>
           <div class="modal-group"><label class="modal-label">Вік</label><input class="modal-input" id="cf_age" type="number" placeholder="10" min="4" max="80"/></div>
@@ -750,7 +753,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- COURSE MODAL -->
     <div class="modal-overlay" id="courseModal" style="display:none" onclick="if(event.target===this)closeCourseModal()">
       <div class="modal-box" style="max-width:540px">
-        <h3><span id="courseModalTitle">Новий курс</span><button class="btn btn-ghost btn-sm" onclick="closeCourseModal()">✕</button></h3>
+        <h3><span id="courseModalTitle">Новий курс</span><button class="btn btn-ghost btn-sm btn-close" onclick="closeCourseModal()">✕</button></h3>
         <div class="modal-grid">
           <div class="modal-group"><label class="modal-label">ID курсу *</label><input class="modal-input" id="crs_id" placeholder="scratch"/></div>
           <div class="modal-group"><label class="modal-label">Emoji</label><input class="modal-input" id="crs_emoji" placeholder="🧩" style="font-size:20px"/></div>
@@ -803,7 +806,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- ADD/EDIT MODULE MODAL -->
     <div class="modal-overlay" id="moduleModal" style="display:none" onclick="if(event.target===this)closeModuleModal()">
       <div class="modal-box" style="max-width:500px">
-        <h3><span id="moduleModalTitle">Новий модуль</span><button class="btn btn-ghost btn-sm" onclick="closeModuleModal()">✕</button></h3>
+        <h3><span id="moduleModalTitle">Новий модуль</span><button class="btn btn-ghost btn-sm btn-close" onclick="closeModuleModal()">✕</button></h3>
         <div class="modal-grid">
           <div class="modal-group"><label class="modal-label">Номер (напр. "Модуль 1")</label><input class="modal-input" id="mod_num" placeholder="Модуль 1"/></div>
           <div class="modal-group"><label class="modal-label">Назва *</label><input class="modal-input" id="mod_title" placeholder="Знайомство зі Scratch"/></div>
@@ -857,7 +860,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     <!-- ARTICLES MODAL -->
     <div class="modal-overlay" id="articleModal" style="display:none" onclick="if(event.target===this)closeArticleModal()">
       <div class="modal-box" style="max-width:720px">
-        <h3><span id="articleModalTitle">Нова стаття</span><button class="btn btn-ghost btn-sm" onclick="closeArticleModal()">✕</button></h3>
+        <h3><span id="articleModalTitle">Нова стаття</span><button class="btn btn-ghost btn-sm btn-close" onclick="closeArticleModal()">✕</button></h3>
         <div class="modal-grid">
           <div class="modal-group full"><label class="modal-label">Заголовок *</label><input class="modal-input" id="art_title" placeholder="Чому навчити дитину програмуванню"/></div>
           <div class="modal-group"><label class="modal-label">Slug (URL)</label><input class="modal-input" id="art_slug" placeholder="chomu-vchyty-dytynu"/></div>
@@ -904,7 +907,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       <!-- Review modal -->
       <div class="modal-overlay" id="reviewModal" style="display:none" onclick="if(event.target===this)closeReviewModal()">
         <div class="modal-box" style="max-width:520px">
-          <h3><span id="reviewModalTitle">Відгук</span><button class="btn btn-ghost btn-sm" onclick="closeReviewModal()">✕</button></h3>
+          <h3><span id="reviewModalTitle">Відгук</span><button class="btn btn-ghost btn-sm btn-close" onclick="closeReviewModal()">✕</button></h3>
           <div class="modal-grid">
             <div class="modal-group full"><label class="modal-label">Ім'я *</label><input class="modal-input" id="rv_name" placeholder="Марина К."/></div>
             <div class="modal-group"><label class="modal-label">Ініціали (аватар)</label><input class="modal-input" id="rv_initials" placeholder="МК"/></div>
@@ -1496,7 +1499,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 <!-- CONFIRM DIALOG (замінює нативний confirm) -->
 <div class="modal-overlay" id="confirmModal" style="display:none" onclick="if(event.target===this)_uiConfirmClose(false)">
   <div class="modal-box confirm-box">
-    <h3><span id="confirmTitle">Підтвердіть дію</span><button class="btn btn-ghost btn-sm" onclick="_uiConfirmClose(false)">✕</button></h3>
+    <h3><span id="confirmTitle">Підтвердіть дію</span><button class="btn btn-ghost btn-sm btn-close" onclick="_uiConfirmClose(false)">✕</button></h3>
     <div class="confirm-text" id="confirmText"></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" id="confirmCancelBtn" onclick="_uiConfirmClose(false)">Скасувати</button>
@@ -1508,7 +1511,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 <!-- PROMPT DIALOG (замінює нативний prompt) -->
 <div class="modal-overlay" id="promptModal" style="display:none" onclick="if(event.target===this)_uiPromptClose(null)">
   <div class="modal-box confirm-box">
-    <h3><span id="promptTitle">Введіть значення</span><button class="btn btn-ghost btn-sm" onclick="_uiPromptClose(null)">✕</button></h3>
+    <h3><span id="promptTitle">Введіть значення</span><button class="btn btn-ghost btn-sm btn-close" onclick="_uiPromptClose(null)">✕</button></h3>
     <div class="modal-group">
       <label class="modal-label" id="promptLabel">Значення</label>
       <input class="modal-input" id="promptInput" onkeydown="if(event.key==='Enter')_uiPromptClose(document.getElementById('promptInput').value)"/>
