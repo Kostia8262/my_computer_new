@@ -483,6 +483,14 @@ msgstr "Пошта:"
 msgid "Следите за нами в сосетях:"
 msgstr "Слідкуйте за нами в соцмережах:"
 
+#: main/templates/main/index.html
+msgid "Школа программирования"
+msgstr "Школа програмування"
+
+#: main/templates/main/index.html
+msgid "Школа дизайна"
+msgstr "Школа дизайну"
+
 #~ msgid "Русский язык"
 #~ msgstr "Російська мова"
 

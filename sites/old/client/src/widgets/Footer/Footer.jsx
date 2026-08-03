@@ -40,7 +40,8 @@ const Footer = () => (
                 <div className="footer__col">
                     <h4 className="footer__col-title">Наші сайти</h4>
                     <ul className="footer__nav">
-                        <li><a href="https://mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">mycomputer.education</a></li>
+                        <li><a href="https://mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Школа програмування</a></li>
+                        <li><a href="https://mycomputer.school" target="_blank" rel="noopener" className="footer__nav-link">Школа дизайну</a></li>
                         <li><a href="https://python.mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Курс Python</a></li>
                         <li><a href="https://minecraft.mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Курс Minecraft</a></li>
                         <li><a href="https://roblox.mycomputer.education" target="_blank" rel="noopener" className="footer__nav-link">Курс Roblox</a></li>
