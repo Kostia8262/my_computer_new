@@ -510,7 +510,8 @@ async function loadCourses() {
     if (navDrop) {
       // Веб-дизайн has a dedicated landing but no course row in main's own table,
       // so it is appended manually — otherwise this re-render would drop it.
-      const webdesignItem = `<a href="https://webdesign.mycomputer.education/"><span class="nav__dropdown-emoji">🖌️</span>${currentLang === 'ru' ? 'Веб-дизайн' : 'Веб-дизайн'} (12–18 ${currentLang === 'ru' ? 'лет' : 'років'})</a>`;
+      // 6–18 = the landing's two courses combined (webdesign-6-12 + webdesign-12-18)
+      const webdesignItem = `<a href="https://webdesign.mycomputer.education/"><span class="nav__dropdown-emoji">🖌️</span>Веб-дизайн (6–18 ${currentLang === 'ru' ? 'лет' : 'років'})</a>`;
       navDrop.innerHTML = active.map(c => {
         const age = ageGroupLabel(c.age_group) || c.age || '';
         return `<a href="${esc(courseUrl(c.id))}"><span class="nav__dropdown-emoji">${c.emoji || ''}</span>${esc(c.name)}${age ? ` (${esc(age)})` : ''}</a>`;
