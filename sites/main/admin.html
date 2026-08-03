@@ -189,11 +189,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .pager-btns{display:flex;gap:6px}
 
 @media(max-width:900px){
-  /* Action buttons drop their labels and keep only the icon */
+  /* Action buttons drop their labels and keep only the icon.
+     .gs-input/.gs-wrap are declared further down the sheet, so these overrides
+     need the extra .topbar specificity — a media query alone does not win. */
   .btn-txt{display:none}
   .topbar-right{gap:8px}
-  .gs-input{width:150px}
-  .gs-input:focus{width:190px}
+  .topbar .gs-input{width:150px}
+  .topbar .gs-input:focus{width:190px}
 }
 @media(max-width:700px){
   .main{padding:14px}
@@ -206,7 +208,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   /* Last resort: the title, the role chip and the global search step aside —
      search stays reachable through each tab's own filter bar. */
   #panelTitle,#roleBadge{display:none}
-  .gs-wrap{display:none}
+  .topbar .gs-wrap{display:none}
 }
 
 /* ALERTS PANEL */
