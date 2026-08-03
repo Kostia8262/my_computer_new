@@ -40,6 +40,14 @@
     .article-content strong{color:#241A16;font-weight:700}
     .article-content a{color:#E2604A;text-decoration:underline}
     .article-content code{background:#FBEEE9;color:#E2604A;padding:2px 7px;border-radius:5px;font-size:14px;font-family:monospace}
+    /* Comparison tables in article bodies. Wrapped in their own scroll container so a
+       wide table never forces the whole page to scroll sideways on a phone. */
+    .article-content table{display:block;overflow-x:auto;width:100%;border-collapse:collapse;margin-bottom:22px;font-size:15px}
+    .article-content th,
+    .article-content td{border:1px solid #F5DFD6;padding:11px 14px;text-align:left;vertical-align:top;line-height:1.55}
+    .article-content th{background:#FBF3EF;color:#241A16;font-weight:700;white-space:nowrap}
+    .article-content td{color:#444}
+    .article-content tbody tr:nth-child(even) td{background:#FDF9F7}
     .article-sidebar{position:sticky;top:80px;align-self:start}
     .sidebar-card{background:#FBF3EF;border-radius:20px;padding:24px;border:1.5px solid #F5DFD6;margin-bottom:20px}
     .sidebar-card h3{font-size:16px;font-weight:700;margin-bottom:16px;color:#241A16}
