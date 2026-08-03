@@ -99,7 +99,7 @@ const CONTENT_SEED = {
         id: 'main',
         label: 'Головна сторінка (minecraft.mycomputer.education)',
         heading: 'Курс Minecraft Education для дітей — My Computer Academy',
-        text: 'Курс програмування через Minecraft Education для дітей 9–14 років у My Computer Academy: Code Builder, Python + mcpi, власні моди та міні-ігри. Малі групи до 5 осіб, перший урок безкоштовно.',
+        text: 'Курс програмування через Minecraft Education для дітей 6–14 років у My Computer Academy: Code Builder, Python + mcpi, власні моди та міні-ігри. Малі групи до 5 осіб, перший урок безкоштовно.',
       },
     ],
   },
@@ -123,7 +123,7 @@ const CONTENT_SEED = {
 (function seedTestData() {
   try {
     if (!coursesDb.getAll().length) {
-      coursesDb.create({ id: 'minecraft', name: 'Minecraft: програмування в грі', name_ru: 'Minecraft: программирование в игре', emoji: '⛏️', age: '9–14 років', age_group: '10-14', duration: '6 місяців', lessonsCount: 52, groupSize: 5, price: 3600, color: '#22c55e', description: 'Любиш будувати в Minecraft? Навчись створювати моди та міні-ігри! Діти вивчають Python та логіку програмування через улюблену гру.', description_ru: 'Любишь строить в Minecraft? Научись создавать моды и мини-игры! Дети изучают Python и логику программирования через любимую игру.' });
+      coursesDb.create({ id: 'minecraft', name: 'Minecraft: програмування в грі', name_ru: 'Minecraft: программирование в игре', emoji: '⛏️', age: '6–14 років', age_group: '6-10,10-14', duration: '6 місяців', lessonsCount: 52, groupSize: 5, price: 3600, color: '#22c55e', description: 'Любиш будувати в Minecraft? Навчись створювати моди та міні-ігри! Діти вивчають Python та логіку програмування через улюблену гру.', description_ru: 'Любишь строить в Minecraft? Научись создавать моды и мини-игры! Дети изучают Python и логику программирования через любимую игру.' });
       console.log('✅  Seeded minecraft course');
     }
     if (!coursesDb.getAll().some(c => c.id === 'minecraft-8-10')) {
@@ -299,7 +299,7 @@ const adminLimiter = rateLimit({
 const MINECRAFT_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const MINECRAFT_META_RU = {
   title: 'Курс Minecraft для детей и подростков — My Computer Academy, программирование через Minecraft онлайн',
-  desc:  'Курс Minecraft для детей 9–14 лет онлайн. Программирование Python через Minecraft: автоматизация строительства, собственные моды и мини-игры. Малые группы до 5 человек. Первый урок бесплатно.',
+  desc:  'Курс Minecraft для детей 6–14 лет онлайн. Программирование Python через Minecraft: автоматизация строительства, собственные моды и мини-игры. Малые группы до 5 человек. Первый урок бесплатно.',
 };
 app.get(['/', '/index.html'], (req, res, next) => {
   if (req.query.lang !== 'ru') return next();

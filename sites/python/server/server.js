@@ -99,7 +99,7 @@ const CONTENT_SEED = {
         id: 'main',
         label: 'Головна сторінка (python.mycomputer.education)',
         heading: 'Курс Python для дітей — My Computer Academy',
-        text: 'Курс Python для дітей та підлітків 7–18 років у My Computer Academy: реальний код, ігри на Pygame, Telegram-боти. Малі групи до 5 осіб, перший урок безкоштовно.',
+        text: 'Курс Python для дітей та підлітків 6–18 років у My Computer Academy: реальний код, ігри на Pygame, Telegram-боти. Малі групи до 5 осіб, перший урок безкоштовно.',
       },
     ],
   },
@@ -123,7 +123,7 @@ const CONTENT_SEED = {
 (function seedTestData() {
   try {
     if (!coursesDb.getAll().length) {
-      coursesDb.create({ id: 'python', name: 'Python: справжнє програмування', name_ru: 'Python: настоящее программирование', emoji: '🐍', age: '7–18 років', age_group: '6-10,10-14,14-18', duration: '4 місяці', lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.', description_ru: 'Один из самых популярных языков в мире. Дети пишут реальный код: игры, боты, автоматизацию — и начинают думать как разработчики.' });
+      coursesDb.create({ id: 'python', name: 'Python: справжнє програмування', name_ru: 'Python: настоящее программирование', emoji: '🐍', age: '6–18 років', age_group: '6-10,10-14,14-18', duration: '4 місяці', lessonsCount: 32, groupSize: 5, price: 3600, color: '#3b82f6', description: 'Один з найпопулярніших мов у світі. Діти пишуть реальний код: ігри, боти, автоматизацію — і починають думати як розробники.', description_ru: 'Один из самых популярных языков в мире. Дети пишут реальный код: игры, боты, автоматизацию — и начинают думать как разработчики.' });
       console.log('✅  Seeded python course');
     }
     if (!coursesDb.getAll().some(c => c.id === 'python-7-10')) {
@@ -140,7 +140,7 @@ const CONTENT_SEED = {
         { num: '09', title: 'Знайомство зі штучним інтелектом', desc: 'Що таке ШІ та машинне навчання — пояснення на прикладах, гра "навчи комп\'ютер розрізняти котів та собак".', title_ru: 'Знакомство с искусственным интеллектом', desc_ru: 'Что такое ИИ и машинное обучение — объяснение на примерах, игра &quot;научи компьютер отличать кошек от собак&quot;.' },
         { num: '🚀', title: 'Фінальний проект', desc: 'Власна малюнкова програма, вікторина або Minecraft-будівля, створена кодом.', title_ru: 'Финальный проект', desc_ru: 'Собственная рисовальная программа, викторина или Minecraft-постройка, созданная кодом.' },
       ]});
-      coursesDb.create({ id: 'python-10-14', name: 'Python: Ігри та боти', name_ru: 'Python: игры и боты', emoji: '🎮', age: '7–18 років', age_group: '6-10,10-14,14-18', description: 'Від синтаксису до власної гри та Telegram-бота', description_ru: 'От синтаксиса до собственной игры и Telegram-бота', lessonsCount: 13, ...shared, curriculum: [
+      coursesDb.create({ id: 'python-10-14', name: 'Python: Ігри та боти', name_ru: 'Python: игры и боты', emoji: '🎮', age: '10–14 років', age_group: '10-14', description: 'Від синтаксису до власної гри та Telegram-бота', description_ru: 'От синтаксиса до собственной игры и Telegram-бота', lessonsCount: 13, ...shared, curriculum: [
         { num: '01', title: 'Основи та VS Code', desc: 'Середовище розробника, синтаксис, типи, умови, цикли.', title_ru: 'Основы и VS Code', desc_ru: 'Среда разработчика, синтаксис, типы, условия, циклы.' },
         { num: '02', title: 'Структури даних', desc: 'Списки, словники, кортежи, set. Коли що використовувати.', title_ru: 'Структуры данных', desc_ru: 'Списки, словари, кортежи, set. Когда что использовать.' },
         { num: '03', title: 'Функції та модулі', desc: 'Scope, рекурсія, import, власні модулі.', title_ru: 'Функции и модули', desc_ru: 'Scope, рекурсия, import, собственные модули.' },
@@ -276,7 +276,7 @@ const adminLimiter = rateLimit({
 const PYTHON_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const PYTHON_META_RU = {
   title: 'Курс Python для детей и подростков — My Computer Academy, обучение Python онлайн',
-  desc:  'Курс Python для детей и подростков 7–18 лет онлайн. Программирование Python с нуля: переменные, функции, Pygame-игры и Telegram-бот. Малые группы до 5 человек. Первый урок бесплатно.',
+  desc:  'Курс Python для детей и подростков 6–18 лет онлайн. Программирование Python с нуля: переменные, функции, Pygame-игры и Telegram-бот. Малые группы до 5 человек. Первый урок бесплатно.',
 };
 app.get(['/', '/index.html'], (req, res, next) => {
   if (req.query.lang !== 'ru') return next();

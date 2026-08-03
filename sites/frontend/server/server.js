@@ -99,7 +99,7 @@ const CONTENT_SEED = {
         id: 'main',
         label: 'Головна сторінка (frontend.mycomputer.education)',
         heading: 'Курс Frontend-розробки для підлітків — My Computer Academy',
-        text: 'Курс веб-розробки (HTML, CSS, JavaScript) для дітей та підлітків 10–18 років у My Computer Academy: реальні сайти, адаптивна вёрстка, портфоліо на GitHub Pages. Малі групи до 5 осіб, перший урок безкоштовно.',
+        text: 'Курс веб-розробки (HTML, CSS, JavaScript) для дітей та підлітків 6–18 років у My Computer Academy: реальні сайти, адаптивна вёрстка, портфоліо на GitHub Pages. Малі групи до 5 осіб, перший урок безкоштовно.',
       },
     ],
   },
@@ -123,7 +123,7 @@ const CONTENT_SEED = {
 (function seedTestData() {
   try {
     if (!coursesDb.getAll().length) {
-      coursesDb.create({ id: 'web', name: 'Веб-розробка: HTML, CSS, JavaScript', name_ru: 'Веб-разработка: HTML, CSS, JavaScript', emoji: '🌐', age: '10–18 років', age_group: '10-14,14-18', duration: '18 місяців', lessonsCount: 156, groupSize: 5, price: 3600, color: '#8b5cf6', description: 'Від першої сторінки до повноцінного адаптивного сайту. Реальні задачі, сучасні інструменти та портфоліо на GitHub Pages, яке вже можна показати роботодавцю.', description_ru: 'От первой страницы до полноценного адаптивного сайта. Реальные задачи, современные инструменты и портфолио на GitHub Pages, которое уже можно показать работодателю.' });
+      coursesDb.create({ id: 'web', name: 'Веб-розробка: HTML, CSS, JavaScript', name_ru: 'Веб-разработка: HTML, CSS, JavaScript', emoji: '🌐', age: '6–18 років', age_group: '6-10,10-14,14-18', duration: '18 місяців', lessonsCount: 156, groupSize: 5, price: 3600, color: '#8b5cf6', description: 'Від першої сторінки до повноцінного адаптивного сайту. Реальні задачі, сучасні інструменти та портфоліо на GitHub Pages, яке вже можна показати роботодавцю.', description_ru: 'От первой страницы до полноценного адаптивного сайта. Реальные задачи, современные инструменты и портфолио на GitHub Pages, которое уже можно показать работодателю.' });
       console.log('✅  Seeded web course');
     }
     if (!coursesDb.getAll().some(c => c.id === 'frontend-10-14')) {
@@ -280,7 +280,7 @@ const adminLimiter = rateLimit({
 const FRONTEND_INDEX_TPL = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const FRONTEND_META_RU = {
   title: 'Курс Frontend-разработки для подростков — My Computer Academy, обучение веб-разработке онлайн',
-  desc:  'Курс веб-разработки (HTML, CSS, JavaScript) для детей и подростков 10–18 лет онлайн. Реальные сайты, адаптивная вёрстка, портфолио на GitHub Pages. Малые группы до 5 человек. Первый урок бесплатно.',
+  desc:  'Курс веб-разработки (HTML, CSS, JavaScript) для детей и подростков 6–18 лет онлайн. Реальные сайты, адаптивная вёрстка, портфолио на GitHub Pages. Малые группы до 5 человек. Первый урок бесплатно.',
 };
 app.get(['/', '/index.html'], (req, res, next) => {
   if (req.query.lang !== 'ru') return next();
