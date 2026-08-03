@@ -997,7 +997,7 @@ app.get('/sitemap.xml', (req, res) => {
   </url>
 ${courseUrls ? '\n' + courseUrls + '\n' : ''}
   <url>
-    <loc>${base}/articles/</loc>
+    <loc>${base}/articles</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
