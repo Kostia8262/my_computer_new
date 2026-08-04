@@ -2505,10 +2505,18 @@ const SOURCE_LABELS = {
 // ── LESSONS (student web-app access tokens) ──────────────────────────────────
 
 // Mirrors the active-clients list — one row per client with status:'active',
-// plus any standalone tokens not linked to a client (added by name only via
-// the toolbar). Token issuance no longer asks for course/age: the token
-// itself never restricted access to a specific one, so that choice was just
-// friction — every valid token opens the full direction/age picker.
+// plus every token that such a row doesn't already cover. Token issuance no
+// longer asks for course/age: the token itself never restricted access to a
+// specific one, so that choice was just friction — every valid token opens the
+// full direction/age picker.
+//
+// The "плюс" half matters: a token keeps opening the lessons app no matter what
+// happens to its client afterwards. Listing only active clients + client-less
+// tokens hid three kinds of working link — a paused/finished student's, a
+// second token issued to the same student, and one orphaned by a client
+// deletion (deletions now revoke tokens server-side, but pre-fix orphans are
+// still in the DB). Anything that grants access has to be visible here, so it
+// can be switched off or deleted.
 async function loadLessonsTab() {
   try {
     const [clientsRes, tokensRes] = await Promise.all([
@@ -2518,11 +2526,30 @@ async function loadLessonsTab() {
     if (clientsRes.status === 401 || tokensRes.status === 401) { doLogout(); return; }
     const clientsData = await clientsRes.json();
     const tokensData  = await tokensRes.json();
-    const activeClients = (clientsData.clients || []).filter(c => c.status === 'active');
+    const clients       = clientsData.clients || [];
+    const activeClients = clients.filter(c => c.status === 'active');
+    const activeIds     = new Set(activeClients.map(c => c.id));
+    const clientById    = new Map(clients.map(c => [c.id, c]));
     const tokens = tokensData.tokens || [];
-    const tokenByClientId = new Map(tokens.filter(t => t.clientId != null).map(t => [t.clientId, t]));
-    const standaloneTokens = tokens.filter(t => t.clientId == null);
-    renderLessonsTable(activeClients, tokenByClientId, standaloneTokens);
+    // /api/lesson-tokens returns newest first, so the first token seen for a
+    // client is the one its row shows; every other token falls through below.
+    const tokenByClientId = new Map();
+    tokens.forEach(t => {
+      if (t.clientId == null || !activeIds.has(t.clientId)) return;
+      if (!tokenByClientId.has(t.clientId)) tokenByClientId.set(t.clientId, t);
+    });
+    const shownIds = new Set([...tokenByClientId.values()].map(t => t.id));
+    const extraTokens = tokens.filter(t => !shownIds.has(t.id)).map(t => {
+      const c = t.clientId == null ? null : clientById.get(t.clientId);
+      let note = '';
+      if (t.clientId != null) {
+        if (!c) note = 'учня видалено';
+        else if (!activeIds.has(c.id)) note = 'учень не активний';
+        else note = 'ще один доступ';
+      }
+      return { ...t, studentName: (c && c.name) || t.studentName || '', note };
+    });
+    renderLessonsTable(activeClients, tokenByClientId, extraTokens);
   } catch { showToast('Помилка завантаження списку доступів', 'error'); }
 }
 
@@ -2551,12 +2578,12 @@ function _ltCheckboxCell(key) {
   return `<td class="td-tight" style="padding-left:12px"><input type="checkbox" ${_selectedLt.has(key) ? 'checked' : ''} onchange="toggleLtCheck('${key}')" aria-label="Вибрати рядок"/></td>`;
 }
 
-function renderLessonsTable(activeClients, tokenByClientId, standaloneTokens) {
+function renderLessonsTable(activeClients, tokenByClientId, extraTokens) {
   const body = document.getElementById('lessonsTableBody');
   if (!body) return;
-  _ltLastData = { activeClients, tokenByClientId, standaloneTokens };
+  _ltLastData = { activeClients, tokenByClientId, extraTokens };
   _ltRows = [];
-  if (!activeClients.length && !standaloneTokens.length) {
+  if (!activeClients.length && !extraTokens.length) {
     body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--c-muted)">Немає активних учнів</td></tr>';
     _updateLtBulkBar();
     return;
@@ -2569,19 +2596,20 @@ function renderLessonsTable(activeClients, tokenByClientId, standaloneTokens) {
     _ltRows.push({ key, name: c.name || '', clientId: c.id, tokenId: t ? t.id : null, active: t ? !!t.active : false });
     return `<tr>${_ltCheckboxCell(key)}<td>${n}</td><td>${escHtmlAdmin(c.name || '—')}</td>${ltTokenCellsHtml(t, c.id, c.name || '')}</tr>`;
   });
-  const standaloneRows = standaloneTokens.map(t => {
+  const extraRows = extraTokens.map(t => {
     n++;
     const key = 't' + t.id;
     _ltRows.push({ key, name: t.studentName || '', clientId: null, tokenId: t.id, active: !!t.active });
-    return `<tr>${_ltCheckboxCell(key)}<td>${n}</td><td>${escHtmlAdmin(t.studentName || '—')}</td>${ltTokenCellsHtml(t, null, '')}</tr>`;
+    const note = t.note ? ` <span style="font-size:11px;color:var(--c-muted)">(${escHtmlAdmin(t.note)})</span>` : '';
+    return `<tr>${_ltCheckboxCell(key)}<td>${n}</td><td>${escHtmlAdmin(t.studentName || '—')}${note}</td>${ltTokenCellsHtml(t, null, '')}</tr>`;
   });
-  body.innerHTML = clientRows.concat(standaloneRows).join('');
+  body.innerHTML = clientRows.concat(extraRows).join('');
   _updateLtBulkBar();
 }
 
 function _rerenderLessons() {
   if (!_ltLastData) return;
-  renderLessonsTable(_ltLastData.activeClients, _ltLastData.tokenByClientId, _ltLastData.standaloneTokens);
+  renderLessonsTable(_ltLastData.activeClients, _ltLastData.tokenByClientId, _ltLastData.extraTokens);
 }
 
 function toggleLtCheck(key) {
@@ -2617,16 +2645,19 @@ function _updateLtBulkBar() {
   if (count) count.textContent = `${rows.length} вибрано`;
   // Each action only applies to part of a mixed selection, so spell out how many
   // rows it will actually touch instead of silently skipping the rest.
-  const setBtn = (id, n, label) => {
+  // A greyed-out button with no explanation reads as a broken panel, so each
+  // one says on hover which rows it would need to become available.
+  const setBtn = (id, n, label, emptyHint) => {
     const b = document.getElementById(id);
     if (!b) return;
     b.disabled = n === 0;
     b.textContent = n ? `${label} (${n})` : label;
+    b.title = n ? '' : emptyHint;
   };
-  setBtn('ltBulkIssue',  withoutToken.length, 'Видати доступ');
-  setBtn('ltBulkOn',     withToken.filter(r => !r.active).length, 'Активувати');
-  setBtn('ltBulkOff',    withToken.filter(r => r.active).length,  'Деактивувати');
-  setBtn('ltBulkDelete', withToken.length, '✕ Видалити доступи');
+  setBtn('ltBulkIssue',  withoutToken.length, 'Видати доступ', 'Усім вибраним доступ уже видано');
+  setBtn('ltBulkOn',     withToken.filter(r => !r.active).length, 'Активувати', 'Серед вибраних немає вимкнених доступів');
+  setBtn('ltBulkOff',    withToken.filter(r => r.active).length,  'Деактивувати', 'Серед вибраних немає увімкнених доступів');
+  setBtn('ltBulkDelete', withToken.length, '✕ Видалити доступи', 'Вибраним учням ще не видано доступ — видаляти нічого. Самих учнів можна видалити на вкладці «Клієнти»');
   const master = document.getElementById('ltSelectAll');
   if (master) {
     const n = rows.length;

@@ -29,6 +29,7 @@ const insToken   = db.prepare(`INSERT INTO lesson_tokens
 const touchToken = db.prepare('UPDATE lesson_tokens SET last_used_at = @now WHERE token = @token');
 const setActive  = db.prepare('UPDATE lesson_tokens SET active = @active WHERE id = @id');
 const delToken   = db.prepare('DELETE FROM lesson_tokens WHERE id = ?');
+const delByClient = db.prepare('DELETE FROM lesson_tokens WHERE client_id = ?');
 
 module.exports = {
   getAll() { return selAll.all().map(fromRow); },
@@ -60,5 +61,14 @@ module.exports = {
 
   delete(id) {
     return delToken.run(id).changes > 0;
+  },
+
+  // client_id has no FK (a token may exist without a client), so deleting a
+  // client would otherwise leave a live token behind: the link kept opening the
+  // lessons app while the admin table — which lists tokens either under their
+  // client's row or as standalone ones with client_id IS NULL — showed it
+  // nowhere. Deleting the student must revoke their access with them.
+  deleteByClientId(clientId) {
+    return delByClient.run(clientId).changes;
   },
 };
