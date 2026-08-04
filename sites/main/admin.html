@@ -1206,6 +1206,11 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
             <select class="filter-select" id="payMonthDropdown" onchange="jumpToPayMonth(this.value)" style="min-width:160px">
               <option value="">— Обрати місяць —</option>
             </select>
+            <!-- Appears only when the month is missing students who are currently
+                 active/trial. Those already show in the table as client-side rows,
+                 but until they are written to the month the API does not know about
+                 them, so the dashboard and any report count without them. -->
+            <button class="btn btn-ghost btn-sm" id="payAddMissingBtn" style="display:none" onclick="addMissingToMonth()"></button>
             <button class="btn btn-primary btn-sm" onclick="createNewPayMonth()">+ Новий місяць</button>
           </div>
         </div>
@@ -3227,6 +3232,51 @@ async function _loadMpMonth() {
   } catch { showToast('Помилка', 'error'); }
 }
 
+// A client-side row is real to the person looking at the table but invisible to
+// everything that reads the API — the dashboard counts and the unpaid list among
+// them. This writes them all into the month in one go.
+async function addMissingToMonth() {
+  const missing = _mpData.filter(r => r._virtual);
+  if (!missing.length) return;
+  if (!await uiConfirm({
+    title       : `Додати ${missing.length} ${plural(missing.length,'учня','учнів','учнів')} до ${_mpFormatLabel(_mpYear, _mpMonth)}?`,
+    text        : 'Вони вже показані в таблиці, але ще не збережені в місяці — через це не потрапляють у дашборд і звіти.',
+    confirmLabel: 'Додати',
+    danger      : false
+  })) return;
+
+  const ym = _mpYM();
+  let saved = 0, failed = 0;
+  for (const r of missing) {
+    try {
+      const res = await fetch(`/api/monthly-payments/${ym}/${r.clientId}`, {
+        method : 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body   : JSON.stringify({
+          clientName: r.clientName, expectedAmount: r.expectedAmount, paidAmount: r.paidAmount,
+          status: r.status, paidDate: r.paidDate, method: r.method, note: r.note || '',
+        }),
+      });
+      if (res.ok) { r._virtual = false; saved++; } else failed++;
+    } catch { failed++; }
+  }
+  renderMonthPayments();
+  renderPayAlert();
+  if (failed) showToast(`Додано ${saved}, не вдалося ${failed}`, 'error');
+  else showToast(`Додано ${saved} ${plural(saved,'учня','учнів','учнів')} ✓`, 'success');
+}
+
+function _updateAddMissingBtn() {
+  const btn = document.getElementById('payAddMissingBtn');
+  if (!btn) return;
+  const n = _mpData.filter(r => r._virtual).length;
+  btn.style.display = n ? '' : 'none';
+  if (n) {
+    btn.textContent = `+ Додати ${n} ${plural(n,'учня','учнів','учнів')} до місяця`;
+    btn.title = 'Ці учні активні, але ще не збережені в цьому місяці — тому не враховуються на дашборді';
+  }
+}
+
 function _syncVirtualClients() {
   if (!_allClients) return;
   const existingIds = new Set(_mpData.map(r => r.clientId));
@@ -3336,6 +3386,7 @@ async function createNewPayMonth() {
 }
 
 function renderMonthPayments() {
+  _updateAddMissingBtn();
   const q      = (document.getElementById('paySearch')?.value || '').toLowerCase();
   const status = document.getElementById('payStatusFilter')?.value || '';
   const filtered = _mpData.filter(r => {
@@ -3376,7 +3427,7 @@ function renderMonthPayments() {
       `<option value="other"${c.course==='other'?' selected':''}>Інше</option>` : '';
     return `<tr>
       <td style="padding:4px 6px;text-align:center"><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="togglePayCheck(${r.clientId})"/></td>
-      <td style="font-weight:600;white-space:nowrap">${esc((c?.name) || r.clientName || '#'+r.clientId)}</td>
+      <td style="font-weight:600;white-space:nowrap">${esc((c?.name) || r.clientName || '#'+r.clientId)}${r._virtual ? ` <span class="chip" style="background:var(--c-warning-bg);color:var(--c-warning-text);margin-left:6px;font-weight:600" title="Учень активний, але ще не збережений у цьому місяці — тому не враховується на дашборді та у звітах">ще не в місяці</span>` : ''}</td>
       <td><input class="mp-inline" style="width:72px" type="number" value="${r.expectedAmount||''}" placeholder="0"
         onblur="updateMpRecord(${r.clientId},'expectedAmount',this.value)"/></td>
       <td><input class="mp-inline" style="width:72px" type="number" value="${r.paidAmount||''}" placeholder="0"
@@ -3448,7 +3499,9 @@ async function updateMpRecord(clientId, field, value) {
 
   try {
     const isVirtual = !!rec._virtual;
-    if (isVirtual) rec._virtual = false;
+    // Editing any field on a client-side row is what writes it into the month,
+    // so the "add missing" counter has to drop even when nothing re-renders.
+    if (isVirtual) { rec._virtual = false; _updateAddMissingBtn(); }
     const body = isVirtual
       ? { clientName: rec.clientName, expectedAmount: rec.expectedAmount, paidAmount: rec.paidAmount,
           status: rec.status, paidDate: rec.paidDate, method: rec.method, note: rec.note || '' }
