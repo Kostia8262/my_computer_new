@@ -657,7 +657,10 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
         <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
           <div style="flex:2;min-width:180px">
             <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--c-gray-500)">Ім'я</label>
-            <input id="newAdminName" class="search" placeholder="Наприклад: Ірина" style="margin:0"/>
+            <!-- width:100% because .search sizes itself with flex:1, which does
+                 nothing here — this wrapper is a plain block, so without it the
+                 field stayed at its 200px min-width inside a 643px column. -->
+            <input id="newAdminName" class="search" placeholder="Наприклад: Ірина" style="margin:0;width:100%"/>
           </div>
           <div style="flex:1;min-width:160px">
             <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--c-gray-500)">Роль</label>
@@ -669,7 +672,7 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
           </div>
           <div style="display:flex;gap:8px;flex-shrink:0">
             <button class="btn btn-primary" onclick="createAdmin()">Створити</button>
-            <button class="btn btn-ghost" onclick="document.getElementById('createAdminForm').style.display='none'">✕</button>
+            <button class="btn btn-ghost btn-close" onclick="document.getElementById('createAdminForm').style.display='none'" aria-label="Закрити форму" title="Закрити форму">✕</button>
           </div>
         </div>
         <div id="roleHint" style="margin-top:12px;padding:10px 14px;background:var(--c-border-faint);border-radius:var(--r-md);font-size:12px;color:var(--c-gray-500)">
@@ -2349,7 +2352,7 @@ async function renderAdmins() {
     const list = data.admins || [];
     const tbody = document.getElementById('adminsBody');
     if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:40px 20px">Адмінів поки немає. Натисніть «+ Додати адміна».</div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty" style="padding:40px 20px">Співробітників поки немає. Натисніть «+ Додати співробітника».</div></td></tr>`;
       return;
     }
     tbody.innerHTML = list.map(a => {
@@ -4877,6 +4880,23 @@ function plural(n, one, few, many) {
   return many;
 }
 
+// Month keys are computed arithmetically, never through Date.setMonth(). On the
+// 29th-31st setMonth overflows into the following month, so the six-month window
+// came out as e.g. "Бер Бер Тра Тра Лип Лип" on 31 July — three duplicates and
+// three months missing — and the month-over-month figure compared the current
+// month against itself.
+function ymShift(ym, delta) {
+  const [y, m] = ym.split('-').map(Number);
+  const t = y * 12 + (m - 1) + delta;
+  return `${Math.floor(t / 12)}-${String(t % 12 + 1).padStart(2, '0')}`;
+}
+
+// Local, not UTC: toISOString() is UTC, so in Kyiv the first hours of the 1st
+// still reported the previous month.
+function ymOf(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
 function dashKpi(icon, value, label, color, sub) {
   return `<div class="stat" style="border-left:4px solid ${color}">
     <div style="font-size:20px;margin-bottom:3px">${icon}</div>
@@ -4921,7 +4941,7 @@ async function loadDashboardTab() {
 
   financialsEl.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--c-gray-400);padding:14px;font-size:13px">⏳ Завантаження...</div>';
 
-  const ym = new Date().toISOString().slice(0,7);
+  const ym = ymOf(new Date());
   const ymLabel = `${MONTH_NAMES[parseInt(ym.slice(5))]} ${ym.slice(0,4)}`;
   if (curMonthEl) curMonthEl.textContent = ymLabel;
 
@@ -5028,8 +5048,7 @@ async function loadDashboardTab() {
     // MoM delta: compare with last month
     let prevRevenue = 0;
     try {
-      const d = new Date(); d.setMonth(d.getMonth() - 1);
-      const prevYm = d.toISOString().slice(0,7);
+      const prevYm = ymShift(ym, -1);
       const pr = await fetch(`/api/monthly-payments/${prevYm}`, { headers: { 'x-admin-token': token } });
       if (pr.ok) {
         const pd = await pr.json();
@@ -5055,7 +5074,7 @@ async function loadDashboardTab() {
     const churnedMonth   = clients.filter(c => {
       if (c.status !== 'churned') return false;
       const d = new Date(c.updatedAt);
-      return !isNaN(d) && d.toISOString().slice(0,7) === ym;
+      return !isNaN(d) && ymOf(d) === ym;
     });
 
     const totalLeads     = leads.length;
@@ -5091,7 +5110,10 @@ async function loadDashboardTab() {
       dashKpi('🎓', activeClients.length, 'Активних учнів', 'var(--c-brand-500)', `+${trialClients.length} на пробному`),
       dashKpi('⏸️', pausedClients.length, 'На паузі', pausedClients.length > 3 ? 'var(--c-warning-text)' : 'var(--c-gray-500)', 'ризик відтоку'),
       dashKpi('🔴', churnedMonth.length, 'Відмовились (міс.)', churnedMonth.length > 0 ? 'var(--c-danger-text)' : 'var(--c-success-text)', 'відтік цього місяця'),
-      dashKpi('📥', unprocessed, 'Необроблені заявки', unprocessed > 0 ? 'var(--c-danger-text)' : 'var(--c-success-text)', `${newLeadsWeek} за тиждень`),
+      // newLeadsWeek counts every lead created in the last seven days, whatever
+      // its status — under a card headed "Необроблені" the bare "N за тиждень"
+      // read as "N unprocessed this week", which it never was.
+      dashKpi('📥', unprocessed, 'Необроблені заявки', unprocessed > 0 ? 'var(--c-danger-text)' : 'var(--c-success-text)', `${newLeadsWeek} ${plural(newLeadsWeek,'нова','нові','нових')} за тиждень`),
       dashKpi('📈', `${convRate}%`, 'Конверсія в учні', convRate >= 30 ? 'var(--c-success-text)' : convRate >= 15 ? 'var(--c-warning-text)' : 'var(--c-danger-text)', `${enrolledLeads} з ${totalLeads} заявок`),
       dashKpi('🎂', validAges.length ? avgAge.toFixed(1) : '—', 'Середній вік дитини', '#0891b2', validAges.length ? `за ${validAges.length} учнями` : 'немає даних про вік'),
       dashKpi('⏳', withEnroll.length ? avgLifetimeMonths.toFixed(1) + ' міс.' : '—', 'Лайфтайм учня', 'var(--c-brand-700)', withEnroll.length ? `за ${withEnroll.length} учнями` : 'немає дати запису'),
@@ -5102,10 +5124,7 @@ async function loadDashboardTab() {
     // Revenue trend (6 months)
     if (revenueEl) {
       const mArr = [];
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date(); d.setMonth(d.getMonth() - i);
-        mArr.push(d.toISOString().slice(0,7));
-      }
+      for (let i = 5; i >= 0; i--) mArr.push(ymShift(ym, -i));
       const revData = await Promise.all(mArr.map(async m => {
         try {
           const r = await fetch(`/api/monthly-payments/${m}`, { headers: { 'x-admin-token': token } });
