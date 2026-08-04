@@ -14,17 +14,23 @@
   --c-brand-500:#6C47FF; --c-brand-600:#5533EE; --c-brand-700:#7c3aed;
   /* Neutral */
   --c-ink:#1a1a2e; --c-ink-soft:#333;
-  --c-gray-500:#888; --c-gray-400:#aaa; --c-gray-300:#bbb;
+  /* Secondary greys carry real information (dates, counters, empty states), so
+     they must clear WCAG AA 4.5:1 on every surface they land on — including the
+     darkest one, --c-canvas #f0eeff. The old #888/#aaa gave only 3.54/2.32.
+     --c-gray-300 stays light on purpose: its single use is the weekend day
+     numbers in the attendance calendar, where the grid position repeats the
+     same information. */
+  --c-gray-500:#5f5f6b; --c-gray-400:#6b6b78; --c-gray-300:#bbb;
   --c-border:#e8e4ff; --c-border-soft:#f0eeff; --c-border-faint:#f8f7ff;
   --c-surface:#fff; --c-canvas:#f0eeff; --c-row-hover:#faf9ff;
   /* Semantic (bg/border/text/solid per status family) */
   --c-info-bg:#e8f4ff; --c-info-border:#bfdbfe; --c-info-text:#2563eb; --c-info-solid:#3b82f6;
-  --c-success-bg:#e8f5e9; --c-success-border:#a7f3d0; --c-success-text:#15803d; --c-success-solid:#22c55e;
+  --c-success-bg:#e8f5e9; --c-success-border:#a7f3d0; --c-success-text:#106830; --c-success-solid:#22c55e;
   --c-warning-bg:#fef9e7; --c-warning-border:#fde68a; --c-warning-text:#b45309; --c-warning-solid:#eab308;
-  --c-danger-bg:#fff0f0; --c-danger-border:#fecaca; --c-danger-text:#dc2626; --c-danger-solid:#ef4444;
+  --c-danger-bg:#fff0f0; --c-danger-border:#fecaca; --c-danger-text:#c62020; --c-danger-solid:#ef4444;
   --c-trial-bg:#f0e8ff; --c-trial-border:#c4b5fd; --c-trial-text:#7c3aed; --c-trial-solid:#a855f7;
   --c-done-bg:#f0fdf4; --c-done-border:#bbf7d0; --c-done-text:#166534; --c-done-solid:#16a34a;
-  --c-neutral-bg:#f5f5f5; --c-neutral-border:#e0e0e0; --c-neutral-text:#888; --c-neutral-solid:#9ca3af;
+  --c-neutral-bg:#f5f5f5; --c-neutral-border:#e0e0e0; --c-neutral-text:#5f5f6b; --c-neutral-solid:#9ca3af;
   /* Dark shell (sidebar + topbar chrome) — same dark motif already used by
      .client-subtabs/.cms-subtabs, extended to the app's primary navigation. */
   --c-shell-bg:#181527; --c-shell-bg-alt:#211c33; --c-shell-border:rgba(255,255,255,.08);
@@ -37,6 +43,20 @@
   --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
   /* Radius */
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:14px; --r-pill:20px; --r-round:99px;
+  /* Control heights. Every interactive control is pinned to one of these steps
+     instead of letting padding + border + line box add up to whatever they add
+     up to — that is how the admin ended up with 19.35 / 24.4 / 24.8 / 26.6 /
+     28.4 / 29.2 / 32.25 / 33.6 / 33.85 / 35.6 / 36.4 side by side.
+       36  default — toolbars, modal forms, buttons
+       28  compact — topbar row, popups; a control standing on its own
+       24  dense   — inside a table row, where controls sit shoulder to shoulder
+                     with 12px text and every pixel of row height is repeated
+                     down the whole table
+       44  the login screen only
+     28 and 24 are deliberately separate: one value cannot serve both a header
+     bar, where the control is alone and wants presence, and a data row, where
+     it must not inflate the row. */
+  --h-control:36px; --h-control-sm:28px; --h-control-xs:24px; --h-control-lg:44px;
   /* Shadow */
   --shadow-sm:0 4px 24px rgba(108,71,255,.12);
   --shadow-md:0 8px 30px rgba(0,0,0,.18);
@@ -56,9 +76,9 @@ a{color:var(--c-brand-500);text-decoration:none}
 .login-box{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(108,71,255,.12)}
 .login-box h1{font-size:20px;margin-bottom:6px}
 .login-box p{color:#888;font-size:14px;margin-bottom:24px}
-.login-box input{width:100%;padding:12px 14px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:14px;margin-bottom:12px;outline:none}
+.login-box input{width:100%;height:var(--h-control-lg);padding:0 14px;border:1.5px solid #e0d9ff;border-radius:var(--r-md);font-size:14px;margin-bottom:12px;outline:none}
 .login-box input:focus{border-color:#6C47FF}
-.login-box button{width:100%;padding:12px;background:#6C47FF;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.login-box button{width:100%;height:var(--h-control-lg);padding:0;background:#6C47FF;color:#fff;border:none;border-radius:var(--r-md);font-size:15px;font-weight:600;cursor:pointer}
 .login-box button:hover{background:#5533EE}
 .login-error{color:#e53e3e;font-size:13px;margin-top:8px;display:none}
 .logo-row{display:flex;align-items:center;gap:8px;margin-bottom:20px}
@@ -74,12 +94,34 @@ a{color:var(--c-brand-500);text-decoration:none}
 .topbar-left{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#fff;min-width:0}
 #panelTitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+/* This row runs on the compact step: .btn-sm and .gs-input both pick it up from
+   --h-control-sm, so no topbar-specific height override is needed. A square icon
+   control dropped in here later (the drawer burger is already drawn in the Figma
+   file at 36x36) sets its own size and is unaffected. */
+/* line-height is pinned because emoji glyphs fall back to a font with taller
+   metrics: under line-height:normal a button with an emoji rendered ~1.6px
+   taller (MD) / ~0.8px taller (SM) than the same button without one, which is
+   why the topbar row had ragged tops. Unitless so the ratio still holds for the
+   handful of buttons that override font-size inline. */
+/* The border is transparent rather than absent so that .btn-ghost and
+   .btn-danger, which paint theirs, occupy exactly the same box as .btn-primary.
+   Before this, primary sat 3px shorter than the other two at the same size —
+   plainly visible wherever a Save and a Cancel stand side by side. */
+.btn{height:var(--h-control);padding:0 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;line-height:1.25;cursor:pointer;border:1.5px solid transparent;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
 .btn:active{transform:scale(.97)}
 .btn-primary{background:linear-gradient(135deg,#8465ff,#6C47FF);color:#fff;box-shadow:0 2px 8px rgba(108,71,255,.28)}.btn-primary:hover{background:linear-gradient(135deg,#9078ff,#5533EE);box-shadow:0 4px 14px rgba(108,71,255,.4)}
-.btn-ghost{background:var(--c-brand-50);color:var(--c-brand-500);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
-.btn-danger{background:#fff0f0;color:#e53e3e;border:1.5px solid #fecaca}.btn-danger:hover{background:#fecaca}
-.btn-sm{padding:5px 10px;font-size:12px}
+/* Ghost and danger labels use the darker step of their family: on hover the
+   background steps up to --c-brand-100 / --c-danger-border, and the lighter
+   500-step text dropped to 3.9:1 / 4.0:1 there. */
+.btn-ghost{background:var(--c-brand-50);color:var(--c-brand-600);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
+.btn-danger{background:var(--c-danger-bg);color:#991b1b;border:1.5px solid var(--c-danger-border)}.btn-danger:hover{background:var(--c-danger-border)}
+.btn-sm{height:var(--h-control-sm);padding:0 10px;font-size:12px}
+/* A .btn-sm in a toolbar or the topbar stands on its own and gets the 28px
+   step; the same class inside a table cell sits shoulder to shoulder with
+   .notes-input and .status-sel, so it drops to the dense step and the row does
+   not grow. .btn-xs is for the same situation outside a table — currently the
+   reorder arrows stacked inside a course card. */
+.btn-xs,td .btn-sm{height:var(--h-control-xs)}
 /* Modal close button. As a plain .btn-sm the ✕ rendered 31x23 — narrow, not
    square, and an awkward pointer target. Square it off at 36px. */
 .btn-close{width:36px;height:36px;padding:0;justify-content:center;flex-shrink:0;font-size:14px}
@@ -110,9 +152,9 @@ a{color:var(--c-brand-500);text-decoration:none}
 
 /* TOOLBAR */
 .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-.search{flex:1;min-width:200px;padding:9px 14px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:14px;outline:none}
+.search{flex:1;min-width:200px;height:var(--h-control);padding:0 14px;border:1.5px solid #e0d9ff;border-radius:var(--r-md);font-size:14px;outline:none}
 .search:focus{border-color:#6C47FF}
-.filter-select{padding:9px 12px;border:1.5px solid #e0d9ff;border-radius:8px;font-size:13px;outline:none;background:#fff;cursor:pointer}
+.filter-select{height:var(--h-control);padding:0 12px;border:1.5px solid #e0d9ff;border-radius:var(--r-md);font-size:13px;outline:none;background:#fff;cursor:pointer}
 .filter-select:focus{border-color:#6C47FF}
 select.filter-select,select.modal-input{
   padding-right:34px;
@@ -156,7 +198,7 @@ tr:hover td{background:var(--c-row-hover)}
 .chip{display:inline-flex;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:#f0eeff;color:#6C47FF}
 
 /* STATUS SELECT */
-.status-sel{padding:4px 22px 4px 8px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-sm);font-size:12px;background-color:var(--c-surface);cursor:pointer;outline:none;
+.status-sel{height:var(--h-control-xs);padding:0 22px 0 8px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:12px;background-color:var(--c-surface);cursor:pointer;outline:none;
   appearance:none;-webkit-appearance:none;-moz-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 8px center}
@@ -174,11 +216,11 @@ tr:hover td{background:var(--c-row-hover)}
    opened native list still shows full text normally. */
 .status-sel-wrap{position:relative;display:inline-block}
 .status-dot{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:9px;height:9px;border-radius:50%;pointer-events:none;box-shadow:0 0 0 2px rgba(0,0,0,.05),0 1px 3px rgba(0,0,0,.2)}
-.status-sel-icon{width:54px;padding:4px 20px 4px 22px;color:transparent;text-shadow:none;text-align:left;background-position:right 6px center}
+.status-sel-icon{width:54px;padding:0 20px 0 22px;color:transparent;text-shadow:none;text-align:left;background-position:right 6px center}
 .status-sel-icon option{color:var(--c-ink-soft)}
 
 /* NOTES */
-.notes-input{width:100%;padding:4px 8px;border:1.5px solid #e0d9ff;border-radius:6px;font-size:12px;outline:none;min-width:120px}
+.notes-input{width:100%;height:var(--h-control-xs);padding:0 8px;border:1.5px solid #e0d9ff;border-radius:var(--r-md);font-size:12px;outline:none;min-width:120px}
 .notes-input:focus{border-color:#6C47FF}
 /* Setting appearance:textfield on the input itself is not reliably enough in
    Chrome/Edge — the spin-button pseudo-elements need to be targeted directly,
@@ -259,7 +301,10 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .modal-group{display:flex;flex-direction:column;gap:4px}
 .modal-group.full{grid-column:1/-1}
 .modal-label{font-size:12px;font-weight:600;color:var(--c-gray-500)}
-.modal-input{padding:8px 12px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:13px;outline:none;font-family:inherit}
+.modal-input{height:var(--h-control);padding:0 12px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:13px;outline:none;font-family:inherit}
+/* Nine textareas share the .modal-input class and must keep growing with their
+   rows attribute instead of collapsing to the single-line control height. */
+textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
 .modal-input:focus{border-color:var(--c-brand-500)}
 .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
 @media(max-width:600px){.modal-grid{grid-template-columns:1fr}}
@@ -330,28 +375,30 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .att-cell{width:24px;height:24px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;transition:transform .1s;user-select:none;border:1px solid transparent;margin:1px}
 .att-cell:hover{transform:scale(1.25);z-index:1;position:relative}
 .att-none{background:#f0f0f0;color:var(--c-gray-300)}
-.att-present{background:#86efac;color:#15803d;border-color:#4ade80}
-.att-absent{background:#fca5a5;color:#dc2626;border-color:#f87171}
+/* Backgrounds keep the saturated set above; only the glyph colors are darkened
+   so the ✓/✗/↻ still reads on them (was 3.57 / 2.54 / 3.28 against AA 4.5). */
+.att-present{background:#86efac;color:#106830;border-color:#4ade80}
+.att-absent{background:#fca5a5;color:#8f1a1a;border-color:#f87171}
 .att-makeup{background:#fde68a;color:#92400e;border-color:#fbbf24}
-.att-cancelled{background:#d1d5db;color:#6b7280;border-color:#9ca3af}
+.att-cancelled{background:#d1d5db;color:#545a66;border-color:#9ca3af}
 .att-legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;align-items:center;color:#666}
 .att-legend-dot{width:14px;height:14px;border-radius:3px;flex-shrink:0;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 .att-legend-item{display:flex;align-items:center;gap:5px}
 .att-scheduled{background:#ede9fe;color:#7c3aed;border-color:#c4b5fd}
 .att-drop{position:fixed;z-index:9999;background:var(--c-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-md);border:1px solid var(--c-border);padding:5px;min-width:155px}
-.att-drop-btn{display:flex;align-items:center;gap:8px;width:100%;padding:7px 10px;border:none;background:none;cursor:pointer;border-radius:var(--r-sm);font-size:12px;font-weight:600;text-align:left;color:var(--c-ink-soft)}
+.att-drop-btn{display:flex;align-items:center;gap:8px;width:100%;height:var(--h-control-sm);padding:0 10px;border:none;background:none;cursor:pointer;border-radius:var(--r-md);font-size:12px;font-weight:600;text-align:left;color:var(--c-ink-soft)}
 .att-drop-btn:hover{background:var(--c-brand-50)}
 .att-drop-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
 /* Schedule pickers in client modal */
 .sched-row{display:flex;gap:8px;margin-bottom:6px}
-.sched-row select{flex:1;padding:7px 30px 7px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.sched-row select{flex:1;height:var(--h-control-sm);padding:0 30px 0 10px;border:1px solid #ddd;border-radius:var(--r-md);font-size:13px;background:#fff;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .sched-row select:focus{outline:none;border-color:var(--c-brand-500)}
 /* Schedule quick-edit popup */
 .sched-popup{position:fixed;z-index:9999;background:var(--c-surface);border-radius:var(--r-lg);box-shadow:var(--shadow-md);border:1px solid var(--c-border);padding:16px;min-width:260px}
 .sched-popup h5{font-size:13px;font-weight:700;margin-bottom:10px;color:var(--c-ink-soft)}
 .sched-popup-row{display:flex;gap:6px;margin-bottom:8px;align-items:center}
 .sched-popup-row label{font-size:11px;color:var(--c-gray-500);min-width:40px}
-.sched-popup-row select{flex:1;padding:5px 26px 5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.sched-popup-row select{flex:1;height:var(--h-control-sm);padding:0 26px 0 8px;border:1px solid #ddd;border-radius:var(--r-md);font-size:12px;appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
 .sched-popup-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:12px;border-top:1px solid var(--c-border-soft);padding-top:10px}
 
 /* PAYMENTS SUB-TAB */
@@ -371,13 +418,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .pay-alert-title{font-size:13px;font-weight:700;color:var(--c-danger-text);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .pay-alert-names{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .pay-alert-badge{background:var(--c-danger-border);padding:2px 9px;border-radius:var(--r-lg);font-size:11px;font-weight:600;color:#991b1b;white-space:nowrap}
-.mp-status-sel{padding:3px 7px 3px 9px;border-radius:var(--r-sm);font-size:12px;font-weight:700;border:1.5px solid transparent;cursor:pointer;outline:none;min-width:120px;box-shadow:inset 3px 0 0 currentColor}
+.mp-status-sel{height:var(--h-control-xs);padding:0 7px 0 9px;border-radius:var(--r-md);font-size:12px;font-weight:700;border:1.5px solid transparent;cursor:pointer;outline:none;min-width:120px;box-shadow:inset 3px 0 0 currentColor}
 .mp-status-pending{background:var(--c-danger-bg);color:var(--c-danger-text);border-color:var(--c-danger-border)}
 .mp-status-paid{background:var(--c-success-bg);color:var(--c-success-text);border-color:var(--c-success-border)}
 .mp-status-partial{background:var(--c-warning-bg);color:var(--c-warning-text);border-color:var(--c-warning-border)}
 .mp-status-waived{background:var(--c-info-bg);color:var(--c-info-text);border-color:var(--c-info-border)}
 .mp-status-completed{background:var(--c-neutral-bg);color:var(--c-neutral-text);border-color:var(--c-neutral-border)}
-.mp-inline{padding:4px 7px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-sm);font-size:12px;outline:none;background:var(--c-surface);width:100%;min-width:60px}
+.mp-inline{height:var(--h-control-xs);padding:0 7px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:12px;outline:none;background:var(--c-surface);width:100%;min-width:60px}
 .mp-inline:focus{border-color:var(--c-brand-500)}
 .mp-no-month{text-align:center;padding:40px 20px;color:var(--c-gray-500)}
 .mp-no-month h3{font-size:16px;margin-bottom:8px;color:#444}
@@ -432,14 +479,17 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
 /* GLOBAL SEARCH */
 .gs-wrap{position:relative;display:flex;align-items:center}
-.gs-input{padding:6px 12px;border:1.5px solid rgba(255,255,255,.14);border-radius:8px;font-size:13px;outline:none;width:190px;background:rgba(255,255,255,.08);color:#fff;transition:width .2s,border-color .2s,background .2s}
+.gs-input{height:var(--h-control-sm);padding:0 12px;border:1.5px solid rgba(255,255,255,.14);border-radius:var(--r-md);font-size:13px;outline:none;width:190px;background:rgba(255,255,255,.08);color:#fff;transition:width .2s,border-color .2s,background .2s}
 .gs-input::placeholder{color:var(--c-shell-text)}
 /* The search field sits on the dark shell and had no hover feedback at all —
    it only reacted on focus. Lift the fill and border one step so it reads as
    interactive before you click it. */
 .gs-input:hover:not(:focus){background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.24)}
 .gs-input:focus{border-color:var(--c-brand-500);background:#fff;color:var(--c-ink);width:250px}
-.gs-dropdown{position:absolute;top:calc(100% + 4px);left:0;min-width:320px;background:#fff;color:var(--c-ink);border-radius:var(--r-lg);border:1px solid #e8e4ff;box-shadow:0 8px 30px rgba(0,0,0,.18);z-index:5000;max-height:380px;overflow-y:auto}
+/* Anchored to the right edge, not the left: the field is 190px wide (250 on
+   focus) and sits near the end of the topbar, so a 320px panel starting at its
+   left edge ran past the window — 38px off at 1440. */
+.gs-dropdown{position:absolute;top:calc(100% + 4px);right:0;min-width:320px;background:#fff;color:var(--c-ink);border-radius:var(--r-lg);border:1px solid #e8e4ff;box-shadow:0 8px 30px rgba(0,0,0,.18);z-index:5000;max-height:380px;overflow-y:auto}
 .gs-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:6px 14px 3px;color:#aaa;background:#fafafa}
 .gs-item{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid #f8f7ff}
 .gs-item:last-child{border-bottom:none}
@@ -450,7 +500,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 /* BULK ACTIONS BAR */
 .bulk-bar{display:none;align-items:center;gap:8px;padding:10px 14px;background:var(--c-trial-bg);border-radius:var(--r-md);margin-bottom:10px;flex-wrap:wrap;border:1.5px solid var(--c-trial-border)}
 .bulk-bar.show{display:flex}
-.bulk-count{font-weight:700;color:var(--c-brand-500);font-size:13px}
+.bulk-count{font-weight:700;color:var(--c-brand-600);font-size:13px}
 /* SCHEDULE VIEW */
 .sched-wrap{overflow-x:auto}
 .sched-tbl{border-collapse:collapse;min-width:600px;width:100%}
@@ -990,8 +1040,8 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
         </div>
 
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-          <button class="btn btn-primary" style="padding:11px 28px;font-size:14px;font-weight:600" onclick="saveSeoTexts()">Зберегти</button>
-          <button class="btn btn-ghost" style="font-size:13px;padding:9px 18px" onclick="toggleSeoPreview()">👁 Переглянути</button>
+          <button class="btn btn-primary" style="padding:0 28px;font-size:14px;font-weight:600" onclick="saveSeoTexts()">Зберегти</button>
+          <button class="btn btn-ghost" style="font-size:13px;padding:0 18px" onclick="toggleSeoPreview()">👁 Переглянути</button>
           <span id="seoSaveOk"  style="font-size:13px;color:var(--c-success-solid);display:none">✓ Збережено!</span>
           <span id="seoSaveErr" style="font-size:13px;color:var(--c-danger-solid);display:none">Помилка збереження</span>
         </div>
@@ -1250,7 +1300,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 
     <div id="lessonsTab" style="display:none">
       <div class="toolbar" style="margin-bottom:16px">
-        <button class="btn btn-primary" onclick="openLtModal()">➕ Додати токен</button>
+        <button class="btn btn-primary btn-sm" onclick="openLtModal()">➕ Додати токен</button>
       </div>
       <div class="table-wrap">
         <table id="lessonsTable" style="min-width:720px">
@@ -1936,7 +1986,7 @@ function renderTable() {
         <td><select class="status-sel" style="min-width:100px" onchange="saveLeadFields(${l.id},{teacher:this.value})">${[`<option value="">— —</option>`,..._teachersList.map(t=>`<option value="${esc(t.name)}"${l.teacher===t.name?' selected':''}>${esc(t.name)}</option>`)].join('')}</select></td>
         <td style="white-space:nowrap">
           <span style="font-size:12px;max-width:110px;display:inline-block;overflow:hidden;text-overflow:ellipsis;vertical-align:middle">${esc(l.schedule||'')}</span>
-          <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;vertical-align:middle"
+          <button class="btn btn-ghost btn-sm" style="padding:0 6px;font-size:11px;vertical-align:middle"
             onclick="openSchedPopup(event,${l.id},'lead')" title="Редагувати розклад">🕐</button>
         </td>
         <td>
@@ -2645,16 +2695,16 @@ function renderClients() {
           onchange="saveClientField(${c.id},'lessonType',this.value)">${lessonTypeOpts}</select></td>
         <td>
           <span style="font-size:12px;line-height:1.5;vertical-align:middle;display:inline-block">${schedLines}</span>
-          <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;vertical-align:middle"
+          <button class="btn btn-ghost btn-sm" style="padding:0 6px;font-size:11px;vertical-align:middle"
             onclick="openSchedPopup(event,${c.id})" title="Редагувати розклад">🕐</button>
         </td>
         <td><select class="status-sel" style="min-width:100px"
           onchange="saveClientField(${c.id},'teacher',this.value)">${teacherOpts}</select></td>
-        <td><input class="notes-input" style="width:72px" type="number"
+        <td><input class="notes-input" style="width:72px;min-width:0" type="number"
           value="${c.monthlyFee ?? ''}" placeholder="0"
           onblur="saveClientField(${c.id},'monthlyFee',this.value)"
           onkeydown="if(event.key==='Enter')this.blur()"/></td>
-        <td><input class="notes-input" style="width:100px;${ncStyle}" type="date"
+        <td><input class="notes-input" style="width:100px;min-width:0;${ncStyle}" type="date"
           value="${c.nextContact||''}"
           onblur="saveClientField(${c.id},'nextContact',this.value)"
           onkeydown="if(event.key==='Enter')this.blur()"/></td>
@@ -3907,8 +3957,8 @@ function renderCoursesGrid() {
     <div style="background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-xl);padding:20px;position:relative">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
         <div style="display:flex;flex-direction:column;gap:2px">
-          <button class="btn btn-ghost btn-sm" style="padding:2px 8px" title="Підняти вище" ${i===0?'disabled':''} onclick="reorderCourse('${c.id}','up')">▲</button>
-          <button class="btn btn-ghost btn-sm" style="padding:2px 8px" title="Опустити нижче" ${i===_allCourses.length-1?'disabled':''} onclick="reorderCourse('${c.id}','down')">▼</button>
+          <button class="btn btn-ghost btn-sm btn-xs" style="padding:0 8px" title="Підняти вище" ${i===0?'disabled':''} onclick="reorderCourse('${c.id}','up')">▲</button>
+          <button class="btn btn-ghost btn-sm btn-xs" style="padding:0 8px" title="Опустити нижче" ${i===_allCourses.length-1?'disabled':''} onclick="reorderCourse('${c.id}','down')">▼</button>
         </div>
         <div style="width:48px;height:48px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:26px;background:${c.color}22;border:1px solid ${c.color}44">${c.emoji}</div>
         <div style="flex:1">
@@ -4467,7 +4517,7 @@ function renderReviewsTable() {
       </td>
       <td style="font-size:13px;color:#777">${esc(r.role||'—')}</td>
       <td style="font-size:13px;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.text||'')}</td>
-      <td style="color:#f59e0b;font-size:14px">${stars(r.rating)}</td>
+      <td style="color:var(--c-warning-text);font-size:14px">${stars(r.rating)}</td>
       <td><span class="badge ${r.active!==false?'badge-enrolled':'badge-rejected'}">${r.active!==false?'Активний':'Архів'}</span></td>
       <td style="white-space:nowrap">
         <button class="btn btn-ghost btn-sm" onclick="openReviewModal(${r.id})">✏️</button>
@@ -5421,7 +5471,7 @@ function renderStaffLeave(list) {
     totalDays += days;
     return `<div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 0;border-bottom:1px solid #eee">
       <span>${LEAVE_TYPE_LABELS[l.type] || l.type} · ${esc(l.startDate)} — ${esc(l.endDate)} (${days} дн.)</span>
-      <button class="btn btn-ghost btn-sm no-print" style="padding:2px 6px" onclick="deleteStaffLeave(${l.id})">✕</button>
+      <button class="btn btn-ghost btn-sm no-print" style="padding:0 6px" onclick="deleteStaffLeave(${l.id})">✕</button>
     </div>`;
   }).join('');
   totalEl.textContent = `${totalDays} дн. всього`;
