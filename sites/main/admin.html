@@ -84,8 +84,11 @@ a{color:var(--c-brand-500);text-decoration:none}
    already works out to (5+5 padding + 15 line box + 1.5+1.5 border), so the
    buttons keep their size and only the search field comes down to meet them —
    it used to run 3px taller on its own 6px/13px rhythm. Border-radius is 8px on
-   both already, so nothing to reconcile there. */
-.topbar-right > .btn{height:28px}
+   both already, so nothing to reconcile there.
+   Scoped to .btn-sm on purpose: a square icon control dropped in here later
+   (the drawer burger is already drawn in the Figma file at 36x36) sets its own
+   size and must not be flattened by this rule. */
+.topbar-right > .btn-sm{height:28px}
 .topbar .gs-input{height:28px;padding:0 12px}
 /* line-height is pinned because emoji glyphs fall back to a font with taller
    metrics: under line-height:normal a button with an emoji rendered ~1.6px
