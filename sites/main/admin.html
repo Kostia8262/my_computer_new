@@ -193,15 +193,17 @@ th{padding:12px 14px;text-align:left;font-size:var(--fs-sm);font-weight:var(--fw
 td{padding:12px 14px;border-bottom:1px solid var(--c-border-faint);vertical-align:middle}
 td.td-tight,th.td-tight{padding:8px 4px}
 /* Lesson access table spans the card like every other table. Left fully to the
-   browser all six columns came out fractional (81.9 / 285.5 / 220.2 / 199 /
-   330.6 / 55.1). Pinning the three fixed-content columns — index, the checkbox
-   and the delete button — puts those four rules on whole pixels; the three text
-   columns split the remainder evenly. The leftover can't be whole: the card is
-   1174 wide but its 1px border snaps to 0.8, so the usable width is 1172.4. */
+   browser all its columns came out fractional (81.9 / 285.5 / 220.2 / 199 /
+   330.6 / 55.1). Pinning the fixed-content ones — the select box, index, the
+   "active" checkbox and the delete button — puts those rules on whole pixels;
+   the three text columns split the remainder evenly. The leftover can't be
+   whole: the card is 1174 wide but its 1px border snaps to 0.8, so 1172.4 is
+   all there is to divide. */
 .lessons-table{table-layout:fixed}
-.lessons-table col:nth-child(1){width:60px}
-.lessons-table col:nth-child(4){width:100px}
-.lessons-table col:nth-child(6){width:60px}
+.lessons-table col:nth-child(1){width:44px}
+.lessons-table col:nth-child(2){width:60px}
+.lessons-table col:nth-child(5){width:100px}
+.lessons-table col:nth-child(7){width:60px}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--c-row-hover)}
 .phone-link{color:var(--c-ink);font-weight:600}
@@ -1323,10 +1325,18 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
       <div class="toolbar" style="margin-bottom:16px">
         <button class="btn btn-primary btn-sm" onclick="openLtModal()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2.5v7M2.5 6h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Додати токен</button>
       </div>
+      <div class="bulk-bar" id="ltBulkBar">
+        <span class="bulk-count" id="ltBulkCount">0 вибрано</span>
+        <button class="btn btn-primary btn-sm" id="ltBulkIssue" onclick="bulkIssueLessonTokens()">Видати доступ</button>
+        <button class="btn btn-ghost btn-sm" id="ltBulkOn" onclick="bulkSetLessonTokens(true)">Активувати</button>
+        <button class="btn btn-ghost btn-sm" id="ltBulkOff" onclick="bulkSetLessonTokens(false)">Деактивувати</button>
+        <button class="btn btn-danger btn-sm" id="ltBulkDelete" onclick="bulkDeleteLessonTokens()">✕ Видалити доступи</button>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="clearLtSelection()">✕ Скасувати</button>
+      </div>
       <div class="table-wrap">
         <table id="lessonsTable" class="lessons-table">
-          <colgroup><col/><col/><col/><col/><col/><col/></colgroup>
-          <thead><tr><th>№</th><th>Ім'я</th><th>Посилання</th><th>Активний</th><th>Востаннє заходив</th><th></th></tr></thead>
+          <colgroup><col/><col/><col/><col/><col/><col/><col/></colgroup>
+          <thead><tr><th class="td-tight" style="padding-left:12px"><input type="checkbox" id="ltSelectAll" onchange="toggleAllLtChecks()" aria-label="Вибрати всіх"/></th><th>№</th><th>Ім'я</th><th>Посилання</th><th>Активний</th><th>Востаннє заходив</th><th></th></tr></thead>
           <tbody id="lessonsTableBody"></tbody>
         </table>
       </div>
@@ -2518,24 +2528,160 @@ function ltTokenCellsHtml(t, clientId, clientName) {
     <td><button class="btn btn-danger btn-sm" onclick="deleteLessonToken(${t.id})">✕</button></td>`;
 }
 
+// Selection keys are prefixed because the table mixes two kinds of row: a client
+// (which may or may not hold a token yet) and a standalone token with no client.
+// 'c<clientId>' vs 't<tokenId>' keeps them from colliding on the same number.
+let _selectedLt = new Set();
+let _ltRows = [];        // [{key, name, clientId, tokenId, active}] — current rows
+let _ltLastData = null;  // last payload, so selection can re-render without refetching
+
+function _ltCheckboxCell(key) {
+  return `<td class="td-tight" style="padding-left:12px"><input type="checkbox" ${_selectedLt.has(key) ? 'checked' : ''} onchange="toggleLtCheck('${key}')" aria-label="Вибрати рядок"/></td>`;
+}
+
 function renderLessonsTable(activeClients, tokenByClientId, standaloneTokens) {
   const body = document.getElementById('lessonsTableBody');
   if (!body) return;
+  _ltLastData = { activeClients, tokenByClientId, standaloneTokens };
+  _ltRows = [];
   if (!activeClients.length && !standaloneTokens.length) {
-    body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--c-muted)">Немає активних учнів</td></tr>';
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--c-muted)">Немає активних учнів</td></tr>';
+    _updateLtBulkBar();
     return;
   }
   let n = 0;
   const clientRows = activeClients.map(c => {
     n++;
     const t = tokenByClientId.get(c.id);
-    return `<tr><td>${n}</td><td>${escHtmlAdmin(c.name || '—')}</td>${ltTokenCellsHtml(t, c.id, c.name || '')}</tr>`;
+    const key = 'c' + c.id;
+    _ltRows.push({ key, name: c.name || '', clientId: c.id, tokenId: t ? t.id : null, active: t ? !!t.active : false });
+    return `<tr>${_ltCheckboxCell(key)}<td>${n}</td><td>${escHtmlAdmin(c.name || '—')}</td>${ltTokenCellsHtml(t, c.id, c.name || '')}</tr>`;
   });
   const standaloneRows = standaloneTokens.map(t => {
     n++;
-    return `<tr><td>${n}</td><td>${escHtmlAdmin(t.studentName || '—')}</td>${ltTokenCellsHtml(t, null, '')}</tr>`;
+    const key = 't' + t.id;
+    _ltRows.push({ key, name: t.studentName || '', clientId: null, tokenId: t.id, active: !!t.active });
+    return `<tr>${_ltCheckboxCell(key)}<td>${n}</td><td>${escHtmlAdmin(t.studentName || '—')}</td>${ltTokenCellsHtml(t, null, '')}</tr>`;
   });
   body.innerHTML = clientRows.concat(standaloneRows).join('');
+  _updateLtBulkBar();
+}
+
+function _rerenderLessons() {
+  if (!_ltLastData) return;
+  renderLessonsTable(_ltLastData.activeClients, _ltLastData.tokenByClientId, _ltLastData.standaloneTokens);
+}
+
+function toggleLtCheck(key) {
+  if (_selectedLt.has(key)) _selectedLt.delete(key);
+  else _selectedLt.add(key);
+  _updateLtBulkBar();
+}
+
+function toggleAllLtChecks() {
+  const master = document.getElementById('ltSelectAll');
+  const checkAll = master ? master.checked : false;
+  if (checkAll) _ltRows.forEach(r => _selectedLt.add(r.key));
+  else _ltRows.forEach(r => _selectedLt.delete(r.key));
+  _rerenderLessons();
+}
+
+function clearLtSelection() {
+  _selectedLt.clear();
+  _rerenderLessons();
+}
+
+function _ltSelectedRows() {
+  return _ltRows.filter(r => _selectedLt.has(r.key));
+}
+
+function _updateLtBulkBar() {
+  const rows = _ltSelectedRows();
+  const withToken    = rows.filter(r => r.tokenId != null);
+  const withoutToken = rows.filter(r => r.tokenId == null && r.clientId != null);
+  const bar   = document.getElementById('ltBulkBar');
+  const count = document.getElementById('ltBulkCount');
+  if (bar)   bar.classList.toggle('show', rows.length > 0);
+  if (count) count.textContent = `${rows.length} вибрано`;
+  // Each action only applies to part of a mixed selection, so spell out how many
+  // rows it will actually touch instead of silently skipping the rest.
+  const setBtn = (id, n, label) => {
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.disabled = n === 0;
+    b.textContent = n ? `${label} (${n})` : label;
+  };
+  setBtn('ltBulkIssue',  withoutToken.length, 'Видати доступ');
+  setBtn('ltBulkOn',     withToken.filter(r => !r.active).length, 'Активувати');
+  setBtn('ltBulkOff',    withToken.filter(r => r.active).length,  'Деактивувати');
+  setBtn('ltBulkDelete', withToken.length, '✕ Видалити доступи');
+  const master = document.getElementById('ltSelectAll');
+  if (master) {
+    const n = rows.length;
+    master.checked       = n > 0 && n === _ltRows.length;
+    master.indeterminate = n > 0 && n < _ltRows.length;
+  }
+}
+
+async function bulkIssueLessonTokens() {
+  const targets = _ltSelectedRows().filter(r => r.tokenId == null && r.clientId != null);
+  if (!targets.length) return;
+  let done = 0;
+  for (const r of targets) {
+    try {
+      const res = await fetch('/api/lesson-tokens', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ studentName: r.name, clientId: r.clientId }),
+      });
+      if (res.status === 401) { doLogout(); return; }
+      const data = await res.json();
+      if (data.success) done++;
+    } catch {}
+  }
+  _selectedLt.clear();
+  await loadLessonsTab();
+  showToast(`Видано доступів: ${done} з ${targets.length}`, done === targets.length ? 'success' : 'error');
+}
+
+async function bulkSetLessonTokens(active) {
+  const targets = _ltSelectedRows().filter(r => r.tokenId != null && r.active !== active);
+  if (!targets.length) return;
+  let done = 0;
+  for (const r of targets) {
+    try {
+      const res = await fetch(`/api/lesson-tokens/${r.tokenId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ active }),
+      });
+      if (res.status === 401) { doLogout(); return; }
+      if (res.ok) done++;
+    } catch {}
+  }
+  _selectedLt.clear();
+  await loadLessonsTab();
+  showToast(`${active ? 'Активовано' : 'Деактивовано'}: ${done} з ${targets.length}`, done === targets.length ? 'success' : 'error');
+}
+
+async function bulkDeleteLessonTokens() {
+  const targets = _ltSelectedRows().filter(r => r.tokenId != null);
+  if (!targets.length) return;
+  if (!await uiConfirm({
+    title: `Видалити ${targets.length} ${plural(targets.length, 'доступ', 'доступи', 'доступів')}?`,
+    text : 'Учні більше не зможуть відкрити свої уроки за цими посиланнями.'
+  })) return;
+  let done = 0;
+  for (const r of targets) {
+    try {
+      const res = await fetch(`/api/lesson-tokens/${r.tokenId}`, { method: 'DELETE', headers: { 'x-admin-token': token } });
+      if (res.status === 401) { doLogout(); return; }
+      if (res.ok) done++;
+    } catch {}
+  }
+  _selectedLt.clear();
+  await loadLessonsTab();
+  showToast(`Видалено доступів: ${done} з ${targets.length}`, done === targets.length ? 'success' : 'error');
 }
 
 function escHtmlAdmin(s) {
