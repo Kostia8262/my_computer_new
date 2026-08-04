@@ -2687,11 +2687,11 @@ function renderClients() {
         </td>
         <td><select class="status-sel" style="min-width:100px"
           onchange="saveClientField(${c.id},'teacher',this.value)">${teacherOpts}</select></td>
-        <td><input class="notes-input" style="width:72px" type="number"
+        <td><input class="notes-input" style="width:72px;min-width:0" type="number"
           value="${c.monthlyFee ?? ''}" placeholder="0"
           onblur="saveClientField(${c.id},'monthlyFee',this.value)"
           onkeydown="if(event.key==='Enter')this.blur()"/></td>
-        <td><input class="notes-input" style="width:100px;${ncStyle}" type="date"
+        <td><input class="notes-input" style="width:100px;min-width:0;${ncStyle}" type="date"
           value="${c.nextContact||''}"
           onblur="saveClientField(${c.id},'nextContact',this.value)"
           onkeydown="if(event.key==='Enter')this.blur()"/></td>
