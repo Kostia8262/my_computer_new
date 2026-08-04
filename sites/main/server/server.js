@@ -37,6 +37,7 @@ const coursesDb      = require('./courses');
 const articlesDb     = require('./articles');
 const CURRICULA      = require('./curricula');
 const reviewsDb      = require('./reviews');
+const lessonTokensDb = require('./lessonTokens');
 const {
   ARTICLES_RU, COURSES_RU, COURSE_SEO_TITLES_RU, COURSE_SEO_DESCS_RU,
   COURSE_SEO_TEXTS_RU, CURRICULA_RU, DOCS_SEO_RU, ARTICLES_INDEX_RU,
@@ -311,10 +312,18 @@ ARTICLES_SEED.forEach(a => {
   if (ru) { a.title_ru = ru.title; a.excerpt_ru = ru.excerpt; a.content_ru = ru.content; }
 });
 
-// ── STARTUP SEED (test teachers + demo clients) ───────────────────────────────
+// ── STARTUP SEED (content/courses/articles + opt-in demo staff & students) ────
+// Demo teachers and students are scaffolding for an empty install, never for a
+// live CRM. Their old guards ("no teacher exists", "no client has scheduleDays")
+// flip back to true the moment you delete the demo rows, so every restart after
+// a cleanup silently re-created them — deleted test students kept reappearing on
+// the Уроки/Клієнти tabs. Gate them on an explicit opt-in instead: set
+// SEED_DEMO_DATA=1 in a local or dev .env when a populated sandbox is wanted.
+const SEED_DEMO_DATA = process.env.SEED_DEMO_DATA === '1';
+
 (function seedTestData() {
   try {
-    if (!adminsDb.getAll().some(a => a.role === 'teacher')) {
+    if (SEED_DEMO_DATA && !adminsDb.getAll().some(a => a.role === 'teacher')) {
       adminsDb.create('Богдан Коваль',   'teacher', { hourlyRate: 150, lessonDuration: 60, phone: '+380501234567', notes: 'Веб-розробка, Python' });
       adminsDb.create('Аліна Петренко',  'teacher', { hourlyRate: 130, lessonDuration: 60, phone: '+380671234568', notes: 'Scratch, Roblox' });
       console.log('✅  Seeded 2 test teachers');
@@ -391,7 +400,7 @@ ARTICLES_SEED.forEach(a => {
     if (articlesSeeded) console.log(`✅  Seeded ${articlesSeeded} articles`);
     if (articlesPatched) console.log(`✅  Patched ${articlesPatched} articles (RU translation)`);
 
-    if (!clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
+    if (SEED_DEMO_DATA && !clientsDb.getAll().some(c => c.scheduleDays && c.scheduleDays.length > 0)) {
       [
         { name: 'Марко Тищенко',    age: 10, course: 'scratch', phone: '+380501001001', status: 'active', teacher: 'Аліна Петренко', lessonType: 'group',      scheduleDays: [{day:'1',time:'15:00'},{day:'4',time:'15:00'}], schedule: 'Пн 15:00, Чт 15:00' },
         { name: 'Діана Коваль',     age: 12, course: 'python',  phone: '+380502002002', status: 'active', teacher: 'Богдан Коваль',  lessonType: 'group',      scheduleDays: [{day:'2',time:'16:00'},{day:'5',time:'16:00'}], schedule: 'Вт 16:00, Пт 16:00' },
@@ -1619,6 +1628,9 @@ app.delete('/api/clients/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   const id = parseInt(req.params.id);
   const ok = clientsDb.delete(id);
   if (!ok) return res.status(404).json({ error: 'Not found' });
+  // Revoke the student's lessons link along with them — see deleteByClientId.
+  const revoked = lessonTokensDb.deleteByClientId(id);
+  if (revoked) console.log(`🔒  Revoked ${revoked} lesson token(s) of deleted client #${id}`);
   res.json({ success: true });
 });
 
