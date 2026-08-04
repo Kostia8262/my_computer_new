@@ -1023,7 +1023,11 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
           <span style="font-size:20px">🏠</span>
           <span style="font-size:16px;font-weight:700;color:var(--c-ink)">Головна сторінка</span>
-          <span style="font-size:12px;background:var(--c-brand-50);color:var(--c-brand-500);padding:2px 10px;border-radius:var(--r-pill);font-weight:500">mycomputer.education</span>
+          <!-- Filled by renderSeoTab from the selected site. It used to be a
+               hardcoded string, so on any other site the card claimed you were
+               editing mycomputer.education while the text was being saved
+               somewhere else entirely. -->
+          <span id="seoSiteBadge" style="font-size:12px;background:var(--c-brand-50);color:var(--c-brand-500);padding:2px 10px;border-radius:var(--r-pill);font-weight:500">mycomputer.education</span>
         </div>
         <p style="font-size:var(--fs-sm);color:var(--c-gray-400);margin-bottom:24px">Блок вставляється між секціями сторінки. Прихований від користувачів через CSS, але видимий пошуковим роботам.</p>
 
@@ -6240,7 +6244,15 @@ async function loadSeoTab() {
   } catch(e) { console.error('SEO load error:', e); }
 }
 
+// Same expression saveSeoTexts() uses to build the stored page label, so the
+// badge and what actually gets written can never disagree.
+function _seoSiteLabel() {
+  return apiBase ? apiBase.replace(/^https?:\/\//, '') : 'mycomputer.education';
+}
+
 function renderSeoTab() {
+  const badge = document.getElementById('seoSiteBadge');
+  if (badge) badge.textContent = _seoSiteLabel();
   const main = (_seoData?.pages || []).find(p => p.id === 'main') || {};
   const h = document.getElementById('seo_main_heading');
   const t = document.getElementById('seo_main_text');
@@ -6272,7 +6284,7 @@ function toggleSeoPreview() {
 async function saveSeoTexts() {
   const heading = (document.getElementById('seo_main_heading')?.value || '').trim();
   const text    = (document.getElementById('seo_main_text')?.value    || '').trim();
-  const pages   = [{ id: 'main', label: `Головна сторінка (${apiBase ? apiBase.replace('https://','') : 'mycomputer.education'})`, heading, text }];
+  const pages   = [{ id: 'main', label: `Головна сторінка (${_seoSiteLabel()})`, heading, text }];
   _seoData = { pages };
   const okEl  = document.getElementById('seoSaveOk');
   const errEl = document.getElementById('seoSaveErr');
