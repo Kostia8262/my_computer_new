@@ -319,7 +319,7 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 @media(max-width:520px){.modal-grid{grid-template-columns:1fr}.modal-box{padding:20px}}
 .modal-box h3{font-size:18px;font-weight:800;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
 .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.modal-group{display:flex;flex-direction:column;gap:4px}
+.modal-group{display:flex;flex-direction:column;gap:4px;min-width:0}
 .modal-group.full{grid-column:1/-1}
 .modal-label{font-size:12px;font-weight:600;color:var(--c-gray-500)}
 .modal-input{height:var(--h-control);padding:0 12px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:13px;outline:none;font-family:inherit}
@@ -3126,32 +3126,48 @@ async function createNewPayMonth() {
   const ym = _mpYM();
   if (!await uiConfirm({
     title       : `Створити місяць ${_mpFormatLabel(_mpYear, _mpMonth)}?`,
-    text        : 'До списку буде додано всіх активних учнів із їхніми місячними внесками.',
+    text        : 'До списку буде додано всіх активних учнів і тих, хто на пробному, із їхніми місячними внесками. Ті, хто вже не навчається, у новий місяць не потрапляють — їхні минулі місяці з боргом залишаються без змін.',
     confirmLabel: 'Створити',
     danger      : false
   })) return;
 
-  // Build records from last month or active clients
-  let records = [];
+  // The month is always built from who is a student *right now*. It used to be
+  // built by copying the previous month whenever one existed, consulting the
+  // client list only for the very first month ever. That had two consequences:
+  // someone who churned or paused kept being invoiced every month forever, and
+  // — the expensive one — anybody who enrolled after the last month was created
+  // never appeared at all, so the school simply did not bill them. There is no
+  // "add a client to this month" button and no server-side reconciliation, so
+  // nothing downstream caught it either.
+  if (!_allClients) { showToast('Список клієнтів ще не завантажено', 'error'); return; }
+  const prevById = {};
   if (_mpAllMonths.length > 0) {
-    // Copy from the most recent existing month, reset payment info
     const prevYm = _mpAllMonths[0]; // already sorted desc
-    const res = await fetch(`/api/monthly-payments/${prevYm}`, { headers: { 'x-admin-token': token } });
-    const d = await res.json();
-    records = (d.records || [])
-      .filter(r => r.status !== 'completed') // drop completed students
-      .map(r => ({ ...r, paidAmount: 0, status: 'pending', paidDate: null, method: null, note: '' }));
-  } else {
-    // First month: build from active clients
-    if (!_allClients) return;
-    records = _allClients
-      .filter(c => ['active','trial'].includes(c.status))
-      .map(c => ({
-        clientId: c.id, clientName: c.name,
-        expectedAmount: c.monthlyFee || 0, paidAmount: 0,
-        status: 'pending', paidDate: null, method: null, note: '',
-      }));
+    try {
+      const res = await fetch(`/api/monthly-payments/${prevYm}`, { headers: { 'x-admin-token': token } });
+      const d = await res.json();
+      (d.records || []).forEach(r => { prevById[r.clientId] = r; });
+    } catch { /* no previous month to carry amounts from — fall back to the card */ }
   }
+  const records = _allClients
+    .filter(c => ['active','trial'].includes(c.status))
+    .map(c => {
+      const prev = prevById[c.id];
+      // The card's monthlyFee is the current agreed price and wins. Last month's
+      // amount is only a fallback for a client whose card has no fee set at all,
+      // so a one-off adjustment made in some past month does not follow them
+      // forever. A fee of 0 counts as set — a free trial is a deliberate 0 and
+      // must not silently inherit last month's amount.
+      const fee = c.monthlyFee;
+      const expected = (fee !== null && fee !== undefined && fee !== '')
+        ? (parseFloat(fee) || 0)
+        : (prev ? (parseFloat(prev.expectedAmount) || 0) : 0);
+      return {
+        clientId: c.id, clientName: c.name,
+        expectedAmount: expected, paidAmount: 0,
+        status: 'pending', paidDate: null, method: null, note: '',
+      };
+    });
 
   try {
     const res = await fetch(`/api/monthly-payments/${ym}`, {
