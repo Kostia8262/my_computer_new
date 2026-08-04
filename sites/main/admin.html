@@ -43,13 +43,20 @@
   --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
   /* Radius */
   --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:14px; --r-pill:20px; --r-round:99px;
-  /* Control heights. Every interactive control is pinned to one of these two
-     steps instead of letting padding + border + line box add up to whatever
-     they add up to — that is how the admin ended up with 19.35 / 24.4 / 24.8 /
-     26.6 / 28.4 / 29.2 / 32.25 / 33.6 / 33.85 / 35.6 / 36.4 side by side.
-     36 is the default (toolbars, modal forms, buttons), 24 the compact one
-     (topbar row, table cells, popups). 44 is the login screen only. */
-  --h-control:36px; --h-control-sm:24px; --h-control-lg:44px;
+  /* Control heights. Every interactive control is pinned to one of these steps
+     instead of letting padding + border + line box add up to whatever they add
+     up to — that is how the admin ended up with 19.35 / 24.4 / 24.8 / 26.6 /
+     28.4 / 29.2 / 32.25 / 33.6 / 33.85 / 35.6 / 36.4 side by side.
+       36  default — toolbars, modal forms, buttons
+       28  compact — topbar row, popups; a control standing on its own
+       24  dense   — inside a table row, where controls sit shoulder to shoulder
+                     with 12px text and every pixel of row height is repeated
+                     down the whole table
+       44  the login screen only
+     28 and 24 are deliberately separate: one value cannot serve both a header
+     bar, where the control is alone and wants presence, and a data row, where
+     it must not inflate the row. */
+  --h-control:36px; --h-control-sm:28px; --h-control-xs:24px; --h-control-lg:44px;
   /* Shadow */
   --shadow-sm:0 4px 24px rgba(108,71,255,.12);
   --shadow-md:0 8px 30px rgba(0,0,0,.18);
@@ -109,6 +116,12 @@ a{color:var(--c-brand-500);text-decoration:none}
 .btn-ghost{background:var(--c-brand-50);color:var(--c-brand-600);border:1.5px solid var(--c-brand-100)}.btn-ghost:hover{background:var(--c-brand-100)}
 .btn-danger{background:var(--c-danger-bg);color:#991b1b;border:1.5px solid var(--c-danger-border)}.btn-danger:hover{background:var(--c-danger-border)}
 .btn-sm{height:var(--h-control-sm);padding:0 10px;font-size:12px}
+/* A .btn-sm in a toolbar or the topbar stands on its own and gets the 28px
+   step; the same class inside a table cell sits shoulder to shoulder with
+   .notes-input and .status-sel, so it drops to the dense step and the row does
+   not grow. .btn-xs is for the same situation outside a table — currently the
+   reorder arrows stacked inside a course card. */
+.btn-xs,td .btn-sm{height:var(--h-control-xs)}
 /* Modal close button. As a plain .btn-sm the ✕ rendered 31x23 — narrow, not
    square, and an awkward pointer target. Square it off at 36px. */
 .btn-close{width:36px;height:36px;padding:0;justify-content:center;flex-shrink:0;font-size:14px}
@@ -185,7 +198,7 @@ tr:hover td{background:var(--c-row-hover)}
 .chip{display:inline-flex;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:#f0eeff;color:#6C47FF}
 
 /* STATUS SELECT */
-.status-sel{height:var(--h-control-sm);padding:0 22px 0 8px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:12px;background-color:var(--c-surface);cursor:pointer;outline:none;
+.status-sel{height:var(--h-control-xs);padding:0 22px 0 8px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:12px;background-color:var(--c-surface);cursor:pointer;outline:none;
   appearance:none;-webkit-appearance:none;-moz-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 8px center}
@@ -207,7 +220,7 @@ tr:hover td{background:var(--c-row-hover)}
 .status-sel-icon option{color:var(--c-ink-soft)}
 
 /* NOTES */
-.notes-input{width:100%;height:var(--h-control-sm);padding:0 8px;border:1.5px solid #e0d9ff;border-radius:var(--r-md);font-size:12px;outline:none;min-width:120px}
+.notes-input{width:100%;height:var(--h-control-xs);padding:0 8px;border:1.5px solid #e0d9ff;border-radius:var(--r-md);font-size:12px;outline:none;min-width:120px}
 .notes-input:focus{border-color:#6C47FF}
 /* Setting appearance:textfield on the input itself is not reliably enough in
    Chrome/Edge — the spin-button pseudo-elements need to be targeted directly,
@@ -405,13 +418,13 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
 .pay-alert-title{font-size:13px;font-weight:700;color:var(--c-danger-text);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .pay-alert-names{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
 .pay-alert-badge{background:var(--c-danger-border);padding:2px 9px;border-radius:var(--r-lg);font-size:11px;font-weight:600;color:#991b1b;white-space:nowrap}
-.mp-status-sel{height:var(--h-control-sm);padding:0 7px 0 9px;border-radius:var(--r-md);font-size:12px;font-weight:700;border:1.5px solid transparent;cursor:pointer;outline:none;min-width:120px;box-shadow:inset 3px 0 0 currentColor}
+.mp-status-sel{height:var(--h-control-xs);padding:0 7px 0 9px;border-radius:var(--r-md);font-size:12px;font-weight:700;border:1.5px solid transparent;cursor:pointer;outline:none;min-width:120px;box-shadow:inset 3px 0 0 currentColor}
 .mp-status-pending{background:var(--c-danger-bg);color:var(--c-danger-text);border-color:var(--c-danger-border)}
 .mp-status-paid{background:var(--c-success-bg);color:var(--c-success-text);border-color:var(--c-success-border)}
 .mp-status-partial{background:var(--c-warning-bg);color:var(--c-warning-text);border-color:var(--c-warning-border)}
 .mp-status-waived{background:var(--c-info-bg);color:var(--c-info-text);border-color:var(--c-info-border)}
 .mp-status-completed{background:var(--c-neutral-bg);color:var(--c-neutral-text);border-color:var(--c-neutral-border)}
-.mp-inline{height:var(--h-control-sm);padding:0 7px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:12px;outline:none;background:var(--c-surface);width:100%;min-width:60px}
+.mp-inline{height:var(--h-control-xs);padding:0 7px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:12px;outline:none;background:var(--c-surface);width:100%;min-width:60px}
 .mp-inline:focus{border-color:var(--c-brand-500)}
 .mp-no-month{text-align:center;padding:40px 20px;color:var(--c-gray-500)}
 .mp-no-month h3{font-size:16px;margin-bottom:8px;color:#444}
@@ -3944,8 +3957,8 @@ function renderCoursesGrid() {
     <div style="background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-xl);padding:20px;position:relative">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
         <div style="display:flex;flex-direction:column;gap:2px">
-          <button class="btn btn-ghost btn-sm" style="padding:0 8px" title="Підняти вище" ${i===0?'disabled':''} onclick="reorderCourse('${c.id}','up')">▲</button>
-          <button class="btn btn-ghost btn-sm" style="padding:0 8px" title="Опустити нижче" ${i===_allCourses.length-1?'disabled':''} onclick="reorderCourse('${c.id}','down')">▼</button>
+          <button class="btn btn-ghost btn-sm btn-xs" style="padding:0 8px" title="Підняти вище" ${i===0?'disabled':''} onclick="reorderCourse('${c.id}','up')">▲</button>
+          <button class="btn btn-ghost btn-sm btn-xs" style="padding:0 8px" title="Опустити нижче" ${i===_allCourses.length-1?'disabled':''} onclick="reorderCourse('${c.id}','down')">▼</button>
         </div>
         <div style="width:48px;height:48px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:26px;background:${c.color}22;border:1px solid ${c.color}44">${c.emoji}</div>
         <div style="flex:1">
