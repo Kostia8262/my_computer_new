@@ -1632,6 +1632,16 @@ function parseUkDate(s) {
   return new Date(`${year}-${month}-${day}T${timePart || '00:00:00'}`);
 }
 
+// Same Slavic rule as pluralArticlesRu above, generalised: the alert copy has to
+// decline the noun and the participle together, so each message passes all three
+// forms. Without this every alert read "1 заявок не прозвонені" on the dashboard.
+function plural(n, one, few, many) {
+  const m = n % 10, m100 = n % 100;
+  if (m === 1 && m100 !== 11) return one;
+  if (m >= 2 && m <= 4 && (m100 < 10 || m100 >= 20)) return few;
+  return many;
+}
+
 app.get('/api/alerts', adminLimiter, requireAdmin, (req, res) => {
   const leads   = db.getAllLeads();
   const clients = clientsDb.getAll();
@@ -1650,7 +1660,7 @@ app.get('/api/alerts', adminLimiter, requireAdmin, (req, res) => {
   });
   if (uncontacted.length) alerts.push({
     type: 'leads_uncontacted', severity: 'high', count: uncontacted.length,
-    message: `${uncontacted.length} нових заявок не прозвонені більше 2 годин`,
+    message: `${uncontacted.length} ${plural(uncontacted.length, 'нова заявка не прозвонена', 'нові заявки не прозвонені', 'нових заявок не прозвонені')} більше 2 годин`,
     hint: 'Зателефонуйте негайно — шанс конверсії падає з кожною годиною',
     ids: uncontacted.map(l => l.id), tab: 'leads',
   });
@@ -1663,7 +1673,7 @@ app.get('/api/alerts', adminLimiter, requireAdmin, (req, res) => {
   });
   if (stale.length) alerts.push({
     type: 'leads_stale', severity: 'medium', count: stale.length,
-    message: `${stale.length} заявок без оновлення більше 3 днів`,
+    message: `${stale.length} ${plural(stale.length, 'заявка без оновлення', 'заявки без оновлення', 'заявок без оновлення')} більше 3 днів`,
     hint: 'Перенабрати — можливо, клієнт передумав або забув',
     ids: stale.map(l => l.id), tab: 'leads',
   });
@@ -1676,7 +1686,7 @@ app.get('/api/alerts', adminLimiter, requireAdmin, (req, res) => {
   });
   if (trialPending.length) alerts.push({
     type: 'leads_trial_pending', severity: 'medium', count: trialPending.length,
-    message: `${trialPending.length} пробних уроків не завершено записом`,
+    message: `${trialPending.length} ${plural(trialPending.length, 'пробний урок не завершено', 'пробні уроки не завершено', 'пробних уроків не завершено')} записом`,
     hint: 'З\'ясуйте результат пробного уроку та запропонуйте запис',
     ids: trialPending.map(l => l.id), tab: 'leads',
   });
@@ -1688,7 +1698,7 @@ app.get('/api/alerts', adminLimiter, requireAdmin, (req, res) => {
   });
   if (overdueClients.length) alerts.push({
     type: 'clients_overdue', severity: 'medium', count: overdueClients.length,
-    message: `${overdueClients.length} клієнтів — прострочений дзвінок`,
+    message: `${overdueClients.length} ${plural(overdueClients.length, 'клієнт із простроченим дзвінком', 'клієнти із простроченим дзвінком', 'клієнтів із простроченим дзвінком')}`,
     hint: 'Дата наступного контакту вже минула — зателефонуйте сьогодні',
     ids: overdueClients.map(c => c.id), tab: 'clients',
   });
@@ -1701,7 +1711,7 @@ app.get('/api/alerts', adminLimiter, requireAdmin, (req, res) => {
   });
   if (longPaused.length) alerts.push({
     type: 'clients_paused', severity: 'low', count: longPaused.length,
-    message: `${longPaused.length} клієнтів на паузі більше 30 днів`,
+    message: `${longPaused.length} ${plural(longPaused.length, 'клієнт на паузі', 'клієнти на паузі', 'клієнтів на паузі')} більше 30 днів`,
     hint: 'Нагадайте про себе — після відпустки або канікул добре "утеплити" контакт',
     ids: longPaused.map(c => c.id), tab: 'clients',
   });
