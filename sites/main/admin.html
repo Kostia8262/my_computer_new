@@ -657,7 +657,10 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
         <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
           <div style="flex:2;min-width:180px">
             <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--c-gray-500)">Ім'я</label>
-            <input id="newAdminName" class="search" placeholder="Наприклад: Ірина" style="margin:0"/>
+            <!-- width:100% because .search sizes itself with flex:1, which does
+                 nothing here — this wrapper is a plain block, so without it the
+                 field stayed at its 200px min-width inside a 643px column. -->
+            <input id="newAdminName" class="search" placeholder="Наприклад: Ірина" style="margin:0;width:100%"/>
           </div>
           <div style="flex:1;min-width:160px">
             <label style="display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--c-gray-500)">Роль</label>
@@ -669,7 +672,7 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
           </div>
           <div style="display:flex;gap:8px;flex-shrink:0">
             <button class="btn btn-primary" onclick="createAdmin()">Створити</button>
-            <button class="btn btn-ghost" onclick="document.getElementById('createAdminForm').style.display='none'">✕</button>
+            <button class="btn btn-ghost btn-close" onclick="document.getElementById('createAdminForm').style.display='none'" aria-label="Закрити форму" title="Закрити форму">✕</button>
           </div>
         </div>
         <div id="roleHint" style="margin-top:12px;padding:10px 14px;background:var(--c-border-faint);border-radius:var(--r-md);font-size:12px;color:var(--c-gray-500)">
@@ -2349,7 +2352,7 @@ async function renderAdmins() {
     const list = data.admins || [];
     const tbody = document.getElementById('adminsBody');
     if (!list.length) {
-      tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:40px 20px">Адмінів поки немає. Натисніть «+ Додати адміна».</div></td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6"><div class="empty" style="padding:40px 20px">Співробітників поки немає. Натисніть «+ Додати співробітника».</div></td></tr>`;
       return;
     }
     tbody.innerHTML = list.map(a => {
