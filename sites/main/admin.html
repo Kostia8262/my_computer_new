@@ -188,6 +188,19 @@ table{width:100%;border-collapse:collapse;font-size:var(--fs-md)}
 th{padding:12px 14px;text-align:left;font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--c-gray-500);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--c-border-soft);white-space:nowrap}
 td{padding:12px 14px;border-bottom:1px solid var(--c-border-faint);vertical-align:middle}
 td.td-tight,th.td-tight{padding:8px 4px}
+/* Lesson access table. With the global width:100% the browser stretched the six
+   columns to fill the card and landed on 81.9 / 285.5 / 220.2 / 199 / 330.6 /
+   55.1 — every vertical rule on a fractional pixel. Sizing the columns from
+   their content instead keeps all six on whole numbers; the wrapper hugs the
+   table so no empty card is left to the right of it. */
+.lessons-wrap{width:max-content;max-width:100%}
+.lessons-table{width:820px;table-layout:fixed}
+.lessons-table col:nth-child(1){width:60px}
+.lessons-table col:nth-child(2){width:220px}
+.lessons-table col:nth-child(3){width:200px}
+.lessons-table col:nth-child(4){width:100px}
+.lessons-table col:nth-child(5){width:180px}
+.lessons-table col:nth-child(6){width:60px}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--c-row-hover)}
 .phone-link{color:var(--c-ink);font-weight:600}
@@ -1309,8 +1322,9 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
       <div class="toolbar" style="margin-bottom:16px">
         <button class="btn btn-primary btn-sm" onclick="openLtModal()">➕ Додати токен</button>
       </div>
-      <div class="table-wrap">
-        <table id="lessonsTable" style="min-width:720px">
+      <div class="table-wrap lessons-wrap">
+        <table id="lessonsTable" class="lessons-table">
+          <colgroup><col/><col/><col/><col/><col/><col/></colgroup>
           <thead><tr><th>№</th><th>Ім'я</th><th>Посилання</th><th>Активний</th><th>Востаннє заходив</th><th></th></tr></thead>
           <tbody id="lessonsTableBody"></tbody>
         </table>
