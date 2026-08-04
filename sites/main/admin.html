@@ -1199,9 +1199,9 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
         <!-- Month navigation bar -->
         <div class="pay-month-bar">
           <div class="pay-month-nav">
-            <button class="btn btn-ghost btn-sm btn-nav" onclick="changePayMonth(-1)" aria-label="Попередній місяць" title="Попередній місяць"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" aria-hidden="true"><path d="M5 1 1 5l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="btn btn-ghost btn-sm btn-nav" onclick="changePayMonth(-1)" aria-label="Попередній місяць" title="Попередній місяць"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7 3 4 6l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <span class="pay-month-label" id="payMonthLabel">—</span>
-            <button class="btn btn-ghost btn-sm btn-nav" onclick="changePayMonth(1)" aria-label="Наступний місяць" title="Наступний місяць"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" aria-hidden="true"><path d="m1 1 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="btn btn-ghost btn-sm btn-nav" onclick="changePayMonth(1)" aria-label="Наступний місяць" title="Наступний місяць"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m5 3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
           <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <select class="filter-select" id="payMonthDropdown" onchange="jumpToPayMonth(this.value)" style="min-width:160px">
@@ -1274,9 +1274,9 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
             </select>
           </div>
           <div class="att-month-nav">
-            <button class="btn btn-ghost btn-sm btn-nav" onclick="changeAttMonth(-1)" aria-label="Попередній місяць" title="Попередній місяць"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" aria-hidden="true"><path d="M5 1 1 5l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="btn btn-ghost btn-sm btn-nav" onclick="changeAttMonth(-1)" aria-label="Попередній місяць" title="Попередній місяць"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7 3 4 6l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <span class="att-month-label" id="attMonthLabel">Червень 2026</span>
-            <button class="btn btn-ghost btn-sm btn-nav" onclick="changeAttMonth(1)" aria-label="Наступний місяць" title="Наступний місяць"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" aria-hidden="true"><path d="m1 1 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="btn btn-ghost btn-sm btn-nav" onclick="changeAttMonth(1)" aria-label="Наступний місяць" title="Наступний місяць"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m5 3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
           <button class="btn btn-ghost btn-sm" style="display:none" onclick="loadAttendance()">🔄 Оновити</button>
           <button class="btn btn-ghost btn-sm" style="display:none" onclick="exportAttendanceCSV()">📥 CSV</button>
@@ -1306,9 +1306,9 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
             </select>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <button class="btn btn-ghost btn-sm btn-nav" onclick="changeSchedWeek(-1)" aria-label="Попередній тиждень" title="Попередній тиждень"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" aria-hidden="true"><path d="M5 1 1 5l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="btn btn-ghost btn-sm btn-nav" onclick="changeSchedWeek(-1)" aria-label="Попередній тиждень" title="Попередній тиждень"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M7 3 4 6l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <span id="schedWeekLabel" style="font-size:13px;font-weight:600;min-width:160px;text-align:center;white-space:nowrap">—</span>
-            <button class="btn btn-ghost btn-sm btn-nav" onclick="changeSchedWeek(1)" aria-label="Наступний тиждень" title="Наступний тиждень"><svg width="6" height="10" viewBox="0 0 6 10" fill="none" aria-hidden="true"><path d="m1 1 4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="btn btn-ghost btn-sm btn-nav" onclick="changeSchedWeek(1)" aria-label="Наступний тиждень" title="Наступний тиждень"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m5 3 3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
             <button class="btn btn-ghost btn-sm" onclick="goToCurrentSchedWeek()" title="Поточний тиждень" style="font-size:11px">Сьогодні</button>
           </div>
         </div>
@@ -3982,8 +3982,8 @@ function renderCoursesGrid() {
     <div style="background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-xl);padding:20px;position:relative">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
         <div style="display:flex;flex-direction:column;gap:2px">
-          <button class="btn btn-ghost btn-sm btn-xs" style="padding:0 8px" title="Підняти вище" ${i===0?'disabled':''} onclick="reorderCourse('${c.id}','up')">▲</button>
-          <button class="btn btn-ghost btn-sm btn-xs" style="padding:0 8px" title="Опустити нижче" ${i===_allCourses.length-1?'disabled':''} onclick="reorderCourse('${c.id}','down')">▼</button>
+          <button class="btn btn-ghost btn-sm btn-xs btn-nav" title="Підняти вище" aria-label="Підняти вище" ${i===0?'disabled':''} onclick="reorderCourse('${c.id}','up')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 7.5 6 4.5l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button class="btn btn-ghost btn-sm btn-xs btn-nav" title="Опустити нижче" aria-label="Опустити нижче" ${i===_allCourses.length-1?'disabled':''} onclick="reorderCourse('${c.id}','down')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="m3 4.5 3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         </div>
         <div style="width:48px;height:48px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;font-size:26px;background:${c.color}22;border:1px solid ${c.color}44">${c.emoji}</div>
         <div style="flex:1">
