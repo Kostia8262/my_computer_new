@@ -109,6 +109,11 @@ a{color:var(--c-brand-500);text-decoration:none}
    plainly visible wherever a Save and a Cancel stand side by side. */
 .btn{height:var(--h-control);padding:0 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;line-height:1.25;cursor:pointer;border:1.5px solid transparent;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
 .btn:active{transform:scale(.97)}
+/* Icons inside buttons are SVG on currentColor, so they take the button's own
+   text colour — an emoji glyph is painted by the font and stays black whatever
+   the button underneath it is. display:block keeps the glyph off the text
+   baseline, which would otherwise pad the flex line. */
+.btn svg{display:block;flex-shrink:0}
 .btn-primary{background:linear-gradient(135deg,#8465ff,#6C47FF);color:#fff;box-shadow:0 2px 8px rgba(108,71,255,.28)}.btn-primary:hover{background:linear-gradient(135deg,#9078ff,#5533EE);box-shadow:0 4px 14px rgba(108,71,255,.4)}
 /* Ghost and danger labels use the darker step of their family: on hover the
    background steps up to --c-brand-100 / --c-danger-border, and the lighter
@@ -131,7 +136,6 @@ a{color:var(--c-brand-500);text-decoration:none}
    Square the box and draw the chevron as an SVG at the same 1.5px round-capped
    stroke the select arrow already uses. */
 .btn-nav{width:var(--h-control-sm);height:var(--h-control-sm);padding:0;flex-shrink:0}
-.btn-nav svg{display:block}
 /* Disabled buttons used to be visually identical to active ones — same fill,
    same border, even cursor:pointer — so there was no way to tell that the
    reorder arrows on the first/last course, or the login button mid-request,
@@ -1320,7 +1324,7 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
 
     <div id="lessonsTab" style="display:none">
       <div class="toolbar" style="margin-bottom:16px">
-        <button class="btn btn-primary btn-sm" onclick="openLtModal()">➕ Додати токен</button>
+        <button class="btn btn-primary btn-sm" onclick="openLtModal()"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2.5v7M2.5 6h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Додати токен</button>
       </div>
       <div class="table-wrap lessons-wrap">
         <table id="lessonsTable" class="lessons-table">
@@ -2506,7 +2510,7 @@ async function loadLessonsTab() {
 function ltTokenCellsHtml(t, clientId, clientName) {
   if (!t) {
     return clientId != null
-      ? `<td colspan="4"><button class="btn btn-primary btn-sm" onclick="createLessonTokenForClient(${clientId}, '${escHtmlAdmin(clientName).replace(/'/g, "\\'")}')">➕ Видати доступ</button></td>`
+      ? `<td colspan="4"><button class="btn btn-primary btn-sm" onclick="createLessonTokenForClient(${clientId}, '${escHtmlAdmin(clientName).replace(/'/g, "\\'")}')"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 2.5v7M2.5 6h7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Видати доступ</button></td>`
       : '<td colspan="4" style="color:var(--c-muted)">токен не видано</td>';
   }
   const link = `${location.origin}/lessons?token=${t.token}`;
