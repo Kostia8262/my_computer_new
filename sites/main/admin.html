@@ -80,7 +80,19 @@ a{color:var(--c-brand-500);text-decoration:none}
 .topbar-left{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px;color:#fff;min-width:0}
 #panelTitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .topbar-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
-.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+/* Every control in this row is pinned to one height. 28px is what .btn.btn-sm
+   already works out to (5+5 padding + 15 line box + 1.5+1.5 border), so the
+   buttons keep their size and only the search field comes down to meet them —
+   it used to run 3px taller on its own 6px/13px rhythm. Border-radius is 8px on
+   both already, so nothing to reconcile there. */
+.topbar-right > .btn{height:28px}
+.topbar .gs-input{height:28px;padding:0 12px}
+/* line-height is pinned because emoji glyphs fall back to a font with taller
+   metrics: under line-height:normal a button with an emoji rendered ~1.6px
+   taller (MD) / ~0.8px taller (SM) than the same button without one, which is
+   why the topbar row had ragged tops. Unitless so the ratio still holds for the
+   handful of buttons that override font-size inline. */
+.btn{padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;line-height:1.25;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
 .btn:active{transform:scale(.97)}
 .btn-primary{background:linear-gradient(135deg,#8465ff,#6C47FF);color:#fff;box-shadow:0 2px 8px rgba(108,71,255,.28)}.btn-primary:hover{background:linear-gradient(135deg,#9078ff,#5533EE);box-shadow:0 4px 14px rgba(108,71,255,.4)}
 /* Ghost and danger labels use the darker step of their family: on hover the
