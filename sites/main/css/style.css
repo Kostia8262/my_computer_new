@@ -1095,7 +1095,9 @@ body.modal-open{overflow:hidden}
 }
 
 @media(max-width:768px){
-  .articles-section{padding:56px 0}
+  /* селектор был .articles-section — такого класса нет, поэтому секция статей
+     оставалась с десктопным padding 80px, когда все соседние ужимались до 56 */
+  .articles{padding:56px 0}
   .articles__slider{gap:16px;padding-bottom:8px;-webkit-overflow-scrolling:touch}
   .article-card{width:300px}
   .articles__pagination{display:none}
