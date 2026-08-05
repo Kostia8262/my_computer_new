@@ -31,6 +31,17 @@
   --c-trial-bg:#f0e8ff; --c-trial-border:#c4b5fd; --c-trial-text:#7c3aed; --c-trial-solid:#a855f7;
   --c-done-bg:#f0fdf4; --c-done-border:#bbf7d0; --c-done-text:#166534; --c-done-solid:#16a34a;
   --c-neutral-bg:#f5f5f5; --c-neutral-border:#e0e0e0; --c-neutral-text:#5f5f6b; --c-neutral-solid:#9ca3af;
+  /* Emphatic steps of the semantic families. The dashboard alert cards need a
+     border and a body text one notch stronger than the badge-sized defaults
+     above, because they sit on a tinted panel rather than on white. */
+  --c-danger-border-strong:#fca5a5; --c-success-border-strong:#86efac;
+  --c-warning-text-strong:#92400e;
+  /* Chart series. Deliberately a separate scale from the semantic families: a
+     Roblox bar is red because Roblox is red, not because anything is wrong, and
+     tying it to --c-danger-solid would make every future palette tweak to
+     "danger" silently repaint the course chart. */
+  --c-chart-amber:#f59e0b; --c-chart-blue:#3b82f6; --c-chart-red:#ef4444;
+  --c-chart-violet:#8b5cf6; --c-chart-slate:#94a3b8;
   /* Dark shell (sidebar + topbar chrome) — same dark motif already used by
      .client-subtabs/.cms-subtabs, extended to the app's primary navigation. */
   --c-shell-bg:#181527; --c-shell-bg-alt:#211c33; --c-shell-border:rgba(255,255,255,.08);
@@ -5000,7 +5011,7 @@ function dashKpi(icon, value, label, color, sub) {
 function dashBar(label, val, maxVal, color) {
   const pct = maxVal > 0 ? Math.round(val / maxVal * 100) : 0;
   return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
-    <div style="min-width:90px;font-size:12px;color:#555;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</div>
+    <div style="min-width:90px;font-size:12px;color:var(--c-gray-500);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</div>
     <div style="flex:1;background:var(--c-brand-50);border-radius:4px;height:18px">
       <div style="background:${color||'var(--c-brand-500)'};border-radius:4px;height:100%;width:${pct}%;min-width:${val>0?4:0}px;transition:width .5s"></div>
     </div>
@@ -5061,18 +5072,18 @@ async function loadDashboardTab() {
         alertsEl.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px;margin-bottom:4px">` +
           all.map(a => {
             const isHigh = a.severity === 'high';
-            return `<div style="background:${isHigh?'#fff5f5':'#fffbeb'};border:2px solid ${isHigh?'#fca5a5':'var(--c-warning-border)'};border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
+            return `<div style="background:${isHigh?'var(--c-danger-bg)':'var(--c-warning-bg)'};border:2px solid ${isHigh?'var(--c-danger-border-strong)':'var(--c-warning-border)'};border-radius:var(--r-lg);padding:14px 16px;display:flex;gap:12px;align-items:flex-start">
               <span style="font-size:20px;flex-shrink:0">${isHigh?'🚨':'⚠️'}</span>
               <div style="flex:1;min-width:0">
-                <div style="font-weight:700;font-size:13px;color:${isHigh?'var(--c-danger-text)':'#92400e'};margin-bottom:3px">${esc(a.message)}</div>
-                <div style="font-size:11px;color:#666;line-height:1.4">${esc(a.hint)}</div>
+                <div style="font-weight:700;font-size:13px;color:${isHigh?'var(--c-danger-text)':'var(--c-warning-text-strong)'};margin-bottom:3px">${esc(a.message)}</div>
+                <div style="font-size:11px;color:var(--c-gray-500);line-height:1.4">${esc(a.hint)}</div>
                 ${a.count ? `<div style="font-size:11px;font-weight:700;color:${isHigh?'var(--c-danger-text)':'var(--c-warning-text)'};margin-top:4px">${a.count} ${a.type.includes('lead') ? plural(a.count,'заявка','заявки','заявок') : plural(a.count,'клієнт','клієнти','клієнтів')}</div>` : ''}
               </div>
               <button class="btn btn-ghost btn-sm" onclick="showTab('${a.tab}')" style="flex-shrink:0;white-space:nowrap">→</button>
             </div>`;
           }).join('') + '</div>';
       } else {
-        alertsEl.innerHTML = `<div style="background:var(--c-done-bg);border:1.5px solid #86efac;border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:var(--c-success-text);margin-bottom:4px">✅ Критичних проблем немає — всі заявки оброблено, прострочень не виявлено</div>`;
+        alertsEl.innerHTML = `<div style="background:var(--c-done-bg);border:1.5px solid var(--c-success-border-strong);border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:var(--c-success-text);margin-bottom:4px">✅ Критичних проблем немає — всі заявки оброблено, прострочень не виявлено</div>`;
       }
     }
 
@@ -5091,12 +5102,12 @@ async function loadDashboardTab() {
         });
         if (overdue.length) {
           lateEl.innerHTML = `
-            <div style="background:#fff5f5;border:2px solid #fca5a5;border-radius:var(--r-xl);padding:20px">
+            <div style="background:var(--c-danger-bg);border:2px solid var(--c-danger-border-strong);border-radius:var(--r-xl);padding:20px">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
                 <span style="font-size:22px">🚨</span>
                 <div>
                   <div style="font-size:14px;font-weight:800;color:var(--c-danger-text)">Прострочені оплати — сьогодні ${dayOfMonth} число</div>
-                  <div style="font-size:12px;color:#b91c1c;margin-top:2px">${overdue.length} ${plural(overdue.length,'учень не сплатив','учні не сплатили','учнів не сплатили')} після 10-го числа</div>
+                  <div style="font-size:12px;color:var(--c-danger-text);margin-top:2px">${overdue.length} ${plural(overdue.length,'учень не сплатив','учні не сплатили','учнів не сплатили')} після 10-го числа</div>
                 </div>
               </div>
               <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px">
@@ -5114,10 +5125,10 @@ async function loadDashboardTab() {
               <div style="margin-top:12px;font-size:12px;color:var(--c-gray-500)">Загальна сума боргу: <strong style="color:var(--c-danger-text)">${overdue.reduce((s,r)=>s+Math.max(0,(parseFloat(r.expectedAmount)||0)-(parseFloat(r.paidAmount)||0)),0).toLocaleString('uk-UA')} ₴</strong></div>
             </div>`;
         } else {
-          lateEl.innerHTML = `<div style="background:var(--c-done-bg);border:1.5px solid #86efac;border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:var(--c-success-text);margin-bottom:4px">✅ Після 10-го числа — всі учні сплатили цей місяць</div>`;
+          lateEl.innerHTML = `<div style="background:var(--c-done-bg);border:1.5px solid var(--c-success-border-strong);border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:var(--c-success-text);margin-bottom:4px">✅ Після 10-го числа — всі учні сплатили цей місяць</div>`;
         }
       } else {
-        lateEl.innerHTML = `<div style="background:#fffbeb;border:1.5px solid var(--c-warning-border);border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:#92400e">⏳ Термін оплати до 10-го числа. Сьогодні ${dayOfMonth}-е — ще ${10 - dayOfMonth} дн. до дедлайну</div>`;
+        lateEl.innerHTML = `<div style="background:var(--c-warning-bg);border:1.5px solid var(--c-warning-border);border-radius:var(--r-lg);padding:12px 16px;font-size:13px;font-weight:600;color:var(--c-warning-text-strong)">⏳ Термін оплати до 10-го числа. Сьогодні ${dayOfMonth}-е — ще ${10 - dayOfMonth} дн. до дедлайну</div>`;
       }
     }
 
@@ -5206,7 +5217,7 @@ async function loadDashboardTab() {
       // read as "N unprocessed this week", which it never was.
       dashKpi('📥', unprocessed, 'Необроблені заявки', unprocessed > 0 ? 'var(--c-danger-text)' : 'var(--c-success-text)', `${newLeadsWeek} ${plural(newLeadsWeek,'нова','нові','нових')} за тиждень`),
       dashKpi('📈', `${convRate}%`, 'Конверсія в учні', convRate >= 30 ? 'var(--c-success-text)' : convRate >= 15 ? 'var(--c-warning-text)' : 'var(--c-danger-text)', `${enrolledLeads} з ${totalLeads} заявок`),
-      dashKpi('🎂', validAges.length ? avgAge.toFixed(1) : '—', 'Середній вік дитини', '#0891b2', validAges.length ? `за ${validAges.length} учнями` : 'немає даних про вік'),
+      dashKpi('🎂', validAges.length ? avgAge.toFixed(1) : '—', 'Середній вік дитини', 'var(--c-info-text)', validAges.length ? `за ${validAges.length} учнями` : 'немає даних про вік'),
       dashKpi('⏳', withEnroll.length ? avgLifetimeMonths.toFixed(1) + ' міс.' : '—', 'Лайфтайм учня', 'var(--c-brand-700)', withEnroll.length ? `за ${withEnroll.length} учнями` : 'немає дати запису'),
     ].join('');
 
@@ -5263,11 +5274,13 @@ async function loadDashboardTab() {
         const tx1 = trendPts[0].x,  ty1 = tSlope * tx1 + tInt;
         const tx2 = trendPts[5].x,  ty2 = tSlope * tx2 + tInt;
         const dots = trendPts.map(p =>
-          `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.2" fill="#f59e0b" opacity="0.9"/>`
+          // var() is substituted for CSS properties, not for SVG presentation
+          // attributes, so the series colour has to go through style="".
+          `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.2" style="fill:var(--c-chart-amber)" opacity="0.9"/>`
         ).join('');
         trendSvg = `<svg style="position:absolute;top:0;left:0;width:100%;height:130px;pointer-events:none" viewBox="0 0 100 130" preserveAspectRatio="none">
           <line x1="${tx1.toFixed(1)}" y1="${ty1.toFixed(1)}" x2="${tx2.toFixed(1)}" y2="${ty2.toFixed(1)}"
-                stroke="#f59e0b" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.85"/>
+                style="stroke:var(--c-chart-amber)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.85"/>
           ${dots}
         </svg>`;
       }
@@ -5281,7 +5294,7 @@ async function loadDashboardTab() {
         `<div style="display:flex;gap:12px;margin-top:8px;font-size:10px;color:var(--c-gray-500)">
           <span><span style="display:inline-block;width:10px;height:10px;background:var(--c-brand-100);border-radius:2px;margin-right:4px"></span>Очікувано</span>
           <span><span style="display:inline-block;width:10px;height:10px;background:var(--c-brand-500);border-radius:2px;margin-right:4px"></span>Зібрано</span>
-          <span><span style="display:inline-block;width:20px;height:2px;background:#f59e0b;border-radius:1px;margin-right:4px;vertical-align:middle"></span>Тренд</span>
+          <span><span style="display:inline-block;width:20px;height:2px;background:var(--c-chart-amber);border-radius:1px;margin-right:4px;vertical-align:middle"></span>Тренд</span>
         </div>`;
     }
 
@@ -5293,7 +5306,7 @@ async function loadDashboardTab() {
         courseCounts[k] = (courseCounts[k] || 0) + 1;
       });
       const maxC = Math.max(1, ...Object.values(courseCounts));
-      const COLORS = { scratch:'#f59e0b', python:'#3b82f6', roblox:'#ef4444', web:'#8b5cf6', other:'#94a3b8' };
+      const COLORS = { scratch:'var(--c-chart-amber)', python:'var(--c-chart-blue)', roblox:'var(--c-chart-red)', web:'var(--c-chart-violet)', other:'var(--c-chart-slate)' };
       courseChEl.innerHTML = Object.entries(courseCounts)
         .sort((a,b) => b[1]-a[1])
         .map(([k,v]) => dashBar(COURSE_LABELS[k]||k, v, maxC, COLORS[k]||'var(--c-brand-500)'))
@@ -5306,7 +5319,7 @@ async function loadDashboardTab() {
       // Wording follows STATUS_LABELS so the funnel and the leads table name the
       // same stage the same way — it said "Зв'язались" and "Відмовили" here.
       const STATUS_LABELS2 = { new:'Нові', contacted:'Зв\'язалися', trial_scheduled:'Пробний', enrolled:'Записані', rejected:'Відмова' };
-      const STATUS_COLORS  = { new:'#3b82f6', contacted:'#f59e0b', trial_scheduled:'#8b5cf6', enrolled:'var(--c-success-text)', rejected:'var(--c-danger-text)' };
+      const STATUS_COLORS  = { new:'var(--c-chart-blue)', contacted:'var(--c-chart-amber)', trial_scheduled:'var(--c-chart-violet)', enrolled:'var(--c-success-text)', rejected:'var(--c-danger-text)' };
       const counts = {};
       leads.forEach(l => { counts[l.status] = (counts[l.status]||0)+1; });
       const maxL = Math.max(1, ...Object.values(counts));
@@ -5334,22 +5347,22 @@ async function loadDashboardTab() {
         const clientMap = {};
         clients.forEach(c => { clientMap[c.id] = c; });
         unpaidEl.innerHTML = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
-          <thead><tr style="background:#fff5f5">
-            <th style="text-align:left;padding:8px 12px;border-bottom:2px solid #fecaca;color:var(--c-danger-text);font-size:11px;text-transform:uppercase">⚠️ Учень</th>
-            <th style="text-align:left;padding:8px 12px;border-bottom:2px solid #fecaca;color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Курс</th>
+          <thead><tr style="background:var(--c-danger-bg)">
+            <th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--c-danger-border);color:var(--c-danger-text);font-size:11px;text-transform:uppercase">⚠️ Учень</th>
+            <th style="text-align:left;padding:8px 12px;border-bottom:2px solid var(--c-danger-border);color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Курс</th>
             <!-- The cell below prints expectedAmount minus paidAmount, i.e. what
                  is still owed, so the header has to say so. Labelled "Ціна
                  навчання" it silently understated the tuition for anyone who had
                  paid part of it. -->
-            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Борг</th>
-            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid #fecaca;color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Телефон</th>
-            <th style="padding:8px 12px;border-bottom:2px solid #fecaca"></th>
+            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid var(--c-danger-border);color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Борг</th>
+            <th style="text-align:right;padding:8px 12px;border-bottom:2px solid var(--c-danger-border);color:var(--c-danger-text);font-size:11px;text-transform:uppercase">Телефон</th>
+            <th style="padding:8px 12px;border-bottom:2px solid var(--c-danger-border)"></th>
           </tr></thead>
           <tbody>
           ${unpaid.map(r => {
             const cl = clientMap[r.clientId] || {};
             const courseLabel = COURSE_LABELS[cl.course || ''] || cl.course || '—';
-            return `<tr style="border-bottom:1px solid #fef2f2">
+            return `<tr style="border-bottom:1px solid var(--c-danger-bg)">
               <td style="padding:10px 12px;font-weight:600">${esc(r.clientName || cl.name || '—')}</td>
               <td style="padding:10px 12px"><span class="chip">${courseLabel}</span></td>
               <td style="padding:10px 12px;font-weight:700;color:var(--c-danger-text);text-align:right">${Math.max(0,(parseFloat(r.expectedAmount)||0)-(parseFloat(r.paidAmount)||0)).toLocaleString('uk-UA')} ₴</td>
@@ -5366,7 +5379,7 @@ async function loadDashboardTab() {
 
   } catch(e) {
     console.error('Dashboard error:', e);
-    if (financialsEl) financialsEl.innerHTML = '<div style="color:#e53e3e;padding:20px;font-size:13px">⚠️ Помилка завантаження дашборду. Перевірте консоль.</div>';
+    if (financialsEl) financialsEl.innerHTML = '<div style="color:var(--c-danger-text);padding:20px;font-size:13px">⚠️ Помилка завантаження дашборду. Перевірте консоль.</div>';
   }
 }
 
@@ -5673,6 +5686,10 @@ function renderSchedule() {
 function _teacherColor(name) {
   // Values are consumed as raw hex with an appended alpha suffix (e.g. `${color}22`)
   // for the translucent card backgrounds below — must stay literal hex, not var().
+  // `var(--x)22` is not a colour: string concatenation happens before CSS sees the
+  // value, so the browser drops the declaration and the card loses its tint. This
+  // is the one place in the file that is deliberately exempt from the token scale;
+  // the values mirror --c-brand-500 / --c-info-text / --c-warning-text / --c-brand-700.
   const palette = ['#6C47FF','#2563eb','#15803d','#b45309','#dc2626','#7c3aed','#0891b2'];
   let h = 0;
   for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
