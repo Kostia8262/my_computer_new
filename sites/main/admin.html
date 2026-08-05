@@ -286,6 +286,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
      search stays reachable through each tab's own filter bar. */
   #panelTitle,#roleBadge{display:none}
   .topbar .gs-wrap{display:none}
+  /* The site selector moves in here at 900px and needs ~132px. On the leads tab
+     the three export buttons are also present, and at 390 the row then wants
+     431px against 362 available — the bar scrolled. Export is the least urgent
+     thing to do from a phone, and knowing which site you are editing is the most
+     urgent, so export steps aside at this width the same way search already does
+     one line above. Both remain available from 600px up. */
+  #xlsxExportBtn,#csvExportBtn,#csvImportBtn{display:none !important}
 }
 
 /* ALERTS PANEL */
