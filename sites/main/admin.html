@@ -291,6 +291,14 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   th,td{padding:9px 10px}
   .cms-grid2{grid-template-columns:1fr}
   .cms-features-row{grid-template-columns:1fr}
+  /* The four client sub-tabs are flex:1, and flex items do not shrink below
+     their content (min-width:auto), so at 390px the bar wanted 352px inside a
+     304px card and simply spilled past its rounded edge. Scroll it instead —
+     the same answer the wide tables already use. .cms-subtabs needs none of
+     this: it is inline-flex with flex-wrap:wrap and wraps on its own. */
+  .client-subtabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .client-subtabs::-webkit-scrollbar{display:none}
+  .csub-btn{flex:0 0 auto;white-space:nowrap}
 }
 @media(max-width:600px){
   /* Last resort: the title, the role chip and the global search step aside —
