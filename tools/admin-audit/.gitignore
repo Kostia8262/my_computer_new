@@ -1,0 +1,11 @@
+# Токены тестовых сотрудников, создаются setup.js
+tokens.json
+
+# Боевой админский токен для prod-ui-check.js — никогда не коммитить
+prod-token.txt
+
+# Результаты прогонов и скриншоты
+report-*.json
+phase3-state.json
+shots/
+shots-prod/
