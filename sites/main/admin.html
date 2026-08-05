@@ -370,11 +370,13 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
   padding:5px;border-radius:var(--r-xl);
   box-shadow:0 6px 20px rgba(20,14,40,.28),inset 0 1px 0 rgba(255,255,255,.05);
 }
+/* Segmented switch, so it sits on the same height step as every other control.
+   Left to padding + line box it measured 37.6 — a fraction nobody chose. */
 .csub-btn{
-  flex:1;padding:10px 12px;border-radius:var(--r-md);font-size:13px;font-weight:600;
+  flex:1;height:var(--h-control);padding:0 12px;border-radius:var(--r-md);font-size:13px;font-weight:600;
   cursor:pointer;border:none;background:transparent;color:#9089b3;
   transition:color .18s ease,background .18s ease,transform .1s ease,box-shadow .18s ease;
-  text-align:center;
+  display:inline-flex;align-items:center;justify-content:center;
 }
 .csub-btn:hover:not(.active){background:rgba(255,255,255,.07);color:#e3dffc}
 .csub-btn:active{transform:scale(.97)}
@@ -499,10 +501,12 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
   padding:5px;border-radius:var(--r-xl);
   box-shadow:0 6px 20px rgba(20,14,40,.28),inset 0 1px 0 rgba(255,255,255,.05);
 }
+/* Same switch, same step — it measured 35.6 before. */
 .cms-subtab{
-  padding:9px 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;
+  height:var(--h-control);padding:0 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;
   cursor:pointer;border:none;background:transparent;color:#9089b3;
   transition:color .18s ease,background .18s ease,transform .1s ease,box-shadow .18s ease;
+  display:inline-flex;align-items:center;justify-content:center;
 }
 .cms-subtab:hover:not(.active){background:rgba(255,255,255,.07);color:#e3dffc}
 .cms-subtab:active{transform:scale(.97)}
