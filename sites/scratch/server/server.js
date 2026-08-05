@@ -1454,10 +1454,12 @@ app.get('/api/content', (req, res) => {
   res.json(loadContent());
 });
 
-// Admin: update a section (pricing | faq | courses | modules)
+// Admin: update a section (pricing | faq | courses | modules | seo)
 app.put('/api/content/:section', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { section } = req.params;
-  const allowed = ['pricing', 'faq', 'courses', 'modules'];
+  // 'seo' was missing here while GET /api/content returns it: the admin panel
+  // showed the SEO fields filled in, then failed every save with 400.
+  const allowed = ['pricing', 'faq', 'courses', 'modules', 'seo'];
   if (!allowed.includes(section)) return res.status(400).json({ error: 'Unknown section' });
   const data = loadContent();
   data[section] = req.body;
