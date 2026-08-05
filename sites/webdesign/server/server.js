@@ -227,6 +227,14 @@ if (!SUPERADMIN_TOKEN) {
   console.warn('⚠️  WARNING: SUPERADMIN_TOKEN / ADMIN_TOKEN is not set in .env!');
 }
 
+// Заявки з цього лендінга пересилаються у спільну CRM на mycomputer.education.
+// Без цього токена пересилання просто не відбувається: заявка залишається
+// тільки в локальній базі лендінга, відвідувач бачить успіх, а в CRM її нема.
+// Мовчазна втрата виявлялася лише при звірці баз, тому попереджаємо на старті.
+if (!process.env.MAIN_ADMIN_TOKEN) {
+  console.warn('⚠️  WARNING: MAIN_ADMIN_TOKEN не заданий — заявки з цього лендінга НЕ потраплятимуть у спільну CRM!');
+}
+
 // ── SECURITY HEADERS (helmet) ────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
