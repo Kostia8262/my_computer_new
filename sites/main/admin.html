@@ -286,6 +286,13 @@ input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
      search stays reachable through each tab's own filter bar. */
   #panelTitle,#roleBadge{display:none}
   .topbar .gs-wrap{display:none}
+  /* The site selector moves in here at 900px and needs ~132px. On the leads tab
+     the three export buttons are also present, and at 390 the row then wants
+     431px against 362 available — the bar scrolled. Export is the least urgent
+     thing to do from a phone, and knowing which site you are editing is the most
+     urgent, so export steps aside at this width the same way search already does
+     one line above. Both remain available from 600px up. */
+  #xlsxExportBtn,#csvExportBtn,#csvImportBtn{display:none !important}
 }
 
 /* ALERTS PANEL */
@@ -363,11 +370,13 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
   padding:5px;border-radius:var(--r-xl);
   box-shadow:0 6px 20px rgba(20,14,40,.28),inset 0 1px 0 rgba(255,255,255,.05);
 }
+/* Segmented switch, so it sits on the same height step as every other control.
+   Left to padding + line box it measured 37.6 — a fraction nobody chose. */
 .csub-btn{
-  flex:1;padding:10px 12px;border-radius:var(--r-md);font-size:13px;font-weight:600;
+  flex:1;height:var(--h-control);padding:0 12px;border-radius:var(--r-md);font-size:13px;font-weight:600;
   cursor:pointer;border:none;background:transparent;color:#9089b3;
   transition:color .18s ease,background .18s ease,transform .1s ease,box-shadow .18s ease;
-  text-align:center;
+  display:inline-flex;align-items:center;justify-content:center;
 }
 .csub-btn:hover:not(.active){background:rgba(255,255,255,.07);color:#e3dffc}
 .csub-btn:active{transform:scale(.97)}
@@ -434,6 +443,12 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
 .debt-ok{color:var(--c-success-text);font-weight:600}
 
 /* MONTHLY PAYMENTS */
+/* Revenue chart, course breakdown and leads funnel. The column ratio was inline
+   with no breakpoint, so on a phone all three were squeezed into ~300px: the
+   six-month bar chart got roughly 150px, its month labels overlapped and the
+   two bar lists lost their labels to ellipsis. They stack below 700. */
+.dash-charts{display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:700px){.dash-charts{grid-template-columns:1fr}}
 .pay-month-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;justify-content:space-between;background:var(--c-surface);border-radius:var(--r-lg);padding:12px 16px;border:1px solid var(--c-border)}
 .pay-month-nav{display:flex;align-items:center;gap:6px}
 .pay-month-label{font-size:15px;font-weight:800;min-width:155px;text-align:center}
@@ -486,10 +501,12 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
   padding:5px;border-radius:var(--r-xl);
   box-shadow:0 6px 20px rgba(20,14,40,.28),inset 0 1px 0 rgba(255,255,255,.05);
 }
+/* Same switch, same step — it measured 35.6 before. */
 .cms-subtab{
-  padding:9px 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;
+  height:var(--h-control);padding:0 16px;border-radius:var(--r-md);font-size:13px;font-weight:600;
   cursor:pointer;border:none;background:transparent;color:#9089b3;
   transition:color .18s ease,background .18s ease,transform .1s ease,box-shadow .18s ease;
+  display:inline-flex;align-items:center;justify-content:center;
 }
 .cms-subtab:hover:not(.active){background:rgba(255,255,255,.07);color:#e3dffc}
 .cms-subtab:active{transform:scale(.97)}
@@ -504,6 +521,15 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
 .cms-toggle{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;white-space:nowrap}
 
 /* GLOBAL SEARCH */
+#siteSelector{width:100%;font-size:13px;color:var(--c-ink)}
+/* The site selector when it has been relocated into the dark topbar: same
+   treatment as .gs-input so it reads as chrome, not as a form field. */
+#siteSelector.in-topbar{width:132px;height:var(--h-control-sm);padding:0 26px 0 10px;font-size:12px;
+  background-color:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);border-radius:var(--r-md);
+  color:#fff;text-overflow:ellipsis;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center}
+#siteSelector.in-topbar option{color:var(--c-ink);background:#fff}
 .gs-wrap{position:relative;display:flex;align-items:center}
 .gs-input{height:var(--h-control-sm);padding:0 12px;border:1.5px solid rgba(255,255,255,.14);border-radius:var(--r-md);font-size:13px;outline:none;width:190px;background:rgba(255,255,255,.08);color:#fff;transition:width .2s,border-color .2s,background .2s}
 .gs-input::placeholder{color:var(--c-shell-text)}
@@ -569,6 +595,12 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
       <span id="roleBadge" style="font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;margin-left:8px"></span>
     </div>
     <div class="topbar-right">
+      <!-- Below 900px the sidebar collapses to 58px and the site selector, which
+           lives in it, was rendered 48px wide starting at x=26 — clipped by the
+           rail and unreadable. Since edits are written to whichever site is
+           selected, not being able to see which one it is matters. The select
+           itself relocates here at that width; see placeSiteSelector(). -->
+      <span id="siteSelectSlot"></span>
       <a href="/" target="_blank" class="btn btn-ghost btn-sm">←<span class="btn-txt">&nbsp;Сайт</span></a>
       <button class="btn btn-ghost btn-sm" id="xlsxExportBtn" onclick="exportExcel()" style="display:none" title="Завантажити Excel">📊<span class="btn-txt">&nbsp;Excel</span></button>
       <button class="btn btn-ghost btn-sm" id="csvExportBtn" onclick="exportCSV()" style="display:none" title="Завантажити CSV">📥<span class="btn-txt">&nbsp;CSV</span></button>
@@ -608,9 +640,11 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
         <span class="sidebar-icon">👥</span><span>Співробітники</span>
       </button>
 
-      <div class="sidebar-section" style="margin-top:16px">Сайт</div>
-      <div style="padding:0 16px 12px">
-        <select id="siteSelector" class="modal-input" style="width:100%;font-size:13px;color:var(--c-ink)" onchange="onSiteChange()">
+      <div class="sidebar-section" style="margin-top:16px" id="siteSelectLabel">Сайт</div>
+      <div id="siteSelectHome" style="padding:0 16px 12px">
+        <!-- Width and colour moved out of an inline style: inline wins over any
+             stylesheet rule, so the compact topbar variant could not override it. -->
+        <select id="siteSelector" class="modal-input" onchange="onSiteChange()">
           <option value="">mycomputer.education</option>
           <option value="https://mycomputer.school">mycomputer.school</option>
           <option value="https://webdesign.mycomputer.education">webdesign.mycomputer.education</option>
@@ -1106,7 +1140,7 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
       <div class="stats" id="dashStudents" style="margin-bottom:24px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"></div>
 
       <!-- ④ CHARTS ROW -->
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:16px;margin-bottom:24px">
+      <div class="dash-charts">
         <div class="card" style="padding:20px">
           <div style="font-size:13px;font-weight:700;margin-bottom:14px;color:var(--c-ink)">📈 Виручка за останні 6 місяців</div>
           <div id="dashRevenueChart" style="min-height:160px"></div>
@@ -1805,6 +1839,7 @@ async function showApp() {
   document.getElementById('app').style.display       = 'flex';
   const siteSel = document.getElementById('siteSelector');
   if (siteSel) siteSel.value = apiBase;
+  placeSiteSelector();
   const ok = await loadMe();
   if (!ok) return; // token invalid — doLogout() already fired inside loadMe
   await loadTeachersList();
@@ -1879,6 +1914,26 @@ let _currentTab = 'leads';
 
 // In-scope site-aware tabs whose data must be refetched when the site switches.
 const SITE_AWARE_TABS = ['courses', 'curriculum', 'content', 'modules', 'articles', 'reviews', 'seo'];
+
+// The collapsed 58px rail cannot hold the site selector — it rendered clipped
+// and unreadable. Rather than duplicate the control (two elements, one id, two
+// states to keep in sync) the single <select> is moved between the sidebar and
+// the topbar as the breakpoint changes. Its value and listener travel with it.
+const _mqNarrow = window.matchMedia('(max-width:900px)');
+function placeSiteSelector() {
+  const sel   = document.getElementById('siteSelector');
+  const slot  = document.getElementById('siteSelectSlot');
+  const home  = document.getElementById('siteSelectHome');
+  const label = document.getElementById('siteSelectLabel');
+  if (!sel || !slot || !home) return;
+  const narrow = _mqNarrow.matches;
+  const target = narrow ? slot : home;
+  if (sel.parentElement !== target) target.appendChild(sel);
+  sel.classList.toggle('in-topbar', narrow);
+  if (label) label.style.display = narrow ? 'none' : '';
+  home.style.display = narrow ? 'none' : '';
+}
+_mqNarrow.addEventListener('change', placeSiteSelector);
 
 function onSiteChange() {
   const sel = document.getElementById('siteSelector');
