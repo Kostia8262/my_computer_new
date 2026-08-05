@@ -1484,7 +1484,11 @@ app.put('/api/content/:section', adminLimiter, requireAdmin, requireNotTeacher, 
 // ── COURSES API ───────────────────────────────────────────────────────────────
 // Public endpoint — landing page fetches it without auth
 app.get('/api/courses', (req, res) => {
-  const all = req.query.all === '1';
+  // ?all=1 includes hidden entries — that is an admin view, so it only applies
+  // with a valid staff token. Without one this stays the plain public list:
+  // a hidden course is a draft or a withdrawn one, and its name and price
+  // are not for visitors.
+  const all = req.query.all === '1' && !!getRole(req.headers['x-admin-token']);
   res.json({ success: true, courses: all ? coursesDb.getAll() : coursesDb.getActive() });
 });
 
@@ -1511,7 +1515,11 @@ app.delete('/api/courses/:id', adminLimiter, requireSuperAdmin, (req, res) => {
 // ── ARTICLES API ─────────────────────────────────────────────────────────────
 // Public: latest active articles (for homepage + article pages)
 app.get('/api/articles', (req, res) => {
-  const all = req.query.all === '1';
+  // ?all=1 includes hidden entries — that is an admin view, so it only applies
+  // with a valid staff token. Without one this stays the plain public list:
+  // a hidden course is a draft or a withdrawn one, and its name and price
+  // are not for visitors.
+  const all = req.query.all === '1' && !!getRole(req.headers['x-admin-token']);
   const list = all ? articlesDb.getAll() : articlesDb.getActive();
   res.json({ success: true, articles: list });
 });
