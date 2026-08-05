@@ -72,7 +72,8 @@ module.exports = {
       else if (k === 'lessonDuration') { sets.push('lesson_duration = @lesson_duration'); params.lesson_duration = parseInt(patch[k]) || 60; }
       else if (k === 'paymentType') { sets.push('payment_type = @payment_type'); params.payment_type = String(patch[k]).slice(0, 20); }
       else if (k === 'name')        { sets.push('name = @name'); params.name = String(patch[k]).slice(0, 500); }
-      else if (k === 'notes')       { sets.push('notes = @notes'); params.notes = String(patch[k]).slice(0, 500); }
+      // Staff remarks are free text like client notes — 500 chars cut them mid-sentence.
+      else if (k === 'notes')       { sets.push('notes = @notes'); params.notes = String(patch[k]).slice(0, 5000); }
       else if (k === 'phone')       { sets.push('phone = @phone'); params.phone = String(patch[k]).slice(0, 500); }
       else if (k === 'fullName')    { sets.push('full_name = @full_name'); params.full_name = String(patch[k]).slice(0, 500); }
       else if (k === 'city')        { sets.push('city = @city'); params.city = String(patch[k]).slice(0, 200); }

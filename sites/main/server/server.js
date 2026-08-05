@@ -940,10 +940,24 @@ app.use(express.static(path.join(__dirname, '..'), {
 }));
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
-function sanitize(str) {
+// Free-text notes (client history, lead comments, staff remarks) used to go
+// through the same blanket 500-character cut as a phone number: anything
+// longer was truncated mid-sentence and the API still answered 200, so the
+// panel reported a successful save while the tail was already gone.
+const NOTES_MAX = 5000;
+
+function sanitize(str, maxLen = 500) {
   if (!str) return '';
-  return String(str).trim().slice(0, 500).replace(/[<>]/g, '');
+  return String(str).trim().slice(0, maxLen).replace(/[<>]/g, '');
 }
+
+// True when the incoming value would lose characters to the cut above, so the
+// caller can refuse the write instead of silently storing a shortened copy.
+function exceeds(value, maxLen) {
+  return value != null && String(value).trim().length > maxLen;
+}
+
+const tooLongError = maxLen => ({ error: `Текст задовгий — максимум ${maxLen} символів` });
 
 function validateLead(data) {
   const errors = [];
@@ -1104,10 +1118,11 @@ app.patch('/api/admins/:id/profile', adminLimiter, requireSuperAdmin, (req, res)
     fullName, city, jobTitle, hireDate, birthday,
     employmentType, probationUntil, qualifications, bankDetails,
   } = req.body;
+  if (exceeds(notes, NOTES_MAX)) return res.status(400).json(tooLongError(NOTES_MAX));
   if (name           !== undefined) patch.name           = sanitize(name);
   if (hourlyRate     !== undefined) patch.hourlyRate     = parseFloat(hourlyRate)    || 0;
   if (lessonDuration !== undefined) patch.lessonDuration = parseInt(lessonDuration)  || 60;
-  if (notes          !== undefined) patch.notes          = sanitize(notes);
+  if (notes          !== undefined) patch.notes          = sanitize(notes, NOTES_MAX);
   if (phone          !== undefined) patch.phone          = sanitize(phone);
   if (paymentType    !== undefined) patch.paymentType    = sanitize(paymentType);
   if (monthlyRate    !== undefined) patch.monthlyRate    = parseFloat(monthlyRate)   || 0;
@@ -1360,6 +1375,7 @@ app.post('/api/leads/admin', adminLimiter, requireAdmin, requireNotTeacher, (req
   const { child_name, age, phone, course, email, teacher, notes, source } = req.body;
   if (!child_name || child_name.trim().length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я (мін. 2 символи)' });
   if (!phone || String(phone).replace(/\D/g,'').length < 10) return res.status(400).json({ error: 'Невірний формат телефону' });
+  if (exceeds(notes, NOTES_MAX)) return res.status(400).json(tooLongError(NOTES_MAX));
   try {
     const result = db.insertLead({
       child_name: sanitize(child_name),
@@ -1371,7 +1387,7 @@ app.post('/api/leads/admin', adminLimiter, requireAdmin, requireNotTeacher, (req
     });
     const lead = db.getLeadById(result.id);
     if (teacher) db.updateFields(result.id, { teacher: sanitize(teacher) });
-    if (notes)   db.updateNotes(result.id, sanitize(notes));
+    if (notes)   db.updateNotes(result.id, sanitize(notes, NOTES_MAX));
     const fresh = db.getLeadById(result.id);
     res.status(201).json({ success: true, lead: fresh });
   } catch (err) {
@@ -1410,6 +1426,7 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, requireNotTeacher, (req,
   const id = parseInt(req.params.id);
   const { status, notes, child_name, phone, age, course, email, teacher, schedule, scheduleDays, lessonType } = req.body;
   const valid = ['new', 'contacted', 'trial_scheduled', 'enrolled', 'rejected'];
+  if (exceeds(notes, NOTES_MAX)) return res.status(400).json(tooLongError(NOTES_MAX));
   try {
     // Update editable fields
     const fieldPatch = {};
@@ -1476,7 +1493,7 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, requireNotTeacher, (req,
         }
       }
     }
-    if (notes !== undefined) db.updateNotes(id, sanitize(notes));
+    if (notes !== undefined) db.updateNotes(id, sanitize(notes, NOTES_MAX));
 
     // Sync field changes from lead to its linked client (by sourceLeadId first, phone as fallback)
     if (fieldPatch.child_name || fieldPatch.phone || fieldPatch.teacher || fieldPatch.schedule) {
@@ -1545,7 +1562,7 @@ function sanitizeClient(body) {
     nextContact:  s(body.nextContact) || null,
     monthlyFee:   body.monthlyFee != null ? parseFloat(body.monthlyFee) || null : null,
     totalPaid:    body.totalPaid != null ? parseFloat(body.totalPaid) || null : null,
-    notes:        s(body.notes),
+    notes:        sanitize(body.notes, NOTES_MAX),
     manager:      s(body.manager),
     teacher:      s(body.teacher),
     schedule:     s(body.schedule),
@@ -1575,7 +1592,7 @@ function sanitizeClientPatch(body) {
   if ('nextContact'  in body) p.nextContact  = s(body.nextContact) || null;
   if ('monthlyFee'   in body) p.monthlyFee   = body.monthlyFee !== '' && body.monthlyFee != null ? parseFloat(body.monthlyFee) || null : null;
   if ('totalPaid'    in body) p.totalPaid    = body.totalPaid !== '' && body.totalPaid != null ? parseFloat(body.totalPaid) || null : null;
-  if ('notes'        in body) p.notes        = s(body.notes);
+  if ('notes'        in body) p.notes        = sanitize(body.notes, NOTES_MAX);
   if ('manager'      in body) p.manager      = s(body.manager);
   if ('teacher'      in body) p.teacher      = s(body.teacher);
   if ('schedule'     in body) p.schedule     = s(body.schedule);
@@ -1592,6 +1609,7 @@ app.get('/api/clients', adminLimiter, requireAdmin, (req, res) => {
 });
 
 app.post('/api/clients', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
+  if (exceeds(req.body.notes, NOTES_MAX)) return res.status(400).json(tooLongError(NOTES_MAX));
   const data = sanitizeClient(req.body);
   if (!data.name || data.name.length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я' });
   const client = clientsDb.create(data);
@@ -1602,6 +1620,7 @@ app.patch('/api/clients/:id', adminLimiter, requireAdmin, requireNotTeacher, (re
   const id = parseInt(req.params.id);
   const before = clientsDb.getById(id);
   if (!before) return res.status(404).json({ error: 'Not found' });
+  if (exceeds(req.body.notes, NOTES_MAX)) return res.status(400).json(tooLongError(NOTES_MAX));
   const data = sanitizeClientPatch(req.body);
   const client = clientsDb.update(id, data);
   if (!client) return res.status(404).json({ error: 'Not found' });
