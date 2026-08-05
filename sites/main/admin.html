@@ -471,7 +471,10 @@ textarea.modal-input{height:auto;min-height:var(--h-control);padding:8px 12px}
 .cms-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;font-weight:700;font-size:14px;color:var(--c-brand-500);flex-wrap:wrap;gap:8px}
 .cms-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .cms-label{display:block;font-size:12px;font-weight:600;color:var(--c-gray-500);margin-bottom:4px}
-.cms-input{width:100%;padding:8px 12px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:13px;outline:none;font-family:inherit}
+/* Same control as .modal-input, so it takes the same height step. Without this
+   the 42 fields on the content tab stayed at the old padding-derived 33.6 while
+   every other form control on the site moved to 36. */
+.cms-input{width:100%;height:var(--h-control);padding:0 12px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:13px;outline:none;font-family:inherit}
 .cms-input:focus{border-color:var(--c-brand-500)}
 .cms-textarea{width:100%;padding:8px 12px;border:1.5px solid var(--c-brand-100);border-radius:var(--r-md);font-size:13px;outline:none;resize:vertical;font-family:inherit;min-height:72px}
 .cms-textarea:focus{border-color:var(--c-brand-500)}
