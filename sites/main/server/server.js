@@ -1465,6 +1465,9 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, requireNotTeacher, (req,
   const { status, notes, child_name, phone, age, course, email, teacher, schedule, scheduleDays, lessonType } = req.body;
   const valid = ['new', 'contacted', 'trial_scheduled', 'enrolled', 'rejected'];
   if (exceeds(notes, NOTES_MAX)) return res.status(400).json(tooLongError(NOTES_MAX));
+  // Editing a lead that is already gone answered 200 and wrote nothing, so a
+  // second person editing a deleted lead was told their change had been saved.
+  if (!db.getLeadById(id)) return res.status(404).json({ error: 'Заявку не знайдено' });
   try {
     // Update editable fields
     const fieldPatch = {};
@@ -1651,8 +1654,34 @@ app.get('/api/clients', adminLimiter, requireAdmin, (req, res) => {
   res.json({ success: true, clients: clientsDb.getAll(), stats: clientsDb.getStats() });
 });
 
+// clients.update() quietly skips any value outside its allowed list, so the API
+// answered 200 while the column kept its previous content and the panel showed
+// the edit as saved. Negative fees went straight through for the same reason.
+function invalidClientValues(body) {
+  const lists = [
+    ['status',     clientsDb.STATUS_VALUES],
+    ['source',     clientsDb.SOURCE_VALUES],
+    ['lessonType', clientsDb.LESSON_TYPE_VALUES],
+  ];
+  for (const [field, allowed] of lists) {
+    const v = body[field];
+    if (v !== undefined && v !== null && v !== '' && !allowed.includes(String(v).trim())) {
+      return `${field}: допустимі значення — ${allowed.join(', ')}`;
+    }
+  }
+  for (const field of ['monthlyFee', 'totalPaid']) {
+    const v = body[field];
+    if (v !== undefined && v !== null && v !== '' && parseFloat(v) < 0) {
+      return `${field}: сума не може бути від'ємною`;
+    }
+  }
+  return null;
+}
+
 app.post('/api/clients', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   if (exceeds(req.body.notes, NOTES_MAX)) return res.status(400).json(tooLongError(NOTES_MAX));
+  const badValue = invalidClientValues(req.body);
+  if (badValue) return res.status(400).json({ error: badValue });
   const data = sanitizeClient(req.body);
   if (!data.name || data.name.length < 2) return res.status(400).json({ error: 'Вкажіть ім\'я' });
   const client = clientsDb.create(data);
@@ -1664,6 +1693,8 @@ app.patch('/api/clients/:id', adminLimiter, requireAdmin, requireNotTeacher, (re
   const before = clientsDb.getById(id);
   if (!before) return res.status(404).json({ error: 'Not found' });
   if (exceeds(req.body.notes, NOTES_MAX)) return res.status(400).json(tooLongError(NOTES_MAX));
+  const badValue = invalidClientValues(req.body);
+  if (badValue) return res.status(400).json({ error: badValue });
   const data = sanitizeClientPatch(req.body);
   const client = clientsDb.update(id, data);
   if (!client) return res.status(404).json({ error: 'Not found' });
@@ -1852,6 +1883,10 @@ app.post('/api/payments', adminLimiter, requireAdmin, requireNotTeacher, (req, r
   const { clientId, amount, date, method, note } = req.body;
   if (!clientId) return res.status(400).json({ error: 'clientId обов\'язковий' });
   if (!amount || parseFloat(amount) <= 0) return res.status(400).json({ error: 'Сума має бути більше 0' });
+  // Without this a typo in the id created a payment attached to nobody: it
+  // showed up in the totals but in no client's card, so it could not be found
+  // again to be corrected.
+  if (!clientsDb.getById(parseInt(clientId))) return res.status(404).json({ error: 'Клієнта не знайдено' });
   const payment = paymentsDb.create({
     clientId, amount, date: date || new Date().toISOString().slice(0, 10),
     method: sanitize(method || 'other'),
@@ -1893,8 +1928,24 @@ app.post('/api/monthly-payments/:ym', adminLimiter, requireAdmin, requireNotTeac
   res.status(result.alreadyExists ? 200 : 201).json({ success: true, ...result });
 });
 
+// The update path skipped the value checks that create/upsert do, so a PATCH
+// could store any string as the status or the payment method and quietly break
+// every filter and cash summary built on those two columns.
+function invalidPaymentValues(body) {
+  if (body.status !== undefined && !monthlyPayDb.STATUS_VALUES.includes(body.status)) {
+    return `Статус має бути одним із: ${monthlyPayDb.STATUS_VALUES.join(', ')}`;
+  }
+  if (body.method !== undefined && body.method !== null && body.method !== '' &&
+      !monthlyPayDb.METHOD_VALUES.includes(body.method)) {
+    return `Спосіб оплати має бути одним із: ${monthlyPayDb.METHOD_VALUES.join(', ')}`;
+  }
+  return null;
+}
+
 app.patch('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { ym, clientId } = req.params;
+  const badValue = invalidPaymentValues(req.body);
+  if (badValue) return res.status(400).json({ error: badValue });
   const monthData = monthlyPayDb.getMonth(ym);
   if (!monthData) return res.status(404).json({ error: 'Month not found' });
   let record = monthlyPayDb.updateRecord(ym, clientId, req.body);
@@ -1910,6 +1961,8 @@ app.patch('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, req
 // Upsert: create record if missing, update if exists (used for "virtual" rows added client-side)
 app.put('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { ym, clientId } = req.params;
+  const badValue = invalidPaymentValues(req.body);
+  if (badValue) return res.status(400).json({ error: badValue });
   if (!monthlyPayDb.getMonth(ym)) return res.status(404).json({ error: 'Month not found' });
   const client = clientsDb.getById(parseInt(clientId));
   // Always take clientName from DB if available — prevents stale/garbled values from client
@@ -1936,6 +1989,10 @@ app.get('/api/attendance', adminLimiter, requireAdmin, (req, res) => {
 app.post('/api/attendance', adminLimiter, requireAdmin, (req, res) => {
   const { clientId, date, status } = req.body;
   if (!clientId || !date) return res.status(400).json({ error: 'clientId та date обов\'язкові' });
+  // The date lands in the table as-is and the month view selects on a
+  // "YYYY-MM%" prefix, so anything else is written but never displayed again.
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(date))) return res.status(400).json({ error: 'Дата має бути у форматі РРРР-ММ-ДД' });
+  if (!clientsDb.getById(parseInt(clientId))) return res.status(404).json({ error: 'Клієнта не знайдено' });
   const ok = attendanceDb.setRecord(clientId, date, status || '');
   if (ok === false) return res.status(400).json({ error: 'Невірний статус' });
   res.json({ success: true });
@@ -1965,7 +2022,21 @@ app.get('/api/courses', (req, res) => {
   res.json({ success: true, courses: all ? coursesDb.getAll() : coursesDb.getActive() });
 });
 
+// A negative price is always a typo, and it feeds the public course cards and
+// the payment amount straight through.
+function invalidCourseValues(body) {
+  for (const field of ['price', 'lessonsCount', 'groupSize']) {
+    const v = body[field];
+    if (v !== undefined && v !== null && v !== '' && parseFloat(v) < 0) {
+      return `${field}: значення не може бути від'ємним`;
+    }
+  }
+  return null;
+}
+
 app.post('/api/courses', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
+  const badValue = invalidCourseValues(req.body);
+  if (badValue) return res.status(400).json({ error: badValue });
   const course = coursesDb.create(req.body);
   if (!course) return res.status(409).json({ error: 'ID вже існує' });
   res.status(201).json({ success: true, course });
@@ -1973,6 +2044,8 @@ app.post('/api/courses', adminLimiter, requireAdmin, requireNotTeacher, (req, re
 
 app.patch('/api/courses/:id', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   if (!SAFE_ID_RE.test(req.params.id)) return res.status(400).json({ error: 'Invalid course ID' });
+  const badValue = invalidCourseValues(req.body);
+  if (badValue) return res.status(400).json({ error: badValue });
   const course = coursesDb.update(req.params.id, req.body);
   if (!course) return res.status(404).json({ error: 'Курс не знайдено' });
   res.json({ success: true, course });
