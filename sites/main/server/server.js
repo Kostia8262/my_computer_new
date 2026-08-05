@@ -917,7 +917,11 @@ app.get('/admin.html', (req, res) => {
 // otherwise happily serve those same files straight from disk to anyone.
 // requireAdmin/escHtml are `function` declarations further down this file,
 // safe to reference here due to hoisting.
-require('./lessonsRoutes')(app, { requireAdmin, escHtml });
+// requireNotTeacher has to be handed in explicitly: the global teacher guard
+// further down (app.use('/api', …)) runs *after* these routes are registered,
+// so it never sees them — a teacher token would otherwise reach every
+// lesson-token route and could list, issue or revoke any student's access.
+require('./lessonsRoutes')(app, { requireAdmin, requireNotTeacher, escHtml });
 
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {

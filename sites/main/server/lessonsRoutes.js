@@ -109,7 +109,7 @@ function agesPage(courseId, course) {
   return pageShell(course.name, `<a class="back" href="/lessons">← Усі напрямки</a><h1>${course.icon} ${course.name} — обери вік</h1><div class="grid">${tiles}</div>`);
 }
 
-module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
+module.exports = function setupLessons(app, { requireAdmin, requireNotTeacher, escHtml }) {
   // ── Auth gate — mounted before any /lessons static/page route ───────────
   app.use('/lessons', (req, res, next) => {
     res.setHeader('X-Robots-Tag', 'noindex, nofollow');
@@ -192,7 +192,10 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
   });
 
   // ── Admin: issue / list / revoke student tokens ──────────────────────────
-  app.get('/api/lesson-tokens', requireAdmin, (req, res) => {
+  // Every route here carries requireNotTeacher of its own — these are
+  // registered above the global /api teacher guard, so that guard never runs
+  // for them.
+  app.get('/api/lesson-tokens', requireAdmin, requireNotTeacher, (req, res) => {
     res.json({ success: true, tokens: lessonTokensDb.getAll() });
   });
 
@@ -201,7 +204,7 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
   // active/valid, the picker always shows every enabled direction), so
   // requiring an upfront choice was just friction. Kept as internal
   // bookkeeping defaults only, not shown or asked in the admin UI anymore.
-  app.post('/api/lesson-tokens', requireAdmin, (req, res) => {
+  app.post('/api/lesson-tokens', requireAdmin, requireNotTeacher, (req, res) => {
     const { clientId, studentName } = req.body || {};
     if (!studentName || !String(studentName).trim()) return res.status(400).json({ error: 'studentName is required' });
     const rec = lessonTokensDb.create({
@@ -211,13 +214,13 @@ module.exports = function setupLessons(app, { requireAdmin, escHtml }) {
     res.json({ success: true, token: rec, link: `${req.protocol}://${req.get('host')}/lessons?token=${rec.token}` });
   });
 
-  app.patch('/api/lesson-tokens/:id', requireAdmin, (req, res) => {
+  app.patch('/api/lesson-tokens/:id', requireAdmin, requireNotTeacher, (req, res) => {
     const rec = lessonTokensDb.setActive(Number(req.params.id), !!(req.body || {}).active);
     if (!rec) return res.status(404).json({ error: 'Not found' });
     res.json({ success: true, token: rec });
   });
 
-  app.delete('/api/lesson-tokens/:id', requireAdmin, (req, res) => {
+  app.delete('/api/lesson-tokens/:id', requireAdmin, requireNotTeacher, (req, res) => {
     const ok = lessonTokensDb.delete(Number(req.params.id));
     res.json({ success: ok });
   });
