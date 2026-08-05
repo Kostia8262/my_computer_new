@@ -1111,6 +1111,13 @@ app.get('/data/articles.json', (req, res) => {
   res.json(articlesDb.getAll());
 });
 
+// The admin panel lives on the main domain only — this site is managed from
+// there through its site switcher. There has never been a copy here, so this
+// only makes the path lead somewhere useful instead of a 404.
+app.get(['/admin', '/admin.html'], (req, res) => {
+  res.redirect(302, 'https://mycomputer.education/admin.html');
+});
+
 // ── STATIC FILES ──────────────────────────────────────────────────────────────
 app.use(express.static(path.join(__dirname, '..'), {
   maxAge: 0,

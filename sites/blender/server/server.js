@@ -406,16 +406,14 @@ app.get('/data/articles.json', (req, res) => {
   res.json(articlesDb.getAll());
 });
 
-// Admin panel — no-store so updates apply immediately. Registered before
-// express.static() so it takes precedence over the static handler, which
-// would otherwise match admin.html first.
-app.get('/admin', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(path.join(__dirname, '..', 'admin.html'));
-});
-app.get('/admin.html', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(path.join(__dirname, '..', 'admin.html'));
+// The admin panel lives on the main domain only. This site is managed from
+// there through its site switcher, so the local copy that used to sit here was
+// dead weight: it never received any of the fixes made on main and was one more
+// login form pointing at the same network-wide token. Old bookmarks are sent to
+// the real panel rather than to a dead page. Registered before express.static()
+// so it wins over any stale file left on disk.
+app.get(['/admin', '/admin.html'], (req, res) => {
+  res.redirect(302, 'https://mycomputer.education/admin.html');
 });
 
 // ── ARTICLES SSR ──────────────────────────────────────────────────────────────
@@ -1469,10 +1467,12 @@ app.get('/api/content', (req, res) => {
   res.json(loadContent());
 });
 
-// Admin: update a section (pricing | faq | courses | modules)
+// Admin: update a section (pricing | faq | courses | modules | seo)
 app.put('/api/content/:section', adminLimiter, requireAdmin, requireNotTeacher, (req, res) => {
   const { section } = req.params;
-  const allowed = ['pricing', 'faq', 'courses', 'modules'];
+  // 'seo' was missing here while GET /api/content returns it: the admin panel
+  // showed the SEO fields filled in, then failed every save with 400.
+  const allowed = ['pricing', 'faq', 'courses', 'modules', 'seo'];
   if (!allowed.includes(section)) return res.status(400).json({ error: 'Unknown section' });
   const data = loadContent();
   data[section] = req.body;

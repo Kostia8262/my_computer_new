@@ -416,17 +416,14 @@ app.get('/data/articles.json', (req, res) => {
   res.json(articlesDb.getAll());
 });
 
-// Admin panel — no-store so updates apply immediately. Registered before
-// express.static() so it takes precedence over the static handler, which
-// would otherwise match admin.html first and serve it with the site-wide
-// 1-day cache meant for marketing assets, not the admin panel.
-app.get('/admin', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(path.join(__dirname, '..', 'admin.html'));
-});
-app.get('/admin.html', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.sendFile(path.join(__dirname, '..', 'admin.html'));
+// The admin panel lives on the main domain only. This site is managed from
+// there through its site switcher, so the local copy that used to sit here was
+// dead weight: it never received any of the fixes made on main and was one more
+// login form pointing at the same network-wide token. Old bookmarks are sent to
+// the real panel rather than to a dead page. Registered before express.static()
+// so it wins over any stale file left on disk.
+app.get(['/admin', '/admin.html'], (req, res) => {
+  res.redirect(302, 'https://mycomputer.education/admin.html');
 });
 
 // ── ARTICLE PAGES ─────────────────────────────────────────────────────────────
