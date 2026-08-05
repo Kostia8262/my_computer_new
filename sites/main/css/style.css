@@ -763,10 +763,8 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
   .modal-form .form-row,.contact-form .form-row{margin-bottom:12px}
   .modal-form .form-row .form-group,.contact-form .form-row .form-group{margin-bottom:0}
   .modal-form .form-group,.contact-form .form-group{margin-bottom:12px}
-  .form-messengers{margin-top:10px}
-  .form-messengers__links{flex-wrap:nowrap;gap:6px}
-  .form-messenger-btn{padding:6px 10px;font-size:var(--fs-11);gap:4px}
-  .form-messenger-btn svg{width:13px;height:13px;flex-shrink:0}
+  /* messenger buttons compact on phones — declared next to their base rules below,
+     otherwise the base block (which comes later in the file) wins at every width */
 
   /* Footer */
   .footer__inner{grid-template-columns:1fr;gap:32px}
@@ -987,6 +985,15 @@ body.modal-open{overflow:hidden}
 .form-messenger-btn--viber{background:rgba(126,76,193,.13);color:#7e4cc1;border:1.5px solid rgba(126,76,193,.35)}
 .form-messenger-btn--whatsapp{background:rgba(37,211,102,.13);color:#1da851;border:1.5px solid rgba(37,211,102,.35)}
 .form-messenger-btn--telegram{background:rgba(0,136,204,.13);color:#0088cc;border:1.5px solid rgba(0,136,204,.35)}
+
+/* Phones: keep the three messenger buttons on one line.
+   Must sit after the base rules above — same specificity, so the later block wins. */
+@media(max-width:768px){
+  .form-messengers{margin-top:10px}
+  .form-messengers__links{flex-wrap:nowrap;gap:6px}
+  .form-messenger-btn{padding:6px 10px;font-size:var(--fs-11);gap:4px}
+  .form-messenger-btn svg{width:13px;height:13px;flex-shrink:0}
+}
 
 @media(max-width:900px){
   .pricing__grid{grid-template-columns:1fr 1fr}
