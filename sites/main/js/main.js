@@ -14,12 +14,24 @@ function cacheUaTexts() {
   });
 }
 
+/* Пишем перевод только в текстовые узлы: el.textContent = ... снёс бы вложенную
+   разметку — например SVG-стрелку внутри кнопки «Безкоштовний урок». */
+function setLocalizedText(el, text) {
+  const textNodes = Array.prototype.filter.call(
+    el.childNodes,
+    n => n.nodeType === Node.TEXT_NODE && n.nodeValue.trim()
+  );
+  if (!textNodes.length) { el.textContent = text; return; }
+  textNodes[0].nodeValue = text;
+  for (let i = 1; i < textNodes.length; i++) textNodes[i].nodeValue = '';
+}
+
 function applyLang(lang) {
   currentLang = lang;
   localStorage.setItem('mca-lang', lang);
   document.documentElement.lang = lang === 'ua' ? 'uk' : 'ru';
   document.querySelectorAll('[data-ru]').forEach(el => {
-    el.textContent = lang === 'ru' ? el.dataset.ru : el.dataset.ua;
+    setLocalizedText(el, lang === 'ru' ? el.dataset.ru : el.dataset.ua);
   });
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.lang === lang);
