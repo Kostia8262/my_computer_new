@@ -2568,9 +2568,30 @@ const STATUS_DOT_COLORS = {
   new: 'var(--c-info-solid)', trial: 'var(--c-trial-solid)', active: 'var(--c-success-solid)',
   paused: 'var(--c-warning-solid)', completed: 'var(--c-done-solid)', churned: 'var(--c-danger-solid)',
 };
+// Перші шість — ручні джерела, які менеджер обирає сам. Далі — домени: заявка
+// з будь-якого лендінга мережі падає в цю CRM, а поле source містить домен, з
+// якого вона прийшла. Без цих підписів адміністратор бачив у підказці сиру
+// адресу на кшталт "digitalart.mycomputer.school" замість назви напрямку.
 const SOURCE_LABELS = {
   website: '🌐 Сайт', referral: '👥 Рекомендація', social: '📱 Соцмережі',
   phone: '📞 Телефон', 'walk-in': '🚶 Прийшов', other: 'Інше',
+
+  'mycomputer.education':            '🏫 Головний сайт',
+  'mycomputer.school':               '🎨 Школа дизайну',
+  'webdesign.mycomputer.education':  '🖥 Веб-дизайн',
+  'python.mycomputer.education':     '🐍 Python',
+  'minecraft.mycomputer.education':  '⛏ Minecraft',
+  'roblox.mycomputer.education':     '🎮 Roblox',
+  'frontend.mycomputer.education':   '⚛️ Frontend',
+  'construct.mycomputer.education':  '🕹 Construct',
+  'scratch.mycomputer.education':    '🐱 Scratch',
+  'blog.mycomputer.school':          '📝 Блог',
+  'digitalart.mycomputer.school':    '🖌 Цифровий малюнок',
+  'branding.mycomputer.school':      '™️ Брендинг',
+  'animation.mycomputer.school':     '🎬 Анімація',
+  'blender.mycomputer.school':       '🧊 Blender',
+  '3dsmax.mycomputer.school':        '🏛 3ds Max',
+  'ai-design.mycomputer.school':     '🤖 AI-дизайн',
 };
 
 // ── LESSONS (student web-app access tokens) ──────────────────────────────────
