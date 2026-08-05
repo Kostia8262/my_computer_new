@@ -77,8 +77,11 @@ module.exports = {
     return delRecord.run(ym, parseInt(clientId)).changes > 0;
   },
 
+  // A month is nothing but its rows — there is no separate month record. So a
+  // month created while no client was active stayed empty, and every later
+  // attempt to add somebody to it was refused with "Month not found". Adding
+  // the first row is what brings the month into existence.
   addRecord(ym, record) {
-    if (!selMonth.get(ym)) return false;
     insRecord.run({
       ym, client_id: record.clientId, client_name: record.clientName || '',
       expected_amount: record.expectedAmount ?? 0, paid_amount: record.paidAmount ?? 0,
@@ -93,9 +96,9 @@ module.exports = {
     return info.changes > 0;
   },
 
-  // Create or update a record (upsert). Used when a "virtual" client row is first edited.
+  // Create or update a record (upsert). Used when a "virtual" client row is
+  // first edited, and to seed a month that has no rows yet — see addRecord.
   upsertRecord(ym, clientId, data) {
-    if (!selMonth.get(ym)) return null;
     const cid = parseInt(clientId);
     const { _virtual, ...d } = data;
     const existing = selRecord.get(ym, cid);

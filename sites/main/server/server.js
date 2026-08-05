@@ -535,7 +535,12 @@ function corsOrigin(origin, callback) {
     /^https:\/\/[a-z0-9-]+\.mycomputer\.education$/.test(origin)
   ) return callback(null, true);
   const allowed = ALLOWED_ORIGIN.split(',').map(s => s.trim()).filter(Boolean);
-  callback(allowed.includes(origin) ? null : new Error('CORS'), allowed.includes(origin));
+  // Reporting the rejection as an Error made the cors middleware throw, so a
+  // request from an unknown origin came back as 500 Internal Server Error —
+  // any crawler hitting the API looked like the server was falling over.
+  // Answering "not allowed" instead simply omits the CORS headers, which is
+  // what actually stops the browser.
+  callback(null, allowed.includes(origin));
 }
 const corsOpts = {
   origin: corsOrigin,
@@ -570,10 +575,21 @@ const paymentLimiter = rateLimit({
 
 // Admin: dashboard makes ~11 requests per load (parallel monthly-payments fetches).
 // 500/15min gives ~45 full dashboard reloads before limiting — plenty for normal use.
+// Keyed on the staff token rather than the IP: a whole office shares one
+// external address, so counting per IP made colleagues eat each other's budget
+// — the third person to open the panel could be locked out by the first two.
+// Requests without a token still fall back to the IP.
 const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500,
   message: { error: 'Too many requests.' },
+  keyGenerator: (req) => {
+    const token = req.headers['x-admin-token'];
+    // Hashed so the bucket key is not the credential itself.
+    if (typeof token === 'string' && token) return 'tok:' + crypto.createHash('sha256').update(token).digest('hex');
+    // Unauthenticated calls fall back to the address; the routes reject them anyway.
+    return req.ip;
+  },
 });
 
 // ── HOMEPAGE LANGUAGE SSR ─────────────────────────────────────────────────────
@@ -1056,7 +1072,12 @@ function requireNotTeacher(req, res, next) {
 
 // Teacher-role guard: allow only attendance + client read + me + alerts
 // req.path inside app.use('/api', ...) is relative to /api (e.g. '/me', '/clients')
-const TEACHER_ALLOWED = ['/me', '/health', '/attendance', '/clients', '/alerts', '/teachers'];
+// '/courses' is read-only for a teacher in practice: every write route under it
+// carries requireNotTeacher or requireSuperAdmin, and the same list is public
+// without a token anyway. It is here because the panel loads course names on
+// startup for every role — without it the teacher's attendance table showed raw
+// course ids and the console filled with 403s.
+const TEACHER_ALLOWED = ['/me', '/health', '/attendance', '/clients', '/alerts', '/teachers', '/courses'];
 app.use('/api', (req, res, next) => {
   const token = req.headers['x-admin-token'];
   if (!token || (SUPERADMIN_TOKEN && safeCompare(token, SUPERADMIN_TOKEN))) return next();
@@ -1675,6 +1696,13 @@ function invalidClientValues(body) {
       return `${field}: сума не може бути від'ємною`;
     }
   }
+  // Leads have checked the phone since day one; the client card did not, so
+  // "не телефон" was stored happily and nobody could call that number back.
+  // An empty phone stays allowed — not every card has one yet.
+  if (body.phone !== undefined && String(body.phone).trim() !== '' &&
+      String(body.phone).replace(/\D/g, '').length < 10) {
+    return 'Невірний формат телефону';
+  }
   return null;
 }
 
@@ -1924,9 +1952,19 @@ app.post('/api/monthly-payments/:ym', adminLimiter, requireAdmin, requireNotTeac
   const { ym } = req.params;
   if (!/^\d{4}-\d{2}$/.test(ym)) return res.status(400).json({ error: 'Format: YYYY-MM' });
   if (!Array.isArray(req.body.records)) return res.status(400).json({ error: 'records[] required' });
-  const result = monthlyPayDb.createMonth(ym, req.body.records);
+  const result = monthlyPayDb.createMonth(ym, req.body.records.map(withExpectedFromClient));
   res.status(result.alreadyExists ? 200 : 201).json({ success: true, ...result });
 });
+
+// The agreed monthly fee lives on the client card, so a row created without an
+// explicit amount should start from it rather than from zero — otherwise every
+// amount has to be retyped by hand for each new month.
+function withExpectedFromClient(record) {
+  if (record.expectedAmount !== undefined && record.expectedAmount !== null && record.expectedAmount !== '') return record;
+  const client = clientsDb.getById(parseInt(record.clientId));
+  const fee = client && client.monthlyFee != null ? parseFloat(client.monthlyFee) || 0 : 0;
+  return { ...record, expectedAmount: fee, clientName: record.clientName || client?.name || '' };
+}
 
 // The update path skipped the value checks that create/upsert do, so a PATCH
 // could store any string as the status or the payment method and quietly break
@@ -1946,13 +1984,14 @@ app.patch('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, req
   const { ym, clientId } = req.params;
   const badValue = invalidPaymentValues(req.body);
   if (badValue) return res.status(400).json({ error: badValue });
-  const monthData = monthlyPayDb.getMonth(ym);
-  if (!monthData) return res.status(404).json({ error: 'Month not found' });
+  if (!/^\d{4}-\d{2}$/.test(ym)) return res.status(400).json({ error: 'Format: YYYY-MM' });
   let record = monthlyPayDb.updateRecord(ym, clientId, req.body);
   if (!record) {
-    // Record missing (client not yet in this month) — upsert it
+    // Record missing (client not yet in this month, or the month has no rows
+    // yet) — upsert it, seeding the amount from the client card.
     const client = clientsDb.getById(parseInt(clientId));
-    record = monthlyPayDb.upsertRecord(ym, clientId, { clientName: client?.name || '', ...req.body });
+    record = monthlyPayDb.upsertRecord(ym, clientId,
+      withExpectedFromClient({ clientId, clientName: client?.name || '', ...req.body }));
   }
   if (!record) return res.status(500).json({ error: 'Failed' });
   res.json({ success: true, record });
@@ -1963,12 +2002,12 @@ app.put('/api/monthly-payments/:ym/:clientId', adminLimiter, requireAdmin, requi
   const { ym, clientId } = req.params;
   const badValue = invalidPaymentValues(req.body);
   if (badValue) return res.status(400).json({ error: badValue });
-  if (!monthlyPayDb.getMonth(ym)) return res.status(404).json({ error: 'Month not found' });
+  if (!/^\d{4}-\d{2}$/.test(ym)) return res.status(400).json({ error: 'Format: YYYY-MM' });
   const client = clientsDb.getById(parseInt(clientId));
   // Always take clientName from DB if available — prevents stale/garbled values from client
-  const data = { ...req.body, clientName: client?.name || req.body.clientName || '' };
+  const data = withExpectedFromClient({ clientId, ...req.body, clientName: client?.name || req.body.clientName || '' });
   const record = monthlyPayDb.upsertRecord(ym, clientId, data);
-  if (!record) return res.status(404).json({ error: 'Month not found' });
+  if (!record) return res.status(500).json({ error: 'Не вдалося зберегти запис' });
   res.status(200).json({ success: true, record });
 });
 
@@ -2062,7 +2101,19 @@ app.post('/api/courses/:id/reorder', adminLimiter, requireAdmin, requireNotTeach
 
 app.delete('/api/courses/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   if (!SAFE_ID_RE.test(req.params.id)) return res.status(400).json({ error: 'Invalid course ID' });
-  const ok = coursesDb.delete(req.params.id);
+  // Students and leads store the course by id. Deleting a course that is still
+  // assigned left them pointing at nothing, and the tables rendered the raw id
+  // instead of a name. Deactivating hides it from the site without breaking them.
+  const id = req.params.id;
+  const usedByClients = clientsDb.getAll().filter(c => c.course === id).length;
+  const usedByLeads   = db.getAllLeads().filter(l => l.course === id).length;
+  if (usedByClients || usedByLeads) {
+    return res.status(409).json({
+      error: `Курс закріплений за ${usedByClients} учнями та ${usedByLeads} заявками. Перенесіть їх на інший курс або зробіть курс неактивним.`,
+      usedByClients, usedByLeads,
+    });
+  }
+  const ok = coursesDb.delete(id);
   if (!ok) return res.status(404).json({ error: 'Курс не знайдено' });
   res.json({ success: true });
 });
