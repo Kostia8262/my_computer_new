@@ -1692,12 +1692,13 @@ app.patch('/api/clients/:id', adminLimiter, requireAdmin, requireNotTeacher, (re
 
 app.delete('/api/clients/:id', adminLimiter, requireSuperAdmin, (req, res) => {
   const id = parseInt(req.params.id);
-  const ok = clientsDb.delete(id);
-  if (!ok) return res.status(404).json({ error: 'Not found' });
+  const result = clientsDb.delete(id);
+  if (!result.removed) return res.status(404).json({ error: 'Not found' });
   // Revoke the student's lessons link along with them — see deleteByClientId.
   const revoked = lessonTokensDb.deleteByClientId(id);
   if (revoked) console.log(`🔒  Revoked ${revoked} lesson token(s) of deleted client #${id}`);
-  res.json({ success: true });
+  console.log(`[CLIENT DELETE] #${id}: ${result.payments} payments, ${result.attendance} attendance marks, ${result.monthlyPayments} monthly rows removed`);
+  res.json({ success: true, removed: result });
 });
 
 // ── ALERTS API ────────────────────────────────────────────────────────────────

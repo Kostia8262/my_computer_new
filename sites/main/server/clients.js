@@ -120,8 +120,22 @@ module.exports = {
     return fromRow(selById.get(id));
   },
 
+  // Deleting a client used to leave their payments, attendance marks and
+  // monthly-payment rows behind: the money kept counting towards the month's
+  // total and the tables showed a name that no longer existed anywhere. The
+  // schema declares no foreign keys, so the cleanup is done here, in one
+  // transaction with the delete itself.
   delete(id) {
-    return delClient.run(id).changes > 0;
+    const cid = parseInt(id);
+    if (!Number.isInteger(cid)) return { removed: false };
+    const tx = db.transaction(() => {
+      const payments  = db.prepare('DELETE FROM payments WHERE client_id = ?').run(cid).changes;
+      const attendance = db.prepare('DELETE FROM attendance WHERE client_id = ?').run(cid).changes;
+      const monthly   = db.prepare('DELETE FROM monthly_payments WHERE client_id = ?').run(cid).changes;
+      const removed   = delClient.run(cid).changes > 0;
+      return { removed, payments, attendance, monthlyPayments: monthly };
+    });
+    return tx();
   },
 
   // Staff rename: the link is teacher_id, this only refreshes the display name
