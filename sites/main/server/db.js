@@ -166,6 +166,13 @@ CREATE TABLE IF NOT EXISTS clients (
   try { db.exec(`ALTER TABLE clients ADD COLUMN ${col} TEXT`); } catch { /* already exists */ }
 });
 
+// The teacher used to be stored as a bare name string, so renaming a staff
+// member detached every one of their students at once — payroll, the teaching
+// calendar and the "who teaches today" summary all matched on
+// client.teacher === admin.name and silently found nothing. teacher_id is the
+// real link now; the name column stays as the display value.
+try { db.exec('ALTER TABLE clients ADD COLUMN teacher_id INTEGER'); } catch { /* already exists */ }
+
 db.exec(`
 
 CREATE TABLE IF NOT EXISTS attendance (
@@ -198,6 +205,10 @@ CREATE INDEX IF NOT EXISTS idx_leads_phone ON leads(phone);
 ['schedule_days', 'lesson_type'].forEach(col => {
   try { db.exec(`ALTER TABLE leads ADD COLUMN ${col} TEXT`); } catch { /* already exists */ }
 });
+
+// Same name-vs-id problem as clients above — a lead carries the assigned
+// teacher through to the client record it creates, so it needs the id too.
+try { db.exec('ALTER TABLE leads ADD COLUMN teacher_id INTEGER'); } catch { /* already exists */ }
 
 db.exec(`
 
@@ -276,5 +287,21 @@ CREATE TABLE IF NOT EXISTS lesson_tokens (
 );
 CREATE INDEX IF NOT EXISTS idx_lesson_tokens_token ON lesson_tokens(token);
 `);
+
+// Backfill teacher_id from the name that is already stored. Runs on every
+// boot but only touches rows that have a teacher name and no id yet, so it is
+// idempotent and also picks up anything written by an older build.
+['clients', 'leads'].forEach(table => {
+  try {
+    db.exec(`
+      UPDATE ${table}
+         SET teacher_id = (SELECT a.id FROM admins a WHERE TRIM(a.name) = TRIM(${table}.teacher) LIMIT 1)
+       WHERE teacher_id IS NULL
+         AND TRIM(COALESCE(teacher, '')) <> ''
+    `);
+  } catch (err) {
+    console.error(`[MIGRATION teacher_id ${table}]`, err.message);
+  }
+});
 
 module.exports = db;

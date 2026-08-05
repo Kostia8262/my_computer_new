@@ -15,7 +15,7 @@ function fromRow(row) {
   return {
     id: row.id, child_name: row.child_name, age: row.age, course: row.course,
     source: row.source, phone: row.phone, email: row.email, status: row.status,
-    notes: row.notes, teacher: row.teacher, schedule: row.schedule,
+    notes: row.notes, teacher: row.teacher, teacherId: row.teacher_id, schedule: row.schedule,
     scheduleDays: JSON.parse(row.schedule_days || '[]'), lessonType: row.lesson_type,
     created_at: row.created_at, updated_at: row.updated_at,
   };
@@ -66,7 +66,7 @@ module.exports = {
   updateFields(id, fields) {
     const existing = selById.get(id);
     if (!existing) return null;
-    const allowed = ['child_name', 'phone', 'age', 'course', 'email', 'teacher', 'schedule', 'schedule_days', 'lesson_type'];
+    const allowed = ['child_name', 'phone', 'age', 'course', 'email', 'teacher', 'teacher_id', 'schedule', 'schedule_days', 'lesson_type'];
     const sets = ['updated_at = @updated_at'];
     const params = { id, updated_at: now() };
     allowed.forEach(k => {
@@ -80,6 +80,19 @@ module.exports = {
 
   getByPhone(phone) {
     return phone ? fromRow(selByPhone.get(phone)) : null;
+  },
+
+  // Mirrors clientsDb.renameTeacher/detachTeacher — see the comment there.
+  renameTeacher(teacherId, newName) {
+    if (!teacherId) return 0;
+    return db.prepare('UPDATE leads SET teacher = ?, updated_at = ? WHERE teacher_id = ?')
+      .run(newName, now(), teacherId).changes;
+  },
+
+  detachTeacher(teacherId) {
+    if (!teacherId) return 0;
+    return db.prepare("UPDATE leads SET teacher = '', teacher_id = NULL, updated_at = ? WHERE teacher_id = ?")
+      .run(now(), teacherId).changes;
   },
 
   deleteLead(id) {

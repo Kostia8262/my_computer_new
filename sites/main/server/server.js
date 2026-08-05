@@ -959,6 +959,23 @@ function exceeds(value, maxLen) {
 
 const tooLongError = maxLen => ({ error: `Текст задовгий — максимум ${maxLen} символів` });
 
+// The panel picks a teacher from a dropdown of names, so the request carries a
+// name rather than an id. Resolve it once here and store both: teacher_id is
+// what payroll and the calendars match on, the name is only what gets shown.
+function resolveTeacherId(name) {
+  const wanted = String(name || '').trim();
+  if (!wanted) return null;
+  const match = adminsDb.getAll().find(a => String(a.name || '').trim() === wanted);
+  return match ? match.id : null;
+}
+
+// A student belongs to this staff member if the id matches. Rows written
+// before teacher_id existed and never touched since fall back to the name.
+function belongsToTeacher(entity, admin) {
+  if (entity.teacherId != null) return entity.teacherId === admin.id;
+  return String(entity.teacher || '').trim() === String(admin.name || '').trim();
+}
+
 function validateLead(data) {
   const errors = [];
   if (!data.child_name || data.child_name.trim().length < 2) {
@@ -1101,9 +1118,18 @@ app.patch('/api/admins/:id/revoke', adminLimiter, requireSuperAdmin, (req, res) 
 });
 
 app.delete('/api/admins/:id', adminLimiter, requireSuperAdmin, (req, res) => {
-  const ok = adminsDb.delete(parseInt(req.params.id));
+  const id = parseInt(req.params.id);
+  const ok = adminsDb.delete(id);
   if (!ok) return res.status(404).json({ error: 'Not found' });
-  res.json({ success: true });
+  // Detach their students and leads: a name left behind points at somebody who
+  // no longer exists, so the roster reads as staffed and payroll can never
+  // match those lessons to anyone again.
+  const detachedClients = clientsDb.detachTeacher(id);
+  const detachedLeads   = db.detachTeacher(id);
+  if (detachedClients || detachedLeads) {
+    console.log(`[STAFF DELETE] #${id}: detached ${detachedClients} clients, ${detachedLeads} leads`);
+  }
+  res.json({ success: true, detachedClients, detachedLeads });
 });
 
 // Teacher profile update (superadmin only)
@@ -1137,6 +1163,18 @@ app.patch('/api/admins/:id/profile', adminLimiter, requireSuperAdmin, (req, res)
   if (bankDetails    !== undefined) patch.bankDetails    = sanitize(bankDetails);
   const admin = adminsDb.update(id, patch);
   if (!admin) return res.status(404).json({ error: 'Не знайдено' });
+  // Students and leads keep the teacher's name as their display value, so a
+  // rename has to be pushed through to them — otherwise the tables would still
+  // show the old name even though the teacher_id link itself stays intact.
+  if (patch.name && patch.name !== before.name) {
+    try {
+      const touchedClients = clientsDb.renameTeacher(id, admin.name);
+      const touchedLeads   = db.renameTeacher(id, admin.name);
+      if (touchedClients || touchedLeads) {
+        console.log(`[STAFF RENAME] #${id} "${before.name}" → "${admin.name}": ${touchedClients} clients, ${touchedLeads} leads`);
+      }
+    } catch (e) { console.error('[STAFF RENAME]', e.message); }
+  }
   // Retroactive-payroll audit trail — only log when a rate/pay-mode field actually changed.
   adminHistoryDb.logChange(id, 'paymentType', before.paymentType, admin.paymentType);
   adminHistoryDb.logChange(id, 'hourlyRate',  before.hourlyRate,  admin.hourlyRate);
@@ -1183,7 +1221,7 @@ app.get('/api/admins/:id/attendance-calendar', adminLimiter, requireSuperAdmin, 
   if (!admin) return res.status(404).json({ error: 'Не знайдено' });
   const ym = req.query.ym || new Date().toISOString().slice(0, 7);
   const [year, month] = ym.split('-').map(Number);
-  const teacherClients = clientsDb.getAll().filter(c => (c.teacher || '').trim() === (admin.name || '').trim());
+  const teacherClients = clientsDb.getAll().filter(c => belongsToTeacher(c, admin));
   const attData = attendanceDb.getMonth(year, month);
   const days = {};
   teacherClients.forEach(c => {
@@ -1304,7 +1342,7 @@ app.get('/api/admins/:id/salary', adminLimiter, requireSuperAdmin, (req, res) =>
   const ym = req.query.ym || new Date().toISOString().slice(0, 7);
   const [year, month] = ym.split('-').map(Number);
   const allClients     = clientsDb.getAll();
-  const teacherClients = allClients.filter(c => (c.teacher || '').trim() === (admin.name || '').trim());
+  const teacherClients = allClients.filter(c => belongsToTeacher(c, admin));
   const attData        = attendanceDb.getMonth(year, month);
   const breakdown = [];
   let totalScheduled = 0;
@@ -1386,7 +1424,7 @@ app.post('/api/leads/admin', adminLimiter, requireAdmin, requireNotTeacher, (req
       source:     sanitize(source || '') || 'mycomputer.education',
     });
     const lead = db.getLeadById(result.id);
-    if (teacher) db.updateFields(result.id, { teacher: sanitize(teacher) });
+    if (teacher) db.updateFields(result.id, { teacher: sanitize(teacher), teacher_id: resolveTeacherId(teacher) });
     if (notes)   db.updateNotes(result.id, sanitize(notes, NOTES_MAX));
     const fresh = db.getLeadById(result.id);
     res.status(201).json({ success: true, lead: fresh });
@@ -1435,7 +1473,10 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, requireNotTeacher, (req,
     if (age        !== undefined) fieldPatch.age        = age ? parseInt(age) || null : null;
     if (course     !== undefined) fieldPatch.course     = sanitize(course) || null;
     if (email      !== undefined) fieldPatch.email      = sanitize(email) || null;
-    if (teacher    !== undefined) fieldPatch.teacher    = sanitize(teacher) || null;
+    if (teacher    !== undefined) {
+      fieldPatch.teacher    = sanitize(teacher) || null;
+      fieldPatch.teacher_id = resolveTeacherId(teacher);
+    }
     if (schedule   !== undefined) fieldPatch.schedule   = sanitize(schedule) || null;
     if (scheduleDays !== undefined) fieldPatch.schedule_days = JSON.stringify(Array.isArray(scheduleDays) ? scheduleDays : []);
     if (lessonType   !== undefined) fieldPatch.lesson_type   = sanitize(lessonType) || null;
@@ -1466,6 +1507,7 @@ app.patch('/api/leads/:id', adminLimiter, requireAdmin, requireNotTeacher, (req,
                 enrolledDate: today,
                 notes:        lead.notes || '',
                 teacher:      lead.teacher || null,
+                teacherId:    lead.teacherId ?? resolveTeacherId(lead.teacher),
                 schedule:     lead.schedule || null,
                 sourceLeadId: id,
               });
@@ -1565,6 +1607,7 @@ function sanitizeClient(body) {
     notes:        sanitize(body.notes, NOTES_MAX),
     manager:      s(body.manager),
     teacher:      s(body.teacher),
+    teacherId:    resolveTeacherId(body.teacher),
     schedule:     s(body.schedule),
     scheduleDays: Array.isArray(body.scheduleDays) ? body.scheduleDays : [],
     lessonType:   s(body.lessonType) || null,
@@ -1594,7 +1637,7 @@ function sanitizeClientPatch(body) {
   if ('totalPaid'    in body) p.totalPaid    = body.totalPaid !== '' && body.totalPaid != null ? parseFloat(body.totalPaid) || null : null;
   if ('notes'        in body) p.notes        = sanitize(body.notes, NOTES_MAX);
   if ('manager'      in body) p.manager      = s(body.manager);
-  if ('teacher'      in body) p.teacher      = s(body.teacher);
+  if ('teacher'      in body) { p.teacher = s(body.teacher); p.teacherId = resolveTeacherId(body.teacher); }
   if ('schedule'     in body) p.schedule     = s(body.schedule);
   if ('scheduleDays' in body) p.scheduleDays = Array.isArray(body.scheduleDays) ? body.scheduleDays : [];
   if ('lessonType'   in body) p.lessonType   = s(body.lessonType) || null;

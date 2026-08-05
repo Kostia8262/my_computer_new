@@ -28,6 +28,7 @@ function fromRow(row) {
     notes: row.notes,
     manager: row.manager,
     teacher: row.teacher,
+    teacherId: row.teacher_id,
     schedule: row.schedule,
     scheduleDays: JSON.parse(row.schedule_days || '[]'),
     lessonType: row.lesson_type,
@@ -44,9 +45,9 @@ const selAll  = db.prepare('SELECT * FROM clients ORDER BY id DESC');
 const selById = db.prepare('SELECT * FROM clients WHERE id = ?');
 const insClient = db.prepare(`INSERT INTO clients
   (name, age, course, phone, email, status, source, enrolled_date, trial_date, last_contact, next_contact,
-   monthly_fee, total_paid, notes, manager, teacher, schedule, schedule_days, lesson_type, city, source_lead_id, created_at, updated_at)
+   monthly_fee, total_paid, notes, manager, teacher, teacher_id, schedule, schedule_days, lesson_type, city, source_lead_id, created_at, updated_at)
   VALUES (@name, @age, @course, @phone, @email, @status, @source, @enrolled_date, @trial_date, @last_contact, @next_contact,
-   @monthly_fee, @total_paid, @notes, @manager, @teacher, @schedule, @schedule_days, @lesson_type, @city, @source_lead_id, @created_at, @updated_at)`);
+   @monthly_fee, @total_paid, @notes, @manager, @teacher, @teacher_id, @schedule, @schedule_days, @lesson_type, @city, @source_lead_id, @created_at, @updated_at)`);
 const delClient = db.prepare('DELETE FROM clients WHERE id = ?');
 
 module.exports = {
@@ -77,6 +78,7 @@ module.exports = {
       notes:        data.notes        || '',
       manager:      data.manager      || '',
       teacher:      data.teacher      || '',
+      teacher_id:   data.teacherId    ?? null,
       schedule:     data.schedule     || '',
       schedule_days: JSON.stringify(Array.isArray(data.scheduleDays) ? data.scheduleDays : []),
       lesson_type:  LESSON_TYPE_VALUES.includes(data.lessonType) ? data.lessonType : 'group',
@@ -96,6 +98,7 @@ module.exports = {
       status: 'status', source: 'source', enrolledDate: 'enrolled_date', trialDate: 'trial_date',
       lastContact: 'last_contact', nextContact: 'next_contact', monthlyFee: 'monthly_fee',
       totalPaid: 'total_paid', notes: 'notes', manager: 'manager', teacher: 'teacher',
+      teacherId: 'teacher_id',
       schedule: 'schedule', scheduleDays: 'schedule_days', lessonType: 'lesson_type',
       city: 'city', sourceLeadId: 'source_lead_id',
       certificateNumber: 'certificate_number', certificateDate: 'certificate_date',
@@ -119,6 +122,26 @@ module.exports = {
 
   delete(id) {
     return delClient.run(id).changes > 0;
+  },
+
+  // Staff rename: the link is teacher_id, this only refreshes the display name
+  // the tables and dropdowns show.
+  renameTeacher(teacherId, newName) {
+    if (!teacherId) return 0;
+    return db.prepare('UPDATE clients SET teacher = ?, updated_at = ? WHERE teacher_id = ?')
+      .run(newName, nowIso(), teacherId).changes;
+  },
+
+  // Staff deletion: leaving the departed teacher's name on a student makes the
+  // roster look staffed when it is not, and payroll would never match it again.
+  detachTeacher(teacherId) {
+    if (!teacherId) return 0;
+    return db.prepare("UPDATE clients SET teacher = '', teacher_id = NULL, updated_at = ? WHERE teacher_id = ?")
+      .run(nowIso(), teacherId).changes;
+  },
+
+  getByTeacherId(teacherId) {
+    return db.prepare('SELECT * FROM clients WHERE teacher_id = ?').all(teacherId).map(fromRow);
   },
 
   getStats() {
