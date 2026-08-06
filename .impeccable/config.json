@@ -11,6 +11,15 @@
         ],
         "createdAt": "2026-08-06T08:46:25.569Z",
         "reason": "User confirmed the violet hairline grid is a deliberate production element on .courses (.04/48px), .stats (.06/48px), .certificate-section (.05/52px) and .articles (.06/48px)"
+      },
+      {
+        "rule": "codex-grid-background",
+        "value": "*",
+        "files": [
+          "**/css/style.css"
+        ],
+        "createdAt": "2026-08-06T09:28:18.727Z",
+        "reason": "Same confirmed exception as sites/main/css/style.css - detector reports the path relative to the site root in some runs"
       }
     ]
   }
