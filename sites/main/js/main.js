@@ -926,23 +926,8 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
   });
 });
 
-/* ===================================================
-   TOAST
-   =================================================== */
-let toastEl = null, toastTimer = null;
-function showToast(msg, type = 'success') {
-  if (!toastEl) {
-    toastEl = document.createElement('div');
-    toastEl.className = 'toast';
-    document.body.appendChild(toastEl);
-  }
-  toastEl.textContent = msg;
-  toastEl.className   = `toast toast--${type}`;
-  clearTimeout(toastTimer);
-  toastEl.offsetHeight; // force reflow
-  toastEl.classList.add('show');
-  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 4500);
-}
+/* showToast() removed: nothing on the public pages ever called it.
+   Form feedback goes through showResultNotify() above. */
 
 /* ═══════════════════════════════════════════════════════
    HERO PHOTO PARALLAX  — mouse-move tilt on 1024px+

@@ -33,8 +33,8 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" /></noscript>
-  <link rel="preload" as="style" href="/css/style.css?v=10" />
-  <link rel="stylesheet" href="/css/style.css?v=10" fetchpriority="high" />
+  <link rel="preload" as="style" href="/css/style.css?v=11" />
+  <link rel="stylesheet" href="/css/style.css?v=11" fetchpriority="high" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -1462,11 +1462,9 @@
       </p>
     </form>
 
-    <div class="form-success modal-success" id="modalSuccess" style="display:none">
-      <div class="form-success__icon">🎉</div>
-      <h3 data-ru="Заявка принята!">Заявку прийнято!</h3>
-      <p data-ru="Перезвоним в течение 30 минут!">Передзвонимо протягом 30 хвилин!</p>
-    </div>
+    <!-- No in-modal success block here on purpose: on this page a successful submit
+         keeps the form in place (so a second child can be signed up) and shows
+         #resultNotify instead. The course and article pages do swap in .form-success. -->
   </div>
 </div>
 
@@ -1541,7 +1539,7 @@
   <div class="result-notify__bar"><div class="result-notify__progress" id="resultNotifyProgress"></div></div>
 </div>
 
-<script src="js/main.js?v=9" defer></script>
+<script src="js/main.js?v=10" defer></script>
 <script src="/js/lessons-widget.js?v=2" defer></script>
 <script>
 (function() {
