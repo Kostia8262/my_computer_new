@@ -504,7 +504,7 @@ async function loadCourses() {
               <span>⏱ ${esc(c.duration)}</span>
               <span>👥 Група до ${esc(String(c.groupSize))} осіб</span>
             </div>
-            <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" style="display:block;text-align:center">${btnLabel}</a>
+            <a href="#" class="btn btn--primary btn--sm btn--block open-modal" data-course="${esc(c.id)}">${btnLabel}</a>
           </div>
         </div>
       </div>`;
@@ -587,7 +587,7 @@ function renderPricing(cards) {
         <div class="pricing-card__price-label">${t2({ua:'від',ru:'от'})}</div>
         <div class="pricing-card__price-val">${c.price} <span>${t2(c.priceUnit)}</span>${c.oldPrice ? ` <del class="pricing-card__price-old">${c.oldPrice}</del>` : ''}</div>
       </div>
-      <a href="#contact" class="pricing-card__btn open-modal">${t2({ua:'Записатись на пробне',ru:'Записаться на пробное'})}</a>
+      <a href="#contact" class="btn btn--lg btn--full btn--primary pricing-card__btn open-modal">${t2({ua:'Записатись на пробне',ru:'Записаться на пробное'})}</a>
     </div>
   `).join('');
   // Re-attach open-modal handlers

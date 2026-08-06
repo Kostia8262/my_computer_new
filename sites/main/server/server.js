@@ -2394,7 +2394,7 @@ app.get('/articles/:slug', (req, res) => {
   const pageContentHtml = `<div id="pageContent">
   <section class="article-hero">
     <div class="container">
-      <a href="/articles" class="article-back-btn">← Назад до статей</a>
+      <a href="/articles" class="btn btn--sm btn--ghost-dark article-back-btn">← Назад до статей</a>
       <nav class="article-breadcrumb" aria-label="Навігація">
         <a href="/">Головна</a>
         <span class="article-breadcrumb-sep">›</span>
@@ -2418,7 +2418,7 @@ app.get('/articles/:slug', (req, res) => {
         <div class="sidebar-cta">
           <h3>Запишіть дитину на курс</h3>
           <p>Перший урок безкоштовно — спробуйте без зобов'язань!</p>
-          <a href="/#contact">Записатись зараз →</a>
+          <a href="/#contact" class="btn btn--lg btn--full btn--primary-inv">Записатись зараз →</a>
         </div>${relatedHtml}
       </aside>
     </div>

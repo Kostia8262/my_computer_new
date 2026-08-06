@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Курс — My Computer Academy</title>
   <meta name="description" content="Детальна інформація про курс програмування для дітей у My Computer Academy"/>
-  <link rel="stylesheet" href="/css/style.css?v=12"/>
+  <link rel="stylesheet" href="/css/style.css?v=14"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
@@ -42,16 +42,8 @@
       box-shadow:0 20px 60px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.3);
       font-size:clamp(72px,12vw,110px)}
     .course-hero__actions{display:flex;gap:12px;flex-wrap:wrap}
-    .course-hero__actions .btn--primary-inv{
-      background:#fff;color:var(--color-primary);font-weight:700;font-size:16px;
-      padding:14px 28px;border-radius:var(--r-full);border:none;cursor:pointer;
-      transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.18)}
-    .course-hero__actions .btn--primary-inv:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.22)}
-    .course-hero__actions .btn--ghost-inv{
-      background:rgba(255,255,255,.12);color:#fff;font-weight:600;font-size:16px;
-      padding:14px 28px;border-radius:var(--r-full);border:1px solid rgba(255,255,255,.25);
-      cursor:pointer;transition:all .2s;backdrop-filter:blur(8px)}
-    .course-hero__actions .btn--ghost-inv:hover{background:rgba(255,255,255,.2)}
+    /* кнопка героя — общая .btn с модификатором .btn--primary-inv из css/style.css,
+       своих правил здесь больше нет (.btn--ghost-inv был мёртвым: разметки не существовало) */
     .course-hero__back{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,.75);font-size:13px;font-weight:600;text-decoration:none;margin-bottom:16px;transition:color .2s,gap .2s}
     .course-hero__back:hover{color:#fff;gap:8px}
 
@@ -731,7 +723,7 @@ function renderCourse(c, lang) {
               <span class="course-meta-pill">💰 ${c.price}</span>
             </div>
             <div class="course-hero__actions">
-              <button class="btn--primary-inv open-modal-btn">Записатись на пробний урок</button>
+              <button class="btn btn--lg btn--primary-inv open-modal-btn">Записатись на пробний урок</button>
             </div>
           </div>
           <div class="course-hero__visual">${c.emoji}</div>
@@ -769,7 +761,7 @@ function renderCourse(c, lang) {
             <div class="course-info-row"><span>Оплата</span><span>WayForPay · Картка · ФОП</span></div>
             <div class="course-info-row"><span>Місто</span><span>Дніпро / Онлайн</span></div>
             <div class="course-info-box__cta">
-              <button class="btn btn--primary btn--lg" style="width:100%;justify-content:center" onclick="document.getElementById('signupModal').classList.add('open');document.body.style.overflow='hidden'">Записатись зараз →</button>
+              <button class="btn btn--lg btn--full btn--primary" onclick="document.getElementById('signupModal').classList.add('open');document.body.style.overflow='hidden'">Записатись зараз →</button>
             </div>
           </div>
         </div>
@@ -799,7 +791,7 @@ function renderCourse(c, lang) {
               <div class="pricing-card__price-label">від</div>
               <div class="pricing-card__price-val">1 800 <span>грн/міс</span></div>
             </div>
-            <button class="pricing-card__btn open-modal-btn">Безкоштовне пробне</button>
+            <button class="btn btn--lg btn--full btn--primary pricing-card__btn open-modal-btn">Безкоштовне пробне</button>
           </div>
           <div class="pricing-card pricing-card--featured">
             <div class="pricing-card__badge">ОПТИМАЛЬНИЙ</div>
@@ -813,7 +805,7 @@ function renderCourse(c, lang) {
               <div class="pricing-card__price-label">від</div>
               <div class="pricing-card__price-val">3 600 <span>грн/міс</span></div>
             </div>
-            <button class="pricing-card__btn open-modal-btn">Безкоштовне пробне</button>
+            <button class="btn btn--lg btn--full btn--primary pricing-card__btn open-modal-btn">Безкоштовне пробне</button>
           </div>
           <div class="pricing-card">
             <div class="pricing-card__badge">ДЛЯ ДОРОСЛИХ</div>
@@ -827,7 +819,7 @@ function renderCourse(c, lang) {
               <div class="pricing-card__price-label">від</div>
               <div class="pricing-card__price-val">9 450 <span>грн/курс</span> <del class="pricing-card__price-old">12 000</del></div>
             </div>
-            <button class="pricing-card__btn open-modal-btn">Безкоштовне пробне</button>
+            <button class="btn btn--lg btn--full btn--primary pricing-card__btn open-modal-btn">Безкоштовне пробне</button>
           </div>
         </div>
       </div>

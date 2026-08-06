@@ -14,10 +14,9 @@
    скопированы из css/style.css — правишь дизайн-систему, синхронизируй здесь. */
 :root{
   --color-primary:#6C47FF; --color-primary-dark:#5533EE; --color-primary-rgb:108,71,255;
-  --color-primary-mid:#8B6FFF; --color-primary-mid-rgb:139,111,255;
-  --color-primary-soft:#A78BFA;                 /* нет в style.css: ссылка на тёмном фоне, hover */
+  --color-primary-soft:#A78BFA;                 /* нет в style.css: hover ссылки на тёмном фоне */
   --color-link-on-dark:rgba(178,151,255,.85);   /* нет в style.css: ссылка на тёмном фоне */
-  --color-error:#DC2626; --color-error-soft:#F87171; --color-error-rgb:220,38,38;
+  --color-error-soft:#F87171; --color-error-rgb:220,38,38;
   --color-white:#FFFFFF; --color-white-rgb:255,255,255;
   --dark-bg:#0D0C1A; --dark-bg-2:#1A0E3A;       /* нет в style.css: второй стоп фона */
   --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
@@ -32,8 +31,9 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:linear-gradient(135deg,var(--dark-bg) 0%,var(--dark-bg-2) 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;color:var(--color-white)}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 60%,rgba(var(--color-error-rgb),.1) 0%,transparent 55%),radial-gradient(ellipse at 70% 20%,rgba(var(--color-primary-rgb),.12) 0%,transparent 50%);pointer-events:none}
-.card{background:rgba(var(--color-white-rgb),.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(var(--color-white-rgb),.1);border-radius:var(--r-card);padding:64px 48px;max-width:560px;width:100%;text-align:center;position:relative;z-index:1}
+.card{background:rgba(var(--color-white-rgb),.05);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(var(--color-white-rgb),.1);border-radius:var(--r-card);padding:64px 48px;max-width:560px;width:100%;text-align:center;position:relative;z-index:1}
 .logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:48px;text-decoration:none;color:var(--color-white)}
+.logo-mark{width:44px;height:44px;background:var(--color-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .logo img{width:44px;height:44px;border-radius:50%}
 .logo span{font-weight:var(--fw-extrabold);font-size:var(--fs-17);opacity:.9}
 .code{font-size:var(--fs-error-code);font-weight:var(--fw-black);line-height:var(--lh-none);color:var(--color-error-soft)}
@@ -69,7 +69,7 @@ p{color:rgba(var(--color-white-rgb),.6);font-size:var(--fs-16);line-height:var(-
 <!-- End Google Tag Manager (noscript) -->
 <div class="card">
   <a href="/" class="logo">
-    <div style="width:44px;height:44px;background:#6C47FF;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="24" height="24" viewBox="0 0 32 32" fill="none"><path d="M8 11L13 16L8 21" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21H24" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div>
+    <div class="logo-mark"><svg width="24" height="24" viewBox="0 0 32 32" fill="none"><path d="M8 11L13 16L8 21" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 21H24" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg></div>
     <span>My Computer Academy</span>
   </a>
   <div class="code">500</div>

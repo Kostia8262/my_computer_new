@@ -9,8 +9,11 @@
   --color-primary-dark: #5533EE;
   --color-primary-light:#EEE9FF;
   --color-primary-mid:  #8B6FFF;
+  --color-primary-soft: #A78BFA;
+  --color-primary-pale: #C4B5FD;
   --color-primary-rgb:  108,71,255;
   --color-primary-mid-rgb: 139,92,246;
+  --color-primary-soft-rgb: 167,139,250;
   --color-success:      #22C55E;
   --color-bg:           #FFFFFF;
   --color-bg-soft:      #F8F7FF;
@@ -75,9 +78,15 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 /* второстепенная кнопка на тёмных поверхностях (cookie-баннер и прочие тёмные секции) */
 .btn--ghost-dark{background:rgba(var(--color-white-rgb),.1);color:rgba(var(--color-white-rgb),.7);border:1px solid rgba(var(--color-white-rgb),.15)}
 .btn--ghost-dark:hover{background:rgba(var(--color-white-rgb),.2);color:var(--color-white)}
+/* инвертированная: белая заливка и фиолетовый текст — для цветных героев (hero страницы курса) */
+.btn--primary-inv{background:var(--color-white);color:var(--color-primary);box-shadow:0 4px 20px rgba(var(--color-black-rgb),.18)}
+.btn--primary-inv:hover{box-shadow:0 8px 32px rgba(var(--color-black-rgb),.22);transform:translateY(-2px)}
 .btn--sm{font-size:var(--fs-14);padding:10px 20px;min-height:44px}
 .btn--lg{font-size:var(--fs-16);padding:14px 28px;min-height:52px}
 .btn--full{width:100%;justify-content:center;border-radius:var(--r-md)}
+/* во всю ширину, но пилюлей: карточки курсов. Раньше стояло инлайновым display:block —
+   он ломал flex-центрирование .btn, и на узких карточках текст уезжал вправо. */
+.btn--block{display:flex;width:100%;justify-content:center}
 
 /* ---------- SECTION COMMON ---------- */
 .section-header{text-align:center;max-width:620px;margin:0 auto 56px}
@@ -264,6 +273,9 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 
 .courses__tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
 .courses__tab{padding:10px 22px;border-radius:var(--r-full);border:1px solid rgba(var(--color-white-rgb),.2);background:transparent;color:rgba(var(--color-white-rgb),.7);font-size:var(--fs-14);font-weight:var(--fw-semibold);cursor:pointer;transition:all var(--t)}
+/* Слово-единица отделено маргином, а не пробелом: пробел остался бы висеть в конце
+   подписи, когда на телефоне span скрывается. .25em = ровно ширина пробела Inter 600. */
+.courses__tab-unit{margin-left:.25em}
 .courses__tab:hover{background:rgba(var(--color-white-rgb),.06);color:var(--color-white)}
 .courses__tab--active{background:var(--color-white);color:#1a1a2e;border-color:var(--color-white)}
 .course-card.course-card--hidden{display:none}
@@ -778,6 +790,21 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
   .benefits__grid{grid-template-columns:1fr}
   /* Courses phone — peek slider 1.5 cards: card = (vw-32px)/1.5 - 16px ≈ 57vw */
   .course-card{flex:0 0 57vw}
+  /* Фильтр возраста — одной строкой. Четыре подписи «… років» в 328px не влезают ни при
+     каком размере шрифта, поэтому слово-единица прячется: «6–10 / 10–14 / 14–18» читаются
+     как возраст и без него (список подписан aria-label="Вік"). overflow-x — страховка,
+     чтобы на совсем узких экранах строка прокручивалась, а не разъезжалась на две. */
+  .courses__tabs{flex-wrap:nowrap;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .courses__tabs::-webkit-scrollbar{display:none}
+  .courses__tab{flex:0 0 auto;padding:13px 14px;font-size:var(--fs-13);line-height:var(--lh-snug)}
+  .courses__tab-unit{display:none}
+  /* Кнопка карточки: на 57vw «Безкоштовне пробне» в 14px не помещается между падингами */
+  .course-card .btn--sm{padding-left:12px;padding-right:12px;font-size:var(--fs-13)}
+}
+
+/* 320px — четыре таба в 288px помещаются только с более тесными боками */
+@media (max-width:359px){
+  .courses__tab{padding-left:12px;padding-right:12px}
 }
 
 /* ===================================================
@@ -983,8 +1010,8 @@ body.modal-open{overflow:hidden}
 .pricing-card__price-val{font-size:var(--fs-24);font-weight:var(--fw-black);color:var(--color-text);display:flex;align-items:baseline;flex-wrap:wrap;gap:6px}
 .pricing-card__price-val span{font-size:var(--fs-13);font-weight:var(--fw-medium);color:var(--color-text-muted)}
 .pricing-card__price-old{font-size:var(--fs-13);color:#bbb;text-decoration:line-through;font-weight:var(--fw-regular)}
-.pricing-card__btn{display:flex;align-items:center;justify-content:center;padding:14px 20px;background:var(--color-primary);color:var(--color-white);font-size:var(--fs-15);font-weight:var(--fw-bold);border-radius:var(--r-full);cursor:pointer;border:none;font-family:var(--font);transition:all var(--t);text-decoration:none;margin-top:auto;box-shadow:0 4px 14px rgba(var(--color-primary-rgb),.35)}
-.pricing-card__btn:hover{background:var(--color-primary-dark);transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--color-primary-rgb),.45)}
+/* сама кнопка — общая .btn (btn--lg btn--full btn--primary), здесь только раскладка в карточке */
+.pricing-card__btn{margin-top:auto}
 .form-messengers{margin-top:16px;text-align:center}
 .form-messengers__label{display:block;font-size:var(--fs-12);color:var(--color-text-muted);margin-bottom:10px;letter-spacing:.02em}
 .form-messengers__links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
@@ -1101,8 +1128,9 @@ body.modal-open{overflow:hidden}
 .articles__pg-dot.active{background:var(--color-primary-mid);transform:scale(1.3)}
 .articles__footer{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-top:36px;padding-top:24px;border-top:1px solid rgba(var(--color-white-rgb),.06);position:relative;z-index:var(--z-base)}
 .articles__footer-text{font-size:var(--fs-14);color:rgba(var(--color-white-rgb),.45);margin:0;line-height:var(--lh-normal);max-width:420px}
-.articles__all-btn{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;border:1.5px solid rgba(167,139,250,.35);color:var(--color-primary-mid);background:rgba(var(--color-primary-rgb),.2);padding:12px 26px;border-radius:var(--r-pill);font-size:var(--fs-14);font-weight:var(--fw-bold);text-decoration:none;white-space:nowrap;transition:border-color var(--t),background var(--t),color var(--t)}
-.articles__all-btn:hover{border-color:var(--color-primary-mid);background:rgba(var(--color-primary-rgb),.2);color:#c4b5fd}
+/* база — общая .btn (btn--sm), здесь только фиолетовый тон для тёмной секции статей */
+.articles__all-btn{flex-shrink:0;border:1.5px solid rgba(var(--color-primary-soft-rgb),.35);color:var(--color-primary-mid);background:rgba(var(--color-primary-rgb),.2)}
+.articles__all-btn:hover{border-color:var(--color-primary-mid);color:var(--color-primary-pale)}
 
 /* Desktop: lock slider scroll, pagination controls it */
 @media(min-width:769px){
