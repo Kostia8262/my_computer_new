@@ -1037,9 +1037,9 @@ document.addEventListener('click', e => {
   if (!btn) return;
   const item = btn.closest('.faq-item');
   if (!item) return;
-  const isOpen = item.classList.contains('open');
-  document.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
-  if (!isOpen) item.classList.add('open');
+  const isOpen = item.classList.contains('active');
+  document.querySelectorAll('.faq-item.active').forEach(el => el.classList.remove('active'));
+  if (!isOpen) item.classList.add('active');
 });
 
 /* ── COURSE CONTACT FORM ────────────────────────────────────────────────────── */
