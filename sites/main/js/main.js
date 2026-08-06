@@ -504,7 +504,7 @@ async function loadCourses() {
               <span>⏱ ${esc(c.duration)}</span>
               <span>👥 Група до ${esc(String(c.groupSize))} осіб</span>
             </div>
-            <a href="#" class="btn btn--primary btn--sm open-modal" data-course="${esc(c.id)}" style="display:block;text-align:center">${btnLabel}</a>
+            <a href="#" class="btn btn--primary btn--sm btn--block open-modal" data-course="${esc(c.id)}">${btnLabel}</a>
           </div>
         </div>
       </div>`;

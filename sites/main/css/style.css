@@ -84,6 +84,9 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .btn--sm{font-size:var(--fs-14);padding:10px 20px;min-height:44px}
 .btn--lg{font-size:var(--fs-16);padding:14px 28px;min-height:52px}
 .btn--full{width:100%;justify-content:center;border-radius:var(--r-md)}
+/* во всю ширину, но пилюлей: карточки курсов. Раньше стояло инлайновым display:block —
+   он ломал flex-центрирование .btn, и на узких карточках текст уезжал вправо. */
+.btn--block{display:flex;width:100%;justify-content:center}
 
 /* ---------- SECTION COMMON ---------- */
 .section-header{text-align:center;max-width:620px;margin:0 auto 56px}
@@ -270,6 +273,9 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 
 .courses__tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
 .courses__tab{padding:10px 22px;border-radius:var(--r-full);border:1px solid rgba(var(--color-white-rgb),.2);background:transparent;color:rgba(var(--color-white-rgb),.7);font-size:var(--fs-14);font-weight:var(--fw-semibold);cursor:pointer;transition:all var(--t)}
+/* Слово-единица отделено маргином, а не пробелом: пробел остался бы висеть в конце
+   подписи, когда на телефоне span скрывается. .25em = ровно ширина пробела Inter 600. */
+.courses__tab-unit{margin-left:.25em}
 .courses__tab:hover{background:rgba(var(--color-white-rgb),.06);color:var(--color-white)}
 .courses__tab--active{background:var(--color-white);color:#1a1a2e;border-color:var(--color-white)}
 .course-card.course-card--hidden{display:none}
@@ -784,6 +790,21 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
   .benefits__grid{grid-template-columns:1fr}
   /* Courses phone — peek slider 1.5 cards: card = (vw-32px)/1.5 - 16px ≈ 57vw */
   .course-card{flex:0 0 57vw}
+  /* Фильтр возраста — одной строкой. Четыре подписи «… років» в 328px не влезают ни при
+     каком размере шрифта, поэтому слово-единица прячется: «6–10 / 10–14 / 14–18» читаются
+     как возраст и без него (список подписан aria-label="Вік"). overflow-x — страховка,
+     чтобы на совсем узких экранах строка прокручивалась, а не разъезжалась на две. */
+  .courses__tabs{flex-wrap:nowrap;gap:6px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .courses__tabs::-webkit-scrollbar{display:none}
+  .courses__tab{flex:0 0 auto;padding:13px 14px;font-size:var(--fs-13);line-height:var(--lh-snug)}
+  .courses__tab-unit{display:none}
+  /* Кнопка карточки: на 57vw «Безкоштовне пробне» в 14px не помещается между падингами */
+  .course-card .btn--sm{padding-left:12px;padding-right:12px;font-size:var(--fs-13)}
+}
+
+/* 320px — четыре таба в 288px помещаются только с более тесными боками */
+@media (max-width:359px){
+  .courses__tab{padding-left:12px;padding-right:12px}
 }
 
 /* ===================================================
