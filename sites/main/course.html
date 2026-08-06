@@ -67,13 +67,6 @@
     .curriculum-card__title{font-size:16px;font-weight:700;color:var(--color-text);margin-bottom:8px}
     .curriculum-card__desc{font-size:13px;color:var(--color-text-2);line-height:1.6}
 
-    /* Who it's for */
-    .course-for{padding:60px 0;background:var(--color-bg-soft)}
-    .course-for__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:36px}
-    .course-for__card{background:#fff;border-radius:var(--r-lg);padding:20px 22px;border:1px solid var(--color-border)}
-    .course-for__card h4{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--color-text)}
-    .course-for__card p{font-size:13px;color:var(--color-text-2);line-height:1.55}
-
     /* Info block — dark theme */
     .course-info{padding:72px 0;background:#07050f;position:relative;overflow:hidden}
     .course-info::before{content:'';position:absolute;inset:0;pointer-events:none;
@@ -100,13 +93,6 @@
     .course-info-row span:first-child{color:rgba(255,255,255,.45);font-weight:500}
     .course-info-row span:last-child{font-weight:700;color:#fff}
     .course-info-box__cta{margin-top:auto;padding-top:24px}
-
-    /* CTA */
-    .course-cta{padding:72px 0;background:linear-gradient(135deg,#6C47FF 0%,#9B76FF 100%);text-align:center;color:#fff}
-    .course-cta h2{font-size:clamp(24px,4vw,38px);font-weight:900;margin-bottom:14px}
-    .course-cta p{font-size:17px;opacity:.85;margin-bottom:32px}
-    .course-cta .btn--white{background:#fff;color:var(--color-primary);font-weight:700;font-size:16px;padding:14px 36px;border-radius:var(--r-full);display:inline-block;transition:transform .2s,box-shadow .2s}
-    .course-cta .btn--white:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.15)}
 
     /* FAQ on course page */
     .course-faq{padding:64px 0}
@@ -719,12 +705,6 @@ function renderCourse(c, lang) {
       <div class="curriculum-card__num">${esc(m.num === 'Фінал' && lang === 'ru' ? 'Финал' : m.num)}</div>
       <div class="curriculum-card__title">${esc((lang === 'ru' && m.title_ru) || m.title)}</div>
       <div class="curriculum-card__desc">${esc((lang === 'ru' && m.desc_ru) || m.desc)}</div>
-    </div>`).join('');
-
-  const forHtml = c.forCards.map(f => `
-    <div class="course-for__card">
-      <h4>${f.title}</h4>
-      <p>${f.desc}</p>
     </div>`).join('');
 
   document.getElementById('courseMain').innerHTML = `
