@@ -1210,7 +1210,7 @@ body.modal-open{overflow:hidden}
 .lw-login p{font-size:var(--fs-13);color:var(--color-text-2);margin:0 0 12px}
 .lw-err{font-size:var(--fs-13);color:#e53e3e;margin-bottom:10px}
 .lw-login input{width:100%;padding:10px 12px;border-radius:var(--r-md);border:1px solid var(--color-border);font-size:var(--fs-14);margin-bottom:10px;font-family:var(--font)}
-.lw-login button{width:100%;padding:10px;border:none;border-radius:var(--r-md);background:var(--color-primary);color:var(--color-white);font-weight:var(--fw-semibold);font-size:var(--fs-14);cursor:pointer}
+/* кнопка входа — общая .btn (btn--sm btn--full btn--primary), своего правила нет */
 .lw-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .lw-head h4{margin:0;font-size:var(--fs-15);font-weight:var(--fw-bold)}
 .lw-logout,.lw-back{background:none;border:none;color:var(--color-text-2);font-size:var(--fs-13);cursor:pointer;padding:0}
