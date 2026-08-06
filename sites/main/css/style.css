@@ -75,6 +75,9 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 /* второстепенная кнопка на тёмных поверхностях (cookie-баннер и прочие тёмные секции) */
 .btn--ghost-dark{background:rgba(var(--color-white-rgb),.1);color:rgba(var(--color-white-rgb),.7);border:1px solid rgba(var(--color-white-rgb),.15)}
 .btn--ghost-dark:hover{background:rgba(var(--color-white-rgb),.2);color:var(--color-white)}
+/* инвертированная: белая заливка и фиолетовый текст — для цветных героев (hero страницы курса) */
+.btn--primary-inv{background:var(--color-white);color:var(--color-primary);box-shadow:0 4px 20px rgba(var(--color-black-rgb),.18)}
+.btn--primary-inv:hover{box-shadow:0 8px 32px rgba(var(--color-black-rgb),.22);transform:translateY(-2px)}
 .btn--sm{font-size:var(--fs-14);padding:10px 20px;min-height:44px}
 .btn--lg{font-size:var(--fs-16);padding:14px 28px;min-height:52px}
 .btn--full{width:100%;justify-content:center;border-radius:var(--r-md)}
