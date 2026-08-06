@@ -629,7 +629,7 @@ function renderFaq(items) {
         <span>${t2(item.question)}</span>
         <svg class="faq-item__icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <div class="faq-item__answer"><p>${t2(item.answer)}</p></div>
+      <div class="faq-item__answer"><div class="faq-item__answer-inner"><p>${t2(item.answer)}</p></div></div>
     </div>
   `).join('');
   // Re-attach FAQ accordion

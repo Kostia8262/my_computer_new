@@ -408,7 +408,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 /* grid-template-rows вместо max-height: не дёргает лэйаут и, в отличие от
    прежнего max-height:200px, не обрезает длинные ответы */
 .faq-item__answer{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--ts)}
-.faq-item__answer>*{overflow:hidden;min-height:0}
+.faq-item__answer-inner{overflow:hidden;min-height:0}
 .faq-item.active .faq-item__answer{grid-template-rows:1fr}
 .faq-item__answer p{padding:4px 20px 18px;font-size:var(--fs-13);color:var(--color-text-2);line-height:var(--lh-relaxed)}
 
