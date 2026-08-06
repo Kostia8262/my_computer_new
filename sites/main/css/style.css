@@ -63,7 +63,8 @@ button{-webkit-appearance:none;appearance:none;background:none;border:none;paddi
 img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none;touch-action:manipulation}
 
-.gradient-text{background:linear-gradient(135deg,var(--color-primary),var(--color-primary-mid));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* акцент в заголовке — сплошным цветом, без градиентной заливки текста */
+.gradient-text{color:var(--color-primary)}
 
 /* ---------- BUTTONS ---------- */
 .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:var(--fw-semibold);border:none;cursor:pointer;transition:all var(--t);text-decoration:none;white-space:nowrap;border-radius:var(--r-full)}
@@ -359,7 +360,9 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .stats__card-icon--orange{background:rgba(245,158,11,.2)}
 .stats__card-body{flex:1;margin-bottom:16px}
 .stats__card-number{display:flex;align-items:baseline;gap:2px;margin-bottom:6px}
-.stats__number{font-size:var(--fs-48);font-weight:var(--fw-black);line-height:var(--lh-none);background:linear-gradient(135deg,var(--color-white),rgba(var(--color-white-rgb),.75));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* было градиентной заливкой текста white -> white 75%: на цифрах перелив
+   не читался, но ломал выделение и копирование числа */
+.stats__number{font-size:var(--fs-48);font-weight:var(--fw-black);line-height:var(--lh-none);color:var(--color-white)}
 .stats__unit{font-size:var(--fs-26);font-weight:var(--fw-black);color:var(--color-primary-mid)}
 .stats__card-label{font-size:var(--fs-15);font-weight:var(--fw-bold);color:var(--color-white);margin-bottom:6px}
 .stats__card-desc{font-size:var(--fs-12);color:rgba(var(--color-white-rgb),.45);line-height:var(--lh-relaxed)}
@@ -402,8 +405,11 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
 .faq-item.active .faq-item__question{background:var(--color-primary-light);color:var(--color-primary)}
 .faq-item__icon{flex-shrink:0;transition:transform var(--t)}
 .faq-item.active .faq-item__icon{transform:rotate(180deg)}
-.faq-item__answer{max-height:0;overflow:hidden;transition:max-height var(--ts)}
-.faq-item.active .faq-item__answer{max-height:200px}
+/* grid-template-rows вместо max-height: не дёргает лэйаут и, в отличие от
+   прежнего max-height:200px, не обрезает длинные ответы */
+.faq-item__answer{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--ts)}
+.faq-item__answer>*{overflow:hidden;min-height:0}
+.faq-item.active .faq-item__answer{grid-template-rows:1fr}
 .faq-item__answer p{padding:4px 20px 18px;font-size:var(--fs-13);color:var(--color-text-2);line-height:var(--lh-relaxed)}
 
 /* ===================================================
@@ -529,7 +535,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border-top:1px solid rgba(var(--color-white-rgb),.1);
   box-shadow:0 -8px 40px rgba(var(--color-black-rgb),.4);
-  animation:cookieSlideUp .4s cubic-bezier(.34,1.56,.64,1);
+  animation:cookieSlideUp .4s cubic-bezier(.25,1,.5,1);
 }
 @keyframes cookieSlideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
 
@@ -803,7 +809,7 @@ a{color:inherit;text-decoration:none;touch-action:manipulation}
   overflow-y:auto;
   box-shadow:0 32px 80px rgba(var(--color-black-rgb),.35),0 8px 24px rgba(var(--color-primary-rgb),.15);
   transform:translateY(24px) scale(.97);
-  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  transition:transform .35s cubic-bezier(.25,1,.5,1);
   scrollbar-width:thin;
 }
 .modal.open .modal__dialog{transform:translateY(0) scale(1)}
@@ -873,7 +879,7 @@ body.modal-open{overflow:hidden}
   z-index:var(--z-notify);min-width:300px;max-width:calc(100vw - 32px);
   border-radius:var(--r-lg);overflow:hidden;
   box-shadow:0 8px 40px rgba(var(--color-black-rgb),.22);
-  animation:notifyIn .35s cubic-bezier(.34,1.56,.64,1);
+  animation:notifyIn .35s cubic-bezier(.25,1,.5,1);
 }
 .result-notify--out{animation:notifyOut .3s ease forwards}
 @keyframes notifyIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
