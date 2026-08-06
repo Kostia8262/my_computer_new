@@ -432,6 +432,8 @@ a{color:inherit;text-decoration:none}
    =================================================== */
 .footer{background:var(--color-text);color:rgba(var(--color-white-rgb),.7);padding:56px 0 28px}
 .footer__inner{display:grid;grid-template-columns:1fr 2fr;gap:48px;margin-bottom:40px}
+/* .footer__logo reuses .nav__logo, so it inherits --z-nav-elevated and would paint over the fixed header */
+.footer__logo{z-index:auto}
 .footer__logo span{color:var(--color-white)}
 .footer__desc{font-size:var(--fs-13);line-height:var(--lh-relaxed);color:rgba(var(--color-white-rgb),.45);margin-top:12px;max-width:240px}
 .footer__social{display:flex;gap:8px;margin-top:18px}
