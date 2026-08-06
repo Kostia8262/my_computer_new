@@ -58,24 +58,47 @@ function pageShell(title, bodyHtml) {
 <html lang="uk"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>${title} — My Computer Academy</title>
 <meta name="robots" content="noindex, nofollow"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
 <style>
+  /* Страница отдаётся сервером и css/style.css не подключает. Брендовые токены
+     и правила .btn* скопированы из css/style.css — правишь дизайн-систему,
+     синхронизируй здесь. Тёмная палитра приложения уроков своя (--lessons-*). */
+  :root{
+    --color-primary:#6C47FF; --color-primary-dark:#5533EE; --color-primary-rgb:108,71,255;
+    --color-white:#FFFFFF;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    --r-md:12px; --r-14:14px; --r-lg:16px; --r-full:9999px;
+    --t:.2s ease;
+    --fw-semibold:600; --fw-bold:700;
+    --fs-12:12px; --fs-13:13px; --fs-14:14px; --fs-15:15px; --fs-22:22px;
+    --fs-19:19px;                                 /* нет в style.css: заголовок карточки входа */
+    --lessons-bg:#0F1220; --lessons-surface:#181C30; --lessons-border:#2A2F4A;
+    --lessons-text:#E8E8F0; --lessons-text-2:#8A8FB0; --lessons-error:#F87171;
+  }
   *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;background:#0f1220;color:#e8e8f0;font-family:'Segoe UI',system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:40px 20px}
-  h1{font-size:22px;margin:8px 0 28px}
+  body{margin:0;min-height:100vh;background:var(--lessons-bg);color:var(--lessons-text);font-family:var(--font);display:flex;flex-direction:column;align-items:center;padding:40px 20px}
+  h1{font-size:var(--fs-22);margin:8px 0 28px}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;max-width:720px;width:100%}
-  a.tile,.tile{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 16px;background:#181c30;border:1px solid #2a2f4a;border-radius:14px;text-decoration:none;color:#e8e8f0;transition:.15s}
-  a.tile:hover{border-color:#6c47ff;transform:translateY(-2px)}
+  a.tile,.tile{display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 16px;background:var(--lessons-surface);border:1px solid var(--lessons-border);border-radius:var(--r-14);text-decoration:none;color:var(--lessons-text);transition:all var(--t)}
+  a.tile:hover{border-color:var(--color-primary);transform:translateY(-2px)}
   .tile.disabled{opacity:.4;cursor:default}
   .tile .ic{font-size:38px}
-  .tile .lb{font-weight:700;font-size:15px}
-  .tile .sub{font-size:12px;color:#8a8fb0}
-  .back{margin-bottom:18px;color:#8a8fb0;text-decoration:none;font-size:13px;align-self:flex-start;max-width:720px;width:100%}
-  .gate{max-width:360px;width:100%;background:#181c30;border:1px solid #2a2f4a;border-radius:16px;padding:32px 26px;margin-top:60px}
-  .gate h2{margin:0 0 6px;font-size:19px}
-  .gate p{color:#8a8fb0;font-size:13px;margin:0 0 18px}
-  .gate input{width:100%;padding:12px 14px;border-radius:9px;border:1px solid #2a2f4a;background:#0f1220;color:#e8e8f0;font-size:14px;margin-bottom:12px}
-  .gate button{width:100%;padding:12px;border:none;border-radius:9px;background:#6c47ff;color:#fff;font-weight:700;font-size:14px;cursor:pointer}
-  .err{color:#f87171;font-size:13px;margin:-6px 0 12px}
+  .tile .lb{font-weight:var(--fw-bold);font-size:var(--fs-15)}
+  .tile .sub{font-size:var(--fs-12);color:var(--lessons-text-2)}
+  .back{margin-bottom:18px;color:var(--lessons-text-2);text-decoration:none;font-size:var(--fs-13);align-self:flex-start;max-width:720px;width:100%}
+  .gate{max-width:360px;width:100%;background:var(--lessons-surface);border:1px solid var(--lessons-border);border-radius:var(--r-lg);padding:32px 26px;margin-top:60px}
+  .gate h2{margin:0 0 6px;font-size:var(--fs-19)}
+  .gate p{color:var(--lessons-text-2);font-size:var(--fs-13);margin:0 0 18px}
+  .gate input{width:100%;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--lessons-border);background:var(--lessons-bg);color:var(--lessons-text);font-family:var(--font);font-size:var(--fs-14);margin-bottom:12px}
+  /* общая кнопка сайта — .btn / .btn--sm / .btn--full / .btn--primary */
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:var(--fw-semibold);border:none;cursor:pointer;transition:all var(--t);text-decoration:none;white-space:nowrap;border-radius:var(--r-full)}
+  .btn--sm{font-size:var(--fs-14);padding:10px 20px;min-height:44px}
+  .btn--full{width:100%;justify-content:center;border-radius:var(--r-md)}
+  .btn--primary{background:var(--color-primary);color:var(--color-white);box-shadow:0 4px 14px rgba(var(--color-primary-rgb),.4)}
+  .btn--primary:hover{background:var(--color-primary-dark);box-shadow:0 6px 20px rgba(var(--color-primary-rgb),.5);transform:translateY(-1px)}
+  .err{color:var(--lessons-error);font-size:var(--fs-13);margin:-6px 0 12px}
 </style></head><body>${bodyHtml}</body></html>`;
 }
 
@@ -87,7 +110,7 @@ function gatePage(error) {
       ${error ? '<div class="err">Код не знайдено або він неактивний.</div>' : ''}
       <form method="get" action="/lessons">
         <input type="text" name="token" placeholder="Код доступу" autofocus required />
-        <button type="submit">Увійти</button>
+        <button type="submit" class="btn btn--sm btn--full btn--primary">Увійти</button>
       </form>
     </div>`);
 }

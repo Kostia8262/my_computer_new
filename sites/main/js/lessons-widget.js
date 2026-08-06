@@ -24,7 +24,7 @@
         ${error ? '<div class="lw-err">Код не знайдено або він неактивний</div>' : ''}
         <form id="lwLoginForm">
           <input type="text" id="lwTokenInput" placeholder="Код доступу" autofocus required/>
-          <button type="submit">Увійти</button>
+          <button type="submit" class="btn btn--sm btn--full btn--primary">Увійти</button>
         </form>
       </div>`);
     document.getElementById('lwLoginForm').addEventListener('submit', async (e) => {

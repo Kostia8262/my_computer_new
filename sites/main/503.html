@@ -9,30 +9,53 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
+/* Страница автономна: css/style.css сюда НЕ подключается, чтобы страница
+   отрисовалась даже при сломанной отдаче статики. Токены и правила .btn*
+   скопированы из css/style.css — правишь дизайн-систему, синхронизируй здесь.
+   Палитра — брендовая фиолетовая, как в 404/500 (золотистая убрана). */
+:root{
+  --color-primary:#6C47FF; --color-primary-dark:#5533EE; --color-primary-rgb:108,71,255;
+  --color-primary-mid:#8B6FFF; --color-primary-mid-rgb:139,111,255;
+  --color-primary-soft:#A78BFA;                 /* нет в style.css: текст бейджа, hover ссылки */
+  --color-link-on-dark:rgba(178,151,255,.85);   /* нет в style.css: ссылка на тёмном фоне */
+  --color-white:#FFFFFF; --color-white-rgb:255,255,255;
+  --dark-bg:#0D0C1A; --dark-bg-2:#1A0E3A;       /* нет в style.css: второй стоп фона */
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --r-xl:24px; --r-full:9999px; --r-card:32px;  /* --r-card нет в style.css */
+  --t:.2s ease;
+  --fw-semibold:600; --fw-extrabold:800; --fw-black:900;
+  --fs-14:14px; --fs-16:16px; --fs-17:17px; --fs-48:48px;
+  --fs-error-code:clamp(96px,20vw,160px);       /* нет в style.css: только страницы состояний */
+  --fs-error-title:clamp(20px,4vw,28px);
+  --lh-none:1; --lh-relaxed:1.7;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',-apple-system,Arial,sans-serif;background:linear-gradient(135deg,#0D0C1A 0%,#1a1400 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;color:#fff}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(245,158,11,.1) 0%,transparent 55%),radial-gradient(ellipse at 80% 30%,rgba(108,71,255,.1) 0%,transparent 50%);pointer-events:none}
-.card{background:rgba(255,255,255,.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:32px;padding:64px 48px;max-width:560px;width:100%;text-align:center;position:relative;z-index:1}
-.logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:48px;text-decoration:none;color:#fff}
+body{font-family:var(--font);background:linear-gradient(135deg,var(--dark-bg) 0%,var(--dark-bg-2) 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;color:var(--color-white)}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 50%,rgba(var(--color-primary-rgb),.18) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(var(--color-primary-mid-rgb),.12) 0%,transparent 50%);pointer-events:none}
+.card{background:rgba(var(--color-white-rgb),.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(var(--color-white-rgb),.1);border-radius:var(--r-card);padding:64px 48px;max-width:560px;width:100%;text-align:center;position:relative;z-index:1}
+.logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:48px;text-decoration:none;color:var(--color-white)}
 .logo img{width:44px;height:44px;border-radius:50%}
-.logo span{font-weight:800;font-size:17px;opacity:.9}
-.code{font-size:clamp(96px,20vw,160px);font-weight:900;line-height:1;background:linear-gradient(135deg,#f59e0b,#fcd34d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.emoji{font-size:48px;margin:16px 0 0;display:block}
-h1{font-size:clamp(20px,4vw,28px);font-weight:800;margin:16px 0 12px}
-p{color:rgba(255,255,255,.6);font-size:16px;line-height:1.7;margin-bottom:24px}
-.status-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fcd34d;padding:10px 22px;border-radius:50px;font-size:14px;font-weight:600;margin-bottom:32px}
-.dot{width:8px;height:8px;background:#f59e0b;border-radius:50%;animation:pulse 1.5s infinite}
+.logo span{font-weight:var(--fw-extrabold);font-size:var(--fs-17);opacity:.9}
+.code{font-size:var(--fs-error-code);font-weight:var(--fw-black);line-height:var(--lh-none);color:var(--color-primary-mid)}
+.emoji{font-size:var(--fs-48);margin:16px 0 0;display:block}
+h1{font-size:var(--fs-error-title);font-weight:var(--fw-extrabold);margin:16px 0 12px}
+p{color:rgba(var(--color-white-rgb),.6);font-size:var(--fs-16);line-height:var(--lh-relaxed);margin-bottom:24px}
+.status-badge{display:inline-flex;align-items:center;gap:10px;background:rgba(var(--color-primary-rgb),.15);border:1px solid rgba(var(--color-primary-rgb),.35);color:var(--color-primary-soft);padding:10px 22px;border-radius:var(--r-full);font-size:var(--fs-14);font-weight:var(--fw-semibold);margin-bottom:32px}
+.dot{width:8px;height:8px;background:var(--color-primary-soft);border-radius:50%;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.btn-later{display:inline-flex;align-items:center;gap:8px;padding:14px 32px;background:#6C47FF;color:#fff;border-radius:14px;font-weight:700;font-size:16px;text-decoration:none;transition:all .2s;box-shadow:0 4px 20px rgba(108,71,255,.5)}
-.btn-later:hover{background:#5533EE;transform:translateY(-2px)}
-.contact{margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,.1);font-size:14px;color:rgba(255,255,255,.4)}
-.contact a{color:rgba(178,151,255,.85);font-weight:600;text-decoration:none}
-.contact a:hover{color:#a78bfa}
+/* общая кнопка сайта — .btn / .btn--lg / .btn--primary */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:var(--fw-semibold);border:none;cursor:pointer;transition:all var(--t);text-decoration:none;white-space:nowrap;border-radius:var(--r-full)}
+.btn--lg{font-size:var(--fs-16);padding:14px 28px;min-height:52px}
+.btn--primary{background:var(--color-primary);color:var(--color-white);box-shadow:0 4px 14px rgba(var(--color-primary-rgb),.4)}
+.btn--primary:hover{background:var(--color-primary-dark);box-shadow:0 6px 20px rgba(var(--color-primary-rgb),.5);transform:translateY(-1px)}
+.contact{margin-top:32px;padding-top:24px;border-top:1px solid rgba(var(--color-white-rgb),.1);font-size:var(--fs-14);color:rgba(var(--color-white-rgb),.4)}
+.contact a{color:var(--color-link-on-dark);font-weight:var(--fw-semibold);text-decoration:none}
+.contact a:hover{color:var(--color-primary-soft)}
 @media(max-width:500px){
-  .card{padding:44px 24px;border-radius:24px}
+  .card{padding:44px 24px;border-radius:var(--r-xl)}
   .actions{flex-direction:column}
-  .btn-later{justify-content:center}
+  .actions .btn{justify-content:center}
 }
 </style>
   <!-- Google Tag Manager -->
@@ -56,7 +79,7 @@ p{color:rgba(255,255,255,.6);font-size:16px;line-height:1.7;margin-bottom:24px}
   <p>Ми оновлюємо сайт та незабаром повернемося. Дякуємо за терпіння!</p>
   <div class="status-badge"><span class="dot"></span>Сайт оновлюється</div>
   <div class="actions">
-    <a href="javascript:location.reload()" class="btn-later">🔄 Спробувати знову</a>
+    <a href="javascript:location.reload()" class="btn btn--lg btn--primary">🔄 Спробувати знову</a>
   </div>
   <div class="contact">
     Зв'яжіться з нами поки: <a href="tel:+380954624672">+38 (095) 462-46-72</a>
